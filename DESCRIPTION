@@ -1,0 +1,31 @@
+Package: dfdiffs
+Type: Package
+Title: This package compares any two rectangular data objects. 
+Version: 0.1.0
+Author: Martin J Frigaard
+Maintainer: Martin J Frigaard <martin.frigaard@bmrn.com>
+Description: dfdiffs compares data.frames, tibbles, and data.tables and tells 
+    you 1) what is here now that wasn't here before, 2) what was here before 
+    that isn't here now, and 3) what's changed?
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
+RoxygenNote: 7.2.0
+Imports: 
+    bs4Dash,
+    dplyr,
+    fivethirtyeight,
+    forcats,
+    fresh,
+    fs,
+    janitor,
+    Lahman,
+    shiny,
+    shinydashboard,
+    stringr
+Depends: 
+    R (>= 2.10)

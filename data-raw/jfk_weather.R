@@ -1,0 +1,36 @@
+## code to prepare `jfk_weather` dataset goes here
+library(tibble)
+jfk_weather <- tibble::tribble(
+  ~tailnum, ~origin, ~dest, ~carrier,               ~name, ~wind_dir, ~wind_speed, ~wind_gust,
+  "N293PQ",   "JFK", "MSP",     "9E", "Endeavor Air Inc.",       270,    24.16638,   33.37262,
+  "N272PQ",   "JFK", "BNA",     "9E", "Endeavor Air Inc.",        60,    18.41248,   27.61872,
+  "N151UW",   "JFK", "CLT",     "US",   "US Airways Inc.",       280,    14.96014,   26.46794,
+  "N294PQ",   "JFK", "DFW",     "9E", "Endeavor Air Inc.",       310,    18.41248,   32.22184,
+  "N293PQ",   "JFK", "DFW",     "9E", "Endeavor Air Inc.",       340,    20.71404,   31.07106,
+  "N358JB",   "JFK", "CLT",     "B6",   "JetBlue Airways",       310,     17.2617,   25.31716,
+  "N296PQ",   "JFK", "DCA",     "9E", "Endeavor Air Inc.",        60,    18.41248,   27.61872,
+  "N296PQ",   "JFK", "BUF",     "9E", "Endeavor Air Inc.",       280,     17.2617,   26.46794,
+  "N834JB",   "JFK", "LAS",     "B6",   "JetBlue Airways",       180,    21.86482,   29.92028,
+  "N368JB",   "JFK", "SYR",     "B6",   "JetBlue Airways",       360,    13.80936,    23.0156,
+  "N368JB",   "JFK", "JAX",     "B6",   "JetBlue Airways",       300,    20.71404,    34.5234,
+  "N294PQ",   "JFK", "RDU",     "9E", "Endeavor Air Inc.",       270,    14.96014,   18.41248,
+  "N374JB",   "JFK", "IAD",     "B6",   "JetBlue Airways",       320,    13.80936,   18.41248,
+  "N373JB",   "JFK", "BOS",     "B6",   "JetBlue Airways",       280,    16.11092,   24.16638,
+  "N374JB",   "JFK", "CHS",     "B6",   "JetBlue Airways",       170,     11.5078,   19.56326,
+  "N354JB",   "JFK", "CHS",     "B6",   "JetBlue Airways",        20,    13.80936,   18.41248,
+  "N368JB",   "JFK", "ACK",     "B6",   "JetBlue Airways",        20,    13.80936,   18.41248,
+  "N355JB",   "JFK", "RDU",     "B6",   "JetBlue Airways",       320,    14.96014,   24.16638,
+  "N355JB",   "JFK", "HOU",     "B6",   "JetBlue Airways",        90,    13.80936,   26.46794,
+  "N374JB",   "JFK", "ROC",     "B6",   "JetBlue Airways",       300,    16.11092,   20.71404,
+  "N361VA",   "JFK", "SFO",     "VX",    "Virgin America",       340,     17.2617,   32.22184,
+  "N358JB",   "JFK", "MVY",     "B6",   "JetBlue Airways",       330,    10.35702,    23.0156,
+  "N272PQ",   "JFK", "BOS",     "9E", "Endeavor Air Inc.",       300,    24.16638,   33.37262,
+  "N354JB",   "JFK", "BOS",     "B6",   "JetBlue Airways",       310,    21.86482,    28.7695,
+  "N355JB",   "JFK", "BUF",     "B6",   "JetBlue Airways",        30,    12.65858,   20.71404,
+  "N354JB",   "JFK", "ROC",     "B6",   "JetBlue Airways",       310,     23.0156,   33.37262,
+  "N374JB",   "JFK", "BUF",     "B6",   "JetBlue Airways",       260,     17.2617,   25.31716,
+  "N354JB",   "JFK", "ACK",     "B6",   "JetBlue Airways",       340,    13.80936,    17.2617,
+  "N355JB",   "JFK", "CHS",     "B6",   "JetBlue Airways",       180,     17.2617,   24.16638,
+  "N368JB",   "JFK", "SYR",     "B6",   "JetBlue Airways",        50,    16.11092,    23.0156
+  )
+usethis::use_data(jfk_weather, overwrite = TRUE)

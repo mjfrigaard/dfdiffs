@@ -1,0 +1,455 @@
+
+
+```{r , eval=FALSE, echo=FALSE}
+    # multiple 'by', no 'by_col', no 'cols' ----
+    } else if (length(by) > 1 & is.null(by_col) & is.null(cols)) {
+    newdf_join <- create_new_column(data = newdf,
+                        cols = all_of(by), new_name = "JOIN")
+    olddf_join <- create_new_column(data = olddf,
+                        cols = all_of(by), new_name = "JOIN")
+    # check
+    # mod_data <- list(newdf_join, olddf_join)
+    comparedf_list <- summary(arsenal::comparedf(
+                                x = newdf_join,
+                                y = olddf_join,
+                                by = "JOIN"))
+    diffs_table <- dplyr::mutate(
+              .data = comparedf_list$diffs.table,
+                  dplyr::across(.cols = dplyr::contains("values"),
+                        .fns = base::as.character))
+    diffs_names <- dplyr::select(
+                    .data = diffs_table,
+                    `Variable name` = var.x,
+                    dplyr::contains("JOIN"),
+                    `Current Value` = values.x,
+                    `Previous Value` = values.y)
+    mod_data <- tibble::as_tibble(diffs_names)
+
+    # multiple 'by', new 'by_col', no 'cols' -----
+  } else if (length(by) > 1 & !is.null(by_col) & is.null(cols)) {
+    newdf_join <- create_new_column(data = newdf,
+                        cols = all_of(by), new_name = {{by_col}})
+    olddf_join <- create_new_column(data = olddf,
+                        cols = all_of(by), new_name = {{by_col}})
+    # check
+    # mod_data <- list(newdf_join, olddf_join)
+    comparedf_list <- summary(arsenal::comparedf(
+                                x = newdf_join,
+                                y = olddf_join,
+                                by = {{by_col}}))
+    diffs_table <- dplyr::mutate(
+              .data = comparedf_list$diffs.table,
+                  dplyr::across(.cols = dplyr::contains("values"),
+                        .fns = base::as.character))
+    diffs_names <- dplyr::select(
+                    .data = diffs_table,
+                    `Variable name` = var.x,
+                     all_of(by_col),
+                    `Current Value` = values.x,
+                    `Previous Value` = values.y)
+    mod_data <- tibble::as_tibble(diffs_names)
+
+    # multiple 'by', 'by_col', multiple 'cols' ----
+  } else if (length(by) > 1 & !is.null(by_col) & !is.null(cols)) {
+    newdf_join <- create_new_column(data = newdf,
+                        cols = all_of(by), new_name = {{by_col}})
+    olddf_join <- create_new_column(data = olddf,
+                        cols = all_of(by), new_name = {{by_col}})
+    newdf_join_cols <- dplyr::select(newdf_join, {{by_col}}, all_of(cols))
+    olddf_join_cols <- dplyr::select(olddf_join, {{by_col}}, all_of(cols))
+    # check
+    # mod_data <- list(newdf_join_cols, olddf_join_cols)
+    comparedf_list <- summary(arsenal::comparedf(
+                                x = newdf_join_cols,
+                                y = olddf_join_cols,
+                                by = {{by_col}}))
+    diffs_table <- dplyr::mutate(
+              .data = comparedf_list$diffs.table,
+                  dplyr::across(.cols = dplyr::contains("values"),
+                        .fns = base::as.character))
+    diffs_names <- dplyr::select(
+                    .data = diffs_table,
+                    `Variable name` = var.x,
+                     all_of(by_col),
+                    `Current Value` = values.x,
+                    `Previous Value` = values.y)
+    mod_data <- tibble::as_tibble(diffs_names)
+
+    # single 'by', no 'by_col', no 'cols' ----
+  } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
+    newdf_join_cols <- dplyr::relocate(newdf, {{by}}, everything())
+    olddf_join_cols <- dplyr::relocate(olddf, {{by}}, everything())
+    # check
+    # mod_data <- list(newdf_join_cols, olddf_join_cols)
+    comparedf_list <- summary(arsenal::comparedf(
+                                x = newdf_join_cols,
+                                y = olddf_join_cols,
+                                by = {{by}}))
+    diffs_table <- dplyr::mutate(
+              .data = comparedf_list$diffs.table,
+                  dplyr::across(.cols = dplyr::contains("values"),
+                        .fns = base::as.character))
+    diffs_names <- dplyr::select(
+                    .data = diffs_table,
+                    `Variable name` = var.x,
+                     all_of(by),
+                    `Current Value` = values.x,
+                    `Previous Value` = values.y)
+    mod_data <- tibble::as_tibble(diffs_names)
+    # single 'by', 'by_col', no 'cols' ----
+  } else if (length(by) == 1 & !is.null(by_col) & is.null(cols)) {
+    names(newdf)[names(newdf) == by] <- by_col
+    names(olddf)[names(olddf) == by] <- by_col
+    newdf_join_cols <- newdf
+    olddf_join_cols <- olddf
+    # check
+    # mod_data <- list(newdf_join_cols, olddf_join_cols)
+    comparedf_list <- summary(arsenal::comparedf(
+                                x = newdf_join_cols,
+                                y = olddf_join_cols,
+                                by = {{by_col}}))
+    diffs_table <- dplyr::mutate(
+              .data = comparedf_list$diffs.table,
+                  dplyr::across(.cols = dplyr::contains("values"),
+                        .fns = base::as.character))
+    diffs_names <- dplyr::select(
+                    .data = diffs_table,
+                    `Variable name` = var.x,
+                     all_of(by_col),
+                    `Current Value` = values.x,
+                    `Previous Value` = values.y)
+    mod_data <- tibble::as_tibble(diffs_names)
+    # single 'by', 'by_col', multiple 'cols' -----
+  } else if (length(by) == 1 & !is.null(by_col) & !is.null(cols)) {
+    names(newdf)[names(newdf) == by] <- by_col
+    names(olddf)[names(olddf) == by] <- by_col
+    # newdf_join_cols <- newdf
+    # olddf_join_cols <- olddf
+    newdf_join_cols <- dplyr::select(newdf, {{by_col}}, all_of(cols))
+    olddf_join_cols <- dplyr::select(olddf, {{by_col}}, all_of(cols))
+    # check
+    # mod_data <- list(newdf_join_cols, olddf_join_cols)
+    comparedf_list <- summary(arsenal::comparedf(
+                                x = newdf_join_cols,
+                                y = olddf_join_cols,
+                                by = {{by_col}}))
+    diffs_table <- dplyr::mutate(
+              .data = comparedf_list$diffs.table,
+                  dplyr::across(.cols = dplyr::contains("values"),
+                        .fns = base::as.character))
+    diffs_names <- dplyr::select(
+                    .data = diffs_table,
+                    `Variable name` = var.x,
+                     all_of(by_col),
+                    `Current Value` = values.x,
+                    `Previous Value` = values.y)
+    mod_data <- tibble::as_tibble(diffs_names)
+    # no 'by', no 'by_col', multiple 'cols' ----
+  } else if (is.null(by) & is.null(by_col) & !is.null(cols)) {
+    newdf_join_cols <- dplyr::select(newdf, all_of(cols))
+    olddf_join_cols <- dplyr::select(olddf, all_of(cols))
+    # check
+    # mod_data <- list(newdf_join_cols, olddf_join_cols)
+    comparedf_list <- summary(arsenal::comparedf(
+                                x = newdf_join_cols,
+                                y = olddf_join_cols))
+    diffs_table <- dplyr::mutate(
+              .data = comparedf_list$diffs.table,
+                  dplyr::across(.cols = dplyr::contains("values"),
+                        .fns = base::as.character))
+    diffs_names <- dplyr::select(
+                    .data = diffs_table,
+                    `Variable name` = var.x,
+                    `Current Value` = values.x,
+                    `Previous Value` = values.y)
+    mod_data <- tibble::as_tibble(diffs_names)
+
+    # single 'by_col', no 'by', no 'cols' ----
+  } else if (length(by_col) == 1 & is.null(by) & is.null(cols)) {
+    # only 'by' provided
+    newdf_join_cols <- dplyr::mutate(newdf,
+                                        ID = row_number(),
+                                        ID = as.character(ID))
+    olddf_join_cols <- dplyr::mutate(olddf,
+                                        ID = row_number(),
+                                        ID = as.character(ID))
+    names(newdf_join_cols)[names(newdf_join_cols) == "ID"] <- by_col
+    names(olddf_join_cols)[names(olddf_join_cols) == 'ID'] <- by_col
+    # check
+    # mod_data <- list(newdf_join_cols, olddf_join_cols)
+    # comparedf_list
+    comparedf_list <- summary(arsenal::comparedf(
+                                x = newdf_join_cols,
+                                y = olddf_join_cols),
+                                by = {{by_col}})
+    diffs_table <- dplyr::mutate(
+              .data = comparedf_list$diffs.table,
+                  dplyr::across(.cols = dplyr::contains("values"),
+                        .fns = base::as.character))
+    diffs_names <- dplyr::select(
+                    .data = diffs_table,
+                      contains("row.names"),
+                    `Variable name` = var.x,
+                    `Current Value` = values.x,
+                    `Previous Value` = values.y)
+    names(diffs_names)[names(diffs_names) == "..row.names.."] <- by_col
+
+    mod_data <- tibble::as_tibble(diffs_names)
+  }
+
+  return(mod_data)
+}
+```
+
+## Use 
+
+Below we will test the `create_modified_data()` function under various conditions. 
+
+### No arguments provided 
+
+If only datasets are provided, a row-by-row comparison is made on all columns. 
+
+```{r nothing, eval=FALSE}
+create_modified_data(
+  newdf = CurrentData, 
+  olddf = PreviousData)
+```
+
+```{r nothing-show, echo=FALSE}
+knitr::kable(
+create_modified_data(
+  newdf = CurrentData, 
+  olddf = PreviousData)
+)
+```
+
+### Multiple `by` columns
+
+If we need to create a new `JOIN` column from multiple columns, we can provide them to `by`.
+
+```{r multiple-by, eval=FALSE}
+create_modified_data(
+  newdf = CurrentData, 
+  olddf = PreviousData, 
+  by = c("subject_id", "record"))
+```
+
+```{r multiple-by-show, echo=FALSE}
+knitr::kable(
+create_modified_data(
+  newdf = CurrentData, 
+  olddf = PreviousData, 
+  by = c("subject_id", "record"))
+)
+```
+
+### Multiple `by` columns, new `by_col`
+
+If we need to create a new joining column from multiple columns and we want to provide a name for this new column, we can do this with `by` and `by_col`:
+
+```{r multiple-by-new-by_col, eval=FALSE}
+create_modified_data(
+  newdf = CurrentData, 
+  olddf = PreviousData, 
+  by = c("subject_id", "record"), 
+  by_col = "new_join_col")
+```
+
+```{r multiple-by-new-by_col-show, echo=FALSE}
+knitr::kable(
+create_modified_data(
+  newdf = CurrentData, 
+  olddf = PreviousData, 
+  by = c("subject_id", "record"), 
+  by_col = "new_join_col")
+)
+```
+
+### Multiple `by` columns, new `by_col`, and `cols`
+
+If we need to create a new joining column from multiple columns, and we want to provide a name for this new column, *and* we want to only compare a few columns, we can do this with `by`, `by_col`, and `cols`. 
+
+```{r multiple-by-new-by_col-cols, eval=FALSE}
+create_modified_data(
+  newdf = CurrentData, 
+  olddf = PreviousData, 
+  by = c("subject_id", "record"), 
+  by_col = "new_join_col", 
+  cols = c("text_value_a", "text_value_b"))
+```
+
+```{r multiple-by-new-by_col-cols-show, echo=FALSE}
+knitr::kable(
+create_modified_data(
+  newdf = CurrentData, 
+  olddf = PreviousData, 
+  by = c("subject_id", "record"), 
+  by_col = "new_join_col", 
+  cols = c("text_value_a", "text_value_b"))
+)
+```
+
+### Single `by` column 
+
+Single `by` column (assuming a join column exists), with no `by_col` or `cols`. 
+
+```{r single-by-var, eval=FALSE}
+create_modified_data(
+  newdf = CurrentDataJoin, 
+  olddf = PreviousDataJoin, 
+  by = "join_var")
+```
+
+```{r single-by-var-show, echo=FALSE}
+knitr::kable(
+create_modified_data(
+  newdf = CurrentDataJoin, 
+  olddf = PreviousDataJoin, 
+  by = "join_var")
+)
+```
+
+
+### Single `by` column, new `by_col` name
+
+Single `by` column (assuming a join column exists), with no `by_col` or `cols`. 
+
+```{r single-by-var-new-by_col, eval=FALSE}
+create_modified_data(
+  newdf = CurrentDataJoin, 
+  olddf = PreviousDataJoin, 
+  by = "join_var", 
+  by_col = "new_join_col")
+```
+
+```{r single-by-var-new-by_col-show, echo=FALSE}
+knitr::kable(
+create_modified_data(
+  newdf = CurrentDataJoin, 
+  olddf = PreviousDataJoin, 
+  by = "join_var", 
+  by_col = "new_join_col")
+)
+```
+
+
+### Single `by` column, new `by_col` name, and `cols` 
+
+```{r single-by-col-new-by_cols-cols, eval=FALSE}
+create_modified_data(
+  newdf = CurrentDataJoin, 
+  olddf = PreviousDataJoin, 
+  by = "join_var", 
+  by_col = "new_join_col",
+  cols = c("text_value_a", "text_value_b")
+  )
+```
+
+```{r single-by-col-new-by_cols-cols-show, echo=FALSE}
+knitr::kable(
+create_modified_data(
+  newdf = CurrentDataJoin, 
+  olddf = PreviousDataJoin, 
+  by = "join_var", 
+  by_col = "new_join_col",
+  cols = c("text_value_a", "text_value_b")
+  ))
+```
+
+
+### Multiple `cols` 
+
+If no `by` column is provided, and no `by_col`, but `cols` are provided, the function will perform a row-by-row comparison on the selected columns. 
+
+```{r no-by-no-new-by_col-multiple-cols, eval=FALSE}
+create_modified_data(
+  newdf = CurrentData, 
+  olddf = PreviousData,
+  cols = c("text_value_a", "text_value_b"))
+```
+
+```{r no-by-no-new-by_col-multiple-cols-show, echo=FALSE}
+knitr::kable(
+create_modified_data(
+  newdf = CurrentData, 
+  olddf = PreviousData,
+  cols = c("text_value_a", "text_value_b")))
+```
+
+
+### Only `by_col` 
+
+If only a `by_col` is provided, the function will create an `ID` for each row in the datasets, then perform the comparison using this joining variable. 
+
+```{r only-by_col, eval=FALSE}
+create_modified_data(
+  newdf = CurrentData, 
+  olddf = PreviousData,
+  by_col = "new_join_col")
+```
+
+```{r only-by_col-show, echo=FALSE}
+knitr::kable(
+create_modified_data(
+  newdf = CurrentData, 
+  olddf = PreviousData,
+  by_col = "new_join_col"))
+```
+
+
+
+```{r old-fun, eval=FALSE, include=FALSE, echo=FALSE}
+function(newdf, olddf, by = NULL, cols = NULL, return_cols = NULL) {
+      # join col x
+      data_x_join <- create_new_column(
+                          data = newdf, 
+                          cols = all_of(by), 
+                          new_name = by) 
+      # var names x
+      data_x <- dplyr::rename_with(
+        .data = data_x_join, 
+        .fn =  base::paste0, 
+        .cols = !all_of(by), "_x")
+      # join col y
+      data_y_join <- create_new_column(
+                         data = olddf, 
+                         cols = all_of(by), 
+                         new_name = by) 
+      # var names y
+      data_y <- dplyr::rename_with(
+        .data = data_y_join, 
+        .fn =  base::paste0, 
+        .cols = !all_of(by), "_y")
+      # mod_table
+      mod_table <- run_modified_data(newdf = newdf, 
+                                     olddf = olddf, 
+                                     by = by, 
+                                     cols = cols)
+    
+      # join back to data_x
+      data_x_mod <- dplyr::inner_join(
+                             x = mod_table, 
+                             y = data_x, 
+                             by = all_of(by))
+      # join back to data_y
+      data_y_mod <- dplyr::inner_join(
+                           x = mod_table, 
+                           y = data_y, 
+                           by = all_of(by))
+      
+      # join back to data_x and data_y
+      data_both_mod <- dplyr::inner_join(x = data_x_mod, 
+                               y = data_y, 
+                               by = all_of(by))
+  
+}
+```
+
+
+
+
+```{r comparedf, eval=FALSE, include=FALSE}
+arsenal::comparedf(x = , y = , by = , by.x = , by.y = , control = )
+```
+
+

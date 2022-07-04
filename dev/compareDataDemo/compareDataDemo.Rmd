@@ -1,0 +1,558 @@
+---
+title: "dfdiffs::compareDataDemo"
+author: "Martin Frigaard"
+output:
+  html_document: 
+    highlight: espresso
+    theme: darkly
+    toc: true
+    toc_float: yes
+    df_print: paged
+    code_folding: hide
+    
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(rmdformats)
+library(tidyverse)
+library(devtools)
+library(hrbrthemes)
+library(fs)
+library(reactable)
+library(rmarkdown)
+library(shiny)
+library(shinythemes)
+library(bs4Dash)
+# Global options
+knitr::opts_chunk$set(
+  # cache = FALSE # cache data
+  echo = TRUE, # show/hide all code
+  # results = "hide", # hide results
+  tidy = FALSE, # cleaner code printing
+  comment = "#> ", # better console printing
+  eval = TRUE, # turn this to FALSE stop code chunks from running
+  message = TRUE, # show messages
+  warning = FALSE, # show warnings
+  size = "tiny", # size of the text
+  fig.path = "images", # location of figure files
+  fig.height = 7.5, # height of figures
+  fig.width = 10 # width of figures
+)
+# knit options
+knitr::opts_knit$set(
+  width = 78,
+  progress = FALSE
+)
+# base options
+base::options(
+  tibble.print_max = 25,
+  tibble.width = 78,
+  max.print = 999999,
+  scipen = 100000000
+)
+# reactable.theme ----
+options(reactable.theme = reactableTheme(
+          color = "hsl(235, 9%, 87%)",
+          backgroundColor = "hsl(208,100%, 17%)",
+          borderColor = "hsl(235, 9%, 22%)",
+          stripedColor = "hsl(235, 12%, 22%)",
+          highlightColor = "hsl(235, 12%, 24%)",
+          inputStyle = list(backgroundColor = "hsl(235, 9%, 25%)"),
+          selectStyle = list(backgroundColor = "hsl(235, 9%, 25%)"),
+          pageButtonHoverStyle = list(backgroundColor = "hsl(235, 9%, 25%)"),
+          pageButtonActiveStyle = list(backgroundColor = "hsl(235, 9%, 28%)")))
+```
+
+# The Goal 
+
+The goal of `compareDataDemo` is to create a demo module for comparing two tables to get 1) new data, 2) deleted data, and 3) changed data in the `prodfdiffs` app. 
+
+The application is broken into four modules: `upload`, `select`, `compare`, and `tables`. 
+
+# Upload
+
+The two functions for the upload modules are loaded below: 
+
+## UI
+
+```{r uploadDataUI}
+source("uploadDataUI.R")
+```
+
+## Server
+
+```{r uploadDataServer}
+source("uploadDataServer.R")
+```
+
+These two files are not shown because they are displayed and covered in detail in previous documentation. The `uploadData` module returns a list of reactive datasets to be used in the `selectData` module. 
+
+# Select 
+
+The `uploadData` module 'passes' the data to the `selectData` module, which displays the data for the user to review and, if necessary, reduce. The `uploadData` module can import up to four data files, but the `selectData`  trims that down to two datasets (and the selected columns). 
+
+We do this by including only two boxes in the select tab, and giving the list of columns from each uploaded dataset. 
+
+## UI
+
+```{r selectDataUI}
+source("selectDataUI.R")
+```
+
+## Server 
+
+```{r selectDataServer}
+source("selectDataServer.R")
+```
+
+# Comparisons 
+
+We're going to import two datasets to simulate the application's compare functions. We'll be using the Master dataset from the [Lahman baseball database](https://github.com/cdalzell/Lahman):
+
+Our 'previous' or 'old' dataset is the 2015 Master dataset. 
+
+```{r master15}
+master15 <- readxl::read_excel("data/xlsx/lahman_compare.xlsx", 
+                                sheet = "master-2015")
+glimpse(master15)
+```
+
+Our 'current' or 'new' dataset is the 2020 People dataset 
+
+```{r master20}
+master20 <- readxl::read_excel("data/xlsx/lahman_compare.xlsx", 
+                                sheet = "master-2020")
+glimpse(master20)
+```
+
+## New Records 
+
+We'll test the `create_new_data()` function on the 2015 vs. 2020 Master data. 
+
+```{r create_new_data}
+# run new data function
+new_master_15_20 <- create_new_data(newdf = master20, 
+  olddf = master15, 
+  by = "playerID",
+  cols = c("playerID", "nameGiven", "height", "bats", "throws"))
+reactable(new_master_15_20,
+  defaultPageSize = 10,
+        resizable = TRUE,
+        highlight = TRUE,
+        compact = TRUE,
+        wrap = FALSE,
+        bordered = TRUE,
+        filterable = TRUE)
+```
+
+In order to check these data, we can test the unique `playerID`s in and see if they're in the `master15` dataset. 
+
+```{r new_playerID}
+# unique ids
+new_playerID <- unique(new_master_15_20$playerID)
+# filter new ids (should be zero)
+glimpse(filter(master15, 
+  playerID %in% new_playerID))
+```
+
+And we can see **none** of these `playerID`s are in the previous dataset.
+
+## Deleted Records 
+
+We're going to check the deleted records using the `create_deleted_data()` function. 
+
+```{r create_deleted_data}
+deleted_master_15_20 <- create_deleted_data(
+  newdf = master20, 
+  olddf = master15, 
+  by = "playerID",
+  cols = c("playerID", "nameGiven", "height", "bats", "throws"))
+reactable(deleted_master_15_20,
+    defaultPageSize = 10,
+        resizable = TRUE,
+        highlight = TRUE,
+        compact = TRUE,
+        wrap = FALSE,
+        bordered = TRUE,
+        filterable = TRUE)
+```
+
+This tells us there were 625 deleted records between 2015 and 2020 in the master dataset. 
+
+## Modified Records 
+
+Below we test our modified function, `create_modified_data()`, which returns a list of two datasets. 
+
+```{r create_modified_data}
+modified_master_15_20 <- create_modified_data(
+  newdf = master20, 
+  olddf = master15, 
+  by = "playerID",
+  cols = c("playerID", "nameGiven", "height", "bats", "throws"))
+names(modified_master_15_20)
+```
+
+The `diffs_byvar` table contains each variable modified (`Variable name`), the count of changes ( `Modified values`) and the count of missing (`Missing Values`).
+
+```{r modified_master_15_20-diffs_byvar}
+reactable(data = modified_master_15_20$diffs_byvar,
+  defaultPageSize = 10,
+        resizable = TRUE,
+        highlight = TRUE,
+        compact = TRUE,
+        wrap = FALSE,
+        bordered = TRUE,
+        filterable = TRUE)
+```
+
+The diffs table contains the modified variable (`Variable Name`), the joining column (`playerID`), and the modified values (`Current Value` & `Previous Value`). 
+
+```{r modified_master_15_20-diffs}
+reactable(data = modified_master_15_20$diffs,
+  defaultPageSize = 10,
+        resizable = TRUE,
+        highlight = TRUE,
+        compact = TRUE,
+        wrap = FALSE,
+        bordered = TRUE,
+        filterable = TRUE)
+```
+
+All of these tables will be presented in the `compareDataUI()`
+
+
+# Compare 
+
+The three functions for comparing any two datasets in the `dfdiffs` package: 
+
+1. **`create_new_data(newdf, olddf, by = NULL, by_col = NULL, cols = NULL)`**: takes two datasets and returns a dataset of, "*what is here now that wasn't here before?*
+
+2. **`create_deleted_data(newdf, olddf, by = NULL, by_col = NULL, cols = NULL)`**: takes two datasets and creates a dataset of, "*What was here before that isn't here now?*  
+
+3. **`create_modified_data(newdf, olddf, by = NULL, by_col = NULL, cols = NULL)`**: takes two datasets and creates a dataset of, "*What was here before that isn't here now?*  
+
+These are all stored in the helpers.R file (sourced below):
+
+```{r helpers}
+source("helpers.R")
+```
+
+## UI  
+
+The UI
+
+```{r compareDataUI}
+compareDataUI <- function(id) {
+  tagList(
+    fluidRow(
+      bs4Dash::sortable(
+        width = 12,
+        bs4Dash::box(
+          solidHeader = TRUE,
+          status = "danger",
+          width = 12,
+          title = "Join columns",
+          fluidRow(
+            column(
+              width = 6,
+          ## OUTPUT |-- (intersecting_cols) ------
+          strong(em("The following columns are in both tables:")),
+          reactableOutput(
+            outputId = NS(
+              namespace = id,
+              id = "intersecting_cols"))
+            ),
+            column(
+              width = 6,
+          ## OUTPUT |-- (new_join_col) ------
+        strong(em("Select the column (or columns) for joining the two datasets")),
+          selectInput(inputId = NS(
+              namespace = id,
+              id = "new_join_col"), 
+              label = "Select Join Columns",             
+              choices = c("<PREVIOUS COLUMN A>", "<PREVIOUS COLUMN B>"),
+              multiple = TRUE,
+              selected = c("<PREVIOUS COLUMN A>"))
+              )
+            )
+          )
+        ),
+        bs4Dash::box(
+          width = 12,
+          title = "Run Comparison",
+          solidHeader = TRUE,
+          status = "primary",
+          h5(em(".")),
+          fluidRow(
+            sortable(
+              width = 12,
+              column(
+                width = 6,
+                ## OUTPUT |-- (dev_display_x) ------
+                strong("dev_display_x"),
+                verbatimTextOutput(
+                  outputId = NS(
+                    namespace = id,
+                    id = "dev_display_x"
+                  )
+                )
+              )
+            )
+          ),
+          fluidRow(
+            sortable(
+              width = 6,
+              column(
+                width = 6,
+                ## OUTPUT |-- (dev_display_y) ------
+                strong("dev_display_y"),
+                verbatimTextOutput(
+                  outputId = NS(
+                    namespace = id,
+                    id = "dev_display_y"
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+}
+```
+
+
+## Server 
+
+```{r compareDataServer}
+compareDataServer <- function(id, data_selected) {
+  moduleServer(id = id, module = function(input, output, session) {
+
+    # |-- REACTIVE data_prev() --------------------------------------
+    data_prev <- eventReactive( data_selected$prev_data(), {
+      data_prev <- data_selected$prev_data()
+      return(data_prev)
+    })
+
+    # |-- REACTIVE data_curr() --------------------------------------
+    data_curr <- eventReactive( data_selected$curr_data(), {
+      data_curr <- data_selected$curr_data()
+      return(data_curr)
+    })
+
+    # |-- OUTPUT (dev_display_x) --------------------------------------
+    output$dev_display_x <- renderPrint({
+      print(str(data_prev()))
+    })
+
+    # |-- OUTPUT (dev_display_y) --------------------------------------
+    output$dev_display_y <- renderPrint({
+      print(str(data_curr()))
+    })
+    # |-- REACTIVE col_intersect() --------------------------------------
+    col_intersect <- reactive({
+      prev_cols <- names(data_prev())
+      curr_cols <- names(data_curr())
+      intersecting_cols <- intersect(x = prev_cols, y = curr_cols)
+      col_intersect <- tibble::tibble(Columns = intersecting_cols)
+      return(col_intersect)
+    })
+
+    # |-- OUTPUT (intersecting_cols) --------------------------------------
+    output$intersecting_cols <- renderReactable({
+      reactable(
+        col_intersect(),
+          resizable = TRUE,
+          highlight = TRUE,
+          compact = TRUE,
+          wrap = FALSE,
+          bordered = TRUE,
+          filterable = TRUE,
+        theme = reactableTheme(
+        color = "hsl(0, 0%, 100%)",
+        backgroundColor = "hsl(235, 48%, 40%)",
+        borderColor = "hsl(233, 9%, 22%)",
+        stripedColor = "hsl(233, 12%, 22%)",
+        highlightColor = "hsl(233, 12%, 24%)",
+        inputStyle = list(backgroundColor = "hsl(0,0%,39%)"),
+        selectStyle = list(backgroundColor = "hsl(0,0%,39%)"),
+        pageButtonHoverStyle = list(backgroundColor = "hsl(0,0%,39%)"),
+        pageButtonActiveStyle = list(backgroundColor = "hsl(233, 9%, 28%)"))
+      )
+    })
+
+
+
+  })
+}
+```
+
+
+## Demo
+
+```{r bmrn_theme}
+bmrn_theme <- function() {
+  fresh::create_theme(
+    # theme vars  -------------------------------------------------------------
+    fresh::bs4dash_vars(
+      navbar_light_color = "#353d98", # purple
+      navbar_light_active_color = "#353d98", # purple
+      navbar_light_hover_color = "#f26631" # orange
+    ),
+    # # theme yiq -------------------------------------------------------------
+    fresh::bs4dash_yiq(
+      contrasted_threshold = 255,
+      text_dark = "#0a0a0a", # dark_gray_s10
+      text_light = "#f5f5f5" # gray_t10
+    ),
+    # theme layout ---------------------------------------------------------
+    fresh::bs4dash_layout(
+      main_bg = NULL, # #ececec
+      font_size_root = 12
+    ),
+    # theme sidebar_light -------------------------------------------------
+    fresh::bs4dash_sidebar_light(
+      header_color = "#ccd5dd", # dark_blue_t9
+      bg = "#eaebf4", # background of entire side-bar
+      color = "#002E56", # text color (no hover)
+      hover_color = "#ee304e", # text color on hover
+      hover_bg = "#353D98", # color on hover
+      active_color = "#f26631", # color is actually the 'primary' status color
+      submenu_bg = "#f5f5f5", # purple
+      submenu_color = "#002444",
+      submenu_hover_color = "#353D98" # purple
+    ),
+    # # theme sidebar_dark -------------------------------------------------
+    fresh::bs4dash_sidebar_dark(
+      header_color = "#ccd5dd",
+      bg = "#1a1e4c",
+      color = "#EE304E", # text color (no hover)
+      hover_bg = "#aeb1d5", # color on hover
+      hover_color = "#EE304E", # text color on hover
+      active_color = "#f26631" # color is actually the 'primary' status color
+    ),
+   # theme status -------------------------------------------------
+    fresh::bs4dash_status(
+      dark = "#323232",
+      light = "#A0A0A0",
+      warning = "#F26631", # orange
+      primary = "#00509C", # blue
+      secondary = "#353D98", # purple
+      success = "#A9218E", # violet
+      danger = "#EE304E", # red
+      info = "#A0A0A0" #orange
+    ),
+    # theme color -------------------------------------------------
+  fresh::bs4dash_color(
+    gray_900 = "#1f245b",
+    gray_800 = "#646464",
+    lightblue = "#6696c3", 
+    blue = "#00509C" 
+    # gray_600 = "#353D98",
+    # yellow = "#F26631",
+    # gray_900 = "#15183c",
+    # gray_800 = "#646464",
+    # green = "#A9218E",
+    # navy = "#002E56",
+    # cyan = "#A0A0A0",
+    # gray_800 = "#646464",
+    # red = "#EE304E",
+    # white = "#272c30"
+   )
+  )
+}
+```
+
+
+```{r compareDataDemo}
+# set theme ---------------------------------------------------------------
+compare_theme <- bmrn_theme()
+
+compareDataDemo <- function() {
+  ui <- bs4Dash::dashboardPage(
+    skin = 'light',
+    freshTheme = compare_theme,
+    title = "compareDataDemo",
+    header = bs4Dash::dashboardHeader(
+      title = "compareDataDemo",
+      status = "secondary"),
+    # sidebar (menuItem) ------------------------------------------------------
+    sidebar = bs4Dash::dashboardSidebar(
+      skin = "light",
+      collapsed = TRUE,
+      bs4Dash::sidebarMenu(
+        id = "sidebarmenu",
+        # bs4Dash::sidebarHeader("Data upload demo"),
+        menuItem("Upload Data",
+          tabName = "upload_data_tab",
+          icon = icon("file-upload")
+        ),
+        menuItem("Select Data",
+          tabName = "select_data_tab",
+          icon = icon("columns")
+        ),
+        menuItem("Compare Data",
+          tabName = "compare_data_tab",
+          icon = icon("compress-alt")
+        ),
+        menuItem("Tables",
+          tabName = "table_output_tab",
+          icon = icon("table")
+        )
+      )
+    ),
+    # dashboardBody (tabItem) ------------------------------------------------
+    body = bs4Dash::dashboardBody(
+      tabItems(
+        tabItem(
+          tabName = "upload_data_tab",
+          ## uploadDataUI -----
+          uploadDataUI(id = "upload_data"),
+        ),
+        tabItem(
+          tabName = "select_data_tab",
+          ## selectDataUI -----
+          selectDataUI(id = "select_data")
+        ),
+        tabItem(
+          tabName = "compare_data_tab",
+          ## compareDataUI -----
+          compareDataUI("compare_data")
+        ),
+        tabItem(
+          tabName = "table_output_tab",
+          ## tableOutputUI -----
+          # tableOutputUI("tables")
+        )
+      )
+    ),
+    controlbar = bs4Dash::dashboardControlbar(),
+    footer = bs4Dash::dashboardFooter()
+  )
+  server <- function(input, output, session) {
+    # upload data ------------------------------------------------
+    upload_data_list <- uploadDataServer(id = "upload_data")
+    # select data ------------------------------------------------
+    select_data_list <- selectDataServer(
+      id = "select_data",
+      data_upload = upload_data_list
+    )
+    # compare data ------------------------------------------------
+    compareDataServer(
+      id = "compare_data",
+      data_selected = select_data_list)
+  }
+  # tableOutputServer ------------------------------------------------
+  shinyApp(
+    ui = ui, server = server, options = list(height = 1000, width = 800)
+  )
+}
+```
+
+# App
+
+```{r run-compareDataDemo, echo=FALSE}
+compareDataDemo()
+```

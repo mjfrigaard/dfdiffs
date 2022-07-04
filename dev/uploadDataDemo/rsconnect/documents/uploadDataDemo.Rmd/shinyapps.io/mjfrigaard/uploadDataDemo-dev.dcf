@@ -1,0 +1,13 @@
+name: uploadDataDemo-dev
+title: uploadDataDemo-dev
+username:
+account: mjfrigaard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6286279
+bundleId: 5898006
+url: https://mjfrigaard.shinyapps.io/uploadDataDemo-dev/
+when: 1652336263.48773
+lastSyncTime: 1652336263.48774
+asMultiple: FALSE
+asStatic: FALSE
