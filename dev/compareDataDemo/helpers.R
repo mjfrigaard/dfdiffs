@@ -1,5 +1,7 @@
 # packages ----------------------------------------------------------------
 library(knitr)
+library(arsenal)
+library(diffdf)
 library(rmdformats)
 library(tidyverse)
 library(devtools)
@@ -12,35 +14,140 @@ library(shinythemes)
 library(bs4Dash)
 library(fresh)
 
-# flat_file_curr_data ---------------------------------------------------------
-flat_file_curr_data <- tibble::tibble(
-  col_a = c(20L, 12L, 18L, 37L),
-  col_b = c("l", "m", "n", "o"),
-  col_c = c(6.6, 7.1, 4.3, 7.2),
-  col_d = c(TRUE, TRUE, FALSE, FALSE)
+# themes ------------------------------------------------------------------
+## bmrn_fresh_theme --------------------------------------------------------
+bmrn_fresh_theme <- function() {
+  fresh::create_theme(
+    # theme vars  -------------------------------------------------------------
+    fresh::bs4dash_vars(
+      navbar_light_color = "#353d98", # purple
+      navbar_light_active_color = "#353d98", # purple
+      navbar_light_hover_color = "#f26631" # orange
+    ),
+    # # theme yiq -------------------------------------------------------------
+    fresh::bs4dash_yiq(
+      contrasted_threshold = 255,
+      text_dark = "#0a0a0a", # dark_gray_s10
+      text_light = "#f5f5f5" # gray_t10
+    ),
+    # theme layout ---------------------------------------------------------
+    fresh::bs4dash_layout(
+      main_bg = NULL, # #ececec
+      font_size_root = 12
+    ),
+    # theme sidebar_light -------------------------------------------------
+    fresh::bs4dash_sidebar_light(
+      header_color = "#ccd5dd", # light blue
+      bg = "#eaebf4", # background of entire side-bar
+      color = "#002E56", # text color (no hover)
+      hover_color = "#ee304e", # text color on hover
+      hover_bg = "#353D98", # color on hover
+      active_color = "#f26631", # color is actually the 'primary' status color
+      submenu_bg = "#f5f5f5", # purple
+      submenu_color = "#002444",
+      submenu_hover_color = "#353D98" # purple
+    ),
+    # # theme sidebar_dark -------------------------------------------------
+    fresh::bs4dash_sidebar_dark(
+      header_color = "#ccd5dd",
+      bg = "#1a1e4c",
+      color = "#EE304E", # text color (no hover)
+      hover_bg = "#aeb1d5", # color on hover
+      hover_color = "#EE304E", # text color on hover
+      active_color = "#f26631" # color is actually the 'primary' status color
+    ),
+    # theme status -------------------------------------------------
+    fresh::bs4dash_status(
+      dark = "#323232",
+      light = "#A0A0A0", # gray
+      warning = "#F26631", # orange
+      primary = "#A9218E", # violet = #A9218E, blue = #00509C
+      secondary = "#353D98", # purple
+      success = "#00509C", # blue
+      danger = "#EE304E", # red
+      info = "#A0A0A0" # gray
+    ),
+    # theme color -------------------------------------------------
+    fresh::bs4dash_color(
+      gray_900 = "#1f245b",
+      gray_800 = "#646464",
+      lightblue = "#6696c3",
+      blue = "#00509C"
+    )
   )
-# flat_file_prev_data ---------------------------------------------------------
-flat_file_prev_data <- tibble::tibble(
-  col_a = c(20L, 12L, 12L, 12L),
-  col_b = c("l", "m", "m", "m"),
-  col_c = c(8.3, 4.4, 2.2, 8.9),
-  col_d = c(FALSE, FALSE, TRUE, TRUE)
-  )
-# xlsx_curr_data ---------------------------------------------------------
-xlsx_curr_data <- tibble::tibble(
-  col_a = c(4L, 3L, 2L, 1L),
-  col_b = c("W", "X", "Y", "Z"),
-  col_c = c(8.3, 3.3, 22.1, 0.1),
-  col_d = c(FALSE, TRUE, FALSE, FALSE)
-  )
-# xlsx_prev_data ---------------------------------------------------------------
-xlsx_prev_data <- tibble::tibble(
-  col_a = c(4L, 4L, 2L, 2L),
-  col_b = c("W", "W", "Y", "Y"),
-  col_c = c(0.5, 1.2, 5.33, 9.1),
-  col_d = c(TRUE, FALSE, TRUE, TRUE)
-  )
+}
 
+## set theme ---------------------------------------------------------------
+compare_theme <- bmrn_fresh_theme()
+
+## base_react_theme --------------------------------------------------------
+base_react_theme <- reactableTheme(
+          color = "#FFFFFF",
+          backgroundColor = "#761763",
+          borderColor = "#646464",
+          stripedColor = "hsl(233, 12%, 22%)",
+          highlightColor = "#a9218e",
+          inputStyle = list(backgroundColor = "#3A3B45"),
+          selectStyle = list(backgroundColor = "#3A3B45"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+
+## compare_react_theme -----------------------------------------------------
+compare_react_theme <- reactableTheme(
+          color = "#FFFFFF",
+          backgroundColor = "#2f3688",
+          borderColor = "#646464",
+          stripedColor = "hsl(233, 12%, 22%)",
+          highlightColor = "#353d98",
+          inputStyle = list(backgroundColor = "#3A3B45"),
+          selectStyle = list(backgroundColor = "#3A3B45"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+
+## new_react_theme ---------------------------------------------------------
+new_react_theme <- reactableTheme(
+          color = "#00509C",
+          backgroundColor = "#FFFFFF",
+          borderColor = "#A0A0A0",
+          stripedColor = "#3A3B45",
+          highlightColor = "#eeeeee",
+          inputStyle = list(backgroundColor = "#eeeeee"),
+          selectStyle = list(backgroundColor = "#eeeeee"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+
+
+# deleted_react_theme -----------------------------------------------------
+deleted_react_theme <- reactableTheme(
+          color = "#d62b46",
+          backgroundColor = "#FFFFFF",
+          borderColor = "#A0A0A0",
+          stripedColor = "#3A3B45",
+          highlightColor = "#eeeeee",
+          inputStyle = list(backgroundColor = "#eeeeee"),
+          selectStyle = list(backgroundColor = "#eeeeee"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+
+# changed_react_theme -----------------------------------------------------
+changed_react_theme <- reactableTheme(
+          color = "#c15127",
+          backgroundColor = "#FFFFFF",
+          borderColor = "#646464",
+          stripedColor = "#3A3B45",
+          highlightColor = "#eeeeee",
+          inputStyle = list(backgroundColor = "#eeeeee"),
+          selectStyle = list(backgroundColor = "#eeeeee"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+
+# upload ----
+## load_flat_file ----------------------------------------------------------
 #' Load flat data files
 #'
 #' @param path path to data file (with extension)
@@ -66,6 +173,34 @@ load_flat_file <- function(path) {
   return(return_data)
 }
 
+# compare
+
+
+
+
+## rename_join_col ---------------------------------------------------------
+#' Rename join column name
+#'
+#' @param data a tibble or data.frame
+#' @param by_col new join column name
+#' @param by join column name
+#'
+#' @return renamed_data
+#' @export rename_join_col
+#'
+#' @importFrom dplyr rename
+#' @importFrom dplyr across
+#' @importFrom dplyr select
+#' @importFrom dplyr relocate
+rename_join_col <- function(data, by, by_col) {
+    # names(data)[names(data) == by] <- by_col
+    renamed_data <-  dplyr::rename_with(.data = data,
+      ~ stringr::str_replace_all(.x, by, by_col))
+    return_data <- dplyr::relocate(renamed_data, all_of(by_col), everything())
+    return(return_data)
+}
+
+## create_new_column -------------------------------------------------------
 #' Create new (joining) column
 #'
 #' @param data a tibble or data.frame
@@ -96,103 +231,46 @@ create_new_column <- function(data, cols, new_name) {
     return(new_col_data)
 }
 
-#' Rename join column name
+## create_join_column ------------------------------------------------------
+#' Create unique row identifier
 #'
-#' @param data a tibble or data.frame
-#' @param by_col new join column name
-#' @param by join column name
+#' @param df a data.frame or tibble
+#' @param by_colums columns to uniquely identify a row
+#' @param new_by_column_name the new column name
 #'
-#' @return renamed_data
-#' @export rename_join_col
+#' @return join_col_data
+#' @export create_join_column
 #'
-#' @importFrom dplyr rename
-#' @importFrom dplyr across
-#' @importFrom dplyr select
-#' @importFrom dplyr relocate
-rename_join_col <- function(data, by, by_col) {
-    # names(data)[names(data) == by] <- by_col
-    renamed_data <-  dplyr::rename_with(.data = data,
-      ~ stringr::str_replace_all(.x, by, by_col))
-    return_data <- dplyr::relocate(renamed_data, all_of(by_col), everything())
-    return(return_data)
-}
+#' @examples # using dfdiffs::diff_modified_data
+#' diff_modified_data <- dfdiffs::diff_modified_data
+#' current_modified <- diff_modified_data$diff_current_modified
+#' previous_modified <- diff_modified_data$diff_previous_modified
+#' create_join_column(df = current_modified,
+#'                    by_columns = c("subject_id", "record"),
+#'                    new_by_column_name = "join")
+  create_join_column <- function(df, by_colums, new_by_column_name) {
+    # select by_vars
+    tmp <- dplyr::select(df, all_of(by_colums))
+    # convert to character
+    tmp <- dplyr::mutate(tmp, across(.fns = as.character))
+    # rename data
+    join_col_data <- df
+    # assign new col
+    join_col_data$new_col <- purrr::pmap_chr(.l = tmp, .f = paste, sep = "-")
+    # rename
+    names(join_col_data)[names(join_col_data) == "new_col"] <- new_by_column_name
+    # relocate
+    join_col_data <- dplyr::relocate(join_col_data,
+      all_of(new_by_column_name))
+    # return
+    return(join_col_data)
+  }
 
-# theme -------------------------------------------------------------------
-bmrn_theme <- function() {
-  fresh::create_theme(
-    # theme vars  -------------------------------------------------------------
-    fresh::bs4dash_vars(
-      navbar_light_color = "#353d98", # purple
-      navbar_light_active_color = "#353d98", # purple
-      navbar_light_hover_color = "#f26631" # orange
-    ),
-    # # theme yiq -------------------------------------------------------------
-    fresh::bs4dash_yiq(
-      contrasted_threshold = 255,
-      text_dark = "#0a0a0a", # dark_gray_s10
-      text_light = "#f5f5f5" # gray_t10
-    ),
-    # theme layout ---------------------------------------------------------
-    fresh::bs4dash_layout(
-      main_bg = NULL, # #ececec
-      font_size_root = 12
-    ),
-    # theme sidebar_light -------------------------------------------------
-    fresh::bs4dash_sidebar_light(
-      header_color = "#ccd5dd", # dark_blue_t9
-      bg = "#eaebf4", # background of entire side-bar
-      color = "#002E56", # text color (no hover)
-      hover_color = "#ee304e", # text color on hover
-      hover_bg = "#353D98", # color on hover
-      active_color = "#f26631", # color is actually the 'primary' status color
-      submenu_bg = "#f5f5f5", # purple
-      submenu_color = "#002444",
-      submenu_hover_color = "#353D98" # purple
-    ),
-    # # theme sidebar_dark -------------------------------------------------
-    fresh::bs4dash_sidebar_dark(
-      header_color = "#ccd5dd",
-      bg = "#1a1e4c",
-      color = "#EE304E", # text color (no hover)
-      hover_bg = "#aeb1d5", # color on hover
-      hover_color = "#EE304E", # text color on hover
-      active_color = "#f26631" # color is actually the 'primary' status color
-    ),
-   # theme status -------------------------------------------------
-    fresh::bs4dash_status(
-      dark = "#323232",
-      light = "#A0A0A0",
-      warning = "#F26631", # orange
-      primary = "#00509C", # blue
-      secondary = "#353D98", # purple
-      success = "#A9218E", # violet
-      danger = "#EE304E", # red
-      info = "#A0A0A0" #orange
-    ),
-    # theme color -------------------------------------------------
-  fresh::bs4dash_color(
-    gray_900 = "#1f245b",
-    gray_800 = "#646464",
-    lightblue = "#6696c3", # blue_t5
-    blue = "#00509C" # bluw
-    # gray_600 = "#353D98",
-    # yellow = "#F26631",
-    # gray_900 = "#15183c",
-    # gray_800 = "#646464",
-    # green = "#A9218E",
-    # navy = "#002E56",
-    # cyan = "#A0A0A0",
-    # gray_800 = "#646464",
-    # red = "#EE304E",
-    # white = "#272c30"
-   )
-  )
-}
-
+## create_new_data ---------------------------------------------------------
 #' Create a table of new records
 #'
-#' @param newdf a 'new' or 'current' dataset
-#' @param olddf an 'old' or 'previous' dataset
+#' @param compare a 'new' or 'current' dataset
+#' @param base an 'old' or 'previous' dataset
 #' @param by the joining column between the two datasets
 #' @param by_col name of the new joining column
 #' @param  cols names of columns to compare
@@ -211,121 +289,550 @@ bmrn_theme <- function() {
 #' @examples # using local data
 #' T2Data <- dfdiffs::T2Data
 #' T1Data <- dfdiffs::T1Data
-#' create_new_data(newdf = T2Data, olddf = T1Data,
+#' create_new_data(compare = T2Data, base = T1Data,
 #'                 by = c('subject', 'record'))
-#' create_new_data(newdf = T2Data, olddf = T1Data,
+#' create_new_data(compare = T2Data, base = T1Data,
 #'                 by = c('subject', 'record'),
 #'                 cols = c("text_var", "factor_var"))
-create_new_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = NULL) {
+create_new_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
   # convert all columns to character
-  newdf <- mutate(newdf, across(.cols = everything(), .fns = as.character))
-  olddf <- mutate(olddf, across(.cols = everything(), .fns = as.character))
+  compare <- mutate(compare, across(.cols = everything(), .fns = as.character))
+  base <- mutate(base, across(.cols = everything(), .fns = as.character))
 
   if (is.null(by) & is.null(by_col) & is.null(cols)) {
-    # 1) no 'by', no 'by_col', no 'cols' -----
-    new_data_join <- dplyr::anti_join(x = newdf,
-                                      y = olddf,
+    # 1) no 'by', no 'by_col', no 'cols'
+    new_data_join <- dplyr::anti_join(x = compare,
+                                      y = base,
                                       by = dplyr::intersect(
-                                                  x = names(newdf),
-                                                  y = names(olddf)))
+                                                  x = names(compare),
+                                                  y = names(base)))
     new_data <- dplyr::distinct(new_data_join)
   } else if (is.null(by) & is.null(by_col) & !is.null(cols)) {
-    # 2) no 'by', no 'by_col', multiple compare 'cols' -----
-    newdf_join_cols <- dplyr::select(newdf, all_of(cols))
-    olddf_join_cols <- dplyr::select(olddf, all_of(cols))
-    new_data_join <- dplyr::anti_join(x = newdf_join_cols,
-                                      y = olddf_join_cols,
-                            by = dplyr::intersect(x = names(newdf_join_cols),
-                                                  y = names(olddf_join_cols)))
+    # 2) no 'by', no 'by_col', multiple compare 'cols'
+    compare_join_cols <- dplyr::select(compare, all_of(cols))
+    base_join_cols <- dplyr::select(base, all_of(cols))
+    new_data_join <- dplyr::anti_join(x = compare_join_cols,
+                                      y = base_join_cols,
+                            by = dplyr::intersect(x = names(compare_join_cols),
+                                                  y = names(base_join_cols)))
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
-    # 3) single 'by' column ----
-    new_data_join <- dplyr::anti_join(x = newdf, y = olddf, by = {{by}})
+    # 3) single 'by' column
+    new_data_join <- dplyr::anti_join(x = compare, y = base, by = {{by}})
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) == 1 & length(by_col) == 1 & is.null(cols)) {
-    # 4) single 'by' column, new 'by_col' ----
-    newdf <- rename_join_col(newdf, by = by, by_col = by_col)
-    olddf <- rename_join_col(olddf, by = by, by_col = by_col)
-    new_data_join <- dplyr::anti_join(x = newdf, y = olddf, by = {{by_col}})
+    # 4) single 'by' column, new 'by_col'
+    compare <- rename_join_col(compare, by = by, by_col = by_col)
+    base <- rename_join_col(base, by = by, by_col = by_col)
+    new_data_join <- dplyr::anti_join(x = compare, y = base, by = {{by_col}})
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) == 1 & is.null(by_col) & !is.null(cols)) {
-    # 5) single 'by' column, multiple compare 'cols' ----
-    newdf_cols <- select(newdf, matches(by), all_of(cols))
-    olddf_cols <- select(olddf, matches(by), all_of(cols))
-    new_data_join <- dplyr::anti_join(x = newdf_cols, y = olddf_cols,
+    # 5) single 'by' column, multiple compare 'cols'
+    compare_cols <- select(compare, matches(by), all_of(cols))
+    base_cols <- select(base, matches(by), all_of(cols))
+    new_data_join <- dplyr::anti_join(x = compare_cols, y = base_cols,
                                       by = {{by}})
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) == 1 & !is.null(by_col) & !is.null(cols)) {
-    # 6) single 'by' column, new 'by_col', multiple compare 'cols' ----
-    newdf_cols <- rename_join_col(newdf, by = by, by_col = by_col)
-    olddf_cols <- rename_join_col(olddf, by = by, by_col = by_col)
-    newdf_join <- select(newdf_cols, matches(by_col), all_of(cols))
-    olddf_join <- select(olddf_cols, matches(by_col), all_of(cols))
-    new_data_join <- dplyr::anti_join(x = newdf_join, y = olddf_join,
+    # 6) single 'by' column, new 'by_col', multiple compare 'cols'
+    compare_cols <- rename_join_col(compare, by = by, by_col = by_col)
+    base_cols <- rename_join_col(base, by = by, by_col = by_col)
+    compare_join <- select(compare_cols, matches(by_col), all_of(cols))
+    base_join <- select(base_cols, matches(by_col), all_of(cols))
+    new_data_join <- dplyr::anti_join(x = compare_join, y = base_join,
                                       by = {{by_col}})
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) > 1 & is.null(by_col) & is.null(cols)) {
-    # 7) multiple 'by' ----
+    # 7) multiple 'by'
     # no 'by_col', no multiple compare 'cols'
-    newdf_join <- create_new_column(data = newdf,
+    compare_join <- create_new_column(data = compare,
                         cols = all_of(by), new_name = "join")
-    olddf_join <- create_new_column(data = olddf,
+    base_join <- create_new_column(data = base,
                         cols = all_of(by), new_name = "join")
-    new_data_join <- dplyr::anti_join(x = newdf_join,
-                                      y = olddf_join,
+    new_data_join <- dplyr::anti_join(x = compare_join,
+                                      y = base_join,
                                       by = dplyr::intersect(
-                                                  x = names(newdf_join),
-                                                  y = names(olddf_join)))
+                                                  x = names(compare_join),
+                                                  y = names(base_join)))
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) > 1 & !is.null(by_col) & is.null(cols)) {
-    # 8) multiple 'by' and 'by_col' ----
+    # 8) multiple 'by' and 'by_col'
     # no multiple compare 'cols'
-    newdf_join <- create_new_column(data = newdf,
+    compare_join <- create_new_column(data = compare,
                                     cols = all_of(by),
                                     new_name = {{by_col}})
-    olddf_join <- create_new_column(data = olddf,
+    base_join <- create_new_column(data = base,
                                     cols = all_of(by),
                                     new_name = {{by_col}})
-    new_data_join <- dplyr::anti_join(x = newdf_join, y = olddf_join,
-                            by = dplyr::intersect(x = names(newdf_join),
-                                                  y = names(olddf_join)))
+    new_data_join <- dplyr::anti_join(x = compare_join, y = base_join,
+                            by = dplyr::intersect(x = names(compare_join),
+                                                  y = names(base_join)))
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) > 1 & is.null(by_col) & !is.null(cols)) {
-    # 9) multiple 'by' & multiple compare 'cols' ----
+    # 9) multiple 'by' & multiple compare 'cols'
     # no 'by_col'
-    newdf_join <- create_new_column(data = newdf,
+    compare_join <- create_new_column(data = compare,
                         cols = all_of(by), new_name = "join")
-    olddf_join <- create_new_column(data = olddf,
+    base_join <- create_new_column(data = base,
                         cols = all_of(by), new_name = "join")
-    newdf_join_cols <- dplyr::select(newdf_join, join, all_of(cols))
-    olddf_join_cols <- dplyr::select(olddf_join, join, all_of(cols))
-    new_data_join <- dplyr::anti_join(x = newdf_join_cols,
-                                      y = olddf_join_cols,
-                            by = dplyr::intersect(x = names(newdf_join_cols),
-                                                  y = names(olddf_join_cols)))
+    compare_join_cols <- dplyr::select(compare_join, join, all_of(cols))
+    base_join_cols <- dplyr::select(base_join, join, all_of(cols))
+    new_data_join <- dplyr::anti_join(x = compare_join_cols,
+                                      y = base_join_cols,
+                            by = dplyr::intersect(x = names(compare_join_cols),
+                                                  y = names(base_join_cols)))
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) > 1 & !is.null(by_col) & !is.null(cols)) {
-    # 10) multiple 'by', new 'by_col' & compare multiple 'cols' ----
-    newdf_join <- create_new_column(data = newdf,
+    # 10) multiple 'by', new 'by_col' & compare multiple 'cols'
+    compare_join <- create_new_column(data = compare,
                         cols = all_of(by), new_name = {{by_col}})
-    olddf_join <- create_new_column(data = olddf,
+    base_join <- create_new_column(data = base,
                         cols = all_of(by), new_name = {{by_col}})
-    newdf_join_cols <- dplyr::select(newdf_join, {{by_col}}, all_of(cols))
-    olddf_join_cols <- dplyr::select(olddf_join, {{by_col}}, all_of(cols))
-    new_data_join <- dplyr::anti_join(x = newdf_join_cols,
-                                      y = olddf_join_cols,
-                            by = dplyr::intersect(x = names(newdf_join_cols),
-                                                  y = names(olddf_join_cols)))
+    compare_join_cols <- dplyr::select(compare_join, {{by_col}}, all_of(cols))
+    base_join_cols <- dplyr::select(base_join, {{by_col}}, all_of(cols))
+    new_data_join <- dplyr::anti_join(x = compare_join_cols,
+                                      y = base_join_cols,
+                            by = dplyr::intersect(x = names(compare_join_cols),
+                                                  y = names(base_join_cols)))
     new_data <- dplyr::distinct(new_data_join)
   }
 
   return(new_data)
 }
 
+
+## create_deleted_data -----------------------------------------------------
+#' Create a dataset of deleted records
+#'
+#' @param compare a 'new' or 'current' dataset
+#' @param base an 'old' or 'previous' dataset
+#' @param by the joining column between the two datasets
+#' @param by_col name of the new joining column
+#' @param  cols names of columns to compare
+#'
+#' @return deleted_data
+#' @export create_deleted_data
+#'
+#' @importFrom dplyr anti_join
+#' @importFrom dplyr distinct
+#' @importFrom dplyr select
+#' @importFrom dplyr intersect
+#' @importFrom dplyr relocate
+#' @importFrom tidyr unite
+#' @importFrom tibble add_column
+#'
+#' @examples # using local data
+#' CompleteData <- dfdiffs::CompleteData
+#' IncompleteData <- dfdiffs::IncompleteData
+#' create_deleted_data(compare = IncompleteData, base = CompleteData,
+#'                     by = c("subject", "record"))
+#' create_deleted_data(compare = IncompleteData, base = CompleteData,
+#'                     by = c("subject", "record")
+#'                     by_col = "join_var"
+#'                     )
+#' create_deleted_data(compare = IncompleteData, base = CompleteData,
+#'                     by = c("subject", "record")
+#'                     by_col = "join_var",
+#'                     cols = c("subject", "record")
+#'                     )
+create_deleted_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
+  # convert all columns to character
+  compare <- mutate(compare, across(.cols = everything(), .fns = as.character))
+  base <- mutate(base, across(.cols = everything(), .fns = as.character))
+  if (is.null(by) & is.null(by_col) & is.null(cols)) {
+     # 1) NOTHING
+     # (no 'by', no 'by_col', and no 'cols')
+      deleted_join <- dplyr::anti_join(x = base, y = compare,
+                                    by = dplyr::intersect(
+                                      x = names(base),
+                                      y = names(compare)))
+     deleted_data <- dplyr::distinct(deleted_join)
+  } else if (is.null(by) & is.null(by_col) & !is.null(cols)) {
+     # 2) multiple compare columns
+     # (no 'by', no 'by_col', and multiple compare 'cols')
+    compare_cols <- select(compare, all_of(cols))
+    base_cols <- select(base, all_of(cols))
+    deleted_join <- dplyr::anti_join(x = base_cols, y = compare_cols,
+                                    by = dplyr::intersect(
+                                      x = names(base_cols),
+                                      y = names(compare_cols)))
+    deleted_data <- dplyr::distinct(deleted_join)
+  } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
+     # 3) single 'by' column
+     deleted_join <- dplyr::anti_join(x = base, y = compare,
+                                        by = {{by}})
+     deleted_data <- dplyr::distinct(deleted_join)
+  } else if (length(by) == 1 & !is.null(by_col) & is.null(cols)) {
+    # 4) single `by` column, new `by_col`
+    compare_cols <- rename_join_col(data = compare, by = by, by_col = by_col)
+    base_cols <- rename_join_col(data = base, by = by, by_col = by_col)
+    deleted_join <- dplyr::anti_join(x = base_cols, y = compare_cols,
+                                        by = {{by_col}})
+    deleted_data <- dplyr::distinct(deleted_join)
+  } else if (length(by) == 1 & is.null(by_col) & !is.null(cols)) {
+    # 5) single 'by' and multiple compare 'cols'
+    # no 'by_col'
+    compare_cols <- dplyr::select(compare, all_of(by), all_of(cols))
+    base_cols <- dplyr::select(base, all_of(by), all_of(cols))
+    deleted_join <- dplyr::anti_join(x = base_cols, y = compare_cols,
+                                    by = dplyr::intersect(
+                                    x = names(base_cols),
+                                    y = names(compare_cols)))
+      deleted_data <- dplyr::distinct(deleted_join)
+  } else if (length(by) == 1 & !is.null(by_col) & !is.null(cols)) {
+    # 6) multiple 'by', new 'by_col', multiple compare 'cols'
+    base_join <- create_new_column(data = base,
+                      cols = all_of(by), new_name = {{by_col}})
+    compare_join <- create_new_column(data = compare,
+                      cols = all_of(by), new_name = {{by_col}})
+    compare_cols <- dplyr::select(compare_join, {{by_col}}, all_of(cols))
+    base_cols <- dplyr::select(base_join, {{by_col}}, all_of(cols))
+    deleted_join <- dplyr::anti_join(x = base_cols, y = compare_cols,
+                                      by = dplyr::intersect(
+                                      x = names(base_cols),
+                                      y = names(compare_cols)))
+    deleted_data <- dplyr::distinct(deleted_join)
+  } else if (length(by) > 1 & is.null(by_col) & is.null(cols)) {
+      # 7) multiple 'by', no 'by_col', no 'cols'
+      base_join <- create_new_column(data = base,
+                        cols = all_of(by), new_name = "join")
+      compare_join <- create_new_column(data = compare,
+                        cols = all_of(by), new_name = "join")
+      deleted_join <- dplyr::anti_join(x = base_join, y = compare_join,
+                                    by = dplyr::intersect(
+                                      x = names(base_join),
+                                      y = names(compare_join)))
+      deleted_data <- dplyr::distinct(deleted_join)
+  } else if (length(by) > 1 & !is.null(by_col) & is.null(cols)) {
+      # 8) multiple 'by', new column ('by_col')
+      # no compare 'cols'
+      base_join <- create_new_column(data = base,
+                        cols = all_of(by), new_name = {{by_col}})
+      compare_join <- create_new_column(data = compare,
+                        cols = all_of(by), new_name = {{by_col}})
+      deleted_join <- dplyr::anti_join(x = base_join, y = compare_join,
+                                    by = dplyr::intersect(
+                                      x = names(base_join),
+                                      y = names(compare_join)))
+      deleted_data <- dplyr::distinct(deleted_join)
+  } else if (length(by) > 1 & is.null(by_col) & !is.null(cols)) {
+      # 9) multiple 'by', multiple compare columns ('cols')
+      # no 'by_col'
+      base_cols <- create_new_column(data = base,
+                        cols = all_of(by), new_name = "join")
+      compare_cols <- create_new_column(data = compare,
+                        cols = all_of(by), new_name = "join")
+      base_join <- dplyr::select(base_cols, matches("join"), all_of(cols))
+      compare_join <- dplyr::select(compare_cols, matches("join"), all_of(cols))
+      deleted_join <- dplyr::anti_join(x = base_join, y = compare_join,
+                                    by = dplyr::intersect(
+                                      x = names(base_join),
+                                      y = names(compare_join)))
+      deleted_data <- dplyr::distinct(deleted_join)
+  } else if (length(by) > 1 & !is.null(by_col) & !is.null(cols)) {
+    # 10) multiple 'by', new column ('by_col'), multiple compare 'cols' s
+      compare_cols <- create_new_column(data = compare,
+                        cols = all_of(by), new_name = {{by_col}})
+      base_cols <- create_new_column(data = base,
+                        cols = all_of(by), new_name = {{by_col}})
+      compare_join <- dplyr::select(compare_cols, {{by_col}}, all_of(cols))
+      base_join <- dplyr::select(base_cols, {{by_col}}, all_of(cols))
+      deleted_join <- dplyr::anti_join(x = base_join, y = compare_join,
+                                        by = dplyr::intersect(
+                                          x = names(base_join),
+                                          y = names(compare_join)))
+      deleted_data <- dplyr::distinct(deleted_join)
+  }
+
+  return(deleted_data)
+}
+
+
+## extract_df_tables -------------------------------------------------------
+#' Extract tables from `diffdf::diffdf` list
+#'
+#' @param diffdf_list output from `diffdf::diffdf()` function
+#' @param by_keys `keys` argument from `diffdf::diffdf()`/`by` argument from
+#'      `create_changed_data()`
+#'
+#' @return diff_tbls list of diff tables
+#' @export extract_df_tables
+#'
+#' @description This is a sub-function for create_changed_data()
+extract_df_tables <- function(diffdf_list, by_keys) {
+  diff_lst_nms <- base::names(diffdf_list)
+  num_diffs_lst <- diffdf_list[stringr::str_detect(diff_lst_nms, "Num")]
+  var_diffs_lst <- diffdf_list[stringr::str_detect(diff_lst_nms, "Var")]
+  base_diffs_lst <- diffdf_list[stringr::str_detect(diff_lst_nms, "Base")]
+  comp_diffs_lst <- diffdf_list[stringr::str_detect(diff_lst_nms, "Comp")]
+  # nums
+  num_diffs <- purrr::map_df(.x = num_diffs_lst,
+                                  .f = janitor::clean_names)
+  # vars
+  var_diffs_chr_lst <- map(var_diffs_lst,
+                            .f = ~mutate(.x,across(.cols = everything(),
+                                                    .fns = as.character)))
+  var_diffs <- purrr::map_df(.x = var_diffs_chr_lst, .f = janitor::clean_names)
+
+  if (length(base_diffs_lst) > 0 & length(comp_diffs_lst) > 0) {
+    # base & comps
+    base_diffs_issue <- tibble::as_tibble(base_diffs_lst)
+    base_diffs <- tidyr::unnest(base_diffs_issue, ExtRowsBase)
+    base_diffs <- purrr::set_names(x = base_diffs,
+                    nm = paste0(by_keys, "s in BASE that are not in COMPARE"))
+    comp_diffs_issue <- tibble::as_tibble(comp_diffs_lst)
+    comp_diffs <- tidyr::unnest(comp_diffs_issue, ExtRowsComp)
+    comp_diffs <- purrr::set_names(x = comp_diffs,
+                      nm = paste0(by_keys, "s in COMPARE that are not in BASE"))
+    diff_tbls <- list(
+      "base_diffs" = base_diffs, "comp_diffs" = comp_diffs,
+      "num_diffs" = num_diffs, "var_diffs" = var_diffs
+      )
+  } else if (length(base_diffs_lst) > 0 & length(comp_diffs_lst) == 0) {
+    # base
+    base_diffs_issue <- tibble::as_tibble(base_diffs_lst)
+    base_diffs <- tidyr::unnest(base_diffs_issue, ExtRowsBase)
+    base_diffs <- purrr::set_names(x = base_diffs,
+                    nm = paste0(by_keys, "s in BASE that are not in COMPARE"))
+    diff_tbls <- list(
+      "base_diffs" = base_diffs,
+      "num_diffs" = num_diffs, "var_diffs" = var_diffs
+      )
+  } else if (length(base_diffs_lst) == 0 & length(comp_diffs_lst) > 0) {
+    # comps
+    comp_diffs_issue <- tibble::as_tibble(comp_diffs_lst)
+    comp_diffs <- tidyr::unnest(comp_diffs_issue, ExtRowsComp)
+    comp_diffs <- purrr::set_names(x = comp_diffs,
+                      nm = paste0(by_keys, "s in COMPARE that are not in BASE"))
+    diff_tbls <- list(
+      "comp_diffs" = comp_diffs,
+      "num_diffs" = num_diffs, "var_diffs" = var_diffs,
+      )
+  } else {
+    diff_tbls <- list(
+      "num_diffs" = num_diffs,
+      "var_diffs" = var_diffs)
+  }
+  return(diff_tbls)
+}
+
+
+## create_changed_data -----------------------------------------------------
+#' Create changed data
+#'
+#' @param compare A 'current' or 'new' dataset (tibble or data.frame)
+#' @param base A 'previous' or 'old' dataset (tibble or data.frame)
+#' @param by A join column between the two datasets, or any combination of columns that constitute a unique row.
+#' @param by_col A new name for the joining column.
+#' @param cols Columns to be compared.
+#'
+#' @importFrom diffdf diffdf
+#' @importFrom dplyr mutate
+#' @importFrom dplyr across
+#' @importFrom dplyr select
+#' @importFrom dplyr contains
+#' @importFrom dplyr relocate
+#' @importFrom dplyr row_number
+#' @importFrom tibble as_tibble
+#'
+#' @return modified data
+#' @export create_changed_data
+#'
+#' @examples # with local data
+#' ChangedData <- dfdiffs::ChangedData
+#' InitialData <- dfdiffs::InitialData
+#' create_changed_data(
+#'   compare = ChangedData,
+#'   base = InitialData,
+#'   by = c("subject_id", "record"),
+#'   cols = c("text_value_a", "text_value_b", "updated_date")
+#' )
+#' create_changed_data(
+#'   compare = ChangedData,
+#'   base = InitialData,
+#'   by = c("subject_id", "record")
+#' )
+create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
+  # convert all columns to character
+  compare <- mutate(compare, across(.cols = everything(), .fns = as.character))
+  base <- mutate(base, across(.cols = everything(), .fns = as.character))
+
+  if (is.null(by) & is.null(by_col) & is.null(cols)) {
+    # 1) NOTHING (Two datasets, compare all columns)
+    diff_lst <- suppressWarnings(suppressMessages(
+      diffdf::diffdf(base = base , compare = compare)))
+    # get names
+    diff_lst_nms <- base::names(diff_lst)
+    # extract nums
+    numdiffs_lst <- diff_lst[stringr::str_detect(diff_lst_nms, "NumDiff")]
+    # better names
+    num_diffs <- purrr::map_df(.x = numdiffs_lst, .f = janitor::clean_names)
+    # extract vars
+    vardiffs_lst <- diff_lst[stringr::str_detect(diff_lst_nms, "VarDiff")]
+    # convert to character
+    chr_vardiffs_lst <- purrr::map(.x = vardiffs_lst,
+                                        dplyr::mutate_all, base::as.character)
+    # better names
+    var_diffs <- purrr::map_df(.x = chr_vardiffs_lst, .f = janitor::clean_names)
+    # return object
+    changed_data <- list("num_diffs" = num_diffs, "var_diffs" = var_diffs)
+
+  } else if (is.null(by) & is.null(by_col) & !is.null(cols)) {
+    # 2) Multiple columns to compare (cols)
+    # no 'by' & no 'by_col'
+    base_cols <- dplyr::select(base, all_of(cols))
+    compare_cols <- dplyr::select(compare, all_of(cols))
+    diff_lst <- suppressWarnings(suppressMessages(
+      diffdf::diffdf(base = base_cols , compare = compare_cols)))
+
+    # get names
+    diff_lst_nms <- base::names(diff_lst)
+    # extract nums
+    numdiffs_lst <- diff_lst[stringr::str_detect(diff_lst_nms, "NumDiff")]
+    # better names
+    num_diffs <- purrr::map_df(.x = numdiffs_lst, .f = janitor::clean_names)
+    # extract vars
+    vardiffs_lst <- diff_lst[stringr::str_detect(diff_lst_nms, "VarDiff")]
+    # convert to character
+    chr_vardiffs_lst <- purrr::map(.x = vardiffs_lst,
+                                        dplyr::mutate_all, base::as.character)
+    # better names
+    var_diffs <- purrr::map_df(.x = chr_vardiffs_lst, .f = janitor::clean_names)
+
+    changed_data <- list("num_diffs" = num_diffs, "var_diffs" = var_diffs)
+  } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
+    # 3) Single 'by' column, no new column name
+    diff_lst <- suppressWarnings(suppressMessages(
+      diffdf::diffdf(base = base , compare = compare, keys = by)))
+
+    changed_data <- extract_df_tables(diffdf_list = diff_lst, by_keys = by)
+
+  } else if (length(by) == 1 & !is.null(by_col) & is.null(cols)) {
+    # 4) Single by column, new column name (by_col)
+      compare_join_cols <- rename_join_col(compare, by = by, by_col = by_col)
+      base_join_cols <- rename_join_col(base, by = by, by_col = by_col)
+      # create df list
+      diff_lst <- suppressWarnings(suppressMessages(
+                    diffdf::diffdf(base = base_join_cols,
+                                  compare = compare_join_cols,
+                                  keys = by_col)))
+      # extract tables (using by_col)
+      changed_data <- extract_df_tables(diffdf_list = diff_lst,
+                                          by_keys = by_col)
+  } else if (length(by) == 1 & is.null(by_col) & !is.null(cols)) {
+    # 5) Single by column, multiple compare columns 'cols'
+      compare_join_cols <- dplyr::select(compare, {{by}}, all_of(cols))
+      base_join_cols <- dplyr::select(base, {{by}}, all_of(cols))
+      # create df list
+      diff_lst <- suppressWarnings(suppressMessages(
+                    diffdf::diffdf(base = base_join_cols,
+                                  compare = compare_join_cols,
+                                  keys = by)))
+      # extract tables (using by)
+      changed_data <- extract_df_tables(diffdf_list = diff_lst,
+                                          by_keys = by)
+
+  } else if (length(by) == 1 & !is.null(by_col) & !is.null(cols)) {
+    # 6) Single by column, new column name (by_col), multiple compare columns (cols)
+      compare_cols <- rename_join_col(compare, by = by, by_col = by_col)
+      base_cols <- rename_join_col(base, by = by, by_col = by_col)
+      compare_join_cols <- dplyr::select(compare_cols, {{by_col}}, all_of(cols))
+      base_join_cols <- dplyr::select(base_cols, {{by_col}}, all_of(cols))
+      # create df list using 'by_col'
+      diff_lst <- suppressWarnings(suppressMessages(
+                    diffdf::diffdf(base = base_join_cols,
+                                  compare = compare_join_cols,
+                                  keys = by_col)))
+      # extract tables (using 'by_col')
+      changed_data <- extract_df_tables(diffdf_list = diff_lst,
+                                          by_keys = by_col)
+
+  } else if (length(by) > 1 & is.null(by_col) & is.null(cols)) {
+    # 7) Multiple by columns
+      compare_join_cols <- create_new_column(data = compare,
+                          cols = all_of(by), new_name = 'join')
+      base_join_cols <- create_new_column(data = base,
+                          cols = all_of(by), new_name = 'join')
+      # create df list using 'join'
+      diff_lst <- suppressWarnings(suppressMessages(
+                    diffdf::diffdf(base = base_join_cols,
+                                  compare = compare_join_cols,
+                                  keys = 'join')))
+      # extract tables (using 'join')
+      changed_data <- extract_df_tables(diffdf_list = diff_lst,
+                                          by_keys = 'join')
+  } else if (length(by) > 1 & !is.null(by_col) & is.null(cols)) {
+    # 8) Multiple by columns, new column name (by_col)
+      compare_join_cols <- create_new_column(data = compare,
+                          cols = all_of(by), new_name = {{by_col}})
+      base_join_cols <- create_new_column(data = base,
+                          cols = all_of(by), new_name = {{by_col}})
+      # create df list using 'by_col'
+      diff_lst <- suppressWarnings(suppressMessages(
+                    diffdf::diffdf(base = base_join_cols,
+                                  compare = compare_join_cols,
+                                  keys = {{by_col}})))
+      # extract tables (using 'by_col')
+      changed_data <- extract_df_tables(diffdf_list = diff_lst,
+                                          by_keys = {{by_col}})
+
+  } else if (length(by) > 1 & is.null(by_col) & !is.null(cols)) {
+    # 9) multiple `by` columns, multiple compare 'cols'
+    # create new 'join' column
+      compare_cols <- create_new_column(data = compare,
+                          cols = all_of(by), new_name = "join")
+      base_cols <- create_new_column(data = base,
+                          cols = all_of(by), new_name = "join")
+      # select the 'cols'
+      compare_join_cols <- dplyr::select(compare_cols,
+                                      matches("join"), all_of(cols))
+      base_join_cols <- dplyr::select(base_cols,
+                                      matches("join"), all_of(cols))
+      # create df list using 'join'
+      diff_lst <- suppressWarnings(suppressMessages(
+                    diffdf::diffdf(base = base_join_cols,
+                                  compare = compare_join_cols,
+                                  keys = 'join')))
+      # extract tables (using 'join')
+      changed_data <- extract_df_tables(diffdf_list = diff_lst,
+                                          by_keys = 'join')
+
+  } else if (length(by) > 1 & !is.null(by_col) & !is.null(cols)) {
+    # 10) multiple `by` columns, new 'by_col', and 'cols'
+      compare_cols <- create_new_column(data = compare,
+                          cols = all_of(by), new_name = {{by_col}})
+      base_cols <- create_new_column(data = base,
+                          cols = all_of(by), new_name = {{by_col}})
+      compare_join_cols <- dplyr::select(compare_cols,
+                                      all_of(by_col), all_of(cols))
+      base_join_cols <- dplyr::select(base_cols,
+                                      all_of(by_col), all_of(cols))
+      # create df list using 'by_col'
+      diff_lst <- suppressWarnings(suppressMessages(
+                    diffdf::diffdf(base = base_join_cols,
+                                  compare = compare_join_cols,
+                                  keys = {{by_col}})))
+      # extract tables (using 'by_col')
+      changed_data <- extract_df_tables(diffdf_list = diff_lst,
+                                          by_keys = {{by_col}})
+
+  } else {
+
+      changed_data <- suppressWarnings(suppressMessages(
+                    diffdf::diffdf(base = base,
+                                  compare = compare,
+                                  keys = by)))
+  }
+
+  return(changed_data)
+}
+
+
+## create_modified_data ----------------------------------------------------
 #' Create modified data
 #'
-#' @param newdf A 'current' or 'new' dataset (tibble or data.frame)
-#' @param olddf A 'previous' or 'old' dataset (tibble or data.frame)
+#' @param compare A 'current' or 'new' dataset (tibble or data.frame)
+#' @param base A 'previous' or 'old' dataset (tibble or data.frame)
 #' @param by A join column between the two datasets, or any combination of columns that constitute a unique row.
 #' @param by_col A new name for the joining column.
 #' @param cols Columns to be compared.
@@ -346,30 +853,30 @@ create_new_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = NULL)
 #' CurrentData <- dfdiffs::ChangedData
 #' PreviousData <- dfdiffs::InitialData
 #' create_modified_data(
-#'            newdf = CurrentData,
-#'            olddf = PreviousData,
+#'            compare = CurrentData,
+#'            base = PreviousData,
 #'            by = c("subject_id", "record"),
 #'            cols = c("text_value_a", "text_value_b", "updated_date"))
 #' create_modified_data(
-#'            newdf = CurrentData,
-#'            olddf = PreviousData,
+#'            compare = CurrentData,
+#'            base = PreviousData,
 #'            by = c("subject_id", "record"))
-create_modified_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = NULL) {
+create_modified_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
     # convert all columns to character
-    newdf <- dplyr::mutate(newdf,
+    compare <- dplyr::mutate(compare,
                         across(.cols = everything(), .fns = as.character))
-    olddf <- dplyr::mutate(olddf,
+    base <- dplyr::mutate(base,
                         across(.cols = everything(), .fns = as.character))
 
     if (is.null(by) & is.null(by_col) & is.null(cols)) {
-      # 1) NOTHING (two datasets) ----
-      newdf_join_cols <- newdf
-      olddf_join_cols <- olddf
+      # 1) NOTHING (two datasets)
+      compare_join_cols <- compare
+      base_join_cols <- base
       # check
-      # mod_data <- list(newdf_join_cols, olddf_join_cols)
+      # mod_data <- list(compare_join_cols, base_join_cols)
       comparedf_list <- summary(arsenal::comparedf(
-                                  x = newdf_join_cols,
-                                  y = olddf_join_cols))
+                                  x = compare_join_cols,
+                                  y = base_join_cols))
       # diffs
       diffs_table <- dplyr::mutate(
                 .data = comparedf_list$diffs.table,
@@ -390,13 +897,13 @@ create_modified_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = 
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
 
     } else if (is.null(by) & is.null(by_col) & !is.null(cols)) {
-      # 2) multiple 'cols' ----
+      # 2) multiple 'cols'
       # no 'by' & no 'by_col'
-      newdf_join_cols <- dplyr::select(newdf, all_of(cols))
-      olddf_join_cols <- dplyr::select(olddf, all_of(cols))
+      compare_join_cols <- dplyr::select(compare, all_of(cols))
+      base_join_cols <- dplyr::select(base, all_of(cols))
       comparedf_list <- summary(arsenal::comparedf(
-                                  x = newdf_join_cols,
-                                  y = olddf_join_cols))
+                                  x = compare_join_cols,
+                                  y = base_join_cols))
       # diffs
       diffs_table <- dplyr::mutate(
                 .data = comparedf_list$diffs.table,
@@ -418,14 +925,14 @@ create_modified_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = 
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
 
     } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
-      # 3) Single 'by' column ----
-      newdf_join_cols <- dplyr::relocate(newdf, {{by}}, everything())
-      olddf_join_cols <- dplyr::relocate(olddf, {{by}}, everything())
+      # 3) Single 'by' column
+      compare_join_cols <- dplyr::relocate(compare, {{by}}, everything())
+      base_join_cols <- dplyr::relocate(base, {{by}}, everything())
       # check
-      # mod_data <- list(newdf_join_cols, olddf_join_cols)
+      # mod_data <- list(compare_join_cols, base_join_cols)
       comparedf_list <- summary(arsenal::comparedf(
-                                  x = newdf_join_cols,
-                                  y = olddf_join_cols,
+                                  x = compare_join_cols,
+                                  y = base_join_cols,
                                     by = {{by}}))
       # diffs
       diffs_table <- dplyr::mutate(
@@ -449,13 +956,13 @@ create_modified_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = 
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
 
     } else if (length(by) == 1 & !is.null(by_col) & is.null(cols)) {
-      # 3) Single 'by' column, new column ('by_col') ----
-      newdf_join_cols <- rename_join_col(newdf, by = by, by_col = by_col)
-      olddf_join_cols <- rename_join_col(olddf, by = by, by_col = by_col)
+      # 3) Single 'by' column, new column ('by_col')
+      compare_join_cols <- rename_join_col(compare, by = by, by_col = by_col)
+      base_join_cols <- rename_join_col(base, by = by, by_col = by_col)
 
       comparedf_list <- summary(arsenal::comparedf(
-                                  x = newdf_join_cols,
-                                  y = olddf_join_cols,
+                                  x = compare_join_cols,
+                                  y = base_join_cols,
                                     by = {{by_col}}))
       # diffs
      diffs_table <- dplyr::mutate(
@@ -479,13 +986,13 @@ create_modified_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = 
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
 
     } else if (length(by) == 1 & is.null(by_col) & !is.null(cols)) {
-      # 5) Single 'by' column, multiple compare cols ('cols') ----
-      newdf_join_cols <- dplyr::select(newdf, {{by}}, all_of(cols))
-      olddf_join_cols <- dplyr::select(olddf, {{by}}, all_of(cols))
+      # 5) Single 'by' column, multiple compare cols ('cols')
+      compare_join_cols <- dplyr::select(compare, {{by}}, all_of(cols))
+      base_join_cols <- dplyr::select(base, {{by}}, all_of(cols))
 
       comparedf_list <- summary(arsenal::comparedf(
-                                  x = newdf_join_cols,
-                                  y = olddf_join_cols,
+                                  x = compare_join_cols,
+                                  y = base_join_cols,
                                     by = {{by}}))
       # diffs
      diffs_table <- dplyr::mutate(
@@ -509,15 +1016,15 @@ create_modified_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = 
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
 
     } else if (length(by) == 1 & !is.null(by_col) & !is.null(cols)) {
-      # 6) Single 'by' column, new 'by_col', multiple compare 'cols' ----
-      newdf_cols <- rename_join_col(newdf, by = by, by_col = by_col)
-      olddf_cols <- rename_join_col(olddf, by = by, by_col = by_col)
-      newdf_join_cols <- dplyr::select(newdf_cols, {{by_col}}, all_of(cols))
-      olddf_join_cols <- dplyr::select(olddf_cols, {{by_col}}, all_of(cols))
+      # 6) Single 'by' column, new 'by_col', multiple compare 'cols'
+      compare_cols <- rename_join_col(compare, by = by, by_col = by_col)
+      base_cols <- rename_join_col(base, by = by, by_col = by_col)
+      compare_join_cols <- dplyr::select(compare_cols, {{by_col}}, all_of(cols))
+      base_join_cols <- dplyr::select(base_cols, {{by_col}}, all_of(cols))
 
       comparedf_list <- summary(arsenal::comparedf(
-                                  x = newdf_join_cols,
-                                  y = olddf_join_cols,
+                                  x = compare_join_cols,
+                                  y = base_join_cols,
                                     by = {{by_col}}))
       # diffs
      diffs_table <- dplyr::mutate(
@@ -541,15 +1048,15 @@ create_modified_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = 
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
 
     } else if (length(by) > 1 & is.null(by_col) & is.null(cols)) {
-      # 7) multiple `by` columns ----
-      newdf_join_cols <- create_new_column(data = newdf,
+      # 7) multiple `by` columns
+      compare_join_cols <- create_new_column(data = compare,
                           cols = all_of(by), new_name = "join")
-      olddf_join_cols <- create_new_column(data = olddf,
+      base_join_cols <- create_new_column(data = base,
                           cols = all_of(by), new_name = "join")
 
       comparedf_list <- summary(arsenal::comparedf(
-                                  x = newdf_join_cols,
-                                  y = olddf_join_cols,
+                                  x = compare_join_cols,
+                                  y = base_join_cols,
                                     by = "join"))
       # diffs
      diffs_table <- dplyr::mutate(
@@ -572,14 +1079,14 @@ create_modified_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = 
       diffs_byvar_tbl <- tibble::as_tibble(diffs_byvar_names)
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
     } else if (length(by) > 1 & !is.null(by_col) & is.null(cols)) {
-      # 8) multiple `by` columns, new 'by_col' ----
-      newdf_join_cols <- create_new_column(data = newdf,
+      # 8) multiple `by` columns, new 'by_col'
+      compare_join_cols <- create_new_column(data = compare,
                           cols = all_of(by), new_name = {{by_col}})
-      olddf_join_cols <- create_new_column(data = olddf,
+      base_join_cols <- create_new_column(data = base,
                           cols = all_of(by), new_name = {{by_col}})
       comparedf_list <- summary(arsenal::comparedf(
-                                  x = newdf_join_cols,
-                                  y = olddf_join_cols,
+                                  x = compare_join_cols,
+                                  y = base_join_cols,
                                     by = {{by_col}}))
       # diffs
      diffs_table <- dplyr::mutate(
@@ -603,18 +1110,18 @@ create_modified_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = 
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
 
     } else if (length(by) > 1 & is.null(by_col) & !is.null(cols)) {
-      # 9) multiple `by` columns, multiple compare 'cols' ----
-      newdf_cols <- create_new_column(data = newdf,
+      # 9) multiple `by` columns, multiple compare 'cols'
+      compare_cols <- create_new_column(data = compare,
                           cols = all_of(by), new_name = "join")
-      olddf_cols <- create_new_column(data = olddf,
+      base_cols <- create_new_column(data = base,
                           cols = all_of(by), new_name = "join")
-      newdf_join_cols <- dplyr::select(newdf_cols,
+      compare_join_cols <- dplyr::select(compare_cols,
                                       matches("join"), all_of(cols))
-      olddf_join_cols <- dplyr::select(olddf_cols,
+      base_join_cols <- dplyr::select(base_cols,
                                       matches("join"), all_of(cols))
       comparedf_list <- summary(arsenal::comparedf(
-                                  x = newdf_join_cols,
-                                  y = olddf_join_cols,
+                                  x = compare_join_cols,
+                                  y = base_join_cols,
                                     by = "join"))
       # diffs
      diffs_table <- dplyr::mutate(
@@ -638,18 +1145,18 @@ create_modified_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = 
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
 
     } else if (length(by) > 1 & !is.null(by_col) & !is.null(cols)) {
-      # 10) multiple `by` columns, new 'by_col', multiple compare 'cols' ----
-      newdf_cols <- create_new_column(data = newdf,
+      # 10) multiple `by` columns, new 'by_col', multiple compare 'cols'
+      compare_cols <- create_new_column(data = compare,
                           cols = all_of(by), new_name = {{by_col}})
-      olddf_cols <- create_new_column(data = olddf,
+      base_cols <- create_new_column(data = base,
                           cols = all_of(by), new_name = {{by_col}})
-      newdf_join_cols <- dplyr::select(newdf_cols,
+      compare_join_cols <- dplyr::select(compare_cols,
                                       all_of(by_col), all_of(cols))
-      olddf_join_cols <- dplyr::select(olddf_cols,
+      base_join_cols <- dplyr::select(base_cols,
                                       all_of(by_col), all_of(cols))
       comparedf_list <- summary(arsenal::comparedf(
-                                  x = newdf_join_cols,
-                                  y = olddf_join_cols,
+                                  x = compare_join_cols,
+                                  y = base_join_cols,
                                     by = {{by_col}}))
       # diffs
      diffs_table <- dplyr::mutate(
@@ -673,149 +1180,4 @@ create_modified_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = 
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
     }
     return(mod_data)
-}
-
-#' Create a dataset of deleted records
-#'
-#' @param newdf a 'new' or 'current' dataset
-#' @param olddf an 'old' or 'previous' dataset
-#' @param by the joining column between the two datasets
-#' @param by_col name of the new joining column
-#' @param  cols names of columns to compare
-#'
-#' @return deleted_data
-#' @export create_deleted_data
-#'
-#' @importFrom dplyr anti_join
-#' @importFrom dplyr distinct
-#' @importFrom dplyr select
-#' @importFrom dplyr intersect
-#' @importFrom dplyr relocate
-#' @importFrom tidyr unite
-#' @importFrom tibble add_column
-#'
-#' @examples # using local data
-#' CompleteData <- dfdiffs::CompleteData
-#' IncompleteData <- dfdiffs::IncompleteData
-#' create_deleted_data(newdf = IncompleteData, olddf = CompleteData,
-#'                     by = c("subject", "record"))
-#' create_deleted_data(newdf = IncompleteData, olddf = CompleteData,
-#'                     by = c("subject", "record")
-#'                     by_col = "join_var"
-#'                     )
-#' create_deleted_data(newdf = IncompleteData, olddf = CompleteData,
-#'                     by = c("subject", "record")
-#'                     by_col = "join_var",
-#'                     cols = c("subject", "record")
-#'                     )
-create_deleted_data <- function(newdf, olddf, by = NULL, by_col = NULL, cols = NULL) {
-  # convert all columns to character
-  newdf <- mutate(newdf, across(.cols = everything(), .fns = as.character))
-  olddf <- mutate(olddf, across(.cols = everything(), .fns = as.character))
-  if (is.null(by) & is.null(by_col) & is.null(cols)) {
-     # 1) NOTHING ----
-     # (no 'by', no 'by_col', and no 'cols')
-      deleted_join <- dplyr::anti_join(x = olddf, y = newdf,
-                                    by = dplyr::intersect(
-                                      x = names(olddf),
-                                      y = names(newdf)))
-     deleted_data <- dplyr::distinct(deleted_join)
-  } else if (is.null(by) & is.null(by_col) & !is.null(cols)) {
-     # 2) multiple compare columns ----
-     # (no 'by', no 'by_col', and multiple compare 'cols')
-    newdf_cols <- select(newdf, all_of(cols))
-    olddf_cols <- select(olddf, all_of(cols))
-    deleted_join <- dplyr::anti_join(x = olddf_cols, y = newdf_cols,
-                                    by = dplyr::intersect(
-                                      x = names(olddf_cols),
-                                      y = names(newdf_cols)))
-    deleted_data <- dplyr::distinct(deleted_join)
-  } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
-     # 3) single 'by' column ----
-     deleted_join <- dplyr::anti_join(x = olddf, y = newdf,
-                                        by = {{by}})
-     deleted_data <- dplyr::distinct(deleted_join)
-  } else if (length(by) == 1 & !is.null(by_col) & is.null(cols)) {
-    # 4) single `by` column, new `by_col` ----
-    newdf_cols <- rename_join_col(data = newdf, by = by, by_col = by_col)
-    olddf_cols <- rename_join_col(data = olddf, by = by, by_col = by_col)
-    deleted_join <- dplyr::anti_join(x = olddf_cols, y = newdf_cols,
-                                        by = {{by_col}})
-    deleted_data <- dplyr::distinct(deleted_join)
-  } else if (length(by) == 1 & is.null(by_col) & !is.null(cols)) {
-    # 5) single 'by' and multiple compare 'cols' ----
-    # no 'by_col'
-    newdf_cols <- dplyr::select(newdf, all_of(by), all_of(cols))
-    olddf_cols <- dplyr::select(olddf, all_of(by), all_of(cols))
-    deleted_join <- dplyr::anti_join(x = olddf_cols, y = newdf_cols,
-                                    by = dplyr::intersect(
-                                    x = names(olddf_cols),
-                                    y = names(newdf_cols)))
-      deleted_data <- dplyr::distinct(deleted_join)
-  } else if (length(by) == 1 & !is.null(by_col) & !is.null(cols)) {
-    # 6) multiple 'by', new 'by_col', multiple compare 'cols' ----
-    olddf_join <- create_new_column(data = olddf,
-                      cols = all_of(by), new_name = {{by_col}})
-    newdf_join <- create_new_column(data = newdf,
-                      cols = all_of(by), new_name = {{by_col}})
-    newdf_cols <- dplyr::select(newdf_join, {{by_col}}, all_of(cols))
-    olddf_cols <- dplyr::select(olddf_join, {{by_col}}, all_of(cols))
-    deleted_join <- dplyr::anti_join(x = olddf_cols, y = newdf_cols,
-                                      by = dplyr::intersect(
-                                      x = names(olddf_cols),
-                                      y = names(newdf_cols)))
-    deleted_data <- dplyr::distinct(deleted_join)
-  } else if (length(by) > 1 & is.null(by_col) & is.null(cols)) {
-      # 7) multiple 'by', no 'by_col', no 'cols' -----
-      olddf_join <- create_new_column(data = olddf,
-                        cols = all_of(by), new_name = "join")
-      newdf_join <- create_new_column(data = newdf,
-                        cols = all_of(by), new_name = "join")
-      deleted_join <- dplyr::anti_join(x = olddf_join, y = newdf_join,
-                                    by = dplyr::intersect(
-                                      x = names(olddf_join),
-                                      y = names(newdf_join)))
-      deleted_data <- dplyr::distinct(deleted_join)
-  } else if (length(by) > 1 & !is.null(by_col) & is.null(cols)) {
-      # 8) multiple 'by', new column ('by_col') -----
-      # no compare 'cols'
-      olddf_join <- create_new_column(data = olddf,
-                        cols = all_of(by), new_name = {{by_col}})
-      newdf_join <- create_new_column(data = newdf,
-                        cols = all_of(by), new_name = {{by_col}})
-      deleted_join <- dplyr::anti_join(x = olddf_join, y = newdf_join,
-                                    by = dplyr::intersect(
-                                      x = names(olddf_join),
-                                      y = names(newdf_join)))
-      deleted_data <- dplyr::distinct(deleted_join)
-  } else if (length(by) > 1 & is.null(by_col) & !is.null(cols)) {
-      # 9) multiple 'by', multiple compare columns ('cols') -----
-      # no 'by_col'
-      olddf_cols <- create_new_column(data = olddf,
-                        cols = all_of(by), new_name = "join")
-      newdf_cols <- create_new_column(data = newdf,
-                        cols = all_of(by), new_name = "join")
-      olddf_join <- dplyr::select(olddf_cols, matches("join"), all_of(cols))
-      newdf_join <- dplyr::select(newdf_cols, matches("join"), all_of(cols))
-      deleted_join <- dplyr::anti_join(x = olddf_join, y = newdf_join,
-                                    by = dplyr::intersect(
-                                      x = names(olddf_join),
-                                      y = names(newdf_join)))
-      deleted_data <- dplyr::distinct(deleted_join)
-  } else if (length(by) > 1 & !is.null(by_col) & !is.null(cols)) {
-    # 10) multiple 'by', new column ('by_col'), multiple compare 'cols' -----
-      newdf_cols <- create_new_column(data = newdf,
-                        cols = all_of(by), new_name = {{by_col}})
-      olddf_cols <- create_new_column(data = olddf,
-                        cols = all_of(by), new_name = {{by_col}})
-      newdf_join <- dplyr::select(newdf_cols, {{by_col}}, all_of(cols))
-      olddf_join <- dplyr::select(olddf_cols, {{by_col}}, all_of(cols))
-      deleted_join <- dplyr::anti_join(x = olddf_join, y = newdf_join,
-                                        by = dplyr::intersect(
-                                          x = names(olddf_join),
-                                          y = names(newdf_join)))
-      deleted_data <- dplyr::distinct(deleted_join)
-  }
-
-  return(deleted_data)
 }

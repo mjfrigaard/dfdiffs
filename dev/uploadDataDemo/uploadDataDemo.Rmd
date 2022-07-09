@@ -1,5 +1,5 @@
 ---
-title: "uploadDataDemo"
+title: "uploadDataDemo(): upload module (dev)"
 author: "Martin Frigaard"
 output:
   html_document: 
@@ -66,7 +66,7 @@ options(reactable.theme = reactableTheme(
 ))
 ```
 
-# Overview
+# Purpose
 
 This is a development document (written in `rmarkdown` and deployed with `shiny`) for the `dfdiffs` package. The purpose of the dfdiffs package is to perform  comparisons between two datasets (similar to `PROC COMPARE` in SAS). 
 
@@ -78,16 +78,17 @@ In our `uploadDataUI()`, we want the UI to clearly display three actions:
 
 1) Upload a flat/excel file  
   1a) If the imported data are excel files, select the sheets to import  
-  1b) flat files are uploaded using the `load_flat_file()` function  
+  
+2) Upload a flat file with the `load_flat_file()` function  
 2) Enter a name for the uploaded data files    
 
 After uploading and naming the data sources, the data are visible to preview as a `reactable()` table. 
 
 The input IDs in this module have the following naming conventions: 
 
-- `_base` are the objects associated with the base (target) data. 
+- `base` are the objects associated with the base (target) data. 
 
-- `_comp` are the objects associated with the compare (current) data. 
+- `comp` are the objects associated with the compare (current) data. 
 
 ## Excel objects 
 
@@ -118,6 +119,14 @@ If the user uploads a flat file (`.sas7bdat`, `.csv`, etc.), the following inptu
 ### uploadDataUI() 
 
 ```{r uploadDataUI}
+#' data upload (UI) for selectDataDemo
+#'
+#' @param id module id
+#'
+#' @export uploadDataUI
+#'
+#' @description `uploadDataUI()`/`uploadDataServer()` create the upload module
+#' for the dfdiffs app.
 uploadDataUI <- function(id) {
   tagList(
     h3("Upload a ", strong("base"), " (target) data source "),
@@ -128,10 +137,10 @@ uploadDataUI <- function(id) {
         box(
           maximizable = TRUE,
           collapsible = TRUE,
-          collapsed = FALSE,
+          collapsed = TRUE,
           closable = FALSE,
           solidHeader = TRUE,
-          status = "success",
+          status = "primary",
           width = 12,
           title = tags$strong("Upload Excel File (base)"),
           fluidRow(
@@ -202,17 +211,17 @@ uploadDataUI <- function(id) {
         )
       )
     ),
-    # |- upload base xlsx file ----
+    # |- upload base flat file ----
     fluidRow(
       sortable(
         width = 12,
         box(
           maximizable = TRUE,
-          collapsed = TRUE,
+          collapsed = FALSE,
           collapsible = TRUE,
           closable = FALSE,
           solidHeader = TRUE,
-          status = "success",
+          status = "primary",
           width = 12,
           title = tags$strong("Upload Flat Data File (base)"),
           fluidRow(
@@ -281,9 +290,9 @@ uploadDataUI <- function(id) {
         # |- upload compare xlsx file ----
         box(
           maximizable = TRUE,
-          collapsed = FALSE,
+          collapsed = TRUE,
           solidHeader = TRUE,
-          status = "primary",
+          status = "secondary",
           width = 12,
           collapsible = TRUE,
           closable = FALSE,
@@ -362,9 +371,9 @@ uploadDataUI <- function(id) {
         width = 12,
         box(
           maximizable = TRUE,
-          collapsed = TRUE,
+          collapsed = FALSE,
           solidHeader = TRUE,
-          status = "primary",
+          status = "secondary",
           width = 12,
           collapsible = TRUE,
           closable = FALSE,
@@ -552,10 +561,32 @@ All of the objects stored and returned in the list are shown below:
 ## uploadDataServer()
 
 ```{r uploadDataServer}
+# uploadDataServer --------------------------------------------------------
+#' data upload (Server) for selectDataDemo()
+#'
+#' @param id module id
+#'
+#' @export uploadDataServer
+#'
+#' @return list with data inputs
+#' \describe{
+#'   \item{base_xlsx_data}{reactive dataset of imported 'base' excel file}
+#'   \item{base_xlsx_data_name}{name of reactive dataset of imported 'base' excel file}
+#'   \item{base_flat_file_data}{reactive dataset of imported 'base' flat file}
+#'   \item{base_flat_file_data_name}{name of reactive dataset of imported 'base' flat file}
+#'   \item{comp_xlsx_data}{reactive dataset of imported 'compare' excel file}
+#'   \item{comp_xlsx_data_name}{name of reactive dataset of imported 'compare' excel file}
+#'   \item{comp_flat_file_data}{reactive dataset of imported 'compare' flat file}
+#'   \item{comp_flat_file_data_name}{name of reactive dataset of imported 'compare' flat file}
+#' }
+#'
+#' @examples # build server using uploadDataServer() and displayDataServer()
+#' upload_data_list <- uploadDataServer(id = "upload_data")
+#' displayDataServer(id = "display_data", data_upload = upload_data_list)
 uploadDataServer <- function(id) {
   moduleServer(id = id, module = function(input, output, session) {
 
-    # |-- INPUT [previous] xlsx sheets -----
+    # |-- INPUT [base] xlsx sheets -----
     observeEvent(eventExpr = input$xlsx_file_base, handlerExpr = {
       if (is.null(input$xlsx_file_base)) {
         return(NULL)
@@ -565,7 +596,7 @@ uploadDataServer <- function(id) {
       }
     })
 
-    # |-- OUTPUT [previous] xlsx file name -----
+    # |-- OUTPUT [base] xlsx file name -----
     output$xlsx_filename_base <- renderPrint({
       req(input$xlsx_file_base)
       xlsx_filename_base <- as.character(input$xlsx_file_base$name)
@@ -574,7 +605,7 @@ uploadDataServer <- function(id) {
       )
     })
 
-    # |-- OUTPUT display [previous] xlsx ----
+    # |-- OUTPUT display [base] xlsx ----
     # require name
     observeEvent(eventExpr = input$xlsx_new_name_base, handlerExpr = {
       req(input$xlsx_file_base)
@@ -594,12 +625,13 @@ uploadDataServer <- function(id) {
           compact = TRUE,
           wrap = FALSE,
           bordered = TRUE,
-          filterable = TRUE
+          filterable = TRUE,
+          theme = base_react_theme
         )
       )
     })
 
-    # |-- INPUT [previous] flat file -----
+    # |-- INPUT [base] flat file -----
     flat_file_base <- reactive({
       req(input$flat_file_base)
       req(input$flat_file_new_name_base)
@@ -609,7 +641,7 @@ uploadDataServer <- function(id) {
       return(flat_file_base)
     })
 
-    # |-- OUTPUT [previous] flat file name -----
+    # |-- OUTPUT [base] flat file name -----
     output$flat_filename_base <- renderPrint({
       req(input$flat_file_base)
       flat_filename_base <- as.character(input$flat_file_base$name)
@@ -618,7 +650,7 @@ uploadDataServer <- function(id) {
       )
     })
 
-    # |-- OUTPUT display [previous] flat file -----
+    # |-- OUTPUT display [base] flat file -----
     observeEvent(eventExpr = input$flat_file_new_name_base, handlerExpr = {
       output$flat_file_upload_base <- reactable::renderReactable(
         reactable(
@@ -629,12 +661,13 @@ uploadDataServer <- function(id) {
           compact = TRUE,
           wrap = FALSE,
           bordered = TRUE,
-          filterable = TRUE
+          filterable = TRUE,
+          theme = base_react_theme
         )
       )
     })
 
-    # |-- [current] xlsx sheets -----
+    # |-- [compare] xlsx sheets -----
     observeEvent(eventExpr = input$xlsx_file_comp, handlerExpr = {
       if (is.null(input$xlsx_file_comp)) {
         return(NULL)
@@ -644,7 +677,7 @@ uploadDataServer <- function(id) {
       }
     })
 
-    # |-- [current] xlsx filename name -----
+    # |-- [compare] xlsx filename name -----
     output$xlsx_filename_comp <- renderPrint({
       req(input$xlsx_file_comp)
       xlsx_filename_comp <- as.character(input$xlsx_file_comp$name)
@@ -653,7 +686,7 @@ uploadDataServer <- function(id) {
       )
     })
 
-    # |-- display [current] xlsx ----
+    # |-- display [compare] xlsx ----
     observeEvent(eventExpr = input$xlsx_new_name_comp, handlerExpr = {
       req(input$xlsx_file_comp)
       req(input$xlsx_sheets_comp)
@@ -672,12 +705,13 @@ uploadDataServer <- function(id) {
           compact = TRUE,
           wrap = FALSE,
           bordered = TRUE,
-          filterable = TRUE
+          filterable = TRUE,
+          theme = compare_react_theme
         )
       )
     })
 
-    # |-- import [current] flat file -----
+    # |-- import [compare] flat file -----
     flat_file_comp <- reactive({
       req(input$flat_file_comp)
       req(input$flat_file_new_name_comp)
@@ -687,7 +721,7 @@ uploadDataServer <- function(id) {
       return(flat_file_comp)
     })
 
-    # |-- [current] flat file name -----
+    # |-- [compare] flat file name -----
     output$flat_filename_comp <- renderPrint({
       req(input$flat_file_comp)
       flat_filename_comp <- as.character(input$flat_file_comp$name)
@@ -696,7 +730,7 @@ uploadDataServer <- function(id) {
       )
     })
 
-    # |-- display [current] flat file -----
+    # |-- display [compare] flat file -----
     observeEvent(eventExpr = input$flat_file_new_name_comp, handlerExpr = {
       output$flat_file_upload_comp <- reactable::renderReactable(
         reactable(
@@ -707,7 +741,8 @@ uploadDataServer <- function(id) {
           compact = TRUE,
           wrap = FALSE,
           bordered = TRUE,
-          filterable = TRUE
+          filterable = TRUE,
+          theme = compare_react_theme
         )
       )
     })
@@ -795,12 +830,54 @@ uploadDataServer <- function(id) {
 }
 ```
 
+## Uploaded data display 
+
+Both base and compare datasets will be differentiated by color in the application using the `reactable::reactableTheme()` function.
+
+### Base display
+
+The base color will use the `#761763` background color (based on the BioMarin violet (`#a9218e`) :
+
+
+```{r base_react_theme}
+base_react_theme <- reactableTheme(
+          color = "#FFFFFF",
+          backgroundColor = "#761763",
+          borderColor = "#646464",
+          stripedColor = "hsl(233, 12%, 22%)",
+          highlightColor = "#a9218e",
+          inputStyle = list(backgroundColor = "#3A3B45"),
+          selectStyle = list(backgroundColor = "#3A3B45"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+```
+
+### Compare display
+
+The compare color will use the `#2f3688` background color (based on the BioMarin purple (`#353d98`) :
+
+```{r compare_react_theme}
+compare_react_theme <- reactableTheme(
+          color = "#FFFFFF",
+          backgroundColor = "#2f3688",
+          borderColor = "#646464",
+          stripedColor = "hsl(233, 12%, 22%)",
+          highlightColor = "#353d98",
+          inputStyle = list(backgroundColor = "#3A3B45"),
+          selectStyle = list(backgroundColor = "#3A3B45"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+```
+
 ## App theme 
 
 Below we define the app theme using **`fresh::create_theme()`**:
 
-```{r bmrn_theme}
-bmrn_theme <- function() {
+```{r bmrn_fresh_theme}
+# bmrn_fresh_theme --------------------------------------------------------
+bmrn_fresh_theme <- function() {
   fresh::create_theme(
     # theme vars  -------------------------------------------------------------
     fresh::bs4dash_vars(
@@ -821,7 +898,7 @@ bmrn_theme <- function() {
     ),
     # theme sidebar_light -------------------------------------------------
     fresh::bs4dash_sidebar_light(
-      header_color = "#ccd5dd", # dark_blue_t9
+      header_color = "#ccd5dd", # light blue
       bg = "#eaebf4", # background of entire side-bar
       color = "#002E56", # text color (no hover)
       hover_color = "#ee304e", # text color on hover
@@ -843,13 +920,13 @@ bmrn_theme <- function() {
     # theme status -------------------------------------------------
     fresh::bs4dash_status(
       dark = "#323232",
-      light = "#A0A0A0",
+      light = "#A0A0A0", # gray
       warning = "#F26631", # orange
-      primary = "#00509C", # blue
+      primary = "#A9218E", # violet = #A9218E, blue = #00509C
       secondary = "#353D98", # purple
-      success = "#A9218E", # violet
+      success = "#00509C", # blue
       danger = "#EE304E", # red
-      info = "#A0A0A0" # orange
+      info = "#A0A0A0" # gray
     ),
     # theme color -------------------------------------------------
     fresh::bs4dash_color(
@@ -860,6 +937,7 @@ bmrn_theme <- function() {
     )
   )
 }
+
 ```
 
 # Module part 3) Demo
@@ -868,12 +946,12 @@ We define `uploadDataDemo()`, a function for running our application:
 
 ```{r uploadDataDemo}
 # set theme ---------------------------------------------------------------
-compare_theme <- bmrn_theme()
+upload_theme <- bmrn_fresh_theme()
 
 uploadDataDemo <- function() {
   ui <- bs4Dash::dashboardPage(
-    freshTheme = compare_theme,
-    dark = TRUE,
+    freshTheme = upload_theme,
+    dark = FALSE,
     title = "uploadDataDemo",
     header = dashboardHeader(title = "uploadDataDemo"),
     # sidebar (menuItem) ------------------------------------------------------
@@ -914,7 +992,17 @@ uploadDataDemo <- function() {
 
 # App
 
-You can demo this by running `uploadDataDemo()`
+You can demo this by running `uploadDataDemo()`.
+
+## Testing
+
+Files for testing this application can be found here:
+
+1. [base](https://github.com/mjfrigaard/dfdiffs/raw/main/inst/extdata/csv/2015-baseballdatabank/Master.csv): a Master [Lahman dataset](https://www.seanlahman.com/baseball-archive/statistics/) from 2015
+
+2. [compare](https://github.com/mjfrigaard/dfdiffs/raw/main/inst/extdata/csv/2020-baseballdatabank/People.csv): a Master [Lahman dataset](https://www.seanlahman.com/baseball-archive/statistics/) from 2020
+
+3. Also use [this .xlsx file](https://github.com/mjfrigaard/dfdiffs/raw/main/inst/extdata/xlsx/lahman_compare.xlsx) with the same datasets. 
 
 ```{r run-uploadDataDemo}
 uploadDataDemo()

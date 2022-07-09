@@ -1,21 +1,6 @@
----
-title: "selectDataDemo(): select data module (dev)"
-author: "Martin Frigaard"
-output:
-  html_document: 
-    highlight: espresso
-    theme: darkly
-    toc: true
-    toc_float: yes
-    df_print: paged
-    code_folding: hide
-    
-runtime: shiny
----
 
-```{r setup, include=FALSE}
-library(knitr)
-library(rmdformats)
+# packages ----------------------------------------------------------------
+library(fresh)
 library(tidyverse)
 library(devtools)
 library(hrbrthemes)
@@ -25,99 +10,22 @@ library(rmarkdown)
 library(shiny)
 library(shinythemes)
 library(bs4Dash)
-# Global options
-knitr::opts_chunk$set(
-  # cache = FALSE # cache data
-  echo = TRUE, # show/hide all code
-  # results = "hide", # hide results
-  tidy = FALSE, # cleaner code printing
-  comment = "#> ", # better console printing
-  eval = TRUE, # turn this to FALSE stop code chunks from running
-  message = TRUE, # show messages
-  warning = FALSE, # show warnings
-  size = "tiny", # size of the text
-  fig.path = "images", # location of figure files
-  fig.height = 7.5, # height of figures
-  fig.width = 10 # width of figures
-)
-# knit options
-knitr::opts_knit$set(
-  width = 78,
-  progress = FALSE
-)
-# base options
-base::options(
-  tibble.print_max = 25,
-  tibble.width = 78,
-  max.print = 999999,
-  scipen = 100000000
-)
-```
-
-# Purpose
-
-This is a development document (written in `rmarkdown` and deployed with `shiny`) for the `dfdiffs` package. The purpose of the dfdiffs package is to perform  comparisons between two datasets (similar to `PROC COMPARE` in SAS). 
-
-The goal of `selectDataDemo` is to create a module for selecting columns to join and compare in the `dfdiffs` package/app. See the previous `uploadDataDemo` module [here.](https://mjfrigaard.shinyapps.io/uploadDataDemo/).
 
 
-## Overview 
+# reactable.theme ----
+options(reactable.theme = reactableTheme(
+  color = "hsl(233, 9%, 87%)",
+  backgroundColor = "hsl(233, 9%, 19%)",
+  borderColor = "hsl(233, 9%, 22%)",
+  stripedColor = "hsl(233, 12%, 22%)",
+  highlightColor = "hsl(233, 12%, 24%)",
+  inputStyle = list(backgroundColor = "hsl(233, 9%, 25%)"),
+  selectStyle = list(backgroundColor = "hsl(233, 9%, 25%)"),
+  pageButtonHoverStyle = list(backgroundColor = "hsl(233, 9%, 25%)"),
+  pageButtonActiveStyle = list(backgroundColor = "hsl(233, 9%, 28%)")
+))
 
-This document contains to following elements:
-
-- Application theme 
-  - `bmrn_fresh_theme()` is built using the `fresh::create_theme()`  
-  
-- `uploadDataUI()`/`uploadDataServer()`  
-  - which includes the `load_flat_file()` function  
-  
-- `selectDataUI`/`selectDataServer()`/`selectDataDemo`  
-  - this module inherits the uploaded data from the `uploadData` module and displays it in the **Select Data** tab
-  
-# Helpers 
-
-The application runs with a `helpers.R` file, which contains functions necessary for deploying the application. 
-
-```{r helpers, eval=FALSE}
-source("helpers.R")
-```
-
-
-## `load_flat_file()`
-
-The `load_flat_file()` function will import *most* flat data files. 
-
-```{r load_flat_file}
-#' Load flat data files
-#'
-#' @param path path to data file (with extension)
-#'
-#' @return return_data
-#' @export load_flat_file
-#'
-load_flat_file <- function(path) {
-  ext <- tools::file_ext(path)
-  data <- switch(ext,
-    txt = data.table::fread(path),
-    csv = data.table::fread(path),
-    tsv = data.table::fread(path),
-    sas7bdat = haven::read_sas(data_file = path),
-    sas7bcat = haven::read_sas(data_file = path),
-    sav = haven::read_sav(file = path),
-    dta = haven::read_dta(file = path)
-  )
-  return_data <- as_tibble(data)
-  return(return_data)
-}
-```
-
-This is used to load the flat files (`.sas7bdat`, `.csv`, `.txt`, etc.).
-
-## App theme 
-
-We define the `bmrn_fresh_theme()` using `fresh::create_theme()`. 
-
-```{r bmrn_fresh_theme}
+# bmrn_fresh_theme --------------------------------------------------------
 #' BioMarin theme (fresh <> bs4Dash)
 #'
 #' @return theme shiny app
@@ -145,7 +53,7 @@ bmrn_fresh_theme <- function() {
     ),
     # theme sidebar_light -------------------------------------------------
     fresh::bs4dash_sidebar_light(
-      header_color = "#ccd5dd", # light blue
+      header_color = "#ccd5dd", # dark_blue_t9
       bg = "#eaebf4", # background of entire side-bar
       color = "#002E56", # text color (no hover)
       hover_color = "#ee304e", # text color on hover
@@ -167,13 +75,13 @@ bmrn_fresh_theme <- function() {
     # theme status -------------------------------------------------
     fresh::bs4dash_status(
       dark = "#323232",
-      light = "#A0A0A0", # gray
+      light = "#A0A0A0",
       warning = "#F26631", # orange
-      primary = "#A9218E", # violet = #A9218E, blue = #00509C
+      primary = "#00509C", # blue
       secondary = "#353D98", # purple
-      success = "#00509C", # blue
+      success = "#A9218E", # violet
       danger = "#EE304E", # red
-      info = "#A0A0A0" # gray
+      info = "#A0A0A0" # orange
     ),
     # theme color -------------------------------------------------
     fresh::bs4dash_color(
@@ -184,55 +92,40 @@ bmrn_fresh_theme <- function() {
     )
   )
 }
-```
 
-## Uploaded data display 
-
-Both base and compare datasets will be differentiated by color in the application using the `reactable::reactableTheme()` function.
-
-### Base display
-
-The base color will use the `#761763` background color (based on the BioMarin violet (`#a9218e`) :
-
-
-```{r base_react_theme}
-base_react_theme <- reactableTheme(
-          color = "#FFFFFF",
-          backgroundColor = "#761763",
-          borderColor = "#646464",
-          stripedColor = "hsl(233, 12%, 22%)",
-          highlightColor = "#a9218e",
-          inputStyle = list(backgroundColor = "#3A3B45"),
-          selectStyle = list(backgroundColor = "#3A3B45"),
-          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
-        )
-```
-
-### Compare display
-
-The compare color will use the `#2f3688` background color (based on the BioMarin purple (`#353d98`) :
-
-```{r compare_react_theme}
-compare_react_theme <- reactableTheme(
-          color = "#FFFFFF",
-          backgroundColor = "#2f3688",
-          borderColor = "#646464",
-          stripedColor = "hsl(233, 12%, 22%)",
-          highlightColor = "#353d98",
-          inputStyle = list(backgroundColor = "#3A3B45"),
-          selectStyle = list(backgroundColor = "#3A3B45"),
-          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
-        )
-```
+# load_flat_file ----------------------------------------------------------
+#' Load flat data files
+#'
+#' @param path path to data file (with extension)
+#'
+#' @return return_data
+#' @export load_flat_file
+#'
+load_flat_file <- function(path) {
+  ext <- tools::file_ext(path)
+  data <- switch(ext,
+    txt = data.table::fread(path),
+    csv = data.table::fread(path),
+    tsv = data.table::fread(path),
+    sas7bdat = haven::read_sas(data_file = path),
+    sas7bcat = haven::read_sas(data_file = path),
+    sav = haven::read_sav(file = path),
+    dta = haven::read_dta(file = path)
+  )
+  return_data <- as_tibble(data)
+  return(return_data)
+}
 
 
-# Data upload UI
-
-In the UI, users will select from a drop-down list of imported datasets. These items will be imported from the `uploadDataUI()`/`uploadDataServer()`. 
-
-```{r uploadDataUI}
+# uploadDataUI ------------------------------------------------------------
+#' data upload (UI) for selectDataDemo
+#'
+#' @param id module id
+#'
+#' @export uploadDataUI
+#'
+#' @description `uploadDataUI()`/`uploadDataServer()` create the upload module
+#' for the dfdiffs app.
 uploadDataUI <- function(id) {
   tagList(
     h3("Upload a ", strong("base"), " (target) data source "),
@@ -243,10 +136,10 @@ uploadDataUI <- function(id) {
         box(
           maximizable = TRUE,
           collapsible = TRUE,
-          collapsed = TRUE,
+          collapsed = FALSE,
           closable = FALSE,
           solidHeader = TRUE,
-          status = "primary",
+          status = "success",
           width = 12,
           title = tags$strong("Upload Excel File (base)"),
           fluidRow(
@@ -317,17 +210,17 @@ uploadDataUI <- function(id) {
         )
       )
     ),
-    # |- upload base flat file ----
+    # |- upload base xlsx file ----
     fluidRow(
       sortable(
         width = 12,
         box(
           maximizable = TRUE,
-          collapsed = FALSE,
+          collapsed = TRUE,
           collapsible = TRUE,
           closable = FALSE,
           solidHeader = TRUE,
-          status = "primary",
+          status = "success",
           width = 12,
           title = tags$strong("Upload Flat Data File (base)"),
           fluidRow(
@@ -396,9 +289,9 @@ uploadDataUI <- function(id) {
         # |- upload compare xlsx file ----
         box(
           maximizable = TRUE,
-          collapsed = TRUE,
+          collapsed = FALSE,
           solidHeader = TRUE,
-          status = "secondary",
+          status = "primary",
           width = 12,
           collapsible = TRUE,
           closable = FALSE,
@@ -477,9 +370,9 @@ uploadDataUI <- function(id) {
         width = 12,
         box(
           maximizable = TRUE,
-          collapsed = FALSE,
+          collapsed = TRUE,
           solidHeader = TRUE,
-          status = "secondary",
+          status = "primary",
           width = 12,
           collapsible = TRUE,
           closable = FALSE,
@@ -544,17 +437,31 @@ uploadDataUI <- function(id) {
     )
   )
 }
-```
 
-# Data upload server
 
-The `uploadDataServer()` uses the `load_flat_file()` function for importing .csv, .tsv, .sas7bdat, etc. files.
 
-## uploadDataServer()
-
-`uploadDataServer()` uploads up to four datasets, names them, and returns a list with the imported objects. 
-
-```{r uploadDataServer}
+# uploadDataServer --------------------------------------------------------
+#' data upload (Server) for selectDataDemo()
+#'
+#' @param id module id
+#'
+#' @export uploadDataServer
+#'
+#' @return list with data inputs
+#' \describe{
+#'   \item{base_xlsx_data}{reactive dataset of imported 'base' excel file}
+#'   \item{base_xlsx_data_name}{name of reactive dataset of imported 'base' excel file}
+#'   \item{base_flat_file_data}{reactive dataset of imported 'base' flat file}
+#'   \item{base_flat_file_data_name}{name of reactive dataset of imported 'base' flat file}
+#'   \item{comp_xlsx_data}{reactive dataset of imported 'compare' excel file}
+#'   \item{comp_xlsx_data_name}{name of reactive dataset of imported 'compare' excel file}
+#'   \item{comp_flat_file_data}{reactive dataset of imported 'compare' flat file}
+#'   \item{comp_flat_file_data_name}{name of reactive dataset of imported 'compare' flat file}
+#' }
+#'
+#' @examples # build server using uploadDataServer() and displayDataServer()
+#' upload_data_list <- uploadDataServer(id = "upload_data")
+#' displayDataServer(id = "display_data", data_upload = upload_data_list)
 uploadDataServer <- function(id) {
   moduleServer(id = id, module = function(input, output, session) {
 
@@ -597,8 +504,7 @@ uploadDataServer <- function(id) {
           compact = TRUE,
           wrap = FALSE,
           bordered = TRUE,
-          filterable = TRUE,
-          theme = base_react_theme
+          filterable = TRUE
         )
       )
     })
@@ -633,8 +539,7 @@ uploadDataServer <- function(id) {
           compact = TRUE,
           wrap = FALSE,
           bordered = TRUE,
-          filterable = TRUE,
-          theme = base_react_theme
+          filterable = TRUE
         )
       )
     })
@@ -677,8 +582,7 @@ uploadDataServer <- function(id) {
           compact = TRUE,
           wrap = FALSE,
           bordered = TRUE,
-          filterable = TRUE,
-          theme = compare_react_theme
+          filterable = TRUE
         )
       )
     })
@@ -713,8 +617,7 @@ uploadDataServer <- function(id) {
           compact = TRUE,
           wrap = FALSE,
           bordered = TRUE,
-          filterable = TRUE,
-          theme = compare_react_theme
+          filterable = TRUE
         )
       )
     })
@@ -800,154 +703,9 @@ uploadDataServer <- function(id) {
     )
   })
 }
-```
-
-The `uploadDataUI` returns the following reactives (accessible via the `data_upload` object). All of the items have a the appropriate prefix (`base_` or `comp_`) depending on the uploaded file. 
-
-## Base (target) data reactives
-
-There are four reactives from the base data inputs. These objects are stored in the `data_upload` list and are accessible via `data_upload$`
-
-### 1) base_xlsx_data()
-
-The uploaded excel file as a tibble.
-
-```{r base_xlsx_data, eval=FALSE, class.source='fold-show'}
-base_xlsx_data <- reactive({
-  req(input$xlsx_file_prev)
-  req(input$xlsx_sheets_prev)
-  req(input$new_xlsx_name_prev)
-  worksheet_data <- readxl::read_excel(
-    path = input$xlsx_file_prev$datapath,
-    sheet = input$xlsx_sheets_prev
-  )
-})
-```
 
 
-### 2) base_xlsx_data_name()
-
-The *new* name of the uploaded dataset as a character vector. 
-
-```{r base_xlsx_data_name, eval=FALSE, class.source='fold-show'}
-base_xlsx_data_name <- reactive({
-  if (length(input$new_xlsx_name_prev) == 1) {
-    as.character(input$new_xlsx_name_prev)
-  } else {
-    NULL
-  }
-})
-```
-  
-### 3) base_flat_file_data()
-
-The imported flat file (using the `load_flat_file()` function) as a tibble. 
-
-```{r base_flat_file_data, eval=FALSE, class.source='fold-show'}
-base_flat_file_data <- reactive({
-  req(input$flat_file_prev)
-  req(input$new_flat_file_name_prev)
-  flat_file_prev <- load_flat_file(
-    path = input$flat_file_prev$datapath
-  )
-})
-```
-  
-### 4) base_flat_file_data_name()
-
-The *new* base flat file data name (as a character vector).
-
-```{r base_flat_file_data_name, eval=FALSE, class.source='fold-show'}
-base_flat_file_data_name <- reactive({
-  if (length(input$new_flat_file_name_prev) == 1) {
-    as.character(input$new_flat_file_name_prev)
-  } else {
-    NULL
-  }
-})
-```
-
-## Compare data reactives 
-
-There are also four reactives for the compare data objects. 
-
-### 1) comp_xlsx_data()
-
-The compare excel dataset (as a tibble).
-
-```{r comp_xlsx_data, eval=FALSE, class.source='fold-show'}
-comp_xlsx_data <- reactive({
-  req(input$xlsx_file_curr)
-  req(input$xlsx_sheets_curr)
-  req(input$xlsx_new_name_curr)
-  comp_xlsx_data <- readxl::read_excel(
-    path = input$xlsx_file_curr$datapath,
-    sheet = input$xlsx_sheets_curr
-  )
-})
-```
-
-
-### 2) comp_xlsx_data_name()
-
-The *new* name of the compare excel dataset (as a character vector).
-
-```{r comp_xlsx_data_name, eval=FALSE, class.source='fold-show'}
-comp_xlsx_data_name <- reactive({
-  if (length(input$xlsx_new_name_curr) == 1) {
-    as.character(input$xlsx_new_name_curr)
-  } else {
-    NULL
-  }
-})
-```
-
-
-### 3) comp_flat_file_data()
-
-The compare flat file dataset (as a tibble) uploaded with `dfdiffs::load_flat_file()`. 
-
-```{r comp_flat_file_data, eval=FALSE, class.source='fold-show'}
-comp_flat_file_data <- reactive({
-  req(input$flat_file_curr)
-  req(input$new_flat_file_name_curr)
-  comp_flat_file <- load_flat_file(
-    path = input$flat_file_curr$datapath
-  )
-})
-```
-
-### 4) comp_flat_file_data_name()
-
-The name of the compare flat file (as a character vector).
-
-```{r comp_flat_file_data_name, eval=FALSE, class.source='fold-show'}
-comp_flat_file_data_name <- reactive({
-  if (length(input$new_flat_file_name_curr) == 1) {
-    as.character(input$new_flat_file_name_curr)
-  } else {
-    NULL
-  }
-})
-```
-
-
-# Module part 1) UI
-
-The `selectDataUI()` is comprised of two boxes: one for the **Base Data**, one for the **Compare Data**. Each box contains the following IDs: 
-
-  + When the application is loaded,  `input$base_data_select`/`input$comp_data_select` will populate `NULL` values. 
-
-  + After importing base and compare data, the `input$base_data_select`/`input$comp_data_select` will list the datasets imported from the `uploadData` module and **Upload Data** tab.
-
-  + The selected base and compare datasets will render the imported data with a `reactableOutput()` (and `output$base_data_display`/`output$comp_data_display`)
-
-  + The **`base` data source** and **`compare` data source** boxes both have `selectizeInput()` (`input$base_col_select`/`input$comp_col_select`) inputs that will display the column names of the selected, uploaded dataset
-  
-  + The reactive values for base and compare of both printed to the UI (because we're in a DEV environment)
-
-
-```{r selectDataUI, class.source='fold-show'}
+# selectDataUI ------------------------------------------------------------
 selectDataUI <- function(id) {
   tagList(
     h3("Pick a ", strong("base"), "data source"),
@@ -960,13 +718,12 @@ selectDataUI <- function(id) {
           collapsible = TRUE,
           collapsed = FALSE,
           closable = FALSE,
-          status = "primary",
+          status = "success",
           width = 12,
           title = tags$strong("Base Data Files"),
           ## |-- INPUT [base_data_select] ---------
           ## displays dummy data when initially loaded, then imports list
           ## of imported objects from baseUploadDataServer()
-          br(),
           selectInput(
             inputId = NS(
               namespace = id,
@@ -975,6 +732,16 @@ selectDataUI <- function(id) {
             label = strong("Select ", code("base"), " data"),
             choices = c("", NULL),
             selected = NULL
+          ),
+          ## |-- OUTPUT [base_data_display] ---------
+          ## displays uploaded/named/selected data
+          strong("Base Data"),
+          br(),
+          reactableOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_data_display"
+            )
           ),
           ## |-- INPUT [base_col_select] ---------
           ## displays the columns from the imported dataset
@@ -988,16 +755,6 @@ selectDataUI <- function(id) {
             choices = c("", NULL),
             multiple = TRUE,
             selected = NULL
-          ),
-          ## |-- OUTPUT [base_data_display] ---------
-          ## displays uploaded/named/selected data
-          strong("Base Data"),
-          br(),
-          reactableOutput(
-            outputId = NS(
-              namespace = id,
-              id = "base_data_display"
-            )
           )
         )
       )
@@ -1010,7 +767,7 @@ selectDataUI <- function(id) {
           width = 12,
           background = "gray",
           solidHeader = TRUE,
-          closable = TRUE,
+          closable = FALSE,
           maximizable = TRUE,
           collapsible = TRUE,
           collapsed = TRUE,
@@ -1035,13 +792,12 @@ selectDataUI <- function(id) {
           collapsible = TRUE,
           collapsed = TRUE,
           closable = FALSE,
-          status = "secondary",
+          status = "success",
           width = 12,
           title = tags$strong("Compare Data Files"),
           ## |-- INPUT [comp_data_select] ---------
           ## displays dummy data when initially loaded, then imports list
           ## of imported objects from uploadDataServer()
-          br(),
           selectInput(
             inputId = NS(
               namespace = id,
@@ -1050,6 +806,14 @@ selectDataUI <- function(id) {
             label = strong("Select ", code("comare"), " data"),
             choices = c("", NULL),
             selected = c("", NULL)
+          ),
+          ## |-- OUTPUT [comp_data_display] ---------
+          ## displays uploaded/named/selected data
+          reactableOutput(
+            outputId = NS(
+              namespace = id,
+              id = "comp_data_display"
+            )
           ),
           ## |-- INPUT [comp_col_select] ---------
           ## displays the columns from the imported dataset
@@ -1063,15 +827,6 @@ selectDataUI <- function(id) {
             choices = c("", NULL),
             multiple = TRUE,
             selected = c("", NULL)
-          ),
-          ## |-- OUTPUT [comp_data_display] ---------
-          ## displays uploaded/named/selected data
-          br(),
-          reactableOutput(
-            outputId = NS(
-              namespace = id,
-              id = "comp_data_display"
-            )
           )
         )
       )
@@ -1084,11 +839,11 @@ selectDataUI <- function(id) {
           width = 12,
           background = "gray",
           solidHeader = TRUE,
-          closable = TRUE,
+          closable = FALSE,
           maximizable = TRUE,
           collapsible = TRUE,
           collapsed = TRUE,
-          title = "Reactive values (compasre)",
+          title = "Reactive values (comapre)",
           ## values -----
           verbatimTextOutput(
             outputId = NS(
@@ -1101,37 +856,13 @@ selectDataUI <- function(id) {
     )
   )
 }
-```
-
-The naming convention remains the same (`base_` for base, `comp_` for compare).
-
-# Module part 2) Server
-
-The server is built using `eventReactive()` with the reactive items from the upload module: 
-
-- **Base**  
-  + **`base_xlsx_data()`**: the base excel data (from `data_upload$base_xlsx_data()`)     
-  + **`base_xlsx_data_name()`**: the *new* base excel data name (from `data_upload$base_xlsx_data_name()`)     
-  + **`base_flat_file_data()`**: the base flat file (`data_upload$base_flat_file_data()`)     
-  + **`base_flat_file_data_name()`** the *new* base flat file name (from `data_upload$base_flat_file_data_name()`)    
-  
-- **Compare**  
-  + **`comp_xlsx_data()`**: the base excel data (from `data_upload$comp_xlsx_data()`)      
-  + **`comp_xlsx_data_name()`**: the *new* compare excel data name (from `data_upload$comp_xlsx_data_name()`)    
-  + **`comp_flat_file_data()`**: the compare flat file (from `data_upload$comp_flat_file_data()`)    
-  + **`comp_flat_file_data_name()`**: the *new* compare flat file name (from `data_upload$comp_flat_file_data_name()`)    
 
 
-After creating these reactives, we create a vector of names (`base_data_names()`) for the `selectInput()` and update this with `observeEvent()` and `updateSelectInput()`.
-
-The display the uploaded data, we create `base_data()` and `comp_data()` using the `input$base_data_select`/`input$comp_data_select` and either `base_xlsx_data_name()`/`base_flat_file_data_name()` or `comp_xlsx_data_name()`/`comp_flat_file_data_name()`.
-
-We display the list of uploaded columns using `observeEvent()` and `updateSelectizeInput()`. 
-
-```{r selectDataServer, class.source='fold-show'}
+# selectDataServer --------------------------------------------------------
+#
 selectDataServer <- function(id, data_upload) {
-  moduleServer(id = id, module = function(input, output, session) {
 
+  moduleServer(id = id, module = function(input, output, session) {
     # BASE DATA |-- ----
     ## BASE EACTIVE |-- base_xlsx_data (reactive) ---------
     base_xlsx_data <- eventReactive(data_upload$base_xlsx_data(), {
@@ -1227,7 +958,6 @@ selectDataServer <- function(id, data_upload) {
         data = select(base_data(), all_of(input$base_col_select)),
         # data = base_data(),
         defaultPageSize = 10,
-        theme = base_react_theme,
         resizable = TRUE,
         highlight = TRUE,
         compact = TRUE,
@@ -1347,7 +1077,6 @@ selectDataServer <- function(id, data_upload) {
         data = select(comp_data(), all_of(input$comp_col_select)),
         # data = comp_data(),
         defaultPageSize = 10,
-        theme = compare_react_theme,
         resizable = TRUE,
         highlight = TRUE,
         compact = TRUE,
@@ -1411,22 +1140,7 @@ selectDataServer <- function(id, data_upload) {
     )
   })
 }
-```
 
-### Return list 
-
-The `selectDataServer()` returns two items: 
-
-+ **`base_data()`**: the uploaded base dataset and selected columns 
-
-+ **`comp_data()`**: the uploaded compare dataset and selected columns 
-
-
-# Module part 3) Demo
-
-Below we define the theme as `select_data_theme`, build `selectDataDemo()`, and include a list of `reactiveValues()` in the application (outside of the modules) to keep track on the inputs. 
-
-```{r selectDataDemo}
 select_data_theme <- bmrn_fresh_theme()
 selectDataDemo <- function() {
   ui <- bs4Dash::dashboardPage(
@@ -1507,32 +1221,11 @@ selectDataDemo <- function() {
     })
   }
   shinyApp(
-    ui = ui, server = server,
-    options = list(height = 1000, width = 800)
+    ui = ui, server = server
+    # options = list(height = 1000, width = 800)
   )
 }
-```
-
-# App
-
-Run the application below using the `selectDataDemo()` function.
-
-## Testing
-
-Files for testing this application can be found here:
-
-1. [base](https://github.com/mjfrigaard/dfdiffs/raw/main/inst/extdata/csv/2015-baseballdatabank/Master.csv): a Master [Lahman dataset](https://www.seanlahman.com/baseball-archive/statistics/) from 2015
-
-2. [compare](https://github.com/mjfrigaard/dfdiffs/raw/main/inst/extdata/csv/2020-baseballdatabank/People.csv): a Master [Lahman dataset](https://www.seanlahman.com/baseball-archive/statistics/) from 2020
-
-3. Also use [this .xlsx file](https://github.com/mjfrigaard/dfdiffs/raw/main/inst/extdata/xlsx/lahman_compare.xlsx) with the same datasets. 
 
 
-
-```{r run-selectDataDemo}
+# run selectDataDemo ------------------------------------------------------
 selectDataDemo()
-```
-
-
-
-
