@@ -6,10 +6,9 @@
 \usage{
 uploadDataDemo()
 }
-\description{
-uploadDataDemo
+\value{
+app
 }
-\examples{
-# run app
-uploadDataDemo()
+\description{
+demo of dev upload module
 }

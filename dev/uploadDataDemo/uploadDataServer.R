@@ -5,57 +5,61 @@
 #'
 #' @export uploadDataServer
 #'
-#' @return list with data inputs
+#' @return list with uploaded data inputs
 #' \describe{
-#'   \item{base_xlsx_data}{reactive dataset of imported 'base' excel file}
-#'   \item{base_xlsx_data_name}{name of reactive dataset of imported 'base' excel file}
-#'   \item{base_flat_file_data}{reactive dataset of imported 'base' flat file}
-#'   \item{base_flat_file_data_name}{name of reactive dataset of imported 'base' flat file}
-#'   \item{comp_xlsx_data}{reactive dataset of imported 'compare' excel file}
-#'   \item{comp_xlsx_data_name}{name of reactive dataset of imported 'compare' excel file}
-#'   \item{comp_flat_file_data}{reactive dataset of imported 'compare' flat file}
-#'   \item{comp_flat_file_data_name}{name of reactive dataset of imported 'compare' flat file}
+#'   \item{base_data}{reactive dataset of imported 'base' file}
+#'   \item{base_name}{name of reactive dataset of imported 'base' file}
+#'   \item{comp_data}{reactive dataset of imported 'compare' file}
+#'   \item{comp_name}{name of reactive dataset of imported 'compare' file}
 #' }
 #'
-#' @examples # build server using uploadDataServer() and displayDataServer()
+#' @examples # build server using selectDataServer()
 #' upload_data_list <- uploadDataServer(id = "upload_data")
 #' displayDataServer(id = "display_data", data_upload = upload_data_list)
 uploadDataServer <- function(id) {
+
   moduleServer(id = id, module = function(input, output, session) {
 
-    # |-- INPUT [base] xlsx sheets -----
-    observeEvent(eventExpr = input$xlsx_file_base, handlerExpr = {
-      if (is.null(input$xlsx_file_base)) {
-        return(NULL)
+    # |-- INPUT [base] base_xlsx_sheets -----
+    observeEvent(eventExpr = input$base_file, handlerExpr = {
+      if (tools::file_ext(input$base_file$name) == "xlsx") {
+        choices <- readxl::excel_sheets(path = input$base_file$datapath)
       } else {
-        xlsx_sheets <- readxl::excel_sheets(path = input$xlsx_file_base$datapath)
-        updateSelectInput(session, "xlsx_sheets_base", choices = xlsx_sheets)
+        choices <- c("", NULL)
       }
+      updateSelectInput(session = session,
+          inputId = "base_xlsx_sheets",
+          choices = choices
+          )
     })
 
     # |-- OUTPUT [base] xlsx file name -----
-    output$xlsx_filename_base <- renderPrint({
-      req(input$xlsx_file_base)
-      xlsx_filename_base <- as.character(input$xlsx_file_base$name)
+    output$base_filename <- renderPrint({
+      req(input$base_file)
+      base_filename <- as.character(input$base_file$name)
       paste0(
-        tags$code(xlsx_filename_base)
+        tags$code(base_filename)
       )
+    })
+
+    base_data <- eventReactive(input$base_file, {
+        if (nchar(input$base_xlsx_sheets) == 0) {
+          uploaded <- upload_data(path = input$base_file$datapath)
+        } else {
+          uploaded <- upload_data(path = input$base_file$datapath,
+                                  sheet = as.character(input$base_xlsx_sheets))
+        }
+        return(uploaded)
     })
 
     # |-- OUTPUT display [base] xlsx ----
     # require name
-    observeEvent(eventExpr = input$xlsx_new_name_base, handlerExpr = {
-      req(input$xlsx_file_base)
-      req(input$xlsx_sheets_base)
-      req(input$xlsx_new_name_base)
-      worksheet_data <- readxl::read_excel(
-        path = input$xlsx_file_base$datapath,
-        sheet = input$xlsx_sheets_base
-      )
-      worksheet_names_tbl <- tibble::as_tibble(worksheet_data)
-      output$xlsx_upload_base <- reactable::renderReactable(
+    observeEvent(eventExpr = input$base_new_name, handlerExpr = {
+      req(input$base_file)
+      req(input$base_new_name)
+      output$base_display_upload <- reactable::renderReactable(
         reactable(
-          data = worksheet_names_tbl,
+          data = base_data(),
           defaultPageSize = 5,
           resizable = TRUE,
           highlight = TRUE,
@@ -68,74 +72,72 @@ uploadDataServer <- function(id) {
       )
     })
 
-    # |-- INPUT [base] flat file -----
-    flat_file_base <- reactive({
-      req(input$flat_file_base)
-      req(input$flat_file_new_name_base)
-      flat_file_base <- load_flat_file(
-        path = input$flat_file_base$datapath
-      )
-      return(flat_file_base)
-    })
+      ## DEV OUTPUT |-- (base_dev_a) ---------
+      output$base_dev_a <- renderPrint({
+        print(
+          paste0("input$base_filename = ", input$base_file$name)
+          )
+      })
+      ## DEV OUTPUT |-- (base_dev_b) ---------
+      output$base_dev_b <- renderPrint({
+        print(
+          base_data()
+          )
+      })
+      ## DEV OUTPUT |-- (base_dev_x) ---------
+      output$base_dev_x <- renderPrint({
+        print(
+          paste0("input$base_xlsx_sheets = ",  as.character(input$base_xlsx_sheets))
+          )
+      })
+      ## DEV OUTPUT |-- (base_dev_y) ---------
+      output$base_dev_y <- renderPrint({
+        print(
+          paste0("input$base_new_name = ",  as.character(input$base_new_name))
+          )
+      })
 
-    # |-- OUTPUT [base] flat file name -----
-    output$flat_filename_base <- renderPrint({
-      req(input$flat_file_base)
-      flat_filename_base <- as.character(input$flat_file_base$name)
-      paste0(
-        tags$code(flat_filename_base)
-      )
-    })
 
-    # |-- OUTPUT display [base] flat file -----
-    observeEvent(eventExpr = input$flat_file_new_name_base, handlerExpr = {
-      output$flat_file_upload_base <- reactable::renderReactable(
-        reactable(
-          data = flat_file_base(),
-          defaultPageSize = 5,
-          resizable = TRUE,
-          highlight = TRUE,
-          compact = TRUE,
-          wrap = FALSE,
-          bordered = TRUE,
-          filterable = TRUE,
-          theme = base_react_theme
-        )
-      )
-    })
-
-    # |-- [compare] xlsx sheets -----
-    observeEvent(eventExpr = input$xlsx_file_comp, handlerExpr = {
-      if (is.null(input$xlsx_file_comp)) {
-        return(NULL)
+    # |-- INPUT [comp] comp_xlsx_sheets -----
+    observeEvent(eventExpr = input$comp_file, handlerExpr = {
+      if (tools::file_ext(input$comp_file$name) == "xlsx") {
+        choices <- readxl::excel_sheets(path = input$comp_file$datapath)
       } else {
-        xlsx_sheets <- readxl::excel_sheets(path = input$xlsx_file_comp$datapath)
-        updateSelectInput(session, "xlsx_sheets_comp", choices = xlsx_sheets)
+        choices <- c("", NULL)
       }
+      updateSelectInput(session = session,
+          inputId = "comp_xlsx_sheets",
+          choices = choices
+          )
     })
 
-    # |-- [compare] xlsx filename name -----
-    output$xlsx_filename_comp <- renderPrint({
-      req(input$xlsx_file_comp)
-      xlsx_filename_comp <- as.character(input$xlsx_file_comp$name)
+    # |-- OUTPUT [comp] xlsx file name -----
+    output$comp_filename <- renderPrint({
+      req(input$comp_file)
+      comp_filename <- as.character(input$comp_file$name)
       paste0(
-        tags$code(xlsx_filename_comp)
+        tags$code(comp_filename)
       )
     })
 
-    # |-- display [compare] xlsx ----
-    observeEvent(eventExpr = input$xlsx_new_name_comp, handlerExpr = {
-      req(input$xlsx_file_comp)
-      req(input$xlsx_sheets_comp)
-      req(input$xlsx_new_name_comp)
-      worksheet_data <- readxl::read_excel(
-        path = input$xlsx_file_comp$datapath,
-        sheet = input$xlsx_sheets_comp
-      )
-      worksheet_names_tbl <- tibble::as_tibble(worksheet_data)
-      output$xlsx_upload_comp <- reactable::renderReactable(
+    comp_data <- eventReactive(input$comp_file, {
+        if (nchar(input$comp_xlsx_sheets) == 0) {
+          uploaded <- upload_data(path = input$comp_file$datapath)
+        } else {
+          uploaded <- upload_data(path = input$comp_file$datapath,
+                                  sheet = as.character(input$comp_xlsx_sheets))
+        }
+        return(uploaded)
+    })
+
+   # |-- OUTPUT display [comp] xlsx ----
+    # require name
+    observeEvent(eventExpr = input$comp_new_name, handlerExpr = {
+      req(input$comp_file)
+      req(input$comp_new_name)
+      output$comp_display_upload <- reactable::renderReactable(
         reactable(
-          data = worksheet_names_tbl,
+          data = comp_data(),
           defaultPageSize = 5,
           resizable = TRUE,
           highlight = TRUE,
@@ -143,125 +145,84 @@ uploadDataServer <- function(id) {
           wrap = FALSE,
           bordered = TRUE,
           filterable = TRUE,
-          theme = compare_react_theme
+          theme = comp_react_theme
         )
       )
     })
 
-    # |-- import [compare] flat file -----
-    flat_file_comp <- reactive({
-      req(input$flat_file_comp)
-      req(input$flat_file_new_name_comp)
-      flat_file_comp <- load_flat_file(
-        path = input$flat_file_comp$datapath
-      )
-      return(flat_file_comp)
-    })
-
-    # |-- [compare] flat file name -----
-    output$flat_filename_comp <- renderPrint({
-      req(input$flat_file_comp)
-      flat_filename_comp <- as.character(input$flat_file_comp$name)
-      paste0(
-        tags$code(flat_filename_comp)
-      )
-    })
-
-    # |-- display [compare] flat file -----
-    observeEvent(eventExpr = input$flat_file_new_name_comp, handlerExpr = {
-      output$flat_file_upload_comp <- reactable::renderReactable(
-        reactable(
-          data = flat_file_comp(),
-          defaultPageSize = 5,
-          resizable = TRUE,
-          highlight = TRUE,
-          compact = TRUE,
-          wrap = FALSE,
-          bordered = TRUE,
-          filterable = TRUE,
-          theme = compare_react_theme
-        )
-      )
-    })
+      ## DEV OUTPUT |-- (comp_dev_a) ---------
+      output$comp_dev_a <- renderPrint({
+        print(
+          paste0("input$comp_filename = ",  as.character(input$comp_file$name))
+          )
+      })
+      ## DEV OUTPUT |-- comp_dev_y (dev) ---------
+      output$comp_dev_b <- renderPrint({
+        print(
+          comp_data()
+          )
+      })
+      ## DEV OUTPUT |-- comp_dev_a (dev) ---------
+      output$comp_dev_x <- renderPrint({
+        print(
+          paste0("input$comp_xlsx_sheets = ",  as.character(input$comp_xlsx_sheets))
+          )
+      })
+      ## DEV OUTPUT |-- comp_dev_b (dev) ---------
+      output$comp_dev_y <- renderPrint({
+        print(
+          paste0("input$comp_new_name = ",  as.character(input$comp_new_name))
+          )
+      })
 
     # |---- return list -----
     # assign this as 'upload_data_list'
     return(
       list(
-        # |------ base_xlsx_data ----
-        base_xlsx_data = reactive({
-          req(input$xlsx_file_base)
-          req(input$xlsx_sheets_base)
-          req(input$xlsx_new_name_base)
-          worksheet_data <- readxl::read_excel(
-            path = input$xlsx_file_base$datapath,
-            sheet = input$xlsx_sheets_base
-          )
-        }),
-        # |------ base_xlsx_data_name ----
-        base_xlsx_data_name = reactive({
-          # req(input$xlsx_new_name_base)
-          if (length(input$xlsx_new_name_base) == 1) {
-            as.character(input$xlsx_new_name_base)
+        # |------ base_data ----
+        base_data = reactive({
+          req(input$base_file)
+          req(input$base_new_name)
+          if (nchar(input$base_xlsx_sheets) == 0) {
+            uploaded <- upload_data(path = input$base_file$datapath)
           } else {
-            NULL
+            uploaded <- upload_data(path = input$base_file$datapath,
+                                  sheet = as.character(input$base_xlsx_sheets))
+          }
+          return(uploaded)
+        }),
+        # |------ base_name ----
+        base_name = reactive({
+          # req(input$base_new_name)
+          if (nchar(input$base_new_name) != 0) {
+            as.character(input$base_new_name)
+          } else {
+            as.character(input$base_filename)
           }
         }),
-        # |------ base_flat_file_data ----
-        base_flat_file_data = reactive({
-          req(input$flat_file_base)
-          req(input$flat_file_new_name_base)
-          flat_file_base <- load_flat_file(
-            path = input$flat_file_base$datapath
-          )
-        }),
-        # |------ base_flat_file_data_name ----
-        base_flat_file_data_name = reactive({
-          # req(input$flat_file_new_name_base)
-          if (length(input$flat_file_new_name_base) == 1) {
-            as.character(input$flat_file_new_name_base)
+        # |------ comp_data ----
+        comp_data = reactive({
+          req(input$comp_file)
+          req(input$comp_new_name)
+          if (nchar(input$comp_xlsx_sheets) == 0) {
+            uploaded <- upload_data(path = input$comp_file$datapath)
           } else {
-            NULL
+            uploaded <- upload_data(path = input$comp_file$datapath,
+                                  sheet = as.character(input$comp_xlsx_sheets))
           }
+          return(uploaded)
         }),
-
-        # |------ comp_xlsx_data ----
-        comp_xlsx_data = reactive({
-          req(input$xlsx_file_comp)
-          req(input$xlsx_sheets_comp)
-          req(input$xlsx_new_name_comp)
-          comp_xlsx_data <- readxl::read_excel(
-            path = input$xlsx_file_comp$datapath,
-            sheet = input$xlsx_sheets_comp
-          )
-        }),
-        # |------ comp_xlsx_data_name ----
-        comp_xlsx_data_name = reactive({
-          # req(input$xlsx_new_name_comp)
-          if (length(input$xlsx_new_name_comp) == 1) {
-            as.character(input$xlsx_new_name_comp)
+        # |------ comp_name ----
+        comp_name = reactive({
+          # req(input$comp_new_name)
+          if (nchar(input$comp_new_name) != 0) {
+            as.character(input$comp_new_name)
           } else {
-            NULL
-          }
-        }),
-        # |------ comp_flat_file_data ----
-        comp_flat_file_data = reactive({
-          req(input$flat_file_comp)
-          req(input$flat_file_new_name_comp)
-          comp_flat_file <- load_flat_file(
-            path = input$flat_file_comp$datapath
-          )
-        }),
-        # |------ comp_flat_file_data_name ----
-        comp_flat_file_data_name = reactive({
-          # req(input$flat_file_new_name_comp)
-          if (length(input$flat_file_new_name_comp) == 1) {
-            as.character(input$flat_file_new_name_comp)
-          } else {
-            NULL
+            as.character(input$base_filename)
           }
         })
       )
     )
+
   })
 }

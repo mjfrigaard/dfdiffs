@@ -1,21 +1,71 @@
-# packages ----------------------------------------------------------------
-library(knitr)
-library(arsenal)
-library(diffdf)
-library(rmdformats)
-library(tidyverse)
-library(devtools)
-library(hrbrthemes)
-library(fs)
-library(reactable)
-library(rmarkdown)
-library(shiny)
-library(shinythemes)
-library(bs4Dash)
-library(fresh)
+#' Load flat data files
+#'
+#' @param path path to data file (with extension)
+#'
+#' @return return_data
+#' @export load_flat_file
+#' @importFrom data.table fread
+#' @importFrom haven read_sas
+#' @importFrom haven read_sav
+#' @importFrom haven read_dta
+#' @importFrom tools file_ext
+#' @importFrom tibble as_tibble
+#'
+#' @examples # from local
+#' load_flat_file(path = "inst/extdata/csv/2015-baseballdatabank/core/AllstarFull.csv")
+#'
+load_flat_file <- function(path) {
+  ext <- tools::file_ext(path)
+  data <- switch(ext,
+    txt = data.table::fread(path),
+    csv = data.table::fread(path),
+    tsv = data.table::fread(path),
+    sas7bdat = haven::read_sas(data_file = path),
+    sas7bcat = haven::read_sas(data_file = path),
+    sav = haven::read_sav(file = path),
+    dta = haven::read_dta(file = path)
+  )
+  return_data <- tibble::as_tibble(data)
+  return(return_data)
+}
 
-# themes -----
-## bmrn_fresh_theme --------------------------------------------------------
+#' Upload data to app `upload_data()`
+#'
+#' @param path path to data file (with extension)
+#' @param sheet excel sheet (if excel file)
+#'
+#' @return uploaded
+#' @export upload_data
+#' @importFrom readxl read_excel
+#' @importFrom tools file_ext
+#' @importFrom tibble as_tibble
+#'
+#'
+#' @examples # not run
+#' upload_data(path = "inst/extdata/app-testing/lahman_compare.xlsx",
+#'             sheet = "master-2015")
+#' upload_data(path = "inst/extdata/app-testing/m15.csv")
+#' upload_data(path = "inst/extdata/dta/iris.dta")
+#' upload_data(path = "inst/extdata/sas7bdat/iris.sas7bdat")
+#' upload_data(path = "inst/extdata/sav/iris.sav")
+#' upload_data(path = "inst/extdata/tsv/Batting.tsv")
+#' upload_data(path = "inst/extdata/txt/Batting.txt")
+upload_data <- function(path, sheet = NULL) {
+  ext <- tools::file_ext(path)
+  if (ext == "xlsx") {
+    raw_data <- readxl::read_excel(
+        path = path,
+        sheet = sheet
+      )
+    uploaded <- tibble::as_tibble(raw_data)
+  } else {
+    uploaded <- load_flat_file(path = path)
+  }
+  return(uploaded)
+}
+
+
+# bmrn_fresh_theme --------------------------------------------------------
 bmrn_fresh_theme <- function() {
   fresh::create_theme(
     # theme vars  -------------------------------------------------------------
@@ -77,8 +127,6 @@ bmrn_fresh_theme <- function() {
   )
 }
 
-## set theme ---------------------------------------------------------------
-compare_theme <- bmrn_fresh_theme()
 
 ## base_react_theme --------------------------------------------------------
 base_react_theme <- reactableTheme(
@@ -93,8 +141,8 @@ base_react_theme <- reactableTheme(
           pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
         )
 
-## compare_react_theme -----------------------------------------------------
-compare_react_theme <- reactableTheme(
+## comp_react_theme -----------------------------------------------------
+comp_react_theme <- reactableTheme(
           color = "#FFFFFF",
           backgroundColor = "#2f3688",
           borderColor = "#646464",
@@ -106,28 +154,37 @@ compare_react_theme <- reactableTheme(
           pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
         )
 
-
-# upload ----
-## load_flat_file ----------------------------------------------------------
-#' Load flat data files
+## create_join_column ------------------------------------------------------
+#' Create unique row identifier
 #'
-#' @param path path to data file (with extension)
+#' @param df a data.frame or tibble
+#' @param by_colums columns to uniquely identify a row
+#' @param new_by_column_name the new column name
 #'
-#' @return return_data
-#' @export load_flat_file
+#' @return join_col_data
+#' @export create_join_column
 #'
-load_flat_file <- function(path) {
-  ext <- tools::file_ext(path)
-  data <- switch(ext,
-    txt = data.table::fread(path),
-    csv = data.table::fread(path),
-    tsv = data.table::fread(path),
-    sas7bdat = haven::read_sas(data_file = path),
-    sas7bcat = haven::read_sas(data_file = path),
-    sav = haven::read_sav(file = path),
-    dta = haven::read_dta(file = path)
-  )
-  return_data <- as_tibble(data)
-  return(return_data)
-}
-
+#' @examples # using dfdiffs::diff_modified_data
+#' diff_modified_data <- dfdiffs::diff_modified_data
+#' current_modified <- diff_modified_data$diff_current_modified
+#' previous_modified <- diff_modified_data$diff_previous_modified
+#' create_join_column(df = current_modified,
+#'                    by_columns = c("subject_id", "record"),
+#'                    new_by_column_name = "join")
+  create_join_column <- function(df, by_colums, new_by_column_name) {
+    # select by_vars
+    tmp <- dplyr::select(df, all_of(by_colums))
+    # convert to character
+    tmp <- dplyr::mutate(tmp, across(.fns = as.character))
+    # rename data
+    join_col_data <- df
+    # assign new col
+    join_col_data$new_col <- purrr::pmap_chr(.l = tmp, .f = paste, sep = "-")
+    # rename
+    names(join_col_data)[names(join_col_data) == "new_col"] <- new_by_column_name
+    # relocate
+    join_col_data <- dplyr::relocate(join_col_data,
+      all_of(new_by_column_name))
+    # return
+    return(join_col_data)
+  }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/uploadDataUI.R
 \name{uploadDataUI}
 \alias{uploadDataUI}
-\title{data upload (UI)}
+\title{uploadDataUI()}
 \usage{
 uploadDataUI(id)
 }
@@ -10,9 +10,5 @@ uploadDataUI(id)
 \item{id}{module id}
 }
 \description{
-data upload (UI)
-}
-\examples{
-# build ui for data upload
-uploadDataUI("input_id")
+UI module for upload
 }

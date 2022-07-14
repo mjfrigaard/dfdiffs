@@ -8,7 +8,7 @@
 #' for the dfdiffs app.
 uploadDataUI <- function(id) {
   tagList(
-    h3("Upload a ", strong("base"), " (target) data source "),
+    h3("Upload a ", strong("base"), " (i.e., target) data source "),
     fluidRow(
       sortable(
         width = 12,
@@ -16,73 +16,77 @@ uploadDataUI <- function(id) {
         box(
           maximizable = TRUE,
           collapsible = TRUE,
-          collapsed = TRUE,
+          collapsed = FALSE,
           closable = FALSE,
           solidHeader = TRUE,
           status = "primary",
           width = 12,
-          title = tags$strong("Upload Excel File (base)"),
+          title = tags$strong("Upload File (base)"),
           fluidRow(
             column(
               width = 6,
               fileInput(
-                ## |-- INPUT [xlsx_file_base] -------
+                ## |-- INPUT [base_file] -------
                 inputId = NS(
                   namespace = id,
-                  id = "xlsx_file_base"
+                  id = "base_file"
                 ),
-                label = "Excel file input",
-                accept = c(".xlsx")
+                label = tags$strong(
+                  "Accepts: ",
+                  code(".sas7bdat"), code(".csv"),
+                  code(".txt"), code(".tsv"), code(".xlsx")),
+                  accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
               )
             ),
             column(
               width = 6,
-              ### |-- INPUT [xlsx_sheets_base] ---------
+              ### |-- INPUT [base_xlsx_sheets] ---------
               selectInput(
                 inputId = NS(
                   namespace = id,
-                  id = "xlsx_sheets_base"
+                  id = "base_xlsx_sheets"
                 ),
-                label = "Select sheet:",
-                choices = ""
+                label = strong("Select sheet (if ", code(".xlsx"), " file):"),
+                choices = c("", NULL)
               )
             )
           ),
           fluidRow(
             column(
               width = 6,
-              ## |-- OUTPUT [xlsx_filename_base] ---------
-              tags$strong("Excel data file:"),
+              ## |-- OUTPUT [base_filename] ---------
+              tags$strong("Data file name:"),
               shiny::htmlOutput(
                 outputId = NS(
                   namespace = id,
-                  id = "xlsx_filename_base"
+                  id = "base_filename"
                 )
               )
             ),
             column(
               width = 6,
-              ## |-- INPUT [xlsx_new_name_base] ---------
+              ## |-- INPUT [base_new_name] ---------
               textInput(
                 inputId = NS(
                   namespace = id,
-                  id = "xlsx_new_name_base"
+                  id = "base_new_name"
                 ),
                 label = strong(
-                  "Provide a name for the", code("base"), " excel fil:"
+                  "Provide a name to preview the", code("base"), " file:"
                 )
               ),
+              em("Not sure what name to use? Copy + paste the file name."),
             )
           ),
           fluidRow(
             column(
               width = 12,
               br(), br(),
-              ## |-- OUTPUT [xlsx_upload_base] ---------
+              ## |-- OUTPUT [base_display_upload] ---------
               reactable::reactableOutput(
                 outputId = NS(
                   namespace = id,
-                  id = "xlsx_upload_base"
+                  id = "base_display_upload"
                 )
               )
             )
@@ -90,78 +94,65 @@ uploadDataUI <- function(id) {
         )
       )
     ),
-    # |- upload base flat file ----
+    ## DEV (base) -----
     fluidRow(
       sortable(
         width = 12,
         box(
-          maximizable = TRUE,
-          collapsed = FALSE,
-          collapsible = TRUE,
-          closable = FALSE,
-          solidHeader = TRUE,
-          status = "primary",
           width = 12,
-          title = tags$strong("Upload Flat Data File (base)"),
+          status = "info",
+          solidHeader = TRUE,
+          closable = TRUE,
+          maximizable = TRUE,
+          collapsed = TRUE,
+          title = "Reactive values (base)",
+          strong(em("For DEV purposes only")),
           fluidRow(
-            column(
-              width = 6,
-              fileInput(
-                ## |-- INPUT [flat_file_base] -------
-                inputId = NS(
-                  namespace = id,
-                  id = "flat_file_base"
-                ),
-                label = tags$strong(
-                  "Accepts: ",
-                  code(".sas7bdat"), code(".csv"), code(".txt"), code(".tsv")
-                ),
-                accept = c(".sas7bdat", ".csv", ".txt", ".tsv")
-              )
+            column(12,
+              ## base_dev_a -----
+              code("base_dev_a"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_dev_a"
             )
+          ))),
+          fluidRow(
+            column(12,
+              ## base_dev_b -----
+              code("base_dev_b"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_dev_b"
+            )
+          ))
           ),
           fluidRow(
-            column(
-              width = 6,
-              ## |-- OUTPUT [flat_filename_base] ---------
-              tags$strong("Flat file data:"),
-              shiny::htmlOutput(
-                outputId = NS(
-                  namespace = id,
-                  id = "flat_filename_base"
-                )
-              )
-            ),
-            column(
-              width = 6,
-              ## |-- INPUT [flat_file_new_name_base] ---------
-              textInput(
-                inputId = NS(
-                  namespace = id,
-                  id = "flat_file_new_name_base"
-                ),
-                label = strong(
-                  "Provide a name for the ", code("base"), " flat file:"
-                )
-              )
+            column(12,
+              ## base_dev_x -----
+              code("base_dev_x"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_dev_x"
             )
-          ),
+          ))),
           fluidRow(
-            column(
-              width = 12,
-              ## |-- OUTPUT [flat_file_upload_base] -------
-              reactable::reactableOutput(
-                outputId = NS(
-                  namespace = id,
-                  id = "flat_file_upload_base"
-                )
-              )
+            column(12,
+              ## base_dev_y -----
+              code("base_dev_y"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_dev_y"
             )
+          ))
           )
         )
       )
     ),
-    h3("Upload a ", strong("compare"), " (current) data source"),
+    h3("Upload a ", strong("compare"), " (i.e., current) data source"),
     # br(), br(),
     fluidRow(
       sortable(
@@ -169,74 +160,78 @@ uploadDataUI <- function(id) {
         # |- upload compare xlsx file ----
         box(
           maximizable = TRUE,
-          collapsed = TRUE,
+          collapsed = FALSE,
           solidHeader = TRUE,
           status = "secondary",
           width = 12,
           collapsible = TRUE,
           closable = FALSE,
-          title = tags$strong("Upload Excel File (compare)"),
+          title = tags$strong("Upload File (compare)"),
           fluidRow(
             column(
               width = 6,
               fileInput(
-                ## |-- INPUT [xlsx_file_comp] -------
+                ## |-- INPUT [comp_file] -------
                 inputId = NS(
                   namespace = id,
-                  id = "xlsx_file_comp"
+                  id = "comp_file"
                 ),
-                label = "Excel file upload",
-                accept = c(".xlsx")
+                label = tags$strong(
+                  "Accepts: ",
+                  code(".sas7bdat"), code(".csv"),
+                  code(".txt"), code(".tsv"), code(".xlsx")),
+                  accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
               )
             ),
             column(
               width = 6,
-              ## |-- INPUT [xlsx_sheets_comp] ---------
+              ## |-- INPUT [comp_xlsx_sheets] ---------
               selectInput(
                 inputId = NS(
                   namespace = id,
-                  id = "xlsx_sheets_comp"
+                  id = "comp_xlsx_sheets"
                 ),
-                label = "Select sheet:",
-                choices = ""
+                label = strong("Select sheet (if ", code(".xlsx"), " file):"),
+                choices = c("", NULL)
               )
             )
           ),
           fluidRow(
             column(
               width = 6,
-              ## |-- OUTPUT [xlsx_filename_comp] ---------
-              tags$strong("Excel Data File:"),
+              ## |-- OUTPUT [comp_filename] ---------
+              tags$strong("Data file name:"),
               shiny::htmlOutput(
                 outputId = NS(
                   namespace = id,
-                  id = "xlsx_filename_comp"
+                  id = "comp_filename"
                 )
               )
             ),
             column(
               width = 6,
-              ## |-- INPUT [xlsx_new_name_comp] ---------
+              ## |-- INPUT [comp_new_name] ---------
               textInput(
                 inputId = NS(
                   namespace = id,
-                  id = "xlsx_new_name_comp"
+                  id = "comp_new_name"
                 ),
                 label = strong(
-                  "Provide a name for the ", code("compare"), " excel file :"
+                  "Provide a name to preview the ", code("compare"), " file:"
                 )
               ),
+              em("Not sure what name to use? Copy + paste the file name."),
             )
           ),
           fluidRow(
             column(
               width = 12,
               br(), br(),
-              ## |-- OUTPUT [xlsx_upload_comp] ---------
+              ## |-- OUTPUT [comp_display_upload] ---------
               reactable::reactableOutput(
                 outputId = NS(
                   namespace = id,
-                  id = "xlsx_upload_comp"
+                  id = "comp_display_upload"
                 )
               )
             )
@@ -244,73 +239,60 @@ uploadDataUI <- function(id) {
         )
       )
     ),
-    # |- upload compare flat file ----
+    ## DEV -----
     fluidRow(
       sortable(
         width = 12,
         box(
-          maximizable = TRUE,
-          collapsed = FALSE,
-          solidHeader = TRUE,
-          status = "secondary",
           width = 12,
-          collapsible = TRUE,
-          closable = FALSE,
-          title = tags$strong("Upload Flat Data File (compare)"),
+          status = "info",
+          solidHeader = TRUE,
+          closable = TRUE,
+          maximizable = TRUE,
+          collapsed = TRUE,
+          title = "Reactive values (compare)",
+          strong(em("For DEV purposes only")),
           fluidRow(
-            column(
-              width = 6,
-              fileInput(
-                ## |-- INPUT [flat_file_comp] -------
-                inputId = NS(
-                  namespace = id,
-                  id = "flat_file_comp"
-                ),
-                label = tags$strong(
-                  "Accepts: ",
-                  code(".sas7bdat"), code(".csv"), code(".txt"), code(".tsv")
-                ),
-                accept = c(".sas7bdat", ".csv", ".txt", ".tsv")
-              )
+            column(12,
+              ## comp_dev_a -----
+              code("comp_dev_a"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "comp_dev_a"
             )
+          ))),
+          fluidRow(
+            column(12,
+              ## comp_dev_b -----
+              code("comp_dev_b"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "comp_dev_b"
+            )
+          ))
           ),
           fluidRow(
-            column(
-              width = 6,
-              ## |-- OUTPUT [flat_filename_comp] ---------
-              tags$strong("Flat file data:"),
-              shiny::htmlOutput(
-                outputId = NS(
-                  namespace = id,
-                  id = "flat_filename_comp"
-                )
-              )
-            ),
-            column(
-              width = 6,
-              ## |-- INPUT [flat_file_new_name_comp] ---------
-              textInput(
-                inputId = NS(
-                  namespace = id,
-                  id = "flat_file_new_name_comp"
-                ),
-                label = strong(
-                  "Provide a name for the ", code("compare"), " flat file:"
-                )
-              )
+            column(12,
+              ## comp_dev_x -----
+              code("comp_dev_x"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "comp_dev_x"
             )
-          ),
+          ))),
           fluidRow(
-            column(
-              width = 12,
-              ## |-- OUTPUT [flat_file_upload_comp] -------
-              reactable::reactableOutput(
-                outputId = NS(
-                  namespace = id,
-                  id = "flat_file_upload_comp"
-                )
-              )
+            column(12,
+              ## comp_dev_y -----
+              code("comp_dev_y"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "comp_dev_y"
             )
+          ))
           )
         )
       )

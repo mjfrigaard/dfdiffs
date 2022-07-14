@@ -29,8 +29,6 @@ This vignette is an intro to the `dfdiffs` package. The goal  of `dfdiffs` is to
 1. What rows are here now that weren't here before?  
 2. What rows were here before that aren't here now?   
 3. What values have been changed?   
-4. What columns have been moved?    
-5. What rows have been moved?    
 
 ## Packages 
 

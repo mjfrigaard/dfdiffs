@@ -1,35 +1,36 @@
-***This application compares two SAS datasets and creates the following
-tables:***
+### Getting Started
 
-### Output Tables
+Quick dataset comparisons in three steps!
 
-#### Comparison Summary
+#### 1) Upload
 
-An overall summary of the datasets compared
+-   Start by uploading a `base` (i.e., target) data file in the upload
+    box
 
-#### New records
+-   After uploading the file, provide a name for the imported file
+    (**uploaded files will not be imported into the application until
+    they are named.**)
 
-Data that are in `DATA X` that are not in `DATA Y`
+-   Repeat this process for the `compare` (i.e., comparison) dataset.
 
-#### Modified records
+#### 2) Select
 
-`Changes detected per variable` = counts of changes (`Diffs`) per
-variable and `Missing`
+-   Click on the **Select Data** tab and review your uploaded data. If
+    you’d like, you can reduce the columns you’d like to include in the
+    comparison
 
-`Changes detected` = row-by-row changes, ordered according to the `by`
-(join) column
+-   In the **Select Join Columns** box, you’ll see a table of shared
+    columns between `base` and `compare` (f the data has a join column
+    (or columns), you can select them in the **Select Joining
+    Column(s)** section)
 
-#### Deleted Records
+-   Use the final two boxes to review the data that will be compared
 
-Data that are in `DATA Y` that aren’t in `DATA Y`
+#### 3) Compare
 
-#### Variables
+-   After you’ve uploaded and selected the data, click on the **Compare
+    Data** tab where you will see an info box summary of the two
+    comparison datasets
 
-`Observations not shared`: observations (rows) in `DATA X` that are not
-shared in `DATA Y`
-
-`Variables not shared`: variables (columns) in `DATA X` that are not
-shared in `DATA Y`
-
-`Other variables not compared`: variables (columns) not compared due to
-differences in class (format)
+-   The comparison outputs are displayed in three boxes: **New Data**,
+    **Deleted Data**, and **Changed Data**

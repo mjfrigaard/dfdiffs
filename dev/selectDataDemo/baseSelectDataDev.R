@@ -222,7 +222,7 @@ baseUploadDataUI <- function(id) {
         width = 12,
         box(
           maximizable = TRUE,
-          collapsed = TRUE,
+          collapsed = FALSE,
           collapsible = TRUE,
           closable = FALSE,
           solidHeader = TRUE,
@@ -496,7 +496,7 @@ baseSelectDataUI <- function(id) {
         )
       )
     ),
-    ## reactive values -----
+    ## DEV -----
     fluidRow(
       sortable(
         width = 12,
@@ -504,15 +504,66 @@ baseSelectDataUI <- function(id) {
           width = 12,
           background = "gray",
           solidHeader = TRUE,
-          closable = FALSE,
+          closable = TRUE,
           maximizable = TRUE,
-          collapsible = TRUE,
           collapsed = FALSE,
-          title = "Reactive values",
-          ## values -----
+          title = "Reactive values (base)",
+          strong(em("For DEV purposes only")),
+          fluidRow(
+            column(6,
+              ## base_dev_x -----
+              code("base_dev_x"),
           verbatimTextOutput(
-            outputId = NS(namespace = id,
-              id = "reactive_values")
+            outputId = NS(
+              namespace = id,
+              id = "base_dev_x"
+            )
+          )),
+            column(6,
+              ## base_dev_y -----
+              code("base_dev_y"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_dev_y"
+            )
+          ))
+          )
+        )
+      )
+    ),
+    ## DEV -----
+    fluidRow(
+      sortable(
+        width = 12,
+        box(
+          width = 12,
+          background = "gray",
+          solidHeader = TRUE,
+          closable = TRUE,
+          maximizable = TRUE,
+          collapsed = FALSE,
+          title = "Reactive values (base)",
+          strong(em("For DEV purposes only")),
+          fluidRow(
+            column(6,
+              ## base_dev_a -----
+              code("base_dev_a"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_dev_a"
+            )
+          )),
+            column(6,
+              ## base_dev_b -----
+              code("base_dev_b"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_dev_b"
+            )
+          ))
           )
         )
       )
@@ -533,13 +584,11 @@ baseSelectDataServer <- function(id, data_upload) {
       base_xlsx <- data_upload$base_xlsx_data()
       return(base_xlsx)
     })
-
     ## REACTIVE |-- base_xlsx_data_name (reactive) ---------
     base_xlsx_data_name <- eventReactive(data_upload$base_xlsx_data_name(), {
       base_xlsx_name <- data_upload$base_xlsx_data_name()
       return(base_xlsx_name)
     })
-
     ## REACTIVE |-- base_flat_file_data (reactive) ---------
     base_flat_file_data <- eventReactive(data_upload$base_flat_file_data(), {
       base_flat_file <- data_upload$base_flat_file_data()
@@ -551,17 +600,22 @@ baseSelectDataServer <- function(id, data_upload) {
       return(base_flat_file_name)
     })
 
-    ## REACTIVE |-- base_uploaded_data_names (reactive) ---------
+    ## REACTIVE (data file names) |-- base_uploaded_data_names (reactive) ------
+    # create a vector of names from uploaded xlsx/flat file names
     base_uploaded_data_names <- reactive({
+      # both xlsx and flat file
       if (nchar(base_xlsx_data_name()) != 0 & nchar(base_flat_file_data_name()) != 0 ) {
         base_xlsx_data_name <- as.character(base_xlsx_data_name())
         base_flat_file_data_name <- as.character(base_flat_file_data_name())
         names <- c(base_flat_file_data_name, base_xlsx_data_name)
+        # xlsx file
       } else if (nchar(base_xlsx_data_name()) != 0 & nchar(base_flat_file_data_name()) == 0 ) {
         names <- as.character(base_xlsx_data_name())
+        # flat file
       } else if (nchar(base_xlsx_data_name()) == 0 & nchar(base_flat_file_data_name()) != 0 ) {
         names <- as.character(base_flat_file_data_name())
       } else {
+        # nothing
         NULL
       }
       return(names)
@@ -571,19 +625,15 @@ baseSelectDataServer <- function(id, data_upload) {
     observeEvent(base_uploaded_data_names(), {
       if (is.character(unclass(base_uploaded_data_names())) == TRUE) {
         data_choices <- base_uploaded_data_names()
-        updated_select <- as.character(input$base_data_select)
-        selected <- data_choices[stringr::str_detect(data_choices, updated_select)]
       } else {
         data_choices <- c("", NULL)
-        selected <- c("")
       }
       updateSelectInput(inputId = "base_data_select",
-        choices = data_choices,
-        selected = selected)
+        choices = data_choices)
     })
 
-    ##  REACTIVE |-- (base_data) ---------
-    base_data <- reactive({
+    ##  REACTIVE (dataset) |-- (base_data) ---------
+    base_data <- eventReactive(input$base_data_select, {
       req(input$base_data_select)
       # if the selected data is the excel data name
       if (as.character(input$base_data_select) == as.character(base_xlsx_data_name())) {
@@ -599,49 +649,53 @@ baseSelectDataServer <- function(id, data_upload) {
       return(base_data)
     })
 
-    ##  UPDATE |-- input$base_col_select   ---------
-    observeEvent(base_data(), {
-        data_choices <- names(base_data())
-      updateSelectizeInput(
-        inputId = "base_col_select",
-        choices = data_choices,
-        selected = data_choices
-        )
-    })
-
-    ## OUTPUT |-- base_data_display (display) ---------
-    output$base_data_display <- reactable::renderReactable({
-      req(input$base_col_select)
+    ##  REACTIVE (dataset columns) |-- (base_data_cols) ---------
+    base_data_cols <- eventReactive(input$base_data_select, {
       req(input$base_data_select)
-      validate(
-        need(base_data(), "please upload data")
-      )
-        reactable::reactable(
-          data = select(base_data(), all_of(input$base_col_select)),
-          # data = base_data(),
-        defaultPageSize = 10,
-        resizable = TRUE,
-        highlight = TRUE,
-        compact = TRUE,
-        wrap = FALSE,
-        bordered = TRUE,
-        filterable = TRUE)
-        })
-
-
-    ## OUTPUT |-- reactive_values (dev) ---------
-    output$reactive_values <- renderPrint({
-      all_values <- reactiveValuesToList(x = input, all.names = TRUE)
-      module_names <- str_detect(names(all_values), "base")
-      module_values <- all_values[module_names]
-      reactable_names <- str_detect(
-        names(module_values),
-        "__reactable__",
-        negate = TRUE
-      )
-      values <- module_values[reactable_names]
-      print(values)
+      # if the selected data is the excel data name
+      if (as.character(input$base_data_select) == as.character(base_xlsx_data_name())) {
+        data <- base_xlsx_data()
+        base_data <- tibble::as_tibble(data)
+        base_data_cols <- names(base_data)
+        # if the selected data is the flat file name
+      } else if (as.character(input$base_data_select) == as.character(base_flat_file_data_name())) {
+        data <- base_flat_file_data()
+        base_data <- tibble::as_tibble(data)
+        base_data_cols <- names(base_data)
+      } else {
+        NULL
+      }
+      return(base_data_cols)
     })
+
+      ## BASE OUTPUT |-- reactive_values (dev) ---------
+      output$base_dev_x <- renderPrint({
+        print(
+          list(base_flat_file_data_name(), base_flat_file_data())
+          )
+      })
+
+      ## BASE OUTPUT |-- reactive_values (dev) ---------
+      output$base_dev_y <- renderPrint({
+        print(
+          list(base_xlsx_data_name(), base_xlsx_data())
+          )
+      })
+
+      ## BASE OUTPUT |-- reactive_values (dev) ---------
+      output$base_dev_a <- renderPrint({
+        print(
+          paste0("input$base_data_select = ", input$base_data_select)
+
+          )
+      })
+
+      ## BASE OUTPUT |-- reactive_values (dev) ---------
+      output$base_dev_b <- renderPrint({
+        print(
+          base_uploaded_data_names()
+          )
+      })
 
     # RETURN LIST |-- ----
     return(

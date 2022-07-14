@@ -2,16 +2,13 @@
 % Please edit documentation in R/selectDataUI.R
 \name{selectDataUI}
 \alias{selectDataUI}
-\title{Select data columns}
+\title{selectDataUI}
 \usage{
 selectDataUI(id)
 }
 \arguments{
-\item{id}{}
-}
-\value{
-select data module
+\item{id}{module id}
 }
 \description{
-Select data columns
+select UI module
 }

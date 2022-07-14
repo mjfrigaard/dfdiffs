@@ -2,31 +2,13 @@
 % Please edit documentation in R/uploadDataServer.R
 \name{uploadDataServer}
 \alias{uploadDataServer}
-\title{data upload (Server)}
+\title{uploadDataServer()}
 \usage{
 uploadDataServer(id)
 }
 \arguments{
 \item{id}{module id}
 }
-\value{
-list with data inputs
-\describe{
-  \item{prev_xlsx_data}{reactive dataset of imported 'previous' excel file}
-  \item{prev_xlsx_data_name}{name of reactive dataset of imported 'previous' excel file}
-  \item{prev_flat_file_data}{reactive dataset of imported 'previous' flat file}
-  \item{prev_flat_file_data_name}{name of reactive dataset of imported 'previous' flat file}
-  \item{curr_xlsx_data}{reactive dataset of imported 'current' excel file}
-  \item{curr_xlsx_data_name}{name of reactive dataset of imported 'current' excel file}
-  \item{curr_flat_file_data}{reactive dataset of imported 'current' flat file}
-  \item{curr_flat_file_data_name}{name of reactive dataset of imported 'current' flat file}
-}
-}
 \description{
-data upload (Server)
-}
-\examples{
-# build server using uploadDataServer() and displayDataServer()
-upload_data_list <- uploadDataServer(id = "upload_data")
-displayDataServer(id = "display_data", data_upload = upload_data_list)
+Server module for upload
 }

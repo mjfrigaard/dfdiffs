@@ -10,9 +10,5 @@ bmrn_fresh_theme()
 theme shiny app
 }
 \description{
-BioMarin theme (fresh <> bs4Dash)
-}
-\examples{
-# see the example in:
-# modules/freshDemo.R
+this is the fresh theme with BioMarin colors.
 }

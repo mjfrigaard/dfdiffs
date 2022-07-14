@@ -31,13 +31,11 @@ extdata_folder <- "../inst/extdata/"
 
 # Motivation
 
-The goal of the `dfdiffs` is to answer the following questions: 
+The goal of the `dfdiffs` is to answer the following questions:
 
-1. What rows are here now that weren't here before?  
-2. What rows were here before that aren't here now?   
-**3. What values have been changed?**   
-4. What columns have been moved?    
-5. What rows have been moved?    
+1.  What rows are here now that weren't here before?
+2.  What rows were here before that aren't here now?
+3.   **What values have been changed?**
 
 This vignette takes us through the `create_changed_data()` function, which answers the "*What values have been changed?*". We also have another function that detects modified data, `create_modified_data()`.
 
@@ -58,7 +56,7 @@ library(readxl)
 library(dfdiffs)
 ```
 
-## Changed data 
+## Changed data
 
 We have two datasets to test what's been modified:
 
@@ -82,30 +80,29 @@ ChangedData <- dfdiffs::ChangedData
 knitr::kable(ChangedData)
 ```
 
+These data do not have a unique identifier, but we can create one with the `create_new_column()` function.
 
-These data do not have a unique identifier, but we can create one with the `create_new_column()` function. 
+## Lahman datasets
 
-## Lahman datasets 
+We will also import two master datasets from the `Lahman` baseball package because they're larger and have unique keys.
 
-We will also import two master datasets from the `Lahman` baseball package because they're larger and have unique keys.  
-
-Master (2015)
+###  Master (2015)
 
 ```{r master15, echo=TRUE}
 master15 <- dfdiffs::master15
 glimpse(master15)
 ```
 
-Master (2020)
+### Master (2020)
 
 ```{r master20, echo=TRUE}
 master20 <- dfdiffs::master20
 glimpse(master20)
 ```
 
-## `nycflights13` data 
+## `nycflights13` data
 
-We'll also test this with some data from the `nycflights13`. 
+We'll also test this with some data from the `nycflights13`.
 
 ```{r nycflights13}
 library(nycflights13)
@@ -122,20 +119,18 @@ jfk_flights <- dfdiffs::jfk_flights
 glimpse(jfk_flights)
 ```
 
-
 ```{r jfk_weather}
 jfk_weather <- dfdiffs::jfk_weather
 glimpse(jfk_weather)
 ```
 
+## Conditions
 
-## Conditions 
-
-Each function in the `dfdiffs` package assumes the following conditions: 
+Each function in the `dfdiffs` package assumes the following conditions:
 
 ### Single by column conditions
 
-1) Two datasets, compare all columns:
+1)  Two datasets, compare all columns:
 
     ```{r cond-1, eval=FALSE}
     create_changed_data(
@@ -143,7 +138,7 @@ Each function in the `dfdiffs` package assumes the following conditions:
       base = InitialData)
     ```
 
-2) Multiple columns to compare (`cols`): 
+2)  Multiple columns to compare (`cols`):
 
     ```{r cond-2, eval=FALSE}
     create_changed_data(
@@ -152,8 +147,7 @@ Each function in the `dfdiffs` package assumes the following conditions:
       cols = c("text_value_a", "text_value_b"))
     ```
 
-
-3) Single `by` column, no new column name
+3)  Single `by` column, no new column name
 
     ```{r cond-3, eval=FALSE}
     create_changed_data(
@@ -162,7 +156,7 @@ Each function in the `dfdiffs` package assumes the following conditions:
       by = "join_var")
     ```
 
-4) Single by column, new column name (`by_col`)
+4)  Single by column, new column name (`by_col`)
 
     ```{r cond-4, eval=FALSE}
     create_changed_data(
@@ -172,7 +166,7 @@ Each function in the `dfdiffs` package assumes the following conditions:
       by_col = "new_join_var")
     ```
 
-5) Single `by` column, multiple compare columns `cols`
+5)  Single `by` column, multiple compare columns `cols`
 
     ```{r cond-5, eval=FALSE}
     create_changed_data(
@@ -182,7 +176,7 @@ Each function in the `dfdiffs` package assumes the following conditions:
       cols = c("text_value_a", "text_value_b"))
     ```
 
-6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
+6)  Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
 
     ```{r cond-6, eval=FALSE}
     create_changed_data(
@@ -193,10 +187,9 @@ Each function in the `dfdiffs` package assumes the following conditions:
       cols = c("text_value_a", "text_value_b"))
     ```
 
-
 ### Multiple by column conditions
 
-7) Multiple `by` columns
+7)  Multiple `by` columns
 
     ```{r cond-7, eval=FALSE}
     create_changed_data(
@@ -205,8 +198,7 @@ Each function in the `dfdiffs` package assumes the following conditions:
       by = c("subject_id", "record"))
     ```
 
-
-8) Multiple `by` columns, new column name (`by_col`)
+8)  Multiple `by` columns, new column name (`by_col`)
 
     ```{r cond-8, eval=FALSE}
     create_changed_data(
@@ -216,7 +208,7 @@ Each function in the `dfdiffs` package assumes the following conditions:
       by_col = "new_join_var")
     ```
 
-9) Multiple `by` columns, multiple compare columns (`cols`)
+9)  Multiple `by` columns, multiple compare columns (`cols`)
 
     ```{r cond-9, eval=FALSE}
     create_changed_data(
@@ -235,7 +227,6 @@ Each function in the `dfdiffs` package assumes the following conditions:
       by = c("subject_id", "record"), 
       cols = c("text_value_a", "text_value_b"))
     ```
-
 
 ## Creating a join column
 
@@ -266,6 +257,7 @@ create_changed_data(compare = , base = , by = , by_col = , cols = )
 ```
 
 ```{r SOURCE-create_changed_data, echo=FALSE, eval=TRUE}
+# run this during development
 source("../R/create_changed_data.R")
 ```
 
@@ -289,7 +281,6 @@ knitr::kables(
 
 ```
 
-
 ### 2) Multiple columns to compare (`cols`):
 
 ```{r cond-2-create_changed_data}
@@ -311,10 +302,10 @@ knitr::kables(
 
 ### 3) Single `by` column, no new column name
 
-We'll run this on two datasets: 
+We'll run this on two datasets:
 
-1. `InitialDataJoin` vs. `ChangedDataJoin`     
-2. `master15` vs. `master20`
+1.  `InitialDataJoin` vs. `ChangedDataJoin`\
+2.  `master15` vs. `master20`
 
 ```{r cond-3-test, eval=FALSE, echo=FALSE, include=FALSE}
 changed_cond_3 <- diffdf::diffdf(base = master15, compare = master20,
@@ -363,7 +354,6 @@ knitr::kables(
     knitr::kable(changed_cond_3$var_diffs)
     ), format = "html")
 ```
-
 
 ```{r cond-3-2-create_changed_data}
 changed_cond_3 <- create_changed_data(
@@ -440,7 +430,6 @@ rename_join_col(data = master15,
   head()
 ```
 
-
 We will run this condition using `InitialDataJoin` vs. `ChangedDataJoin`
 
 ```{r cond-4-create_changed_data}
@@ -484,10 +473,9 @@ knitr::kables(
     knitr::kable(head(changed_cond_4$var_diffs))), format = "html")
 ```
 
-
 ### 5) Single `by` column, multiple compare columns `cols`
 
-User provides a `by`/`keys` column, and only wants to view the comparison of a select number of columns from each dataset. 
+User provides a `by`/`keys` column, and only wants to view the comparison of a select number of columns from each dataset.
 
 ```{r cond-5-1-create_changed_data}
 changed_cond_5 <- create_changed_data(
@@ -505,8 +493,7 @@ knitr::kables(
     knitr::kable(changed_cond_5$var_diffs)), format = "html")
 ```
 
-
-We'll also check this on the `master15` vs. `master20` dataset. 
+We'll also check this on the `master15` vs. `master20` dataset.
 
 ```{r cond-5-test, eval=FALSE, echo=FALSE, include=FALSE}
 diffdf::diffdf(base = master15, compare = master20, keys = "playerID")
@@ -537,7 +524,7 @@ knitr::kables(
 
 ### 6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
 
-User supplies a `by`/`keys` variable, a new column name for the join column (`by_col`), and a select number of columns to compare and view. 
+User supplies a `by`/`keys` variable, a new column name for the join column (`by_col`), and a select number of columns to compare and view.
 
 First we test on `InitialDataJoin` vs `ChangedDataJoin`:
 
@@ -550,7 +537,6 @@ changed_cond_6 <- create_changed_data(
   cols = c("text_value_a", "text_value_b"))
 glimpse(changed_cond_6)
 ```
-
 
 ```{r cond-6-1-create_changed_data-num_diffs-var_diffs, echo=FALSE}
 knitr::kables(
@@ -569,7 +555,6 @@ changed_cond_6 <- create_changed_data(
 glimpse(changed_cond_6)
 ```
 
-
 ```{r cond-6-2-create_changed_data-base_diffs-comp_diffs, echo=FALSE}
 knitr::kables(
   x = list(
@@ -584,10 +569,9 @@ knitr::kables(
     knitr::kable(head(changed_cond_6$var_diffs))), format = "html")
 ```
 
-
 ## Multiple `by` column conditions
 
-These conditions are slightly different than the previous six because we're going to be building the join column using the `create_join_column()` function we covered above. 
+These conditions are slightly different than the previous six because we're going to be building the join column using the `create_join_column()` function we covered above.
 
 ### 7) Multiple `by` columns
 
@@ -614,7 +598,7 @@ knitr::kables(
 diffdf::diffdf(base = master15, compare = master20, keys = c("playerID", "nameGiven"))
 ```
 
-And now we'll test this on `master15` vs. `master20` using the `"playerID"` and `"nameGiven"` as join variables. 
+And now we'll test this on `master15` vs. `master20` using the `"playerID"` and `"nameGiven"` as join variables.
 
 ```{r cond-7-2-create_changed_data}
 changed_cond_7 <- create_changed_data(
@@ -681,7 +665,7 @@ knitr::kables(
 
 ### 9) Multiple `by` columns, multiple compare columns (`cols`)
 
-User provides `by`/`keys` and columns to compare, but no new `by_col`. We will test this with `InitialData` vs. `ChangedData`. 
+User provides `by`/`keys` and columns to compare, but no new `by_col`. We will test this with `InitialData` vs. `ChangedData`.
 
 ```{r cond-9-create_changed_data}
 changed_cond_9 <- create_changed_data(
@@ -699,7 +683,7 @@ knitr::kables(
     knitr::kable(changed_cond_9$var_diffs)), format = "html")
 ```
 
-And we will test this with the larger `master15` vs. `master20` datasets, using `"playerID"` and  `"nameGiven"` as the `by`/`keys` and the `"nameFirst"` and `"nameLast"` as the `cols`. 
+And we will test this with the larger `master15` vs. `master20` datasets, using `"playerID"` and `"nameGiven"` as the `by`/`keys` and the `"nameFirst"` and `"nameLast"` as the `cols`.
 
 ```{r cond-9-2-create_changed_data}
 changed_cond_9 <- create_changed_data(
@@ -726,7 +710,7 @@ knitr::kables(
 
 ### 10) Multiple `by` columns, a new `by_col`, and `cols`
 
-User provides multiple `by` columns, a new name for the `by_col`, and a select number of columns to compare `col`. 
+User provides multiple `by` columns, a new name for the `by_col`, and a select number of columns to compare `col`.
 
 We will start by testing this condition on the `InitialData` vs. the `ChangedData`, using `"subject_id"` and `"record"` as the `by`/`keys`, `"new_join_var"` as the new `by_col`, and `"text_value_a"`, `"text_value_b"` as the `cols`.
 
