@@ -597,7 +597,8 @@ selectDataServer <- function(id, data_upload) {
         need(base_data(), "please upload data")
       )
       reactable::reactable(
-        data = select(base_data(), all_of(input$base_col_select)),
+        data = select(base_data(),
+                      all_of(input$base_col_select)),
         theme = base_react_theme,
         defaultPageSize = 10,
         resizable = TRUE,
@@ -635,7 +636,6 @@ selectDataServer <- function(id, data_upload) {
         selected = data_choices
       )
     })
-
     ## |-- COMP OUTPUT |-- comp_data_display (display) ---------
     output$comp_data_display <- reactable::renderReactable({
       req(input$comp_col_select)
@@ -643,7 +643,8 @@ selectDataServer <- function(id, data_upload) {
         need(comp_data(), "please upload data")
       )
       reactable::reactable(
-        data = select(comp_data(), all_of(input$comp_col_select)),
+        data = select(comp_data(),
+                      all_of(input$comp_col_select)),
         theme = comp_react_theme,
         defaultPageSize = 10,
         resizable = TRUE,
@@ -700,7 +701,6 @@ selectDataServer <- function(id, data_upload) {
     })
 
     ##  REACTIVE |--  base_join_col_data -----
-    # base_join_col_data <- eventReactive(input$by, {
     base_join_col_data <- reactive({
       # no by col, no new name
       if (length(input$by) != 0) {
@@ -709,13 +709,17 @@ selectDataServer <- function(id, data_upload) {
           by_colums = input$by,
           new_by_column_name = "join_column"
         )
-        base_join_col <- select(base_join_col,
-          join_column, all_of(col_intersect()$Columns))
+        base_join_col <- select(
+          base_join_col,
+          join_column, all_of(col_intersect()$Columns)
+        )
       } else {
         base_join_col <- base_select()
         # no by col, new name
-        base_join_col <- select(base_join_col,
-          all_of(col_intersect()$Columns))
+        base_join_col <- select(
+          base_join_col,
+          all_of(col_intersect()$Columns)
+        )
       }
     })
 
@@ -735,7 +739,6 @@ selectDataServer <- function(id, data_upload) {
     })
 
     ##  REACTIVE |--  comp_join_col_data -----
-    # comp_join_col_data <- eventReactive(input$by, {
     comp_join_col_data <- reactive({
       # no by col, no new name
       if (length(input$by) != 0) {
@@ -744,13 +747,17 @@ selectDataServer <- function(id, data_upload) {
           by_colums = input$by,
           new_by_column_name = "join_column"
         )
-        comp_join_col <- select(comp_join_col,
-          join_column, all_of(col_intersect()$Columns))
+        comp_join_col <- select(
+          comp_join_col,
+          join_column, all_of(col_intersect()$Columns)
+        )
       } else {
         comp_join_col <- comp_select()
-        # no by col, new name
-        comp_join_col <- select(comp_join_col,
-          all_of(col_intersect()$Columns))
+        # no by col
+        comp_join_col <- select(
+          comp_join_col,
+          all_of(col_intersect()$Columns)
+        )
       }
     })
 
@@ -773,65 +780,92 @@ selectDataServer <- function(id, data_upload) {
       list(
         ## base_join_col_data -----
         base_join_col_data = reactive({
-            # no by col, no new name
-            if (length(input$by) != 0) {
-              base_join_col <- create_join_column(
-                df = base_select(),
-                by_colums = input$by,
-                new_by_column_name = "join_column"
-              )
-              # only intersecting columns
-              base_join_col <- dplyr::select(base_join_col,
-                join_column, all_of(col_intersect()$Columns))
-              # join column
-              base_join_col <- tibble::add_column(.data = base_join_col,
-                join_source = input$by, .after = 1)
-              # data source column
-              base_join_col <- tibble::add_column(.data = base_join_col,
-                data_source = base_name(), .after = 1)
-            } else {
-              # no by col, new name
-              base_join_col <- base_select()
-              base_join_col <- select(base_join_col,
-                all_of(col_intersect()$Columns))
-              # data source column
-              base_join_col <- tibble::add_column(.data = base_join_col,
-                data_source = base_name(), .after = 1)
-            }
+          # no by col, no new name
+          if (length(input$by) > 0) {
+            # by columns
+            by_cols <- paste0(input$by, collapse = "-")
+            # create new column(s)
+            base_join_col <- create_join_column(
+              df = base_select(),
+              by_colums = input$by,
+              new_by_column_name = "join_column"
+            )
+            # only intersecting columns
+            base_join_col <- dplyr::select(
+              base_join_col,
+              join_column, all_of(col_intersect()$Columns)
+            )
+            # join column
+            base_join_col <- tibble::add_column(
+              .data = base_join_col,
+              join_source = by_cols, .after = 1
+            )
+            # data source column
+            base_join_col <- tibble::add_column(
+              .data = base_join_col,
+              data_source = base_name(), .after = 1
+            )
+          } else {
+            # no by col, new name
+            base_join_col <- base_select()
+            base_join_col <- select(
+              base_join_col,
+              all_of(col_intersect()$Columns)
+            )
+            # data source column
+            base_join_col <- tibble::add_column(
+              .data = base_join_col,
+              data_source = base_name(), .after = 1
+            )
+          }
           return(base_join_col)
         }),
         ## comp_join_col_data -----
         comp_join_col_data = reactive({
           # no by col, no new name
-          if (length(input$by) != 0) {
+          if (length(input$by) > 0) {
+            # by columns
+            by_cols <- paste0(input$by, collapse = "-")
+            # create new column(s)
             comp_join_col <- create_join_column(
               df = comp_select(),
               by_colums = input$by,
               new_by_column_name = "join_column"
             )
             # only intersecting columns
-            comp_join_col <- select(comp_join_col,
-              join_column, all_of(col_intersect()$Columns))
+            comp_join_col <- select(
+              comp_join_col,
+              join_column, all_of(col_intersect()$Columns)
+            )
             # data source column
-            comp_join_col <- tibble::add_column(.data = comp_join_col,
-                join_source = input$by, .after = 1)
+            comp_join_col <- tibble::add_column(
+              .data = comp_join_col,
+              join_source = by_cols, .after = 1
+            )
             # data source column
-            comp_join_col <- tibble::add_column(.data = comp_join_col,
-                data_source = comp_name(), .after = 1)
+            comp_join_col <- tibble::add_column(
+              .data = comp_join_col,
+              data_source = comp_name(), .after = 1
+            )
           } else {
-             # no by col, new name
+            # no by col, new name
             comp_join_col <- comp_select()
             # only intersecting columns
-            comp_join_col <- select(comp_join_col,
-              all_of(col_intersect()$Columns))
+            comp_join_col <- select(
+              comp_join_col,
+              all_of(col_intersect()$Columns)
+            )
             # data source column
-            comp_join_col <- tibble::add_column(.data = comp_join_col,
-                data_source = comp_name(), .after = 1)
+            comp_join_col <- tibble::add_column(
+              .data = comp_join_col,
+              data_source = comp_name(), .after = 1
+            )
           }
           return(comp_join_col)
         })
       )
     )
+
   })
 }
 #' compareDataUI
@@ -1322,12 +1356,21 @@ compareDataServer <- function(id, data_selected) {
         num_diffs_graph
       })
     })
+
+    ### |-- REACTIVE comp_var_diffs -------------------
+    comp_var_diffs <- eventReactive(input$go_changed_data, {
+    # comp_var_diffs <- reactive({
+      left_join(x = changed_data()$var_diffs,
+                y = comp_join_data(),
+                by = "join_column")
+    })
+
     ###  OUTPUT |-- (var_diffs_display) ----
-    observeEvent(input$go_changed_data, {
+    observeEvent(comp_var_diffs(), {
       if (!is.null(changed_data()[["var_diffs"]])) {
         output$var_diffs_display <- renderReactable({
           reactable(
-            data = changed_data()$var_diffs,
+            data = comp_var_diffs(),
             resizable = TRUE,
             pagination = TRUE,
             defaultPageSize = 25,
@@ -1428,13 +1471,13 @@ compareDataApp <- function() {
       )
     ),
     controlbar = bs4Dash::dashboardControlbar(
-      width = 320, 
+      width = 320,
       pinned = TRUE,
-      collapsed = FALSE, 
-      skin = "light", 
+      collapsed = FALSE,
+      skin = "light",
       column(
         width = 12,
-        br(), 
+        br(),
         shiny::includeMarkdown(path = "assets/intro.md")
         )
       ),

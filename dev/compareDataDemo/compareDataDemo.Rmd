@@ -25,6 +25,7 @@ library(rmarkdown)
 library(shiny)
 library(shinythemes)
 library(bs4Dash)
+library(openxlsx)
 # Global options
 knitr::opts_chunk$set(
   # cache = FALSE # cache data
@@ -113,6 +114,25 @@ master20 <- readr::read_csv("data/csv/m20.csv")
 ```
 
 ```{r export, eval=FALSE, echo=FALSE}
+# T10 <- readr::read_csv("data/csv/Teams2010.csv")
+# T10 <- mutate(T10, across(where(is.logical), as.character))
+# T15 <- readr::read_csv("data/csv/Teams2015.csv")
+# T15 <- mutate(T15, across(where(is.logical), as.character))
+# wb <- createWorkbook()
+# addWorksheet(wb, 
+#     sheetName = "teams-2010", gridLines = FALSE)
+# addWorksheet(wb, 
+#     sheetName = "teams-2015", gridLines = FALSE)
+# writeDataTable(wb, 
+#     sheet = "teams-2010", x = T10, colNames = TRUE)
+# writeDataTable(wb, 
+#     sheet = "teams-2015", x = T15, colNames = TRUE)
+# saveWorkbook(wb, "data/teams10-15.xlsx",
+#              overwrite = TRUE)
+# t10 <- readxl::read_excel(path = "data/teams10-15.xlsx", 
+#                    sheet = "teams-2010")
+# t15 <- readxl::read_excel(path = "data/teams10-15.xlsx", 
+#                    sheet = "teams-2015")
 # base_data <- create_join_column(df = master15, 
 #   by_colums = "playerID", new_by_column_name = "join_column")
 # # join column
@@ -1361,19 +1381,19 @@ selectDataServer <- function(id, data_upload) {
     ## DEV OUTPUT |-- base_dev_x (dev) ---------
     output$base_dev_a <- renderPrint({
       print(
-        base_data()
+        base_select()
       )
     })
     ## DEV OUTPUT |-- base_dev_y (dev) ---------
     output$base_dev_b <- renderPrint({
       print(
-        base_name()
+        paste0(input$by, collapse = "-")
       )
     })
     ## DEV OUTPUT |-- base_dev_a (dev) ---------
     output$base_dev_c <- renderPrint({
       print(
-        names(base_select())
+        as.character(input$base_col_select)
       )
     })
     ## BASE OUTPUT |-- base_data_display (display) ---------
@@ -1383,7 +1403,8 @@ selectDataServer <- function(id, data_upload) {
         need(base_data(), "please upload data")
       )
       reactable::reactable(
-        data = select(base_data(), all_of(input$base_col_select)),
+        data = select(base_data(),
+                      all_of(input$base_col_select)),
         theme = base_react_theme,
         defaultPageSize = 10,
         resizable = TRUE,
@@ -1424,19 +1445,19 @@ selectDataServer <- function(id, data_upload) {
     ## |-- DEV OUTPUT |-- comp_dev_x (dev) ---------
     output$comp_dev_a <- renderPrint({
       print(
-        comp_data()
+        comp_select()
       )
     })
     ## |-- DEV OUTPUT |-- comp_dev_y (dev) ---------
     output$comp_dev_b <- renderPrint({
       print(
-        comp_name()
+        paste0(input$by, collapse = "-")
       )
     })
     ## |-- DEV OUTPUT |-- comp_dev_a (dev) ---------
     output$comp_dev_c <- renderPrint({
       print(
-        input$comp_col_select
+        as.character(input$comp_col_select)
       )
     })
 
@@ -1447,7 +1468,8 @@ selectDataServer <- function(id, data_upload) {
         need(comp_data(), "please upload data")
       )
       reactable::reactable(
-        data = select(comp_data(), all_of(input$comp_col_select)),
+        data = select(comp_data(),
+                      all_of(input$comp_col_select)),
         theme = comp_react_theme,
         defaultPageSize = 10,
         resizable = TRUE,
@@ -1558,7 +1580,7 @@ selectDataServer <- function(id, data_upload) {
         )
       } else {
         comp_join_col <- comp_select()
-        # no by col, new name
+        # no by col
         comp_join_col <- select(
           comp_join_col,
           all_of(col_intersect()$Columns)
@@ -1586,7 +1608,8 @@ selectDataServer <- function(id, data_upload) {
         ## base_join_col_data -----
         base_join_col_data = reactive({
           # no by col, no new name
-          if (length(input$by) != 0) {
+          if (length(input$by) > 0) {
+            by_cols <- paste0(input$by, collapse = "-")
             base_join_col <- create_join_column(
               df = base_select(),
               by_colums = input$by,
@@ -1600,7 +1623,7 @@ selectDataServer <- function(id, data_upload) {
             # join column
             base_join_col <- tibble::add_column(
               .data = base_join_col,
-              join_source = input$by, .after = 1
+              join_source = by_cols, .after = 1
             )
             # data source column
             base_join_col <- tibble::add_column(
@@ -1617,7 +1640,7 @@ selectDataServer <- function(id, data_upload) {
             # data source column
             base_join_col <- tibble::add_column(
               .data = base_join_col,
-              data_source = base_name(), .after = 0
+              data_source = base_name(), .after = 1
             )
           }
           return(base_join_col)
@@ -1625,7 +1648,8 @@ selectDataServer <- function(id, data_upload) {
         ## comp_join_col_data -----
         comp_join_col_data = reactive({
           # no by col, no new name
-          if (length(input$by) != 0) {
+          if (length(input$by) > 0) {
+            by_cols <- paste0(input$by, collapse = "-")
             comp_join_col <- create_join_column(
               df = comp_select(),
               by_colums = input$by,
@@ -1639,7 +1663,7 @@ selectDataServer <- function(id, data_upload) {
             # data source column
             comp_join_col <- tibble::add_column(
               .data = comp_join_col,
-              join_source = input$by, .after = 1
+              join_source = by_cols, .after = 1
             )
             # data source column
             comp_join_col <- tibble::add_column(
@@ -1664,6 +1688,7 @@ selectDataServer <- function(id, data_upload) {
         })
       )
     )
+
   })
 }
 ```
@@ -1987,7 +2012,7 @@ compareDataServer <- function(id, data_selected) {
       return(compare_cols_tbl)
     })
 
-    #### DEV OUTPUT |--  (dev_a) ---------
+    ## INFO --------------------------------------------------------------------    #### DEV OUTPUT |--  (dev_a) ---------
     output$dev_a <- renderPrint({
       print(
         base_join_data()
@@ -2002,11 +2027,9 @@ compareDataServer <- function(id, data_selected) {
     #### DEV OUTPUT |--  (dev_c) ---------
     output$dev_c <- renderPrint({
       print(
-        compare_cols_tbl()
+        new_data()
       )
     })
-
-    ## INFO --------------------------------------------------------------------
     ### OUTPUT |--  (base_info) ---------
     output$base_info <- renderUI({
       HTML(paste0(
@@ -2046,7 +2069,7 @@ compareDataServer <- function(id, data_selected) {
         ))
       }
 
-      
+
     })
     ### OUTPUT |--  (display_compare_cols) ---------
     output$display_compare_cols <- renderReactable({
@@ -2244,12 +2267,21 @@ compareDataServer <- function(id, data_selected) {
         num_diffs_graph
       })
     })
+
+    ### |-- REACTIVE comp_var_diffs -------------------
+    comp_var_diffs <- eventReactive(input$go_changed_data, {
+    # comp_var_diffs <- reactive({
+      left_join(x = changed_data()$var_diffs,
+                y = comp_join_data(),
+                by = "join_column")
+    })
+
     ###  OUTPUT |-- (var_diffs_display) ----
-    observeEvent(input$go_changed_data, {
+    observeEvent(comp_var_diffs(), {
       if (!is.null(changed_data()[["var_diffs"]])) {
         output$var_diffs_display <- renderReactable({
           reactable(
-            data = changed_data()$var_diffs,
+            data = comp_var_diffs(),
             resizable = TRUE,
             pagination = TRUE,
             defaultPageSize = 25,

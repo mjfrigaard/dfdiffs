@@ -25,7 +25,7 @@ bmrn_fresh_theme <- function() {
     ),
     # theme sidebar_light -------------------------------------------------
     fresh::bs4dash_sidebar_light(
-      header_color = "#ccd5dd", # dark_blue_t9
+      header_color = "#ccd5dd", # light blue
       bg = "#eaebf4", # background of entire side-bar
       color = "#002E56", # text color (no hover)
       hover_color = "#ee304e", # text color on hover
@@ -47,13 +47,13 @@ bmrn_fresh_theme <- function() {
     # theme status -------------------------------------------------
     fresh::bs4dash_status(
       dark = "#323232",
-      light = "#A0A0A0",
+      light = "#A0A0A0", # gray
       warning = "#F26631", # orange
-      primary = "#00509C", # blue
+      primary = "#A9218E", # violet = #A9218E, blue = #00509C
       secondary = "#353D98", # purple
-      success = "#A9218E", # violet
+      success = "#00509C", # blue
       danger = "#EE304E", # red
-      info = "#A0A0A0" # orange
+      info = "#A0A0A0" # gray
     ),
     # theme color -------------------------------------------------
     fresh::bs4dash_color(
@@ -61,16 +61,6 @@ bmrn_fresh_theme <- function() {
       gray_800 = "#646464",
       lightblue = "#6696c3",
       blue = "#00509C"
-      # gray_600 = "#353D98",
-      # yellow = "#F26631",
-      # gray_900 = "#15183c",
-      # gray_800 = "#646464",
-      # green = "#A9218E",
-      # navy = "#002E56",
-      # cyan = "#A0A0A0",
-      # gray_800 = "#646464",
-      # red = "#EE304E",
-      # white = "#272c30"
     )
   )
 }
