@@ -25,15 +25,15 @@ compareDataDemo <- function() {
       bs4Dash::sidebarMenu(
         id = "sidebarmenu",
         # bs4Dash::sidebarHeader("Data upload demo"),
-        menuItem("Upload Data",
+        menuItem("1) Upload Data",
           tabName = "upload_data_tab",
           icon = icon("file-upload")
         ),
-        menuItem("Select Data",
+        menuItem("2) Select Data",
           tabName = "select_data_tab",
           icon = icon("columns")
         ),
-        menuItem("Compare Data",
+        menuItem("3) Compare Data",
           tabName = "compare_data_tab",
           icon = icon("compress-alt")
         )

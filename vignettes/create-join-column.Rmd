@@ -2,7 +2,7 @@
 title: "create-join-column"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{create_join_column}
+  %\VignetteIndexEntry{create-join-column}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -31,7 +31,6 @@ This vignette walks through the `create_join_column()` function, which is used f
 
 ```{r pkgs, message=FALSE, warning=FALSE}
 library(shiny)
-library(data.table)
 library(tidyverse)
 library(purrr)
 library(vroom)

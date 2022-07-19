@@ -2,7 +2,7 @@
 % Please edit documentation in R/upload_data.R
 \name{upload_data}
 \alias{upload_data}
-\title{Upload data to app `upload_data()`}
+\title{Upload data files}
 \usage{
 upload_data(path, sheet = NULL)
 }
@@ -12,19 +12,8 @@ upload_data(path, sheet = NULL)
 \item{sheet}{excel sheet (if excel file)}
 }
 \value{
-uploaded
+uploaded data file
 }
 \description{
-Upload data to app `upload_data()`
-}
-\examples{
-# not run
-upload_data(path = "inst/extdata/app-testing/lahman_compare.xlsx",
-            sheet = "master-2015")
-upload_data(path = "inst/extdata/app-testing/m15.csv")
-upload_data(path = "inst/extdata/dta/iris.dta")
-upload_data(path = "inst/extdata/sas7bdat/iris.sas7bdat")
-upload_data(path = "inst/extdata/sav/iris.sav")
-upload_data(path = "inst/extdata/tsv/Batting.tsv")
-upload_data(path = "inst/extdata/txt/Batting.txt")
+Upload data files
 }

@@ -27,15 +27,6 @@ Create a dataset of deleted records
 # using local data
 CompleteData <- dfdiffs::CompleteData
 IncompleteData <- dfdiffs::IncompleteData
-create_deleted_data(compare = IncompleteData, base = CompleteData,
-                    by = c("subject", "record"))
-create_deleted_data(compare = IncompleteData, base = CompleteData,
-                    by = c("subject", "record")
-                    by_col = "join_var"
-                    )
-create_deleted_data(compare = IncompleteData, base = CompleteData,
-                    by = c("subject", "record")
-                    by_col = "join_var",
-                    cols = c("subject", "record")
-                    )
+create_deleted_data(compare = IncompleteData,
+                    base = CompleteData)
 }

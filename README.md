@@ -6,15 +6,14 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of dfdiffs is to is to answer the following questions:
+The goal of `dfdiffs` is to is to answer the following questions:
 
 1.  What rows are here now that weren’t here before?  
 2.  What rows were here before that aren’t here now?  
-3.  What values have been changed?  
-4.  What columns have been moved?  
-5.  What rows have been moved?
+3.  What values have been changed?
 
-This vignette is an intro to the `dfdiffs` package.
+You can access a development version of the application
+[here.](https://mjfrigaard.shinyapps.io/compareDataApp/)
 
 ## Installation
 
@@ -37,8 +36,6 @@ library(dfdiffs)
 Dependencies
 
 ``` r
-library(shiny)
-library(data.table)
 library(dplyr)
 library(stringr)
 library(forcats)

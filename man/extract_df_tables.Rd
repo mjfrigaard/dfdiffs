@@ -2,15 +2,15 @@
 % Please edit documentation in R/create_changed_data.R
 \name{extract_df_tables}
 \alias{extract_df_tables}
-\title{Extract tables from `diffdf::diffdf` list}
+\title{Extract tables from \code{diffdf::diffdf} list}
 \usage{
 extract_df_tables(diffdf_list, by_keys)
 }
 \arguments{
-\item{diffdf_list}{output from `diffdf::diffdf()` function}
+\item{diffdf_list}{output from \code{diffdf::diffdf()} function}
 
-\item{by_keys}{`keys` argument from `diffdf::diffdf()`/`by` argument from
-`create_changed_data()`}
+\item{by_keys}{\code{keys} argument from \code{diffdf::diffdf()}/\code{by} argument from
+\code{create_changed_data()}}
 }
 \value{
 diff_tbls list of diff tables

@@ -21,11 +21,11 @@ selectDataDemo <- function() {
       bs4Dash::sidebarMenu(
         id = "sidebarmenu",
         bs4Dash::sidebarHeader("Data upload demo"),
-        menuItem("Upload Data",
+        menuItem("1) Upload Data",
           tabName = "upload_data_tab",
           icon = icon("file")
         ),
-        menuItem("Select Data",
+        menuItem("2) Select Data",
           tabName = "select_data_tab",
           icon = icon("table")
         )

@@ -7,13 +7,13 @@
 \format{
 A data frame with 3 rows and 7 variables:
 \describe{
-  \item{subject}{A character ID variable ("A", "B", "D")}
-  \item{record}{A numeric record ID (2, 4, 5)}
-  \item{start_date}{a beginning date (from 2022-04-02 to 2022-04-04)}
-  \item{mid_date}{a middle date (from 2022-04-13 to 2022-04-15)}
-  \item{end_date}{a last date (from 2022-04-20 to 2022-04-22)}
-  \item{text_var}{a variable containing random text}
-  \item{factor_var}{a categorical variable formatted as a factor}
+\item{subject}{A character ID variable ("A", "B", "D")}
+\item{record}{A numeric record ID (2, 4, 5)}
+\item{start_date}{a beginning date (from 2022-04-02 to 2022-04-04)}
+\item{mid_date}{a middle date (from 2022-04-13 to 2022-04-15)}
+\item{end_date}{a last date (from 2022-04-20 to 2022-04-22)}
+\item{text_var}{a variable containing random text}
+\item{factor_var}{a categorical variable formatted as a factor}
 }
 }
 \usage{

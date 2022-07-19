@@ -1,6 +1,9 @@
 ---
 title: "function-checks"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 4
 vignette: >
   %\VignetteIndexEntry{function-checks}
   %\VignetteEngine{knitr::rmarkdown}
@@ -10,29 +13,33 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = TRUE
 )
+# id <- as.integer(c(c(7:12), c(7:9)))
+# group <- factor(rep(c("D", "E", "F"), times  = 3), levels = c("D", "E", "F"))
+# var_x <- round(rnorm(n = 9, mean = 50, sd = 15), 1)
+# var_y <- as.integer(round(rnorm(n = 9, mean = 300, sd = 120), 0))
+# var_z <- sample(x = str_to_upper(words), size = 9, replace = FALSE)
 ```
 
-```{r setup}
+```{r setup, eval=TRUE}
 library(dfdiffs)
 ```
 
 
 # Motivation
 
-This vignette takes us through some of the functions used to compare datasets in the `dfdiffs` package. The goal  of `dfdiffs` is to answer the following questions: 
+This vignette takes us through the functions used to compare datasets in the `dfdiffs` package. The goal  of `dfdiffs` is to answer the following questions: 
 
 1. What rows are here now that weren't here before?  
 2. What rows were here before that aren't here now?   
 3. What values have been changed?   
-4. What columns have been moved?    
-5. What rows have been moved?    
 
 
 ## Packages
 
-```{r pkgs, message=FALSE, warning=FALSE, results='hide'}
+```{r pkgs, message=FALSE, warning=FALSE, results='hide', eval=TRUE}
 library(shiny)
 library(data.table)
 library(dplyr)
@@ -51,7 +58,124 @@ library(arsenal) # comparedf
 library(diffdf)  # diffdf
 library(testthat) # expect_equal
 library(vetr) # alike
+library(gt)
 ```
+
+```{r data, eval=TRUE, echo=FALSE}
+# new data
+compare_new_df <- tibble::tribble(
+  ~id, ~group, ~var_x, ~var_y,     ~var_z,
+    1,    "A",    5.5,   111L,   "notice",
+    2,    "B",      9,   106L,    "admit",
+    3,    "C",    5.2,   109L,  "america",
+    4,    "A",    4.4,    96L,      "try",
+    5,    "B",    9.1,   116L,    "serve",
+    6,    "C",    6.7,    98L,  "because",
+    1,    "A",    2.8,    97L,   "unless",
+    2,    "B",      8,   113L,  "believe",
+    3,    "C",    6.8,   111L,    "union"
+  )
+base_new_df <- tibble::tribble(
+   ~id, ~group, ~var_x, ~var_y,    ~var_z,
+     1,    "A",    5.5,   111L,  "notice",
+     2,    "B",      9,   106L,   "admit",
+     3,    "C",    5.2,   109L, "america",
+     4,    "A",    4.4,    96L,     "try",
+     5,    "B",    9.1,   116L,   "serve",
+     6,    "C",    6.7,    98L, "because"
+   )
+# deleted data
+base_deleted_df <- tibble::tribble(
+  ~id, ~group, ~var_x, ~var_y,     ~var_z,
+   7L,    "D",   38.3,   207L,   "APPEAR",
+   8L,    "E",   72.8,   383L,     "SAVE",
+   9L,    "F",     57,   274L,     "EAST",
+  10L,    "D",   43.1,   307L,  "SIMILAR",
+  11L,    "E",     40,   305L,     "STEP",
+  12L,    "F",   38.7,   168L, "CONSIDER",
+   7L,    "D",   43.3,   338L,     "EVER",
+   8L,    "E",   49.6,   347L,   "EFFECT",
+   9L,    "F",   58.7,   478L,      "BIT"
+  )
+compare_deleted_df <- tibble::tribble(
+  ~id, ~group, ~var_x, ~var_y,     ~var_z,
+   7L,    "D",   38.3,   207L,   "APPEAR",
+   8L,    "E",   72.8,   383L,     "SAVE",
+   9L,    "F",     57,   274L,     "EAST",
+  10L,    "D",   43.1,   307L,  "SIMILAR",
+  11L,    "E",     40,   305L,     "STEP",
+  12L,    "F",   38.7,   168L, "CONSIDER"
+  )
+# changed data 
+base_change_df <- tibble::tribble(
+  ~id, ~group, ~var_x, ~var_y,     ~var_z,
+    1,    "A",    5.5,   111L,   "notice",
+    2,    "B",      9,   106L,    "admit",
+    3,    "C",    5.2,   109L,  "america",
+    4,    "A",    4.4,    96L,      "try",
+    5,    "B",    9.1,   116L,    "serve",
+    6,    "C",    6.7,    98L,  "because",
+  )
+compare_change_df <- tibble::tribble(
+  ~id, ~group, ~var_x, ~var_y,     ~var_z,
+    1,    "A",    5.5,   111L,   "notice",
+    2,    "B",    3.3,   106L,    "admit",
+    3,    "C",    5.2,   109L,  "America",
+    4,    "A",    4.4,    73L,      NA_character_,
+    5,    "B",    9.1,   116L,    "serve",
+    6,    "C",    6.7,    98L,  "HiStorY",
+  )
+```
+
+## New Data
+
+Below are the test `base` and `compare` new datasets: `base_new_df` and `compare_new_df`
+
+### Base 
+
+```{r base_new_df}
+base_new_df |> gt::gt(data = )
+```
+
+### Compare 
+
+```{r compare_new_df}
+compare_new_df |> gt::gt(data = )
+```
+
+
+## Deleted Data 
+
+Below are the test `base` and `compare` deleted datasets: `base_deleted_df` and `compare_deleted_df`
+
+### Base 
+
+```{r base_deleted_df}
+base_deleted_df |> gt::gt(data = )
+```
+
+### Compare 
+
+```{r compare_deleted_df}
+compare_deleted_df |> gt::gt(data = )
+```
+
+## Changed Data 
+
+Below are the test `base` and `compare` changed datasets: `base_change_df` and `compare_change_df`
+
+### Base
+
+```{r base_change_df}
+base_change_df |> gt::gt(data = )
+```
+
+### Compare 
+
+```{r compare_change_df}
+compare_change_df |> gt::gt(data = )
+```
+
 
 ## Single joining (`by`) column conditions 
 
@@ -59,26 +183,295 @@ library(vetr) # alike
 
 + No `by` columns (only two datasets)
 
+```{r test-create_new_data-1}
+create_new_data(
+   compare = compare_new_df,
+   base = base_new_df) |> gt::gt(data = )
+```
+
+```{r test-create_deleted_data-1}
+create_deleted_data(
+   compare = compare_deleted_df,
+   base = base_deleted_df) |> gt::gt(data = )
+```
+
+```{r test-create_changed_data-1}
+changes <- create_changed_data(
+  compare = compare_change_df, 
+  base = base_change_df)
+```
+
+```{r num_diffs-1}
+changes$num_diffs |> gt::gt(data = )
+```
+
+```{r var_diffs-1}
+changes$var_diffs |> gt::gt(data = )
+```
+
 ### 2) Multiple columns to compare (`cols`)
 
 + No `by` columns (only two datasets) and multiple compare (`cols`)  
 
+```{r test-create_new_data-2}
+create_new_data(
+   compare = compare_new_df,
+   base = base_new_df, 
+   cols = c('var_x', 'var_z')) |> 
+  gt::gt(data = )
+```
+
+
+```{r test-create_deleted_data-2}
+create_deleted_data(
+   compare = compare_deleted_df,
+   base = base_deleted_df, 
+   cols = c('var_x', 'var_y', 'var_z')) |> 
+  gt::gt(data = )
+```
+
+```{r test-create_changed_data-2}
+changes <- create_changed_data(
+  compare = compare_change_df, 
+  base = base_change_df, 
+  cols = c('var_y', 'var_z'))
+```
+
+```{r num_diffs-2}
+changes$num_diffs |> gt::gt(data = )
+```
+
+```{r var_diffs-2}
+changes$var_diffs |> gt::gt(data = )
+```
+
 ### 3) Single `by` column
 
-+ We can provide a single `by` column (using our `T1DataJoin` and `T2DataJoin`) datasets we created above. 
++ Provide a single `by` column (in this case, we will create the join column using `row_number()`)
+
+```{r test-create_new_data-3}
+compare <- mutate(compare_new_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+base <- mutate(base_new_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+create_new_data(
+   compare = compare,
+   base =  base,
+   by = "join_var") |> gt::gt(data = )
+```
+
+```{r test-create_deleted_data-3}
+compare <- mutate(compare_deleted_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+base <- mutate(base_deleted_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+create_deleted_data(
+   compare = compare,
+   base = base, 
+   by = 'join_var') |> 
+  gt::gt(data = )
+```
+
+
+```{r test-create_changed_data-3}
+compare <- mutate(compare_change_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+base <- mutate(base_change_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+changes <- create_changed_data(
+  compare = compare, 
+  base = base, 
+  by = 'join_var')
+```
+
+```{r num_diffs-3}
+changes$num_diffs |> gt::gt(data = )
+```
+
+```{r var_diffs-3}
+changes$var_diffs |> gt::gt(data = )
+```
+
 
 ### 4) Single `by` column, new column name (`by_col`)
 
-+ We can also provide a single `by` column (for unique identifiers) and a new name for the `by_col`
++ We can also provide a single `by` column (for unique identifiers) and a new name for the `by_col` 
+
++ We will create the join column (`join_var`) using `row_number()`, then name it `join_column`
+
+```{r test-create_new_data-4}
+compare <- mutate(compare_new_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+base <- mutate(base_new_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+create_new_data(
+   compare = compare,
+   base =  base,
+   by = "join_var", 
+   by_col = 'join_column') |> gt::gt(data = )
+```
+
+
+```{r test-create_deleted_data-4}
+compare <- mutate(compare_deleted_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+base <- mutate(base_deleted_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+create_deleted_data(
+   compare = compare,
+   base = base, 
+   by = 'join_var', 
+   by_col = 'join_column') |> 
+  gt::gt(data = )
+```
+
+```{r test-create_changed_data-4}
+compare <- mutate(compare_change_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+base <- mutate(base_change_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+changes <- create_changed_data(
+  compare = compare, 
+  base = base, 
+  by = 'join_var', 
+  by_col = 'join_column')
+```
+
+```{r num_diffs-4}
+changes$num_diffs |> gt::gt(data = )
+```
+
+```{r var_diffs-4}
+changes$var_diffs |> gt::gt(data = )
+```
 
 ### 5) Single `by` column, multiple compare columns `cols`
 
 + Single `by` column and multiple compare columns (`cols`) 
 
+```{r test-create_new_data-5}
+compare <- mutate(compare_new_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+base <- mutate(base_new_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+create_new_data(
+   compare = compare,
+   base =  base,
+   by = "join_var", 
+   cols = c('var_x', 'var_z')) |> gt::gt(data = )
+```
+
+
+```{r test-create_deleted_data-5}
+compare <- mutate(compare_deleted_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+base <- mutate(base_deleted_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+create_deleted_data(
+   compare = compare,
+   base = base, 
+   by = 'join_var', 
+   cols = c('var_x', 'var_z')) |> 
+  gt::gt(data = )
+```
+
+
+```{r test-create_changed_data-5}
+compare <- mutate(compare_change_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+base <- mutate(base_change_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+changes <- create_changed_data(
+  compare = compare, 
+  base = base, 
+  by = 'join_var', 
+  cols = c('var_x', 'var_z'))
+```
+
+```{r num_diffs-5}
+changes$num_diffs |> gt::gt(data = )
+```
+
+```{r var_diffs-5}
+changes$var_diffs |> gt::gt(data = )
+```
+
+
 ### 6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
 
 - Single `by` column, a new name for the by column (`by_col`), and multiple compare columns (`cols`)
 
+```{r test-create_new_data-6}
+compare <- mutate(compare_new_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+base <- mutate(base_new_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+create_new_data(
+   compare = compare,
+   base =  base,
+   by = "join_var", 
+   by_col = "join_column",
+   cols = c('var_x', 'var_z')) |> gt::gt(data = )
+```
+
+```{r test-create_deleted_data-6}
+compare <- mutate(compare_deleted_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+base <- mutate(base_deleted_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+create_deleted_data(
+   compare = compare,
+   base = base, 
+   by = 'join_var', 
+   by_col = "join_column",
+   cols = c('var_x', 'var_z')) |> 
+  gt::gt(data = )
+```
+
+```{r test-create_changed_data-6}
+compare <- mutate(compare_change_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+base <- mutate(base_change_df, 
+  join_var = as.character(row_number())) |>  
+  dplyr::relocate(join_var, everything())
+changes <- create_changed_data(
+  compare = compare, 
+  base = base, 
+  by = 'join_var', 
+  by_col = "join_column",
+  cols = c('var_x', 'var_z'))
+```
+
+```{r num_diffs-6}
+changes$num_diffs |> gt::gt(data = )
+```
+
+```{r var_diffs-6}
+changes$var_diffs |> gt::gt(data = )
+```
 
 ## Multiple `by` column conditions
 
@@ -86,253 +479,151 @@ library(vetr) # alike
 
 + Multiple `by` columns (assuming the columns create a unique identifier).
 
+```{r test-create_new_data-7}
+create_new_data(
+   compare = compare_new_df,
+   base = base_new_df,
+   by = c("id", "group")) |> gt::gt(data = )
+```
+
+```{r test-create_deleted_data-7}
+create_deleted_data(
+  compare = compare_deleted_df,
+  base = base_deleted_df,
+  by = c("id", "group")) |> gt::gt(data = )
+```
+
+```{r test-create_changed_data-7}
+changes <- create_changed_data(
+  compare = compare_change_df, 
+  base = base_change_df,
+  by = c("id", "group"))
+```
+
+```{r num_diffs-7}
+changes$num_diffs |> gt::gt(data = )
+```
+
+```{r var_diffs-7}
+changes$var_diffs |> gt::gt(data = )
+```
+
+
 ### 8) Multiple `by` columns, new column name (`by_col`)
 
 We can provide multiple `by` columns, a new `by_col`, and  **no `cols`**
+
+```{r test-create_new_data-8}
+create_new_data(
+   compare = compare_new_df,
+   base = base_new_df,
+   by = c("id", "group"),
+   by_col = "join_column") |> 
+   gt::gt(data = )
+```
+
+```{r test-create_deleted_data-8}
+create_deleted_data(
+  compare = compare_deleted_df,
+  base = base_deleted_df,
+  by = c("id", "group"),
+  by_col = "join_column") |> gt::gt(data = )
+```
+
+```{r test-create_changed_data-8}
+changes <- create_changed_data(
+  compare = compare_change_df, 
+  base = base_change_df,
+  by = c("id", "group"),
+  by_col = "join_column")
+```
+
+```{r num_diffs-8}
+changes$num_diffs |> gt::gt(data = )
+```
+
+```{r var_diffs-8}
+changes$var_diffs |> gt::gt(data = )
+```
 
 ### 9) Multiple `by` columns, multiple compare columns (`cols`)  
 
 + Multiple `by` columns and multiple compare columns (`cols`), and **no new `by_col`**.
 
+```{r test-create_new_data-9}
+create_new_data(
+   compare = compare_new_df,
+   base = base_new_df,
+   by = c("id", "group"),
+   cols = c('var_x', 'var_z')) |> 
+   gt::gt(data = )
+```
+
+```{r test-create_deleted_data-9}
+create_deleted_data(
+  compare = compare_deleted_df,
+  base = base_deleted_df,
+  by = c("id", "group"),
+  cols = c('var_x', 'var_z')) |> 
+  gt::gt(data = )
+```
+
+
+```{r test-create_changed_data-9}
+changes <- create_changed_data(
+  compare = compare_change_df, 
+  base = base_change_df,
+  by = c("id", "group"),
+  cols = c('var_x', 'var_z'))
+```
+
+```{r num_diffs-9}
+changes$num_diffs |> gt::gt(data = )
+```
+
+```{r var_diffs-9}
+changes$var_diffs |> gt::gt(data = )
+```
+
+
 ### 10) Multiple `by` columns, a new `by_col`, and `cols`
 
 We can provide multiple `by` columns, new `by_col`, and multiple `cols`.
 
-***
-
-# Loading data 
-
-Below we load three datasets from the [`Lahman` package](https://cran.r-project.org/web/packages/Lahman/index.html)
-
-## 2010 Lahamn 'Master'
-
-```{r lahman_2010_master_path}
-lahman_2010_master_path <- list.files(
-  path = "../inst/extdata/csv/2010-lahman", 
-  full.names = TRUE, 
-  pattern = "^Master")
-master_2010_raw <- load_flat_file(path = lahman_2010_master_path)
-master_2010 <- mutate(master_2010_raw, 
-  debut = lubridate::mdy_hms(debut),
-  finalGame = lubridate::mdy_hms(finalGame)
-  )
-glimpse(master_2010)
+```{r test-create_new_data-10}
+create_new_data(
+   compare = compare_new_df,
+   base = base_new_df,
+   by = c("id", "group"),
+   by_col = "join_column",
+   cols = c('var_x', 'var_z')) |> 
+   gt::gt(data = )
 ```
 
-## 2015 Lahamn 'Master'
-
-```{r master_2015}
-lahman_2015_master_path <- list.files(
-  path = "../inst/extdata/csv/2015-baseballdatabank", 
-  full.names = TRUE, pattern = "^Master")
-master_2015 <- load_flat_file(path = lahman_2015_master_path)
-glimpse(master_2015)
-```
-
-## 2020 Lahamn 'People'
-
-The name for this dataset changed from `Master` to `People`.
-
-```{r people_2020}
-lahman_2020_people_path <- list.files(
-  path = "../inst/extdata/csv/2020-baseballdatabank/", 
-  full.names = TRUE, pattern = "^People")
-people_2020 <- load_flat_file(path = lahman_2020_people_path)
-glimpse(people_2020)
-```
-
-# New data: "*What rows are here now that weren't here before?*"
-
-```{r create_new_data-args, eval=FALSE}
-dfdiffs::create_new_data(newdf = , olddf = , by = , by_col = , cols = )
+```{r test-create_deleted_data-10}
+create_deleted_data(
+  compare = compare_deleted_df,
+  base = base_deleted_df,
+  by = c("id", "group"),
+  by_col = "join_column",
+  cols = c('var_x', 'var_z')) |> 
+  gt::gt(data = )
 ```
 
 
-We can test this function by looking at the new data between 2010, 2015, and 2020 datasets. 
-
-## New data between 2010 - 2020
-
-The new data between 2010 and 2020 is created below. 
-
-```{r new_2010thru2020}
-new_2010thru2020 <- create_new_data(newdf = people_2020, 
-                                    olddf = master_2010, 
-                                    by = "playerID")
+```{r test-create_changed_data-10}
+changes <- create_changed_data(
+  compare = compare_change_df, 
+  base = base_change_df,
+  by = c("id", "group"),
+  by_col = "join_column",
+  cols = c('var_x', 'var_z'))
 ```
 
-The most straightforward way to check if this function is working is to get the `playerID`s that are in `people_2020` but not in `master_2010`. 
-
-```{r new_2010thru2020_playerIDs}
-new_2010thru2020_playerIDs <- unique(new_2010thru2020$playerID)
-length(new_2010thru2020_playerIDs)
+```{r num_diffs-10}
+changes$num_diffs |> gt::gt(data = )
 ```
 
-Now we can check to see if these names are the identical number of rows filtered to the `playerID`s in the 2020 data:
-
-```{r identical-new_2010thru2020-new_2010thru2020_playerIDs}
-identical(x = nrow(new_2010thru2020), 
-  y = nrow(filter(people_2020, playerID %in% new_2010thru2020_playerIDs)))
+```{r var_diffs-10}
+changes$var_diffs |> gt::gt(data = )
 ```
-
-
-We can also check the `debut` variable in the `new_2010thru2020` data. The earliest and latest dates for `debut` in `new_2010thru2020` are below:
-
-```{r min-max-new_2010thru2020-debut}
-min(new_2010thru2020$debut, na.rm = TRUE)
-max(new_2010thru2020$debut, na.rm = TRUE)
-```
-
-
-If we filter each dataset to for the earliest date, we find the player who was added to the 2020 data:
-
-```{r 1873-player}
-people_2020_1873 <- filter(people_2020, debut == lubridate::as_date("1873-04-14"))
-master_2010_1873 <- filter(master_2010, debut == lubridate::as_date("1873-04-14"))
-player_debut_1873 <- setdiff(x = people_2020_1873$playerID, 
-  y = master_2010_1873$playerID)
-player_debut_1873
-```
-
-Our missing player is `r player_debut_1873`. If we use this player to check the 2010 and 2020 data, we can see this player is in the 2020 dataset...
-
-```{r check-2020-player_debut_1873}
-knitr::kable(filter(people_2020, playerID == player_debut_1873) %>% 
-  select(playerID, debut))
-```
-
-...and not the 2010 data:
-
-```{r check-2010-player_debut_1873}
-knitr::kable(filter(master_2010, playerID == player_debut_1873) %>% 
-  select(playerID, debut))
-```
-
-## New data between 2010 - 2015
-
-Below we perform similar checks for 2010 vs. 2015 data
-
-```{r new_2010thru2015}
-new_2010thru2015 <- create_new_data(newdf = master_2015, 
-                                    olddf = master_2010, 
-                                    by = "playerID")
-```
-
-```{r new_2010thru2015_playerIDs}
-new_2010thru2015_playerIDs <- unique(new_2010thru2015$playerID)
-# check length
-length(new_2010thru2015_playerIDs)
-```
-
-Check to see if these names are the identical rows in the 2015 data
-
-```{r identical-new_2010thru2015-new_2010thru2015_playerIDs}
-identical(x = nrow(new_2010thru2015), 
-  y = nrow(filter(master_2015, playerID %in% new_2010thru2015_playerIDs)))
-```
-
-## New data between 2015 - 2020
-
-```{r new_2015thru2020}
-new_2015thru2020 <- create_new_data(newdf = people_2020, 
-                                    olddf = master_2015, 
-                                    by = "playerID")
-```
-
-```{r new_2015thru2020_playerIDs}
-new_2015thru2020_playerIDs <- unique(new_2015thru2020$playerID)
-length(new_2015thru2020_playerIDs)
-```
-
-Check to see if these names are the identical rows in the 2020 data
-
-```{r identical-new_2015thru2020-new_2015thru2020_playerIDs}
-identical(x = nrow(new_2015thru2020), 
-  y = nrow(filter(people_2020, playerID %in% new_2015thru2020_playerIDs)))
-```
-
-# Deleted Data 
-
-Now that we've covered the creation of 'new data', we can move onto the 'deleted data'. 
-
-## Deleted data: "*What rows were here before that aren't here now?*"
-
-For the deleted datasets, we'll be using the `create_deleted_data()` function.  
-
-```{r create_deleted_data-args, eval=FALSE}
-dfdiffs::create_deleted_data(newdf = , olddf = , by = , by_col = , cols = )
-```
-
-## Deleted data between 2010 - 2020
-
-We can test to see if any data have been removed between the 2020 and 2010 'Master/People' datasets.
-
-```{r deleted_2010thru2020}
-deleted_2010thru2020 <- create_deleted_data(
-  newdf = people_2020, 
-  olddf = master_2010, 
-  by = "playerID")
-```
-
-Now if we check the `playerID`s from the `deleted_2010thru2020` data, they shouldn't be in the `people_2020` data. 
-
-```{r identical-people_2020-deleted_2010thru2020_playerIDs}
-deleted_2010thru2020_playerIDs <- unique(deleted_2010thru2020$playerID)
-deleted_2010thru2020_playerIDs
-```
-
-And the number of IDs in the `master_2010` data should be identical to the number of rows in the `deleted_2010thru2020` dataset. 
-
-```{r identical-deleted_2010thru2020-deleted_2010thru2020_playerIDs}
-identical(
-  x = nrow(filter(master_2010, playerID %in% deleted_2010thru2020_playerIDs)),
-  y = nrow(deleted_2010thru2020))
-```
-
-## Deleted data between 2010 - 2015
-
-We'll also test to see if any data have been removed between the 2015 and 2010 'Master/People' datasets.
-
-```{r deleted_2010thru2015}
-deleted_2010thru2015 <- create_deleted_data(
-  newdf = master_2015, 
-  olddf = master_2010, 
-  by = "playerID")
-# get unique ids
-deleted_2010thru2015_playerIDs <- unique(deleted_2010thru2015$playerID)
-deleted_2010thru2015_playerIDs
-```
-```{r identical-deleted_2010thru2015-deleted_2010thru2015_playerIDs}
-# check identical
-identical(
-  x = nrow(filter(master_2010, playerID %in% deleted_2010thru2015_playerIDs)),
-  y = nrow(deleted_2010thru2015))
-```
-
-## Deleted data between 2015 - 2020
-
-```{r deleted_2015thru2020}
-deleted_2015thru2020 <- create_deleted_data(
-  newdf = people_2020, 
-  olddf = master_2015, 
-  by = "playerID")
-# get unique ids
-deleted_2015thru2020_playerIDs <- unique(deleted_2015thru2020$playerID)
-deleted_2015thru2020_playerIDs
-```
-
-
-```{r identical-deleted_2015thru2020-deleted_2015thru2020_playerIDs}
-# check identical
-identical(
-  x = nrow(filter(master_2015, playerID %in% deleted_2015thru2020_playerIDs)),
-  y = nrow(deleted_2015thru2020))
-```
-
-## Modified data: "*What values have been changed?*"
-
-We now have functions for returning new records and deleted records, but what about records that have been modified? Both `create_new_data()` and `create_deleted_data()` are built using `dplyr` joins, but to find records where specific values have changed row-by-row, we need to enlist the help of a few functions from other packages. 
-
-
-Other functions for comparing datasets to each other are used in the `dfdiffs` package, and these have all been rewritten to return a `tibble`. 
-
-

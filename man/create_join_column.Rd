@@ -20,11 +20,9 @@ join_col_data
 Create unique row identifier
 }
 \examples{
-# using dfdiffs::diff_modified_data
-diff_modified_data <- dfdiffs::diff_modified_data
-current_modified <- diff_modified_data$diff_current_modified
-previous_modified <- diff_modified_data$diff_previous_modified
-create_join_column(df = current_modified,
-                   by_columns = c("subject_id", "record"),
-                   new_by_column_name = "join")
+# using dfdiffs::InitialData
+InitialData <- dfdiffs::InitialData
+create_join_column(df = InitialData,
+                    by_colums = c('subject_id', 'record'),
+                    new_by_column_name = 'join_var')
 }

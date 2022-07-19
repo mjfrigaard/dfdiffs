@@ -1,0 +1,200 @@
+---
+title: "upload-data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{upload-data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options(
+  rmarkdown.html_vignette.check_title = FALSE,
+  tibble.print_max = Inf)
+extdata_folder <- "../inst/extdata/"
+```
+
+# Motivation
+
+This vignette walks through the `upload-data()` function, which is used for loading a variety of file types into the `dfdiffs` shiny application. 
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(dfdiffs)
+library(shiny)
+library(data.table)
+library(tidyverse)
+library(purrr)
+library(vroom)
+library(reactable)
+library(haven)
+library(readxl)
+```
+
+## External Data 
+
+Test data can be found in the `../inst/extdata/` folder:
+
+```{r extdata-folder, echo=FALSE}
+fs::dir_tree("../inst/extdata/", recurse = TRUE)
+```
+
+
+## load_flat_file()
+
+The `load_flat_file()` function imports all forms of flat data files.  
+
+```{r load_flat_file}
+load_flat_file <- function(path) {
+  ext <- tools::file_ext(path)
+  data <- switch(ext,
+    txt = data.table::fread(path),
+    csv = data.table::fread(path),
+    tsv = data.table::fread(path),
+    sas7bdat = haven::read_sas(data_file = path),
+    sas7bcat = haven::read_sas(data_file = path),
+    sav = haven::read_sav(file = path),
+    dta = haven::read_dta(file = path)
+  )
+  return_data <- tibble::as_tibble(data)
+  return(return_data)
+}
+```
+
+If the file is an excel file, the name of the sheet should be passed to `sheet`. 
+
+```{r upload_data}
+upload_data <- function(path, sheet = NULL) {
+  ext <- tools::file_ext(path)
+  if (ext == "xlsx") {
+    raw_data <- readxl::read_excel(
+        path = path,
+        sheet = sheet
+      )
+    uploaded <- tibble::as_tibble(raw_data)
+  } else {
+    uploaded <- load_flat_file(path = path)
+  }
+  return(uploaded)
+}
+```
+
+
+## 2010 Lahamn CSVs
+
+```{r lahman_2010_csv_paths}
+lahman_2010_csv_paths <- list.files(path = "../inst/extdata/csv/2010-lahman", full.names = TRUE, pattern = ".csv$")
+head(lahman_2010_csv_paths)
+```
+
+Test this on `lahman_2010_csv_paths[13]`
+
+```{r test-load_flat_file-1}
+master_2010 <- load_flat_file(path = lahman_2010_csv_paths[4])
+glimpse(master_2010)
+```
+
+## 2015 Lahamn CSVs
+
+```{r lahman_2015_csv_paths}
+lahman_2015_csv_paths <- list.files(path = "../inst/extdata/csv/2015-baseballdatabank", full.names = TRUE, pattern = ".csv$")
+head(lahman_2015_csv_paths)
+```
+
+Test this on `lahman_2015_csv_paths[4]`
+
+```{r test-master_2015}
+master_csv_2015 <- load_flat_file(path = lahman_2015_csv_paths[4])
+glimpse(master_csv_2015)
+```
+
+## List of 2010 csvs 
+
+Now we create `lahman_2010_csv_files`
+
+```{r lahman_2010_csv_files}
+lahman_2010_csv_files <- map(.x = lahman_2010_csv_paths, 
+  .f = load_flat_file) %>% 
+  set_names(x = ., nm = basename(lahman_2010_csv_paths))
+map(lahman_2010_csv_files, names)
+```
+
+We'll test this on the `map_df()` function. 
+
+```{r tbl_2010_csv_files}
+tbl_2010_csv_files <- lahman_2010_csv_paths %>% 
+  set_names() %>% 
+  map_df(.x = ., 
+  .f = load_flat_file, .id = "source") %>% 
+  mutate(source = basename(source))
+tbl_2010_csv_files %>% count(source)
+```
+
+
+## Test on dta 
+
+```{r dta_paths}
+dta_paths <- list.files(path = "../inst/extdata/dta", 
+  full.names = TRUE, pattern = ".dta$")
+tbl_dta_files <- dta_paths %>% 
+  set_names() %>% 
+  map_df(.x = ., 
+  .f = load_flat_file, .id = "source") %>% 
+  mutate(source = basename(source))
+tbl_dta_files %>% count(source)
+```
+
+## Test on sas7bdat 
+
+```{r sas7bdat_paths}
+sas7bdat_paths <- list.files(path = "../inst/extdata/sas7bdat", 
+  full.names = TRUE, pattern = ".sas7bdat$")
+tbl_sas7bdat_files <- sas7bdat_paths %>% 
+  set_names() %>% 
+  map_df(.x = ., 
+  .f = load_flat_file, .id = "source") %>% 
+  mutate(source = basename(source))
+tbl_sas7bdat_files %>% count(source)
+```
+
+## Test on sav 
+
+```{r sav_paths}
+sav_paths <- list.files(path = "../inst/extdata/sav", 
+  full.names = TRUE, pattern = ".sav$")
+tbl_sav_files <- sav_paths %>% 
+  set_names() %>% 
+  map_df(.x = ., 
+  .f = load_flat_file, .id = "source") %>% 
+  mutate(source = basename(source))
+tbl_sav_files %>% count(source)
+```
+
+## Test on tsv
+
+```{r tsv_paths}
+tsv_paths <- list.files(path = "../inst/extdata/tsv", 
+  full.names = TRUE, pattern = ".tsv$")
+tbl_tsv_files <- tsv_paths %>% 
+  set_names() %>% 
+  map_df(.x = ., 
+  .f = load_flat_file, .id = "source") %>% 
+  mutate(source = basename(source))
+tbl_tsv_files %>% count(source)
+```
+
+## Test on txt 
+
+```{r txt_paths}
+txt_paths <- list.files(path = "../inst/extdata/txt", 
+  full.names = TRUE, pattern = ".txt$")
+tbl_txt_files <- txt_paths %>% 
+  set_names() %>% 
+  map_df(.x = ., 
+  .f = load_flat_file, .id = "source") %>% 
+  mutate(source = basename(source))
+tbl_txt_files %>% count(source)
+```

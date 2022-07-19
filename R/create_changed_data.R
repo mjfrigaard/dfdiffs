@@ -4,6 +4,23 @@
 #' @param by_keys `keys` argument from `diffdf::diffdf()`/`by` argument from
 #'      `create_changed_data()`
 #'
+#' @importFrom stringr str_detect
+#' @importFrom dplyr mutate
+#' @importFrom stringr str_detect
+#' @importFrom purrr map_df
+#' @importFrom purrr map
+#' @importFrom janitor clean_names
+#' @importFrom purrr set_names
+#' @importFrom dplyr across
+#' @importFrom dplyr select
+#' @importFrom dplyr contains
+#' @importFrom dplyr relocate
+#' @importFrom dplyr row_number
+#' @importFrom tibble as_tibble
+#' @importFrom tidyr unite
+#' @importFrom tidyr unnest
+#' @importFrom magrittr `%>%`
+#'
 #' @return diff_tbls list of diff tables
 #' @export extract_df_tables
 #'
@@ -18,8 +35,8 @@ extract_df_tables <- function(diffdf_list, by_keys) {
   num_diffs <- purrr::map_df(.x = num_diffs_lst,
                                   .f = janitor::clean_names)
   # vars
-  var_diffs_chr_lst <- map(var_diffs_lst,
-                            .f = ~mutate(.x,across(.cols = everything(),
+  var_diffs_chr_lst <- purrr::map(var_diffs_lst,
+                            .f = ~dplyr::mutate(.x,across(.cols = everything(),
                                                     .fns = as.character)))
   var_diffs <- purrr::map_df(.x = var_diffs_chr_lst, .f = janitor::clean_names)
 
@@ -82,6 +99,9 @@ extract_df_tables <- function(diffdf_list, by_keys) {
 #' @importFrom dplyr relocate
 #' @importFrom dplyr row_number
 #' @importFrom tibble as_tibble
+#' @importFrom tidyr unite
+#' @importFrom tidyr separate
+#' @importFrom magrittr `%>%`
 #'
 #' @return modified data
 #' @export create_changed_data
@@ -101,9 +121,14 @@ extract_df_tables <- function(diffdf_list, by_keys) {
 #'   by = c("subject_id", "record")
 #' )
 create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
-  # convert all columns to character
-  compare <- mutate(compare, across(.cols = everything(), .fns = as.character))
-  base <- mutate(base, across(.cols = everything(), .fns = as.character))
+  # check to see if by is included in cols
+  if (sum(by %in% cols) > 0) {
+    stop("The 'by' column is listed in the columns to compare ('cols)")
+  } else {
+      # convert all columns to character
+    compare <- mutate(compare, across(.cols = everything(), .fns = as.character))
+    base <- mutate(base, across(.cols = everything(), .fns = as.character))
+  }
 
   if (is.null(by) & is.null(by_col) & is.null(cols)) {
     # 1) NOTHING (Two datasets, compare all columns) ----

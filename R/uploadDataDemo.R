@@ -18,7 +18,7 @@ uploadDataDemo <- function() {
       sidebarMenu(
         id = "sidebarmenu",
         sidebarHeader("Data upload demo"),
-        menuItem("Upload Data",
+        menuItem("1) Upload Data",
           tabName = "upload_data_tab",
           icon = icon("file")
         )

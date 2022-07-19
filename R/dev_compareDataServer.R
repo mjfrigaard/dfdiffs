@@ -43,6 +43,7 @@ dev_compareDataServer <- function(id, data_selected) {
       return(compare_cols_tbl)
     })
 
+    ## INFO ---------
     #### DEV OUTPUT |--  (dev_a) ---------
     output$dev_a <- renderPrint({
       print(
@@ -58,11 +59,9 @@ dev_compareDataServer <- function(id, data_selected) {
     #### DEV OUTPUT |--  (dev_c) ---------
     output$dev_c <- renderPrint({
       print(
-        compare_cols_tbl()
+        new_data()
       )
     })
-
-    ## INFO --------------------------------------------------------------------
     ### OUTPUT |--  (base_info) ---------
     output$base_info <- renderUI({
       HTML(paste0(
@@ -300,12 +299,34 @@ dev_compareDataServer <- function(id, data_selected) {
         num_diffs_graph
       })
     })
+
+    ### |-- REACTIVE comp_var_diffs -------------------
+    comp_var_diffs <- eventReactive(input$go_changed_data, {
+      if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
+          # join to var_diffs
+            left_join(x = changed_data()$var_diffs,
+                      y = comp_join_data(),
+                      by = "join_column")
+      } else {
+        # HERE! ----
+        compare_row_by_row <- comp_join_data() %>%
+          mutate(rownumber = row_number(),
+                 rownumber = as.character(rownumber)) |>
+          relocate(rownumber, .before = 1)
+        # join to var_diffs
+            left_join(x = changed_data()$var_diffs,
+                      y = compare_row_by_row,
+                      by = "rownumber")
+      }
+
+    })
+
     ###  OUTPUT |-- (var_diffs_display) ----
-    observeEvent(input$go_changed_data, {
+    observeEvent(comp_var_diffs(), {
       if (!is.null(changed_data()[["var_diffs"]])) {
         output$var_diffs_display <- renderReactable({
           reactable(
-            data = changed_data()$var_diffs,
+            data = comp_var_diffs(),
             resizable = TRUE,
             pagination = TRUE,
             defaultPageSize = 25,

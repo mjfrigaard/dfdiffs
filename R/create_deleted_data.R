@@ -20,17 +20,8 @@
 #' @examples # using local data
 #' CompleteData <- dfdiffs::CompleteData
 #' IncompleteData <- dfdiffs::IncompleteData
-#' create_deleted_data(compare = IncompleteData, base = CompleteData,
-#'                     by = c("subject", "record"))
-#' create_deleted_data(compare = IncompleteData, base = CompleteData,
-#'                     by = c("subject", "record")
-#'                     by_col = "join_var"
-#'                     )
-#' create_deleted_data(compare = IncompleteData, base = CompleteData,
-#'                     by = c("subject", "record")
-#'                     by_col = "join_var",
-#'                     cols = c("subject", "record")
-#'                     )
+#' create_deleted_data(compare = IncompleteData,
+#'                     base = CompleteData)
 create_deleted_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
   # convert all columns to character
   compare <- mutate(compare, across(.cols = everything(), .fns = as.character))
