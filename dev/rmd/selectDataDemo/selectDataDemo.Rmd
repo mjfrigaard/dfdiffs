@@ -1,0 +1,1804 @@
+---
+title: "selectDataDemo(): select data module (dev)"
+author: "Martin Frigaard"
+output:
+  html_document: 
+    highlight: espresso
+    theme: darkly
+    toc: true
+    toc_float: yes
+    df_print: paged
+    code_folding: hide
+    
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(rmdformats)
+library(tidyverse)
+library(devtools)
+library(hrbrthemes)
+library(fs)
+library(reactable)
+library(rmarkdown)
+library(shiny)
+library(shinythemes)
+library(bs4Dash)
+# Global options
+knitr::opts_chunk$set(
+  # cache = FALSE # cache data
+  echo = TRUE, # show/hide all code
+  # results = "hide", # hide results
+  tidy = FALSE, # cleaner code printing
+  comment = "#> ", # better console printing
+  eval = TRUE, # turn this to FALSE stop code chunks from running
+  message = TRUE, # show messages
+  warning = FALSE, # show warnings
+  size = "tiny", # size of the text
+  fig.path = "images", # location of figure files
+  fig.height = 7.5, # height of figures
+  fig.width = 10 # width of figures
+)
+# knit options
+knitr::opts_knit$set(
+  width = 78,
+  progress = FALSE
+)
+# base options
+base::options(
+  tibble.print_max = 25,
+  tibble.width = 78,
+  max.print = 999999,
+  scipen = 100000000
+)
+```
+
+# Purpose
+
+This is a development document (written in `rmarkdown` and deployed with `shiny`) for the [`dfdiffs` package](https://github.com/mjfrigaard/dfdiffs). The purpose of the `dfdiffs` package is to perform  comparisons between two datasets (similar to `PROC COMPARE` in SAS). 
+
+The goal of `selectDataDemo` is to create a module for selecting columns to join and compare in the `dfdiffs` package/app.
+
+See the first module for the application, `uploadDataDemo` module [here.](https://mjfrigaard.shinyapps.io/uploadDataDemo/).
+
+
+## Overview 
+
+This document contains to following elements:
+
+- Application themes
+  - `bmrn_fresh_theme()` is built using the `fresh::create_theme()`   
+- `uploadDataUI()`/`uploadDataServer()`   
+- `selectDataUI`/`selectDataServer()`/`selectDataDemo`  
+  - this module inherits the uploaded data from the `uploadData` module and displays it in the **Select Data** tab
+  
+# Helpers 
+
+The application runs with a `helpers.R` file, which contains functions necessary for deploying the application. 
+
+```{r helpers, eval=FALSE}
+source("helpers.R")
+```
+
+## App theme 
+
+We define the `bmrn_fresh_theme()` using `fresh::create_theme()`. 
+
+```{r bmrn_fresh_theme}
+bmrn_fresh_theme <- function() {
+  fresh::create_theme(
+    # theme vars  -------------------------------------------------------------
+    fresh::bs4dash_vars(
+      navbar_light_color = "#353d98", # purple
+      navbar_light_active_color = "#353d98", # purple
+      navbar_light_hover_color = "#f26631" # orange
+    ),
+    # # theme yiq -------------------------------------------------------------
+    fresh::bs4dash_yiq(
+      contrasted_threshold = 255,
+      text_dark = "#0a0a0a", # dark_gray_s10
+      text_light = "#f5f5f5" # gray_t10
+    ),
+    # theme layout ---------------------------------------------------------
+    fresh::bs4dash_layout(
+      main_bg = NULL, # #ececec
+      font_size_root = 12
+    ),
+    # theme sidebar_light -------------------------------------------------
+    fresh::bs4dash_sidebar_light(
+      header_color = "#ccd5dd", # light blue
+      bg = "#eaebf4", # background of entire side-bar
+      color = "#002E56", # text color (no hover)
+      hover_color = "#ee304e", # text color on hover
+      hover_bg = "#353D98", # color on hover
+      active_color = "#f26631", # color is actually the 'primary' status color
+      submenu_bg = "#f5f5f5", # purple
+      submenu_color = "#002444",
+      submenu_hover_color = "#353D98" # purple
+    ),
+    # # theme sidebar_dark -------------------------------------------------
+    fresh::bs4dash_sidebar_dark(
+      header_color = "#ccd5dd",
+      bg = "#1a1e4c",
+      color = "#EE304E", # text color (no hover)
+      hover_bg = "#aeb1d5", # color on hover
+      hover_color = "#EE304E", # text color on hover
+      active_color = "#f26631" # color is actually the 'primary' status color
+    ),
+    # theme status -------------------------------------------------
+    fresh::bs4dash_status(
+      dark = "#323232",
+      light = "#A0A0A0", # gray
+      warning = "#F26631", # orange
+      primary = "#A9218E", # violet = #A9218E, blue = #00509C
+      secondary = "#353D98", # purple
+      success = "#00509C", # blue
+      danger = "#EE304E", # red
+      info = "#A0A0A0" # gray
+    ),
+    # theme color -------------------------------------------------
+    fresh::bs4dash_color(
+      gray_900 = "#1f245b",
+      gray_800 = "#646464",
+      lightblue = "#6696c3",
+      blue = "#00509C"
+    )
+  )
+}
+```
+
+## Table themes
+
+Both base and compare datasets will be differentiated by color in the application using the `reactable::reactableTheme()` function.
+
+### Base display
+
+The base color will use the `#761763` background color (based on the bmrn violet (`#a9218e`) :
+
+```{r base_react_theme}
+base_react_theme <- reactableTheme(
+  color = "#FFFFFF",
+  backgroundColor = "#761763",
+  borderColor = "#646464",
+  stripedColor = "hsl(233, 12%, 22%)",
+  highlightColor = "#a9218e",
+  inputStyle = list(backgroundColor = "#3A3B45"),
+  selectStyle = list(backgroundColor = "#3A3B45"),
+  pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+  pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+)
+```
+
+### Compare display
+
+The compare color will use the `#2f3688` background color (based on the bmrn purple (`#353d98`) :
+
+```{r comp_react_theme}
+comp_react_theme <- reactableTheme(
+  color = "#FFFFFF",
+  backgroundColor = "#2f3688",
+  borderColor = "#646464",
+  stripedColor = "hsl(233, 12%, 22%)",
+  highlightColor = "#353d98",
+  inputStyle = list(backgroundColor = "#3A3B45"),
+  selectStyle = list(backgroundColor = "#3A3B45"),
+  pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+  pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+)
+```
+
+## `upload_data()`
+
+The `upload_data()` function will import *most* data files. 
+
+```{r upload_data, class.source='fold-show'}
+upload_data <- function(path, sheet = NULL) {
+  load_flat_file <- function(path) {
+    ext <- tools::file_ext(path)
+    data <- switch(ext,
+      txt = data.table::fread(path),
+      csv = data.table::fread(path),
+      tsv = data.table::fread(path),
+      sas7bdat = haven::read_sas(data_file = path),
+      sas7bcat = haven::read_sas(data_file = path),
+      sav = haven::read_sav(file = path),
+      dta = haven::read_dta(file = path)
+    )
+    return_data <- tibble::as_tibble(data)
+    return(return_data)
+  }
+
+  ext <- tools::file_ext(path)
+  if (ext == "xlsx") {
+    raw_data <- readxl::read_excel(
+      path = path,
+      sheet = sheet
+    )
+    uploaded <- tibble::as_tibble(raw_data)
+  } else {
+    uploaded <- load_flat_file(path = path)
+  }
+  return(uploaded)
+}
+```
+
+
+## `create_join_column()`
+
+The `create_join_column()` function creates a new column from existing columns. 
+
+```{r create_join_column, class.source='fold-show'}
+create_join_column <- function(df, by_colums, new_by_column_name) {
+  # select by_vars
+  tmp <- dplyr::select(df, all_of(by_colums))
+  # convert to character
+  tmp <- dplyr::mutate(tmp, across(.fns = as.character))
+  # rename data
+  join_col_data <- df
+  # assign new col
+  join_col_data$new_col <- purrr::pmap_chr(.l = tmp, .f = paste, sep = "-")
+  # rename
+  names(join_col_data)[names(join_col_data) == "new_col"] <- new_by_column_name
+  # relocate
+  join_col_data <- dplyr::relocate(
+    join_col_data,
+    all_of(new_by_column_name)
+  )
+  # return
+  return(join_col_data)
+}
+```
+
+
+
+# Data upload UI
+
+In the UI, users will select from a drop-down list of imported datasets. These items will be imported from the `uploadDataUI()`/`uploadDataServer()`. 
+
+```{r uploadDataUI}
+uploadDataUI <- function(id) {
+  tagList(
+    h3("Upload a ", strong("base"), " (i.e., target) data source "),
+    fluidRow(
+      sortable(
+        width = 12,
+        # |- upload base xlsx file ----
+        box(
+          maximizable = TRUE,
+          collapsible = TRUE,
+          collapsed = FALSE,
+          closable = FALSE,
+          solidHeader = TRUE,
+          status = "primary",
+          width = 12,
+          title = tags$strong("Upload File (base)"),
+          fluidRow(
+            column(
+              width = 6,
+              fileInput(
+                ## |-- INPUT [base_file] -------
+                inputId = NS(
+                  namespace = id,
+                  id = "base_file"
+                ),
+                label = tags$strong(
+                  "Accepts: ",
+                  code(".sas7bdat"), code(".csv"),
+                  code(".txt"), code(".tsv"), code(".xlsx")
+                ),
+                accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
+              )
+            ),
+            column(
+              width = 6,
+              ### |-- INPUT [base_xlsx_sheets] ---------
+              selectInput(
+                inputId = NS(
+                  namespace = id,
+                  id = "base_xlsx_sheets"
+                ),
+                label = strong("Select sheet (if ", code(".xlsx"), " file):"),
+                choices = c("", NULL)
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 6,
+              ## |-- OUTPUT [base_filename] ---------
+              tags$strong("Data file name:"),
+              shiny::htmlOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "base_filename"
+                )
+              )
+            ),
+            column(
+              width = 6,
+              ## |-- INPUT [base_new_name] ---------
+              textInput(
+                inputId = NS(
+                  namespace = id,
+                  id = "base_new_name"
+                ),
+                label = strong(
+                  "Provide a name to preview the", code("base"), " file:"
+                )
+              ),
+              em("Not sure what name to use? Copy + paste the file name."),
+            )
+          ),
+          fluidRow(
+            column(
+              width = 12,
+              br(), br(),
+              ## |-- OUTPUT [base_display_upload] ---------
+              reactable::reactableOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "base_display_upload"
+                )
+              )
+            )
+          )
+        )
+      )
+    ),
+    ## DEV (base) -----
+    fluidRow(
+      sortable(
+        width = 12,
+        box(
+          width = 12,
+          status = "info",
+          solidHeader = TRUE,
+          closable = TRUE,
+          maximizable = TRUE,
+          collapsed = TRUE,
+          title = "Reactive values (base)",
+          strong(em("For DEV purposes only")),
+          fluidRow(
+            column(
+              12,
+              ## base_dev_a -----
+              code("base_dev_a"),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "base_dev_a"
+                )
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              12,
+              ## base_dev_b -----
+              code("base_dev_b"),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "base_dev_b"
+                )
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              12,
+              ## base_dev_x -----
+              code("base_dev_x"),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "base_dev_x"
+                )
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              12,
+              ## base_dev_y -----
+              code("base_dev_y"),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "base_dev_y"
+                )
+              )
+            )
+          )
+        )
+      )
+    ),
+    h3("Upload a ", strong("compare"), " (i.e., current) data source"),
+    # br(), br(),
+    fluidRow(
+      sortable(
+        width = 12,
+        # |- upload compare xlsx file ----
+        box(
+          maximizable = TRUE,
+          collapsed = FALSE,
+          solidHeader = TRUE,
+          status = "secondary",
+          width = 12,
+          collapsible = TRUE,
+          closable = FALSE,
+          title = tags$strong("Upload File (compare)"),
+          fluidRow(
+            column(
+              width = 6,
+              fileInput(
+                ## |-- INPUT [comp_file] -------
+                inputId = NS(
+                  namespace = id,
+                  id = "comp_file"
+                ),
+                label = tags$strong(
+                  "Accepts: ",
+                  code(".sas7bdat"), code(".csv"),
+                  code(".txt"), code(".tsv"), code(".xlsx")
+                ),
+                accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
+              )
+            ),
+            column(
+              width = 6,
+              ## |-- INPUT [comp_xlsx_sheets] ---------
+              selectInput(
+                inputId = NS(
+                  namespace = id,
+                  id = "comp_xlsx_sheets"
+                ),
+                label = strong("Select sheet (if ", code(".xlsx"), " file):"),
+                choices = c("", NULL)
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 6,
+              ## |-- OUTPUT [comp_filename] ---------
+              tags$strong("Data file name:"),
+              shiny::htmlOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "comp_filename"
+                )
+              )
+            ),
+            column(
+              width = 6,
+              ## |-- INPUT [comp_new_name] ---------
+              textInput(
+                inputId = NS(
+                  namespace = id,
+                  id = "comp_new_name"
+                ),
+                label = strong(
+                  "Provide a name to preview the ", code("compare"), " file:"
+                )
+              ),
+              em("Not sure what name to use? Copy + paste the file name."),
+            )
+          ),
+          fluidRow(
+            column(
+              width = 12,
+              br(), br(),
+              ## |-- OUTPUT [comp_display_upload] ---------
+              reactable::reactableOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "comp_display_upload"
+                )
+              )
+            )
+          )
+        )
+      )
+    ),
+    ## DEV -----
+    fluidRow(
+      sortable(
+        width = 12,
+        box(
+          width = 12,
+          status = "info",
+          solidHeader = TRUE,
+          closable = TRUE,
+          maximizable = TRUE,
+          collapsed = TRUE,
+          title = "Reactive values (compare)",
+          strong(em("For DEV purposes only")),
+          fluidRow(
+            column(
+              12,
+              ## comp_dev_a -----
+              code("comp_dev_a"),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "comp_dev_a"
+                )
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              12,
+              ## comp_dev_b -----
+              code("comp_dev_b"),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "comp_dev_b"
+                )
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              12,
+              ## comp_dev_x -----
+              code("comp_dev_x"),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "comp_dev_x"
+                )
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              12,
+              ## comp_dev_y -----
+              code("comp_dev_y"),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "comp_dev_y"
+                )
+              )
+            )
+          )
+        )
+      )
+    )
+  )
+}
+```
+
+# Data upload server
+
+
+## uploadDataServer()
+
+`uploadDataServer()` uploads up to four datasets, names them, and returns a list with the imported objects. 
+
+```{r uploadDataServer}
+uploadDataServer <- function(id) {
+  moduleServer(id = id, module = function(input, output, session) {
+
+    # |-- INPUT [base] base_xlsx_sheets -----
+    observeEvent(eventExpr = input$base_file, handlerExpr = {
+      if (tools::file_ext(input$base_file$name) == "xlsx") {
+        choices <- readxl::excel_sheets(path = input$base_file$datapath)
+      } else {
+        choices <- c("", NULL)
+      }
+      updateSelectInput(
+        session = session,
+        inputId = "base_xlsx_sheets",
+        choices = choices
+      )
+    })
+
+    # |-- OUTPUT [base] xlsx file name -----
+    output$base_filename <- renderPrint({
+      req(input$base_file)
+      base_filename <- as.character(input$base_file$name)
+      paste0(
+        tags$code(base_filename)
+      )
+    })
+
+    base_data <- eventReactive(input$base_file, {
+      if (nchar(input$base_xlsx_sheets) == 0) {
+        uploaded <- upload_data(path = input$base_file$datapath)
+      } else {
+        uploaded <- upload_data(
+          path = input$base_file$datapath,
+          sheet = as.character(input$base_xlsx_sheets)
+        )
+      }
+      return(uploaded)
+    })
+
+    # |-- OUTPUT display [base] xlsx ----
+    # require name
+    observeEvent(eventExpr = input$base_new_name, handlerExpr = {
+      req(input$base_file)
+      req(input$base_new_name)
+      output$base_display_upload <- reactable::renderReactable(
+        reactable(
+          data = base_data(),
+          defaultPageSize = 5,
+          resizable = TRUE,
+          highlight = TRUE,
+          compact = TRUE,
+          wrap = FALSE,
+          bordered = TRUE,
+          filterable = TRUE,
+          theme = base_react_theme
+        )
+      )
+    })
+
+    ## DEV OUTPUT |-- (base_dev_a) ---------
+    output$base_dev_a <- renderPrint({
+      print(
+        paste0("input$base_filename = ", input$base_file$name)
+      )
+    })
+    ## DEV OUTPUT |-- (base_dev_b) ---------
+    output$base_dev_b <- renderPrint({
+      print(
+        base_data()
+      )
+    })
+    ## DEV OUTPUT |-- (base_dev_x) ---------
+    output$base_dev_x <- renderPrint({
+      print(
+        paste0("input$base_xlsx_sheets = ", as.character(input$base_xlsx_sheets))
+      )
+    })
+    ## DEV OUTPUT |-- (base_dev_y) ---------
+    output$base_dev_y <- renderPrint({
+      print(
+        paste0("input$base_new_name = ", as.character(input$base_new_name))
+      )
+    })
+
+
+    # |-- INPUT [comp] comp_xlsx_sheets -----
+    observeEvent(eventExpr = input$comp_file, handlerExpr = {
+      if (tools::file_ext(input$comp_file$name) == "xlsx") {
+        choices <- readxl::excel_sheets(path = input$comp_file$datapath)
+      } else {
+        choices <- c("", NULL)
+      }
+      updateSelectInput(
+        session = session,
+        inputId = "comp_xlsx_sheets",
+        choices = choices
+      )
+    })
+
+    # |-- OUTPUT [comp] xlsx file name -----
+    output$comp_filename <- renderPrint({
+      req(input$comp_file)
+      comp_filename <- as.character(input$comp_file$name)
+      paste0(
+        tags$code(comp_filename)
+      )
+    })
+
+    comp_data <- eventReactive(input$comp_file, {
+      if (nchar(input$comp_xlsx_sheets) == 0) {
+        uploaded <- upload_data(path = input$comp_file$datapath)
+      } else {
+        uploaded <- upload_data(
+          path = input$comp_file$datapath,
+          sheet = as.character(input$comp_xlsx_sheets)
+        )
+      }
+      return(uploaded)
+    })
+
+    # |-- OUTPUT display [comp] xlsx ----
+    # require name
+    observeEvent(eventExpr = input$comp_new_name, handlerExpr = {
+      req(input$comp_file)
+      req(input$comp_new_name)
+      output$comp_display_upload <- reactable::renderReactable(
+        reactable(
+          data = comp_data(),
+          defaultPageSize = 5,
+          resizable = TRUE,
+          highlight = TRUE,
+          compact = TRUE,
+          wrap = FALSE,
+          bordered = TRUE,
+          filterable = TRUE,
+          theme = comp_react_theme
+        )
+      )
+    })
+
+    ## DEV OUTPUT |-- (comp_dev_a) ---------
+    output$comp_dev_a <- renderPrint({
+      print(
+        paste0("input$comp_filename = ", as.character(input$comp_file$name))
+      )
+    })
+    ## DEV OUTPUT |-- comp_dev_y (dev) ---------
+    output$comp_dev_b <- renderPrint({
+      print(
+        comp_data()
+      )
+    })
+    ## DEV OUTPUT |-- comp_dev_a (dev) ---------
+    output$comp_dev_x <- renderPrint({
+      print(
+        paste0("input$comp_xlsx_sheets = ", as.character(input$comp_xlsx_sheets))
+      )
+    })
+    ## DEV OUTPUT |-- comp_dev_b (dev) ---------
+    output$comp_dev_y <- renderPrint({
+      print(
+        paste0("input$comp_new_name = ", as.character(input$comp_new_name))
+      )
+    })
+
+    # |---- return list -----
+    # assign this as 'upload_data_list'
+    return(
+      list(
+        # |------ base_data ----
+        base_data = reactive({
+          req(input$base_file)
+          req(input$base_new_name)
+          if (nchar(input$base_xlsx_sheets) == 0) {
+            uploaded <- upload_data(path = input$base_file$datapath)
+          } else {
+            uploaded <- upload_data(
+              path = input$base_file$datapath,
+              sheet = as.character(input$base_xlsx_sheets)
+            )
+          }
+          return(uploaded)
+        }),
+        # |------ base_name ----
+        base_name = reactive({
+          # req(input$base_new_name)
+          if (nchar(input$base_new_name) != 0) {
+            as.character(input$base_new_name)
+          } else {
+            as.character(input$base_filename)
+          }
+        }),
+        # |------ comp_data ----
+        comp_data = reactive({
+          req(input$comp_file)
+          req(input$comp_new_name)
+          if (nchar(input$comp_xlsx_sheets) == 0) {
+            uploaded <- upload_data(path = input$comp_file$datapath)
+          } else {
+            uploaded <- upload_data(
+              path = input$comp_file$datapath,
+              sheet = as.character(input$comp_xlsx_sheets)
+            )
+          }
+          return(uploaded)
+        }),
+        # |------ comp_name ----
+        comp_name = reactive({
+          # req(input$comp_new_name)
+          if (nchar(input$comp_new_name) != 0) {
+            as.character(input$comp_new_name)
+          } else {
+            as.character(input$base_filename)
+          }
+        })
+      )
+    )
+  })
+}
+```
+
+The `uploadDataUI` returns the following reactives (accessible via the `data_upload` object). All of the items have a the appropriate prefix (`base_` or `comp_`) depending on the uploaded file. 
+
+# Returned data objects
+
+The uploaded datasets in `uploadData` are transferred to `selectData` via a returned list (see code below) 
+
+```{r uploadDataServer-selectDataServer-data, eval=FALSE, class.source='fold-show'}
+# objects created in application with uploadDataServer()/upload_data_list
+upload_data_list <- uploadDataServer(id = "upload_data")
+# objects transferred to selectData module with selectDataServer()/data_upload
+selectDataServer(id = "select_data", data_upload = upload_data_list)
+```
+
+## Base (target) data reactives
+
+Two `base` objects are returned from the `uploadData` module: `base_data` and `base_name`
+
+### 1) `base_data()`
+
+Below is the `base` dataset (i.e. reference)
+
+```{r base_data, eval=FALSE, class.source='fold-show'}
+# object returned in uploadData module as list
+base_data <- reactive({
+  req(input$base_file)
+  req(input$base_new_name)
+  if (nchar(input$base_xlsx_sheets) == 0) {
+    uploaded <- upload_data(path = input$base_file$datapath)
+  } else {
+    uploaded <- upload_data(
+      path = input$base_file$datapath,
+      sheet = as.character(input$base_xlsx_sheets)
+    )
+  }
+  return(uploaded)
+})
+# object accessed in selectData module as reactive
+base_data <- eventReactive(data_upload$base_data(), {
+  base_data <- data_upload$base_data()
+  return(base_data)
+})
+```
+
+
+### 2) `base_name()`
+
+Below is the `base` dataset name.
+
+```{r base_name, eval=FALSE, class.source='fold-show'}
+# object returned in uploadData module as list
+base_name <- reactive({
+  if (nchar(input$base_new_name) != 0) {
+    as.character(input$base_new_name)
+  } else {
+    as.character(input$base_filename)
+  }
+})
+# object accessed in selectData module as reactive
+base_name <- eventReactive(data_upload$base_name(), {
+  base_name <- data_upload$base_name()
+  return(base_name)
+})
+```
+  
+
+
+## Compare data reactives 
+
+### 1) `comp_data()`
+
+```{r comp_data, eval=FALSE, class.source='fold-show'}
+# object returned in uploadData module as list
+comp_data <- reactive({
+  req(input$comp_file)
+  req(input$comp_new_name)
+  if (nchar(input$comp_xlsx_sheets) == 0) {
+    uploaded <- upload_data(path = input$comp_file$datapath)
+  } else {
+    uploaded <- upload_data(
+      path = input$comp_file$datapath,
+      sheet = as.character(input$comp_xlsx_sheets)
+    )
+  }
+  return(uploaded)
+})
+# object accessed in selectData module as reactive
+comp_data <- eventReactive(data_upload$comp_data(), {
+  comp_data <- data_upload$comp_data()
+  return(comp_data)
+})
+```
+
+
+### 2) `comp_name()`
+
+```{r comp_name, eval=FALSE, class.source='fold-show'}
+# object returned in uploadData module as list
+comp_name <- reactive({
+  if (nchar(input$comp_new_name) != 0) {
+    as.character(input$comp_new_name)
+  } else {
+    as.character(input$base_filename)
+  }
+})
+# object accessed in selectData module as reactive
+comp_name <- eventReactive(data_upload$comp_name(), {
+  comp_name <- data_upload$comp_name()
+  return(comp_name)
+})
+```
+
+
+# Module UI 1) inputs
+
+The inputs for `selectDataUI()` are collected in one of three `sortable()` boxes: one for the **Base Data**, one for the **Compare Data**, and one for the **Joins**. 
+
+Each box collects the following IDs: 
+
+- **Base**  
+
+  - **`input$base_col_select`**: the columns from `base_data()`
+  
+- **Compare** 
+
+  - **`input$base_col_select`**: the columns from `comp_data()`
+  
+- **Joins** 
+
+  - **`input$by`**: the columns used to create a unique observation between the two datasets. 
+  + The reactive values for base and compare of both printed to the UI (because we're in a DEV environment)
+  
+# Module UI 2) outputs
+
+The outputs for `selectDataUI()` are `reactable` tables in one of four `sortable()` boxes: 
+
+1. **Base Data Files**: 
+
+  - **`output$base_data_display`**: display of imported `base` data 
+  
+2. **Compare Data Files**:
+
+  - **`output$comp_data_display`**:  display of imported `compare` data 
+
+```{r selectDataUI, class.source='fold-hide'}
+selectDataUI <- function(id) {
+  tagList(
+    h3("Select columns from ", strong("base"), "data"),
+    br(),
+    fluidRow(
+      sortable(
+        width = 12,
+        box(
+          maximizable = TRUE,
+          collapsible = TRUE,
+          collapsed = FALSE,
+          closable = FALSE,
+          status = "primary",
+          width = 12,
+          title = tags$strong("Select Base Data"),
+          ## |-- INPUT [base_col_select] ---------
+          ## displays the columns from the imported dataset
+          br(),
+          selectizeInput(
+            inputId = NS(
+              namespace = id,
+              id = "base_col_select"
+            ),
+            label = strong("Select ", code("base"), " columns"),
+            choices = c("", NULL),
+            multiple = TRUE,
+            selected = NULL
+          ),
+          ## |-- OUTPUT [base_data_display] ---------
+          ## displays uploaded/named/selected data
+          strong("Base Data"),
+          br(), br(),
+          reactableOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_data_display"
+            )
+          )
+        )
+      )
+    ),
+    ## DEV (base) -----
+    fluidRow(
+      sortable(
+        width = 12,
+        box(
+          width = 12,
+          status = "info",
+          solidHeader = TRUE,
+          closable = TRUE,
+          maximizable = TRUE,
+          collapsed = TRUE,
+          title = "Reactive values (base)",
+          strong(em("For DEV purposes only")),
+          fluidRow(
+            column(
+              12,
+              ## base_dev_a -----
+              strong(code("base_dev_a"), "=", code("base_data()")),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "base_dev_a"
+                )
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              12,
+              ## base_dev_b -----
+              strong(code("base_dev_b"), "=", code("base_name()")),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "base_dev_b"
+                )
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              12,
+              ## base_dev_c -----
+              strong(code("base_dev_c"), "=", code("input$base_col_select")),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "base_dev_c"
+                )
+              )
+            )
+          )
+        )
+      )
+    ),
+    h3("Select columns from ", strong("compare"), "data"),
+    br(),
+    fluidRow(
+      sortable(
+        width = 12,
+        box(
+          maximizable = TRUE,
+          collapsible = TRUE,
+          collapsed = TRUE,
+          closable = FALSE,
+          status = "secondary",
+          width = 12,
+          title = tags$strong("Select Compare Data"),
+          ## |-- INPUT [comp_col_select] ---------
+          ## displays the columns from the imported dataset
+          br(),
+          selectizeInput(
+            inputId = NS(
+              namespace = id,
+              id = "comp_col_select"
+            ),
+            label = strong("Select ", code("compare"), " columns"),
+            choices = c("", NULL),
+            multiple = TRUE,
+            selected = c("", NULL)
+          ),
+          ## |-- OUTPUT [comp_data_display] ---------
+          ## displays uploaded/named/selected data
+          strong("Compare Data"),
+          br(), br(),
+          reactableOutput(
+            outputId = NS(
+              namespace = id,
+              id = "comp_data_display"
+            )
+          )
+        )
+      )
+    ),
+    ## DEV (base) -----
+    fluidRow(
+      sortable(
+        width = 12,
+        box(
+          width = 12,
+          status = "info",
+          solidHeader = TRUE,
+          closable = TRUE,
+          maximizable = TRUE,
+          collapsed = TRUE,
+          title = "Reactive values (comp)",
+          strong(em("For DEV purposes only")),
+          fluidRow(
+            column(
+              12,
+              ## comp_dev_a -----
+              strong(code("comp_dev_a"), "=", code("comp_data()")),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "comp_dev_a"
+                )
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              12,
+              ## comp_dev_b -----
+              strong(code("comp_dev_b"), "=", code("comp_name()")),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "comp_dev_b"
+                )
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              12,
+              ## comp_dev_c -----
+              strong(code("comp_dev_c"), "=", code("input$comp_col_select")),
+              verbatimTextOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "comp_dev_c"
+                )
+              )
+            )
+          )
+        )
+      )
+    ),
+    h3("Select join columns between ", strong("base"), " and ", strong("compare")),
+    br(),
+    fluidRow(
+      bs4Dash::sortable(
+        width = 12,
+        bs4Dash::box(
+          solidHeader = FALSE,
+          collapsed = TRUE,
+          status = "info",
+          width = 12,
+          title = strong("Select Join Columns"),
+          fluidRow(
+            column(
+              width = 5,
+              h5(
+                strong(
+                  em("Intersecting columns:")
+                )
+              ),
+              br(),
+              ## OUTPUT |-- (intersecting_cols) ------
+              reactableOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "intersecting_cols"
+                )
+              )
+            ),
+            column(
+              width = 6,
+              h5(
+                strong(
+                  em("Select Joining Column(s)")
+                )
+              ),
+              ## INPUT |-- (by) ------
+              selectizeInput(
+                inputId = NS(
+                  namespace = id,
+                  id = "by"
+                ),
+                label =
+                  em(
+                    "Select the column (or columns) that create a unique observation between ",
+                    code("base"), "and ", code("compare"), ""
+                  ),
+                choices = c("", NULL),
+                multiple = TRUE,
+                selected = c("", NULL)
+              ),
+              em(
+                "The join column will be named", code("join_column"),
+                "Leave blank for a row-by-row comparison"
+              ),
+              br(), br(),
+              strong(
+                "The final ", code("base"), " and ",
+                code("compare"), "data are displayed below to review"
+              )
+              # h5( ## placeholder for 'Name Joining Column(s)'
+              # ),
+            )
+          )
+        )
+      ),
+      sortable(
+        bs4Dash::box(
+          width = 12,
+          title = strong(code("base"), " data (for comparison)"),
+          solidHeader = FALSE,
+          maximizable = TRUE,
+          collapsed = TRUE,
+          status = "primary",
+          fluidRow(
+            column(
+              width = 12,
+              ## OUTPUT |-- (comp_join_col_display) ------
+              reactableOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "base_join_col_display"
+                )
+              )
+            )
+          )
+        )
+      ),
+      bs4Dash::sortable(
+        bs4Dash::box(
+          width = 12,
+          title = strong(code("compare"), " data (for comparison)"),
+          solidHeader = FALSE,
+          collapsed = TRUE,
+          maximizable = TRUE,
+          status = "secondary",
+          fluidRow(
+            column(
+              width = 12,
+              ## OUTPUT |-- (comp_join_col_display) ------
+              reactableOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "comp_join_col_display"
+                )
+              )
+            )
+          )
+        )
+      ),
+    )
+  )
+}
+```
+
+The naming convention remains the same (`base_` for base, `comp_` for compare).
+
+# Module server 1) server
+
+The imported data in the server are built using `eventReactive()`. 
+
+- **Base**    
+  + **`base_data()`**: imported base data     
+  + **`base_name()`**: imported base data name 
+
+- **Compare**    
+  + **`comp_data()`**: imported comp data     
+  + **`comp_name()`**: imported comp data name 
+  
+These are combined with the inputs from the UI to create the following:
+
+- **Base**    
+  + **`input$base_col_select`**: the columns selected from the imported data  
+  + **`output$base_data_display`**: display of the imported data with the selected columns
+  + **`base_select()`**: reactive data created from **`base_data()`** and **`input$base_col_select`**.
+  
+- **Compare**  
+  + **`input$comp_col_select`**: the columns selected from the imported data  
+  + **`output$comp_data_display`**: display of the imported data with the selected columns       
+  + **`comp_select()`**: reactive data created from **`comp_data()`** and **`input$comp_col_select`**.
+  
+
+  
+1.) The columns in both **`base_select()`** and **`comp_select()`** are used to create the **`col_intersect()`** reactive dataset (displayed in the **`output$intersecting_cols`**). 
+
+2.) When/if join columns are identified, a new `join_column` is added to the **`_select()`** data to create the **`_join_col_data()`** datasets. These datasets are displayed using the **`base_join_col_display`** and **`comp_join_col_display`**.
+
+# Module server 2) return list
+
+The `selectDataServer()` returns a list of two datasets when it's assigned to an object (preferably `select_data_list`), these are `base_join_col_data()` and `comp_join_col_data()`.
+
+## What happened to the dataset names? 
+
+In the return list, a **`data_source`** column is added to each dataset, and it's value is the name the user provided for each dataset (see list below):
+
+```{r return-list, eval=FALSE, class.source='fold-show'}
+return(
+      list(
+        ## base_join_col_data -----
+        base_join_col_data = reactive({
+            # no by col, no new name
+            if (length(input$by) != 0) {
+              base_join_col <- create_join_column(
+                df = base_select(),
+                by_colums = input$by,
+                new_by_column_name = "join_column"
+              )
+              base_join_col <- dplyr::select(base_join_col,
+                join_column, all_of(col_intersect()$Columns))
+              base_join_col <- tibble::add_column(.data = base_join_col,
+                data_source = base_name(), .after = 1)
+            } else {
+              # no by col, new name
+              base_join_col <- base_select()
+              base_join_col <- select(base_join_col,
+                all_of(col_intersect()$Columns))
+              base_join_col <- tibble::add_column(.data = base_join_col,
+                data_source = base_name(), .after = 0)
+            }
+          return(base_join_col)
+        }),
+        ## comp_join_col_data -----
+        comp_join_col_data = reactive({
+          # no by col, no new name
+          if (length(input$by) != 0) {
+            comp_join_col <- create_join_column(
+              df = comp_select(),
+              by_colums = input$by,
+              new_by_column_name = "join_column"
+            )
+            comp_join_col <- select(comp_join_col,
+              join_column, all_of(col_intersect()$Columns))
+            comp_join_col <- tibble::add_column(.data = comp_join_col,
+                data_source = comp_name(), .after = 1)
+          } else {
+             # no by col, new name
+            comp_join_col <- comp_select()
+            comp_join_col <- select(comp_join_col,
+              all_of(col_intersect()$Columns))
+            comp_join_col <- tibble::add_column(.data = comp_join_col,
+                data_source = comp_name(), .after = 1)
+          }
+          return(comp_join_col)
+        })
+      )
+    )
+```
+
+
+Expand the code chunk below to view the `selectDataServer()` function.
+
+```{r selectDataServer, class.source='fold-hide'}
+selectDataServer <- function(id, data_upload) {
+  moduleServer(id = id, module = function(input, output, session) {
+    # BASE DATA |-- ----
+    ## BASE REACTIVE |-- base_data (reactive) ---------
+    base_data <- eventReactive(data_upload$base_data(), {
+      base_data <- data_upload$base_data()
+      return(base_data)
+    })
+    ## BASE REACTIVE |-- base_name (reactive) ---------
+    base_name <- eventReactive(data_upload$base_name(), {
+      base_name <- data_upload$base_name()
+      return(base_name)
+    })
+    ## BASE UPDATE |-- input$base_col_select   ---------
+    observeEvent(base_data(), {
+      data_choices <- names(base_data())
+      updateSelectizeInput(
+        inputId = "base_col_select",
+        choices = data_choices,
+        selected = data_choices
+      )
+    })
+    ## DEV OUTPUT |-- base_dev_x (dev) ---------
+    output$base_dev_a <- renderPrint({
+      print(
+        base_select()
+      )
+    })
+    ## DEV OUTPUT |-- base_dev_y (dev) ---------
+    output$base_dev_b <- renderPrint({
+      print(
+        paste0(input$by, collapse = "-")
+      )
+    })
+    ## DEV OUTPUT |-- base_dev_a (dev) ---------
+    output$base_dev_c <- renderPrint({
+      print(
+        as.character(input$base_col_select)
+      )
+    })
+    ## BASE OUTPUT |-- base_data_display (display) ---------
+    output$base_data_display <- reactable::renderReactable({
+      req(input$base_col_select)
+      validate(
+        need(base_data(), "please upload data")
+      )
+      reactable::reactable(
+        data = select(base_data(),
+                      all_of(input$base_col_select)),
+        theme = base_react_theme,
+        defaultPageSize = 10,
+        resizable = TRUE,
+        highlight = TRUE,
+        compact = TRUE,
+        wrap = FALSE,
+        bordered = TRUE,
+        filterable = TRUE
+      )
+    })
+    ## BASE REACTIVE |-- base_select   ---------
+    base_select <- eventReactive(input$base_col_select, {
+      # create selection
+      base_select <- select(base_data(), all_of(input$base_col_select))
+      return(base_select)
+    })
+
+    # COMP DATA |-- -----------------------------------------------------------
+    ## COMPARE REACTIVE |-- comp_data (reactive) ---------
+    comp_data <- eventReactive(data_upload$comp_data(), {
+      comp_data <- data_upload$comp_data()
+      return(comp_data)
+    })
+    ## COMPARE REACTIVE |-- comp_name (reactive) ---------
+    comp_name <- eventReactive(data_upload$comp_name(), {
+      comp_name <- data_upload$comp_name()
+      return(comp_name)
+    })
+    ## COMP UPDATE |-- input$comp_col_select   ---------
+    observeEvent(comp_data(), {
+      data_choices <- names(comp_data())
+      updateSelectizeInput(
+        inputId = "comp_col_select",
+        choices = data_choices,
+        selected = data_choices
+      )
+    })
+    ## |-- DEV OUTPUT |-- comp_dev_x (dev) ---------
+    output$comp_dev_a <- renderPrint({
+      print(
+        comp_select()
+      )
+    })
+    ## |-- DEV OUTPUT |-- comp_dev_y (dev) ---------
+    output$comp_dev_b <- renderPrint({
+      print(
+        paste0(input$by, collapse = "-")
+      )
+    })
+    ## |-- DEV OUTPUT |-- comp_dev_a (dev) ---------
+    output$comp_dev_c <- renderPrint({
+      print(
+        as.character(input$comp_col_select)
+      )
+    })
+
+    ## |-- COMP OUTPUT |-- comp_data_display (display) ---------
+    output$comp_data_display <- reactable::renderReactable({
+      req(input$comp_col_select)
+      validate(
+        need(comp_data(), "please upload data")
+      )
+      reactable::reactable(
+        data = select(comp_data(),
+                      all_of(input$comp_col_select)),
+        theme = comp_react_theme,
+        defaultPageSize = 10,
+        resizable = TRUE,
+        highlight = TRUE,
+        compact = TRUE,
+        wrap = FALSE,
+        bordered = TRUE,
+        filterable = TRUE
+      )
+    })
+    ## COMPARE REACTIVE |-- comp_select (reactive) ---------
+    comp_select <- eventReactive(input$comp_col_select, {
+      # create selection
+      comp_select <- select(comp_data(), all_of(input$comp_col_select))
+      return(comp_select)
+    })
+
+    ## REACTIVE |-- col_intersect (reactive) ---------
+    col_intersect <- reactive({
+      base_cols <- names(base_select())
+      comp_cols <- names(comp_select())
+      intersecting_cols <- intersect(x = base_cols, y = comp_cols)
+      col_intersect <- tibble::tibble(Columns = intersecting_cols)
+      return(col_intersect)
+    })
+
+    # |-- OUTPUT (intersecting_cols) --------
+    output$intersecting_cols <- renderReactable({
+      reactable(
+        col_intersect(),
+        resizable = TRUE,
+        highlight = TRUE,
+        compact = TRUE,
+        wrap = FALSE,
+        bordered = TRUE,
+        defaultPageSize = 5,
+        theme = reactableTheme(
+          color = "#2a3079",
+          borderColor = "#e5eaee",
+          stripedColor = "#f6f8fa",
+          highlightColor = "#f0f5f9",
+          cellPadding = "8px 12px"
+        )
+      )
+    })
+    ##  UPDATE |-- input$by   ---------
+    observeEvent(col_intersect(), {
+      data_choices <- col_intersect()$Columns
+      updateSelectizeInput(
+        inputId = "by",
+        choices = data_choices,
+        selected = NULL
+      )
+    })
+
+    ##  REACTIVE |--  base_join_col_data -----
+    base_join_col_data <- reactive({
+      # no by col, no new name
+      if (length(input$by) != 0) {
+        base_join_col <- create_join_column(
+          df = base_select(),
+          by_colums = input$by,
+          new_by_column_name = "join_column"
+        )
+        base_join_col <- select(
+          base_join_col,
+          join_column, all_of(col_intersect()$Columns)
+        )
+      } else {
+        base_join_col <- base_select()
+        # no by col, new name
+        base_join_col <- select(
+          base_join_col,
+          all_of(col_intersect()$Columns)
+        )
+      }
+    })
+
+    # |-- OUTPUT (base_join_col_display) --------
+    output$base_join_col_display <- renderReactable({
+      reactable(
+        data = base_join_col_data(),
+        resizable = TRUE,
+        defaultPageSize = 5,
+        highlight = TRUE,
+        compact = TRUE,
+        wrap = FALSE,
+        bordered = TRUE,
+        filterable = TRUE,
+        theme = base_react_theme
+      )
+    })
+
+    ##  REACTIVE |--  comp_join_col_data -----
+    comp_join_col_data <- reactive({
+      # no by col, no new name
+      if (length(input$by) != 0) {
+        comp_join_col <- create_join_column(
+          df = comp_select(),
+          by_colums = input$by,
+          new_by_column_name = "join_column"
+        )
+        comp_join_col <- select(
+          comp_join_col,
+          join_column, all_of(col_intersect()$Columns)
+        )
+      } else {
+        comp_join_col <- comp_select()
+        # no by col
+        comp_join_col <- select(
+          comp_join_col,
+          all_of(col_intersect()$Columns)
+        )
+      }
+    })
+
+    output$comp_join_col_display <- renderReactable({
+      reactable(
+        data = comp_join_col_data(),
+        resizable = TRUE,
+        defaultPageSize = 5,
+        highlight = TRUE,
+        compact = TRUE,
+        wrap = FALSE,
+        bordered = TRUE,
+        filterable = TRUE,
+        theme = comp_react_theme
+      )
+    })
+
+    # |---- return list ---------
+    return(
+      list(
+        ## base_join_col_data -----
+        base_join_col_data = reactive({
+          # no by col, no new name
+          if (length(input$by) > 0) {
+            # by columns
+            by_cols <- paste0(input$by, collapse = "-")
+            # create new column(s)
+            base_join_col <- create_join_column(
+              df = base_select(),
+              by_colums = input$by,
+              new_by_column_name = "join_column"
+            )
+            # only intersecting columns
+            base_join_col <- dplyr::select(
+              base_join_col,
+              join_column, all_of(col_intersect()$Columns)
+            )
+            # join column
+            base_join_col <- tibble::add_column(
+              .data = base_join_col,
+              join_source = by_cols, .after = 1
+            )
+            # data source column
+            base_join_col <- tibble::add_column(
+              .data = base_join_col,
+              data_source = base_name(), .after = 1
+            )
+          } else {
+            # no by col, new name
+            base_join_col <- base_select()
+            base_join_col <- select(
+              base_join_col,
+              all_of(col_intersect()$Columns)
+            )
+            # data source column
+            base_join_col <- tibble::add_column(
+              .data = base_join_col,
+              data_source = base_name(), .after = 1
+            )
+          }
+          return(base_join_col)
+        }),
+        ## comp_join_col_data -----
+        comp_join_col_data = reactive({
+          # no by col, no new name
+          if (length(input$by) > 0) {
+            # by columns
+            by_cols <- paste0(input$by, collapse = "-")
+            # create new column(s)
+            comp_join_col <- create_join_column(
+              df = comp_select(),
+              by_colums = input$by,
+              new_by_column_name = "join_column"
+            )
+            # only intersecting columns
+            comp_join_col <- select(
+              comp_join_col,
+              join_column, all_of(col_intersect()$Columns)
+            )
+            # data source column
+            comp_join_col <- tibble::add_column(
+              .data = comp_join_col,
+              join_source = by_cols, .after = 1
+            )
+            # data source column
+            comp_join_col <- tibble::add_column(
+              .data = comp_join_col,
+              data_source = comp_name(), .after = 1
+            )
+          } else {
+            # no by col, new name
+            comp_join_col <- comp_select()
+            # only intersecting columns
+            comp_join_col <- select(
+              comp_join_col,
+              all_of(col_intersect()$Columns)
+            )
+            # data source column
+            comp_join_col <- tibble::add_column(
+              .data = comp_join_col,
+              data_source = comp_name(), .after = 1
+            )
+          }
+          return(comp_join_col)
+        })
+      )
+    )
+
+  })
+}
+```
+
+# Module part 3) Demo
+
+Below we define a theme as `select_data_theme`, and build `selectDataDemo()`, which includes both `uploadData` and `selectData` modules. 
+
+```{r selectDataDemo}
+select_data_theme <- bmrn_fresh_theme()
+selectDataDemo <- function() {
+  ui <- bs4Dash::dashboardPage(
+    title = "(dev) selectDataDemo",
+    dark = FALSE,
+    freshTheme = select_data_theme,
+    header = bs4Dash::dashboardHeader(title = "(dev) selectDataDemo"),
+    # sidebar (menuItem) ------
+    sidebar = bs4Dash::dashboardSidebar(
+      skin = "light",
+      bs4Dash::sidebarMenu(
+        id = "sidebarmenu",
+        bs4Dash::sidebarHeader("Data upload demo"),
+        menuItem("1) Upload Data",
+          tabName = "upload_data_tab",
+          icon = icon("file")
+        ),
+        menuItem("2) Select Data",
+          tabName = "select_data_tab",
+          icon = icon("table")
+        )
+      )
+    ),
+    # dashboardBody (tabItem) ------
+    body = bs4Dash::dashboardBody(
+      tabItems(
+        tabItem(
+          tabName = "upload_data_tab",
+          ## uploadDataUI -----
+          uploadDataUI(id = "upload_data")
+        ),
+        tabItem(
+          tabName = "select_data_tab",
+          ## selectDataUI -----
+          selectDataUI(id = "select_data"),
+          ## reactive values -----
+          fluidRow(
+            sortable(
+              width = 12,
+              box(
+                width = 12,
+                status = "info",
+                solidHeader = TRUE,
+                closable = TRUE,
+                maximizable = TRUE,
+                collapsible = TRUE,
+                collapsed = TRUE,
+                title = "Reactive values",
+                ## values -----
+                verbatimTextOutput(
+                  outputId = "upload_values"
+                )
+              )
+            )
+          )
+        )
+      )
+    ),
+    controlbar = bs4Dash::dashboardControlbar(),
+    footer = bs4Dash::dashboardFooter()
+  )
+  server <- function(input, output, session) {
+    # upload data ------------------------------------------------
+    upload_data_list <- uploadDataServer(id = "upload_data")
+    # display data ------------------------------------------------
+    select_data_list <- selectDataServer(id = "select_data",
+                                         data_upload = upload_data_list)
+    # reactive values ------------------------------------------------
+    output$upload_values <- renderPrint({
+      all_values <- reactiveValuesToList(x = input, all.names = TRUE)
+      module_names <- str_detect(names(all_values), "upload_data")
+      module_values <- all_values[module_names]
+      reactable_names <- str_detect(
+        names(module_values),
+        "__reactable__",
+        negate = TRUE
+      )
+      values <- module_values[reactable_names]
+      print(values)
+    })
+  }
+  shinyApp(
+    ui = ui, server = server,
+    options = list(height = 1200, width = 900)
+  )
+}
+```
+
+# App
+
+Run the application below using the `selectDataDemo()` function.
+
+## Reactive value boxes 
+
+We also include a series of gray boxes (**Reactive Values**) in the application to keep track on the input/output IDs. These are used to view/verify the objects in each module *and* avoid namespace collision in future modules, and they can be closed by clicking on the 'X'. 
+
+## Testing
+
+Files for testing this application can be found here:
+
+1. [base](https://github.com/mjfrigaard/dfdiffs/raw/main/inst/extdata/csv/2015-baseballdatabank/Master.csv): a Master [Lahman dataset](https://www.seanlahman.com/baseball-archive/statistics/) from 2015
+
+2. [compare](https://github.com/mjfrigaard/dfdiffs/raw/main/inst/extdata/csv/2020-baseballdatabank/People.csv): a Master [Lahman dataset](https://www.seanlahman.com/baseball-archive/statistics/) from 2020
+
+3. Also use [this .xlsx file](https://github.com/mjfrigaard/dfdiffs/raw/main/inst/extdata/xlsx/lahman_compare.xlsx) with the same datasets. 
+
+
+
+```{r run-selectDataDemo}
+selectDataDemo()
+```

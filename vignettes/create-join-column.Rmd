@@ -1,0 +1,126 @@
+---
+title: "create-join-column"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{create-join-column}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+library(janitor) # compare_df_cols
+library(arsenal) # comparedf
+library(diffdf)  # diffdf
+library(testthat) # expect_equal
+library(vetr) # alike
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+options(
+  str = strOptions(strict.width = "wrap"),
+  width = 75,
+  rmarkdown.html_vignette.check_title = FALSE,
+  tibble.print_max = Inf)
+extdata_folder <- "../inst/extdata/"
+```
+
+# Motivation
+
+This vignette walks through the `create_join_column()` function, which is used for creating new columns in the `dfdiffs` shiny application. 
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(shiny)
+library(tidyverse)
+library(purrr)
+library(vroom)
+library(reactable)
+library(haven)
+library(readxl)
+```
+
+## create_join_column()
+
+This function allows us to create a new 'join' column from any number of column inputs. 
+
+```{r create_join_column}
+create_join_column <- function(df, join_cols, new_col_name){
+  # select by_vars
+  tmp <- select(df, all_of(join_cols))
+  # convert to character
+  tmp <- mutate(tmp, across(.fns = as.character))
+  # rename data 
+  join_col_data <- df
+  # assign new col
+  join_col_data$new_col <- pmap_chr(.l = tmp, .f = paste, sep = "-")
+  # rename 
+  names(join_col_data)[names(join_col_data) == "new_col"] <- new_col_name
+  # relocate
+  join_col_data <- relocate(join_col_data, all_of(new_col_name))
+  # return
+  return(join_col_data)
+}
+```
+
+## Test data 
+
+We will load some test data from the `Lahman` package to demonstrate how this function works: 
+
+### Hall of Fame (2010)
+
+Below is the Hall of Fame data from 2010.
+
+```{r lahman2010_files}
+lahman2010_files <- "../inst/extdata/csv/2010-lahman/"
+fs::dir_tree(lahman2010_files)
+```
+
+
+```{r master_2010}
+lahman_2010_csv_paths <- list.files(
+  path = lahman2010_files, 
+  full.names = TRUE, 
+  pattern = ".csv$")
+master_2010_path <- lahman_2010_csv_paths[grepl(pattern = "Master", lahman_2010_csv_paths)]
+master_2010 <- data.table::fread(input = master_2010_path)
+glimpse(master_2010)
+```
+
+### Master data (2015)
+
+And the 'Master' data from 2015.
+
+```{r lahman2015_files}
+lahman2015_files <- "../inst/extdata/csv/2015-baseballdatabank/"
+fs::dir_tree(lahman2015_files)
+```
+
+
+```{r master_2015}
+lahman_2015_csv_paths <- list.files(path = lahman2015_files, 
+                                    full.names = TRUE, 
+                                    pattern = ".csv$")
+master_2015_path <- lahman_2015_csv_paths[grepl(pattern = "Master", lahman_2015_csv_paths)]
+master_2015 <- data.table::fread(input = master_2015_path)
+glimpse(master_2015)
+```
+
+Assume we want to create a new join column for unique rows of `nameFirst`, `nameLast`, and `birthYear`.
+
+```{r name_year_id}
+join_master_2010 <- create_join_column(df = master_2010, 
+  join_cols = c("nameFirst", "nameLast", "birthYear"), 
+  new_col_name = "name_birth_year_id")
+
+join_master_2015 <- create_join_column(df = master_2015, 
+  join_cols = c("nameFirst", "nameLast", "birthYear"), 
+  new_col_name = "name_birth_year_id")
+
+anti_join(
+  # return all rows from join_master_2010 WITHOUT a match in join_master_2015
+  x = join_master_2010, 
+  y = join_master_2015, 
+  by = "name_birth_year_id") %>% glimpse()
+```
+
+These are the rows in `join_master_2010` that aren't in `join_master_2015`. 

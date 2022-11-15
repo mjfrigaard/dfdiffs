@@ -1,0 +1,236 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = TRUE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+# devtools::install_github("mjfrigaard/dfdiffs")
+library(dfdiffs)
+```
+
+# dfdiffs
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of `dfdiffs` is to is to answer the following questions: 
+
+1. What rows are here now that weren't here before?  
+2. What rows were here before that aren't here now?   
+3. What values have been changed?   
+
+You can access a development version of the application [here.](https://mjfrigaard.shinyapps.io/compareDataApp/) 
+
+## Installation
+
+You can install the development version of dfdiffs from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("mjfrigaard/dfdiffs")
+```
+
+## Packages 
+
+Dependencies
+
+```{r similar-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
+library(dplyr)
+library(stringr)
+library(forcats)
+library(lubridate)
+library(fs)
+library(vctrs)
+library(glue)
+library(purrr)
+library(vroom)
+library(haven)
+library(readxl)
+library(janitor) 
+library(arsenal) 
+library(gt)
+library(labelled)
+library(gtsummary)
+```
+
+## Package functions 
+
+We have functions for answering each of the questions posed above. Each function has a pair of datasets to demonstrate how they work (which we'll cover below).
+
+## *What rows are here now that weren't here before?*
+
+To check new data, we're going to use `T1Data` and `T2Data`.
+
+```{r T1Data-T2Data-NewData, echo=TRUE}
+T1Data <- dfdiffs::T1Data
+T2Data <- dfdiffs::T2Data
+NewData <- dfdiffs::NewData
+```
+
+### Timepoint 1 data (original)
+
+These data represent data taken at T1. 
+
+```{r T1Data}
+T1Data |> knitr::kable(format = "pipe")
+```
+
+### Timepoint 2 data (new)
+
+This is a 'new' dataset representing T2.
+
+```{r T2Data}
+T2Data |> knitr::kable(format = "pipe")
+```
+
+### `create_new_data()`
+
+The `create_new_data()` function shows us the 'new data' (i.e. what is here now that wasn't here before?)
+
+```{r}
+create_new_data(
+  compare = T2Data, 
+  base = T1Data) |> 
+  knitr::kable(format = "pipe")
+```
+
+We can check this against the `NewData` dataset (which should match the output from `create_new_data()`)
+
+```{r NewData}
+NewData |> knitr::kable(format = "pipe")
+```
+
+## *What rows were here before that aren't here now?*
+
+To test for the deleted data, we use the `CompleteData`, `IncompleteData`, and check these with `DeletedData`. 
+
+```{r CompleteData-IncompleteData, echo = TRUE}
+CompleteData <- dfdiffs::CompleteData
+IncompleteData <- dfdiffs::IncompleteData
+DeletedData <- dfdiffs::DeletedData
+```
+
+### A complete dataset
+
+`CompleteData` represents a 'complete' set of data. 
+
+```{r CompleteData}
+CompleteData |> knitr::kable(format = "pipe")
+```
+
+
+### An incomplete dataset
+
+This is a dataset with rows removed from `CompleteData`.
+
+```{r IncompleteData}
+IncompleteData |> knitr::kable(format = "pipe")
+```
+
+### `create_deleted_data()`
+
+When we run the `create_deleted_data()`, we check for the deleted rows between `IncompleteData` and `CompleteData`.
+
+```{r create_deleted_data, echo=TRUE}
+create_deleted_data(
+  compare = IncompleteData, 
+  base = CompleteData) |> 
+  knitr::kable(format = "pipe")
+```
+
+### The deleted data 
+
+This is identical to the data stored in `DeletedData`
+
+```{r DeletedData}
+DeletedData |> knitr::kable(format = "pipe")
+```
+
+## *What values have been changed?*
+
+To answer this question, we have two options: `create_changed_data()` and `create_modified_data()`.
+
++ `create_changed_data()` relies on the `diffdf()` function from the [`diffdf` package](https://gowerc.github.io/diffdf/reference/diffdf.html) package. 
+
++ `create_modified_data()` relies on the `comparedf()` function from the [`arsenal` package](https://mayoverse.github.io/arsenal/reference/comparedf.html) package.
+
+To check for changes between two datasets, we use the `InitialData` and `ChangedData`. 
+
+```{r InitialData-ChangedData, echo=TRUE}
+InitialData <- dfdiffs::InitialData
+ChangedData <- dfdiffs::ChangedData
+```
+
+### Initial data 
+
+```{r InitialData}
+InitialData |> knitr::kable(format = "pipe")
+```
+
+### Changed data
+
+```{r ChangedData}
+ChangedData |> knitr::kable(format = "pipe")
+```
+
+### `create_changed_data()` 
+
+`create_changed_data()` creates a list of tables. 
+
+```{r changed}
+changed <- create_changed_data(
+  compare = ChangedData,
+  base = InitialData)
+names(changed)
+```
+
+#### Counts of changes (`num_diffs`)
+
+The counts of changes by variable are stored in `num_diffs`.
+
+```{r num_diffs}
+changed$num_diffs |> knitr::kable(format = "pipe")
+```
+
+#### Changes by row (`var_diffs`)
+
+The changes by row are stored in `var_diffs`.
+
+```{r var_diffs}
+changed$var_diffs |> knitr::kable(format = "pipe")
+```
+
+### `create_modified_data()` 
+
+The `create_modified_data()` function also creates a list of tables. 
+
+```{r modified}
+modified <- create_modified_data(
+  compare = ChangedData,
+  base = InitialData)
+names(modified)
+```
+
+#### Counts of changes (`diffs_byvar`)
+
+The counts of changes by variable are stored in `diffs_byvar`.
+
+```{r diffs_byvar}
+modified$diffs_byvar |> knitr::kable(format = "pipe")
+```
+
+#### Changes by row 
+
+The changes by row are stored in `diffs`.
+
+```{r diffs}
+modified$diffs |> knitr::kable(format = "pipe")
+```
+

@@ -1,0 +1,13 @@
+name: selectDataDemo-dev
+title: selectDataDemo-dev
+username:
+account: mjfrigaard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 6285835
+bundleId: 5897816
+url: https://mjfrigaard.shinyapps.io/selectDataDemo-dev/
+when: 1652329697.91774
+lastSyncTime: 1652329697.91775
+asMultiple: FALSE
+asStatic: FALSE

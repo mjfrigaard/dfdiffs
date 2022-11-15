@@ -1,0 +1,1063 @@
+---
+title: "(dev) uploadData module"
+author: "Martin Frigaard"
+output:
+  html_document: 
+    highlight: espresso
+    theme: darkly
+    toc: true
+    toc_float: yes
+    df_print: paged
+    code_folding: hide
+    
+runtime: shiny
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(rmdformats)
+library(tidyverse)
+library(devtools)
+library(hrbrthemes)
+library(fs)
+library(reactable)
+library(rmarkdown)
+library(shiny)
+library(shinythemes)
+library(bs4Dash)
+# Global options
+knitr::opts_chunk$set(
+  # cache = FALSE # cache data
+  echo = TRUE, # show/hide all code
+  # results = "hide", # hide results
+  tidy = FALSE, # cleaner code printing
+  comment = "#> ", # better console printing
+  eval = TRUE, # turn this to FALSE stop code chunks from running
+  message = TRUE, # show messages
+  warning = FALSE, # show warnings
+  size = "tiny", # size of the text
+  fig.path = "images", # location of figure files
+  fig.height = 7.5, # height of figures
+  fig.width = 10 # width of figures
+)
+# knit options
+knitr::opts_knit$set(
+  width = 78,
+  progress = FALSE
+)
+# base options
+base::options(
+  tibble.print_max = 25,
+  tibble.width = 78,
+  max.print = 999999,
+  scipen = 100000000
+)
+# reactable.theme ----
+options(reactable.theme = reactableTheme(
+  color = "hsl(233, 9%, 87%)",
+  backgroundColor = "hsl(233, 9%, 19%)",
+  borderColor = "hsl(233, 9%, 22%)",
+  stripedColor = "hsl(233, 12%, 22%)",
+  highlightColor = "hsl(233, 12%, 24%)",
+  inputStyle = list(backgroundColor = "hsl(233, 9%, 25%)"),
+  selectStyle = list(backgroundColor = "hsl(233, 9%, 25%)"),
+  pageButtonHoverStyle = list(backgroundColor = "hsl(233, 9%, 25%)"),
+  pageButtonActiveStyle = list(backgroundColor = "hsl(233, 9%, 28%)")
+))
+```
+
+# Purpose
+
+This is a development document (written in `rmarkdown` and deployed with `shiny`) for the `dfdiffs` package. The purpose of the dfdiffs package is to perform  comparisons between two datasets (similar to `PROC COMPARE` in SAS). 
+
+In this file, we'll walk through the development  of the `uploadDataDemo`, which is a shiny module for uploading flat files *or* excel files with multiple sheets into a shiny app. 
+
+# Helpers
+
+The application depends on the functions stored in the `helpers.R` file. 
+
+```{r helpers, class.source = 'fold-hide'}
+#' Load flat data files
+#'
+#' @param path path to data file (with extension)
+#'
+#' @return return_data
+#' @export load_flat_file
+#' @importFrom data.table fread
+#' @importFrom haven read_sas
+#' @importFrom haven read_sav
+#' @importFrom haven read_dta
+#' @importFrom tools file_ext
+#' @importFrom tibble as_tibble
+#'
+#' @examples # from local
+#' load_flat_file(path = "inst/extdata/csv/2015-baseballdatabank/core/AllstarFull.csv")
+#'
+load_flat_file <- function(path) {
+  ext <- tools::file_ext(path)
+  data <- switch(ext,
+    txt = data.table::fread(path),
+    csv = data.table::fread(path),
+    tsv = data.table::fread(path),
+    sas7bdat = haven::read_sas(data_file = path),
+    sas7bcat = haven::read_sas(data_file = path),
+    sav = haven::read_sav(file = path),
+    dta = haven::read_dta(file = path)
+  )
+  return_data <- tibble::as_tibble(data)
+  return(return_data)
+}
+
+#' Upload data to app `upload_data()`
+#'
+#' @param path path to data file (with extension)
+#' @param sheet excel sheet (if excel file)
+#'
+#' @return uploaded
+#' @export upload_data
+#' @importFrom readxl read_excel
+#' @importFrom tools file_ext
+#' @importFrom tibble as_tibble
+#'
+#'
+#' @examples # not run
+#' upload_data(path = "inst/extdata/app-testing/lahman_compare.xlsx",
+#'             sheet = "master-2015")
+#' upload_data(path = "inst/extdata/app-testing/m15.csv")
+#' upload_data(path = "inst/extdata/dta/iris.dta")
+#' upload_data(path = "inst/extdata/sas7bdat/iris.sas7bdat")
+#' upload_data(path = "inst/extdata/sav/iris.sav")
+#' upload_data(path = "inst/extdata/tsv/Batting.tsv")
+#' upload_data(path = "inst/extdata/txt/Batting.txt")
+upload_data <- function(path, sheet = NULL) {
+  ext <- tools::file_ext(path)
+  if (ext == "xlsx") {
+    raw_data <- readxl::read_excel(
+        path = path,
+        sheet = sheet
+      )
+    uploaded <- tibble::as_tibble(raw_data)
+  } else {
+    uploaded <- load_flat_file(path = path)
+  }
+  return(uploaded)
+}
+
+
+# bmrn_fresh_theme --------------------------------------------------------
+bmrn_fresh_theme <- function() {
+  fresh::create_theme(
+    # theme vars  -------------------------------------------------------------
+    fresh::bs4dash_vars(
+      navbar_light_color = "#353d98", # purple
+      navbar_light_active_color = "#353d98", # purple
+      navbar_light_hover_color = "#f26631" # orange
+    ),
+    # # theme yiq -------------------------------------------------------------
+    fresh::bs4dash_yiq(
+      contrasted_threshold = 255,
+      text_dark = "#0a0a0a", # dark_gray_s10
+      text_light = "#f5f5f5" # gray_t10
+    ),
+    # theme layout ---------------------------------------------------------
+    fresh::bs4dash_layout(
+      main_bg = NULL, # #ececec
+      font_size_root = 12
+    ),
+    # theme sidebar_light -------------------------------------------------
+    fresh::bs4dash_sidebar_light(
+      header_color = "#ccd5dd", # light blue
+      bg = "#eaebf4", # background of entire side-bar
+      color = "#002E56", # text color (no hover)
+      hover_color = "#ee304e", # text color on hover
+      hover_bg = "#353D98", # color on hover
+      active_color = "#f26631", # color is actually the 'primary' status color
+      submenu_bg = "#f5f5f5", # purple
+      submenu_color = "#002444",
+      submenu_hover_color = "#353D98" # purple
+    ),
+    # # theme sidebar_dark -------------------------------------------------
+    fresh::bs4dash_sidebar_dark(
+      header_color = "#ccd5dd",
+      bg = "#1a1e4c",
+      color = "#EE304E", # text color (no hover)
+      hover_bg = "#aeb1d5", # color on hover
+      hover_color = "#EE304E", # text color on hover
+      active_color = "#f26631" # color is actually the 'primary' status color
+    ),
+    # theme status -------------------------------------------------
+    fresh::bs4dash_status(
+      dark = "#323232",
+      light = "#A0A0A0", # gray
+      warning = "#F26631", # orange
+      primary = "#A9218E", # violet = #A9218E, blue = #00509C
+      secondary = "#353D98", # purple
+      success = "#00509C", # blue
+      danger = "#EE304E", # red
+      info = "#A0A0A0" # gray
+    ),
+    # theme color -------------------------------------------------
+    fresh::bs4dash_color(
+      gray_900 = "#1f245b",
+      gray_800 = "#646464",
+      lightblue = "#6696c3",
+      blue = "#00509C"
+    )
+  )
+}
+# base_react_theme --------------------------------------------------------
+base_react_theme <- reactableTheme(
+          color = "#FFFFFF",
+          backgroundColor = "#761763",
+          borderColor = "#646464",
+          stripedColor = "hsl(233, 12%, 22%)",
+          highlightColor = "#a9218e",
+          inputStyle = list(backgroundColor = "#3A3B45"),
+          selectStyle = list(backgroundColor = "#3A3B45"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+# compare_react_theme -----------------------------------------------------
+comp_react_theme <- reactableTheme(
+          color = "#FFFFFF",
+          backgroundColor = "#2f3688",
+          borderColor = "#646464",
+          stripedColor = "hsl(233, 12%, 22%)",
+          highlightColor = "#353d98",
+          inputStyle = list(backgroundColor = "#3A3B45"),
+          selectStyle = list(backgroundColor = "#3A3B45"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+```
+
+
+# Module part 1) UI
+
+In our `uploadDataUI()`, we want the UI to clearly display three actions: 
+1) Upload a data file  
+
+  1a) If the imported data are excel files (`.xlsx`), display the sheets in the UI  
+  1b) If the data files are `.sas7bdat`, `.csv`, `.txt`, `.tsv`, 
+  
+2) Upload a flat file with the `upload_data()` function (stored in the `helpers.R` file)
+
+```{r upload_data, echo=FALSE}
+upload_data <- function(path, sheet = NULL) {
+    # define load flat file
+    load_flat_file <- function(path) {
+      ext <- tools::file_ext(path)
+      data <- switch(ext,
+        txt = data.table::fread(path),
+        csv = data.table::fread(path),
+        tsv = data.table::fread(path),
+        sas7bdat = haven::read_sas(data_file = path),
+        sas7bcat = haven::read_sas(data_file = path),
+        sav = haven::read_sav(file = path),
+        dta = haven::read_dta(file = path)
+      )
+      return_data <- tibble::as_tibble(data)
+      return(return_data)
+    }
+    # define upload 
+  ext <- tools::file_ext(path)
+  
+  if (ext == "xlsx") {
+    raw_data <- readxl::read_excel(
+        path = path,
+        sheet = sheet
+      )
+    uploaded <- tibble::as_tibble(raw_data)
+  } else {
+    # use load flat file
+    uploaded <- load_flat_file(path = path)
+  }
+  return(uploaded)
+}
+```
+
+
+3) Enter a name for the uploaded data files    
+
+After uploading and naming the data sources, the data are visible to preview as a `reactable()` table. 
+
+The input IDs in this module have the following naming conventions: 
+
+- `base` are the objects associated with the base (target) data. 
+
+- `comp` are the objects associated with the compare (current) data. 
+
+## `base` (target) objects 
+
+If the user uploads a file, the following inputs are exported as a list.
+
+1. **`base_data`**: the `base` file uploaded with the `fileInput()`
+
+2. **`base_name`**: the new name designated for the `base` uploaded file
+
+
+## `comp` (compare) objects 
+
+If the user uploads a file, the following inputs are exported as a list.
+
+3. **`comp_data`**: the `compare` file uploaded with the `fileInput()`
+
+4. **`comp_name`**: the new name designated for the `compare` uploaded file
+
+### uploadDataUI() 
+
+```{r uploadDataUI}
+uploadDataUI <- function(id) {
+  tagList(
+    h3("Upload a ", strong("base"), " (i.e., target) data source "),
+    fluidRow(
+      sortable(
+        width = 12,
+        # |- upload base xlsx file ----
+        box(
+          maximizable = TRUE,
+          collapsible = TRUE,
+          collapsed = FALSE,
+          closable = FALSE,
+          solidHeader = TRUE,
+          status = "primary",
+          width = 12,
+          title = tags$strong("Upload File (base)"),
+          fluidRow(
+            column(
+              width = 6,
+              fileInput(
+                ## |-- INPUT [base_file] -------
+                inputId = NS(
+                  namespace = id,
+                  id = "base_file"
+                ),
+                label = tags$strong(
+                  "Accepts: ",
+                  code(".sas7bdat"), code(".csv"),
+                  code(".txt"), code(".tsv"), code(".xlsx")),
+                  accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
+              )
+            ),
+            column(
+              width = 6,
+              ### |-- INPUT [base_xlsx_sheets] ---------
+              selectInput(
+                inputId = NS(
+                  namespace = id,
+                  id = "base_xlsx_sheets"
+                ),
+                label = strong("Select sheet (if ", code(".xlsx"), " file):"),
+                choices = c("", NULL)
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 6,
+              ## |-- OUTPUT [base_filename] ---------
+              tags$strong("Data file name:"),
+              shiny::htmlOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "base_filename"
+                )
+              )
+            ),
+            column(
+              width = 6,
+              ## |-- INPUT [base_new_name] ---------
+              textInput(
+                inputId = NS(
+                  namespace = id,
+                  id = "base_new_name"
+                ),
+                label = strong(
+                  "Provide a name to preview the", code("base"), " file:"
+                )
+              ),
+              em("Not sure what name to use? Copy + paste the file name."),
+            )
+          ),
+          fluidRow(
+            column(
+              width = 12,
+              br(), br(),
+              ## |-- OUTPUT [base_display_upload] ---------
+              reactable::reactableOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "base_display_upload"
+                )
+              )
+            )
+          )
+        )
+      )
+    ),
+    ## DEV (base) -----
+    fluidRow(
+      sortable(
+        width = 12,
+        box(
+          width = 12,
+          status = "info",
+          solidHeader = TRUE,
+          closable = TRUE,
+          maximizable = TRUE,
+          collapsed = TRUE,
+          title = "Reactive values (base)",
+          strong(em("For DEV purposes only")),
+          fluidRow(
+            column(12,
+              ## base_dev_a -----
+              code("base_dev_a"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_dev_a"
+            )
+          ))),
+          fluidRow(
+            column(12,
+              ## base_dev_b -----
+              code("base_dev_b"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_dev_b"
+            )
+          ))
+          ),
+          fluidRow(
+            column(12,
+              ## base_dev_x -----
+              code("base_dev_x"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_dev_x"
+            )
+          ))),
+          fluidRow(
+            column(12,
+              ## base_dev_y -----
+              code("base_dev_y"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "base_dev_y"
+            )
+          ))
+          )
+        )
+      )
+    ),
+    h3("Upload a ", strong("compare"), " (i.e., current) data source"),
+    # br(), br(),
+    fluidRow(
+      sortable(
+        width = 12,
+        # |- upload compare xlsx file ----
+        box(
+          maximizable = TRUE,
+          collapsed = FALSE,
+          solidHeader = TRUE,
+          status = "secondary",
+          width = 12,
+          collapsible = TRUE,
+          closable = FALSE,
+          title = tags$strong("Upload File (compare)"),
+          fluidRow(
+            column(
+              width = 6,
+              fileInput(
+                ## |-- INPUT [comp_file] -------
+                inputId = NS(
+                  namespace = id,
+                  id = "comp_file"
+                ),
+                label = tags$strong(
+                  "Accepts: ",
+                  code(".sas7bdat"), code(".csv"),
+                  code(".txt"), code(".tsv"), code(".xlsx")),
+                  accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
+              )
+            ),
+            column(
+              width = 6,
+              ## |-- INPUT [comp_xlsx_sheets] ---------
+              selectInput(
+                inputId = NS(
+                  namespace = id,
+                  id = "comp_xlsx_sheets"
+                ),
+                label = strong("Select sheet (if ", code(".xlsx"), " file):"),
+                choices = c("", NULL)
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 6,
+              ## |-- OUTPUT [comp_filename] ---------
+              tags$strong("Data file name:"),
+              shiny::htmlOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "comp_filename"
+                )
+              )
+            ),
+            column(
+              width = 6,
+              ## |-- INPUT [comp_new_name] ---------
+              textInput(
+                inputId = NS(
+                  namespace = id,
+                  id = "comp_new_name"
+                ),
+                label = strong(
+                  "Provide a name to preview the ", code("compare"), " file:"
+                )
+              ),
+              em("Not sure what name to use? Copy + paste the file name."),
+            )
+          ),
+          fluidRow(
+            column(
+              width = 12,
+              br(), br(),
+              ## |-- OUTPUT [comp_display_upload] ---------
+              reactable::reactableOutput(
+                outputId = NS(
+                  namespace = id,
+                  id = "comp_display_upload"
+                )
+              )
+            )
+          )
+        )
+      )
+    ),
+    ## DEV -----
+    fluidRow(
+      sortable(
+        width = 12,
+        box(
+          width = 12,
+          status = "info",
+          solidHeader = TRUE,
+          closable = TRUE,
+          maximizable = TRUE,
+          collapsed = TRUE,
+          title = "Reactive values (compare)",
+          strong(em("For DEV purposes only")),
+          fluidRow(
+            column(12,
+              ## comp_dev_a -----
+              code("comp_dev_a"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "comp_dev_a"
+            )
+          ))),
+          fluidRow(
+            column(12,
+              ## comp_dev_b -----
+              code("comp_dev_b"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "comp_dev_b"
+            )
+          ))
+          ),
+          fluidRow(
+            column(12,
+              ## comp_dev_x -----
+              code("comp_dev_x"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "comp_dev_x"
+            )
+          ))),
+          fluidRow(
+            column(12,
+              ## comp_dev_y -----
+              code("comp_dev_y"),
+          verbatimTextOutput(
+            outputId = NS(
+              namespace = id,
+              id = "comp_dev_y"
+            )
+          ))
+          )
+        )
+      )
+    )
+  )
+}
+```
+
+# Module part 2) Server
+
+The server needs to be capable of completing the following functions: 
+
+1. Import the excel/flat files
+
+  1a. Files are uploaded using the  `upload_data()` function  (stored in the `helpers.R` file) 
+    
+2. Create a display of the names of the imported files, and--if an excel file--display the sheets of the imported excel file  
+
+3. After a value is provided in **`_new_name_base`**/**`_new_name_comp`**, the module will display the data 
+
+## The return list
+
+The uploaded items must be shared with the `selectData` module. All the objects follow a similar naming convention as the UI/Server, with a `base`/`comp` suffix. All of the objects stored and returned in the list are shown below:
+
+```{r uploadDataServer-return-list, eval=FALSE, class.source = 'fold-show'}
+    return(
+      list(
+        # |------ base_data ----
+        base_data = reactive({
+          req(input$base_file)
+          req(input$base_new_name)
+          if (nchar(input$base_xlsx_sheets) == 0) {
+            uploaded <- upload_data(path = input$base_file$datapath)
+          } else {
+            uploaded <- upload_data(path = input$base_file$datapath,
+                                  sheet = as.character(input$base_xlsx_sheets))
+          }
+          return(uploaded)
+        }),
+        # |------ base_name ----
+        base_name = reactive({
+          if (nchar(input$base_new_name) != 0) {
+            as.character(input$base_new_name)
+          } else {
+            as.character(input$base_filename)
+          }
+        }),
+        # |------ comp_data ----
+        comp_data = reactive({
+          req(input$comp_file)
+          req(input$comp_new_name)
+          if (nchar(input$comp_xlsx_sheets) == 0) {
+            uploaded <- upload_data(path = input$comp_file$datapath)
+          } else {
+            uploaded <- upload_data(path = input$comp_file$datapath,
+                                  sheet = as.character(input$comp_xlsx_sheets))
+          }
+          return(uploaded)
+        }),
+        # |------ comp_name ----
+        comp_name = reactive({
+          if (nchar(input$comp_new_name) != 0) {
+            as.character(input$comp_new_name)
+          } else {
+            as.character(input$base_filename)
+          }
+        })
+      )
+    )
+```
+
+## uploadDataServer()
+
+```{r uploadDataServer}
+uploadDataServer <- function(id) {
+
+  moduleServer(id = id, module = function(input, output, session) {
+
+    # |-- INPUT [base] base_xlsx_sheets -----
+    observeEvent(eventExpr = input$base_file, handlerExpr = {
+      if (tools::file_ext(input$base_file$name) == "xlsx") {
+        choices <- readxl::excel_sheets(path = input$base_file$datapath)
+      } else {
+        choices <- c("", NULL)
+      }
+      updateSelectInput(session = session,
+          inputId = "base_xlsx_sheets",
+          choices = choices
+          )
+    })
+
+    # |-- OUTPUT [base] xlsx file name -----
+    output$base_filename <- renderPrint({
+      req(input$base_file)
+      base_filename <- as.character(input$base_file$name)
+      paste0(
+        tags$code(base_filename)
+      )
+    })
+
+    base_data <- eventReactive(input$base_file, {
+        if (nchar(input$base_xlsx_sheets) == 0) {
+          uploaded <- upload_data(path = input$base_file$datapath)
+        } else {
+          uploaded <- upload_data(path = input$base_file$datapath,
+                                  sheet = as.character(input$base_xlsx_sheets))
+        }
+        return(uploaded)
+    })
+
+    # |-- OUTPUT display [base] xlsx ----
+    # require name
+    observeEvent(eventExpr = input$base_new_name, handlerExpr = {
+      req(input$base_file)
+      req(input$base_new_name)
+      output$base_display_upload <- reactable::renderReactable(
+        reactable(
+          data = base_data(),
+          defaultPageSize = 5,
+          resizable = TRUE,
+          highlight = TRUE,
+          compact = TRUE,
+          wrap = FALSE,
+          bordered = TRUE,
+          filterable = TRUE,
+          theme = base_react_theme
+        )
+      )
+    })
+
+      ## DEV OUTPUT |-- (base_dev_a) ---------
+      output$base_dev_a <- renderPrint({
+        print(
+          paste0("input$base_filename = ", input$base_file$name)
+          )
+      })
+      ## DEV OUTPUT |-- (base_dev_b) ---------
+      output$base_dev_b <- renderPrint({
+        print(
+          base_data()
+          )
+      })
+      ## DEV OUTPUT |-- (base_dev_x) ---------
+      output$base_dev_x <- renderPrint({
+        print(
+          paste0("input$base_xlsx_sheets = ",  as.character(input$base_xlsx_sheets))
+          )
+      })
+      ## DEV OUTPUT |-- (base_dev_y) ---------
+      output$base_dev_y <- renderPrint({
+        print(
+          paste0("input$base_new_name = ",  as.character(input$base_new_name))
+          )
+      })
+
+
+    # |-- INPUT [comp] comp_xlsx_sheets -----
+    observeEvent(eventExpr = input$comp_file, handlerExpr = {
+      if (tools::file_ext(input$comp_file$name) == "xlsx") {
+        choices <- readxl::excel_sheets(path = input$comp_file$datapath)
+      } else {
+        choices <- c("", NULL)
+      }
+      updateSelectInput(session = session,
+          inputId = "comp_xlsx_sheets",
+          choices = choices
+          )
+    })
+
+    # |-- OUTPUT [comp] xlsx file name -----
+    output$comp_filename <- renderPrint({
+      req(input$comp_file)
+      comp_filename <- as.character(input$comp_file$name)
+      paste0(
+        tags$code(comp_filename)
+      )
+    })
+
+    comp_data <- eventReactive(input$comp_file, {
+        if (nchar(input$comp_xlsx_sheets) == 0) {
+          uploaded <- upload_data(path = input$comp_file$datapath)
+        } else {
+          uploaded <- upload_data(path = input$comp_file$datapath,
+                                  sheet = as.character(input$comp_xlsx_sheets))
+        }
+        return(uploaded)
+    })
+
+   # |-- OUTPUT display [comp] xlsx ----
+    # require name
+    observeEvent(eventExpr = input$comp_new_name, handlerExpr = {
+      req(input$comp_file)
+      req(input$comp_new_name)
+      output$comp_display_upload <- reactable::renderReactable(
+        reactable(
+          data = comp_data(),
+          defaultPageSize = 5,
+          resizable = TRUE,
+          highlight = TRUE,
+          compact = TRUE,
+          wrap = FALSE,
+          bordered = TRUE,
+          filterable = TRUE,
+          theme = comp_react_theme
+        )
+      )
+    })
+
+      ## DEV OUTPUT |-- (comp_dev_a) ---------
+      output$comp_dev_a <- renderPrint({
+        print(
+          paste0("input$comp_filename = ",  as.character(input$comp_file$name))
+          )
+      })
+      ## DEV OUTPUT |-- comp_dev_y (dev) ---------
+      output$comp_dev_b <- renderPrint({
+        print(
+          comp_data()
+          )
+      })
+      ## DEV OUTPUT |-- comp_dev_a (dev) ---------
+      output$comp_dev_x <- renderPrint({
+        print(
+          paste0("input$comp_xlsx_sheets = ",  as.character(input$comp_xlsx_sheets))
+          )
+      })
+      ## DEV OUTPUT |-- comp_dev_b (dev) ---------
+      output$comp_dev_y <- renderPrint({
+        print(
+          paste0("input$comp_new_name = ",  as.character(input$comp_new_name))
+          )
+      })
+
+    # |---- return list -----
+    # assign this as 'upload_data_list'
+    return(
+      list(
+        # |------ base_data ----
+        base_data = reactive({
+          req(input$base_file)
+          req(input$base_new_name)
+          if (nchar(input$base_xlsx_sheets) == 0) {
+            uploaded <- upload_data(path = input$base_file$datapath)
+          } else {
+            uploaded <- upload_data(path = input$base_file$datapath,
+                                  sheet = as.character(input$base_xlsx_sheets))
+          }
+          return(uploaded)
+        }),
+        # |------ base_name ----
+        base_name = reactive({
+          # req(input$base_new_name)
+          if (nchar(input$base_new_name) != 0) {
+            as.character(input$base_new_name)
+          } else {
+            as.character(input$base_filename)
+          }
+        }),
+        # |------ comp_data ----
+        comp_data = reactive({
+          req(input$comp_file)
+          req(input$comp_new_name)
+          if (nchar(input$comp_xlsx_sheets) == 0) {
+            uploaded <- upload_data(path = input$comp_file$datapath)
+          } else {
+            uploaded <- upload_data(path = input$comp_file$datapath,
+                                  sheet = as.character(input$comp_xlsx_sheets))
+          }
+          return(uploaded)
+        }),
+        # |------ comp_name ----
+        comp_name = reactive({
+          # req(input$comp_new_name)
+          if (nchar(input$comp_new_name) != 0) {
+            as.character(input$comp_new_name)
+          } else {
+            as.character(input$base_filename)
+          }
+        })
+      )
+    )
+
+  })
+}
+```
+
+## Uploaded data display 
+
+Both base and compare datasets will be differentiated by color in the application using the `reactable::reactableTheme()` function.
+
+### Base display
+
+The base color will use the `#761763` background color (based on the bmrn violet (`#a9218e`) :
+
+
+```{r base_react_theme}
+# base_react_theme ------
+base_react_theme <- reactableTheme(
+          color = "#FFFFFF",
+          backgroundColor = "#761763",
+          borderColor = "#646464",
+          stripedColor = "hsl(233, 12%, 22%)",
+          highlightColor = "#a9218e",
+          inputStyle = list(backgroundColor = "#3A3B45"),
+          selectStyle = list(backgroundColor = "#3A3B45"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+```
+
+### Compare display
+
+The compare color will use the `#2f3688` background color (based on the bmrn purple (`#353d98`) :
+
+```{r compare_react_theme}
+# comp_react_theme ------------
+comp_react_theme <- reactableTheme(
+          color = "#FFFFFF",
+          backgroundColor = "#2f3688",
+          borderColor = "#646464",
+          stripedColor = "hsl(233, 12%, 22%)",
+          highlightColor = "#353d98",
+          inputStyle = list(backgroundColor = "#3A3B45"),
+          selectStyle = list(backgroundColor = "#3A3B45"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+```
+
+## App theme 
+
+Below we define the app theme using **`fresh::create_theme()`**:
+
+```{r bmrn_fresh_theme}
+bmrn_fresh_theme <- function() {
+  fresh::create_theme(
+    # theme vars  -------------------------------------------------------------
+    fresh::bs4dash_vars(
+      navbar_light_color = "#353d98", # purple
+      navbar_light_active_color = "#353d98", # purple
+      navbar_light_hover_color = "#f26631" # orange
+    ),
+    # # theme yiq -------------------------------------------------------------
+    fresh::bs4dash_yiq(
+      contrasted_threshold = 255,
+      text_dark = "#0a0a0a", # dark_gray_s10
+      text_light = "#f5f5f5" # gray_t10
+    ),
+    # theme layout ---------------------------------------------------------
+    fresh::bs4dash_layout(
+      main_bg = NULL, # #ececec
+      font_size_root = 12
+    ),
+    # theme sidebar_light -------------------------------------------------
+    fresh::bs4dash_sidebar_light(
+      header_color = "#ccd5dd", # light blue
+      bg = "#eaebf4", # background of entire side-bar
+      color = "#002E56", # text color (no hover)
+      hover_color = "#ee304e", # text color on hover
+      hover_bg = "#353D98", # color on hover
+      active_color = "#f26631", # color is actually the 'primary' status color
+      submenu_bg = "#f5f5f5", # purple
+      submenu_color = "#002444",
+      submenu_hover_color = "#353D98" # purple
+    ),
+    # # theme sidebar_dark -------------------------------------------------
+    fresh::bs4dash_sidebar_dark(
+      header_color = "#ccd5dd",
+      bg = "#1a1e4c",
+      color = "#EE304E", # text color (no hover)
+      hover_bg = "#aeb1d5", # color on hover
+      hover_color = "#EE304E", # text color on hover
+      active_color = "#f26631" # color is actually the 'primary' status color
+    ),
+    # theme status -------------------------------------------------
+    fresh::bs4dash_status(
+      dark = "#323232",
+      light = "#A0A0A0", # gray
+      warning = "#F26631", # orange
+      primary = "#A9218E", # violet = #A9218E, blue = #00509C
+      secondary = "#353D98", # purple
+      success = "#00509C", # blue
+      danger = "#EE304E", # red
+      info = "#A0A0A0" # gray
+    ),
+    # theme color -------------------------------------------------
+    fresh::bs4dash_color(
+      gray_900 = "#1f245b",
+      gray_800 = "#646464",
+      lightblue = "#6696c3",
+      blue = "#00509C"
+    )
+  )
+}
+```
+
+# Module part 3) Demo
+
+We define `uploadDataDemo()`, a function for running our application:
+
+```{r uploadDataDemo}
+# set theme ---------------------------------------------------------------
+upload_theme <- bmrn_fresh_theme()
+
+uploadDataDemo <- function() {
+  ui <- bs4Dash::dashboardPage(
+    freshTheme = upload_theme,
+    dark = FALSE,
+    title = "uploadDataDemo",
+    header = dashboardHeader(title = "uploadDataDemo"),
+    # sidebar (menuItem) -------------------
+    sidebar = dashboardSidebar(
+      sidebarMenu(
+        id = "sidebarmenu",
+        sidebarHeader("Data upload demo"),
+        menuItem("1) Upload Data",
+          tabName = "upload_data_tab",
+          icon = icon("file")
+        )
+      )
+    ),
+    # dashboardBody (tabItem) --------------
+    body = dashboardBody(
+      tabItems(
+        tabItem(
+          tabName = "upload_data_tab",
+          ## uploadDataUI -----
+          uploadDataUI(id = "upload_data")
+        )
+      )
+    ),
+    controlbar = dashboardControlbar(),
+    footer = dashboardFooter()
+  )
+
+  server <- function(input, output, session) {
+    uploadDataServer(id = "upload_data")
+  }
+
+  shinyApp(
+    ui = ui, server = server,
+    options = list(width = 800, height = 1000)
+  )
+}
+```
+
+# App
+
+You can demo this by running `uploadDataDemo()`.
+
+## Testing
+
+Files for testing this application can be found here:
+
+1. [base](https://github.com/mjfrigaard/dfdiffs/raw/main/inst/extdata/csv/2015-baseballdatabank/Master.csv): a Master [Lahman dataset](https://www.seanlahman.com/baseball-archive/statistics/) from 2015
+
+2. [compare](https://github.com/mjfrigaard/dfdiffs/raw/main/inst/extdata/csv/2020-baseballdatabank/People.csv): a Master [Lahman dataset](https://www.seanlahman.com/baseball-archive/statistics/) from 2020
+
+3. Also use [this .xlsx file](https://github.com/mjfrigaard/dfdiffs/raw/main/inst/extdata/xlsx/lahman_compare.xlsx) with the same datasets. 
+
+## Reactive values 
+
+Two `sortable()` boxes are displayed in the UI (`Reactive values (base)` and `Reactive values (compare)`). These are for development purposes only and will not be displayed in the final application. 
+
+```{r run-uploadDataDemo}
+uploadDataDemo()
+```

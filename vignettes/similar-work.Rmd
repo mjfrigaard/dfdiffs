@@ -1,0 +1,199 @@
+---
+title: "similar-work"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 4
+vignette: >
+  %\VignetteIndexEntry{similar-work}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(labelled)
+library(gt)
+library(gtsummary)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>", 
+  error = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  echo = TRUE
+)
+options(
+  rmarkdown.html_vignette.check_title = FALSE,
+  tibble.print_max = Inf)
+extdata_folder <- "../inst/extdata/"
+```
+
+# Motivation 
+
+This vignette covers similar functions/packages that compare two datasets to each other. 
+
+## Packages 
+
+Our package
+
+```{r dfdiffs, echo = TRUE}
+library(dfdiffs)
+```
+
+
+Similar packages 
+
+```{r similar-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
+library(janitor) # compare_df_cols
+library(arsenal) # comparedf
+library(diffdf)  # diffdf
+library(testthat) # expect_equal
+library(vetr) # alike
+```
+
+## Data 
+
+We'll be using the data in this package to cover similar `packages::functions()`. 
+
+### New data
+
+To check new data, we're going to use `T1Data` and `T2Data`. The `create_new_data()` function shows us the 'new data' (i.e. what is here now that wasn't here before?)
+
+We can check this against the `NewData` dataset (which should match the output from `create_new_data()`)
+
+```{r T1Data-T2Data-NewData, echo=TRUE}
+T1Data <- dfdiffs::T1Data
+T2Data <- dfdiffs::T2Data
+create_new_data(newdf = T2Data, olddf = T1Data)
+```
+
+```{r NewData, echo=TRUE}
+NewData <- dfdiffs::NewData
+NewData
+```
+
+
+###  Deleted data 
+
+To test for the deleted data, we use the `CompleteData`, `IncompleteData`, and `DeletedData`. `CompleteData` represents a 'complete' set of data, and `IncompleteData` is a dataset with rows removed from `CompleteData`. 
+
+When we run the `create_deleted_data()`, we check for the deleted rows between `IncompleteData` and `CompleteData`.
+
+```{r CompleteData-IncompleteData, echo = TRUE}
+CompleteData <- dfdiffs::CompleteData
+IncompleteData <- dfdiffs::IncompleteData
+create_deleted_data(newdf = IncompleteData, olddf = CompleteData)
+```
+
+This is identical to the data stored in `DeletedData`
+
+```{r DeletedData}
+DeletedData <- dfdiffs::DeletedData
+DeletedData
+```
+
+
+### Modified Data 
+
+To check for changes between two datasets, we uses the `InitialData` and `ChangedData`. 
+
+```{r InitialData-ChangedData, echo=TRUE}
+InitialData <- dfdiffs::InitialData
+ChangedData <- dfdiffs::ChangedData
+mods <- create_modified_data(
+  newdf = ChangedData, 
+  olddf = InitialData)
+```
+
+The changes by variable are stored in `diffs_byvar`.
+
+```{r diffs_byvar}
+mods$diffs_byvar
+```
+
+The changes by row are stored in `diffs`.
+
+```{r diffs}
+mods$diffs
+```
+
+## Lahman datasets 
+
+We will also import two master datasets from the `Lahman` baseball package. 
+
+```{r , echo=TRUE}
+master15 <- readxl::read_excel(
+  path = "../inst/extdata/xlsx/lahman_compare.xlsx", 
+  sheet = "master-2015")
+master20 <- readxl::read_excel(
+  path = "../inst/extdata/xlsx/lahman_compare.xlsx", 
+  sheet = "master-2020")
+```
+
+### Master (2015)
+
+```{r master15, echo=TRUE}
+glimpse(master15)
+```
+
+### Master (2020)
+
+```{r master20, echo=TRUE}
+glimpse(master20)
+```
+
+
+## `janitor::compare_df_cols_same()`
+
+The `compare_df_cols_same()` function from `janitor` compares two datasets and "*indicates if they will successfully bind together by rows.*"
+
+```{r compare_df_cols_same, echo=TRUE}
+compare_df_cols_same(T1Data, T2Data, strict_description = FALSE)
+compare_df_cols_same(CompleteData, IncompleteData, strict_description = FALSE)
+compare_df_cols_same(InitialData, ChangedData, strict_description = FALSE)
+```
+
+All of our test datasets meet this condition, but this could be used as a step in one our `create_` functions (to see if they can be successfully bound together).
+
+## `diffdf::diffdf()`
+
+The `diffdf()` function is very similar to `arsenal::comparedf()`
+
+If we run the function without assigning the output to an object, we see the following: 
+
+```{r diffdf, echo=TRUE}
+diffdf::diffdf(base = InitialData , compare = ChangedData)
+```
+
+If we assign the output to an object (`diffdf_output`), we can check it's structure:
+
+```{r diffdf_output, echo=TRUE}
+# assign to an output
+diffdf_output <- diffdf::diffdf(base = InitialData , compare = ChangedData)
+str(diffdf_output)
+```
+
+This list contains objects named according to `NumDiff` and `VarDiff`. We will test this with the larger master datasets. 
+
+
+## `testthat::expect_equal()`
+
+This works, but returns the result as an error. 
+
+```{r , error=TRUE}
+testthat::expect_equal(object = InitialData, expected = ChangedData)
+```
+
+```{r , error=TRUE}
+testthat::expect_equal(object = T1Data, expected = T2Data)
+```
+
+
+
+## vetr::alike()
+
+```{r}
+vetr::alike(target = InitialData, current = ChangedData)
+```
+

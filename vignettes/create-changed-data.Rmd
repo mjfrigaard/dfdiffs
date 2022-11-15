@@ -1,0 +1,781 @@
+---
+title: "create-changed-data"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 4
+vignette: >
+  %\VignetteIndexEntry{create-changed-data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+library(janitor) # compare_df_cols
+library(arsenal) # comparedf
+library(diffdf)  # diffdf
+library(testthat) # expect_equal
+library(vetr) # alike
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>", 
+  error = TRUE
+)
+options(
+  str = strOptions(strict.width = "wrap"),
+  width = 75,
+  rmarkdown.html_vignette.check_title = FALSE,
+  tibble.print_max = Inf)
+extdata_folder <- "../inst/extdata/"
+```
+
+# Motivation
+
+The goal of the `dfdiffs` is to answer the following questions:
+
+1.  What rows are here now that weren't here before?
+2.  What rows were here before that aren't here now?
+3.  **What values have been changed?**
+
+This vignette takes us through the `create_changed_data()` function, which answers the "*What values have been changed?*". We also have another function that detects modified data, `create_modified_data()`.
+
+## Packages
+
+```{r pkgs, message=FALSE, warning=FALSE, results='hide'}
+library(dplyr)
+library(stringr)
+library(forcats)
+library(lubridate)
+library(fs)
+library(vctrs)
+library(glue)
+library(purrr)
+library(vroom)
+library(haven)
+library(readxl)
+library(dfdiffs)
+```
+
+## Changed data
+
+We have two datasets to test what's been modified:
+
+### Initial Data
+
+```{r InitialData}
+InitialData <- dfdiffs::InitialData
+```
+
+```{r InitialData-show, echo=FALSE}
+knitr::kable(InitialData)
+```
+
+### Changed Data
+
+```{r ChangedData}
+ChangedData <- dfdiffs::ChangedData
+```
+
+```{r ChangedData-show, echo=FALSE}
+knitr::kable(ChangedData)
+```
+
+These data do not have a unique identifier, but we can create one with the `create_join_column()` function.
+
+## Lahman datasets
+
+We will also import two master datasets from the `Lahman` baseball package because they're larger and have unique keys.
+
+### Master (2015)
+
+```{r master15, echo=TRUE}
+master15 <- dfdiffs::master15
+glimpse(master15)
+```
+
+### Master (2020)
+
+```{r master20, echo=TRUE}
+master20 <- dfdiffs::master20
+glimpse(master20)
+```
+
+## `nycflights13` data
+
+We'll also test this with some data from the `nycflights13`.
+
+```{r nycflights13}
+library(nycflights13)
+```
+
+```{r relational-nycflights, echo=FALSE}
+knitr::include_graphics(path = "../man/figures/relational-nycflights.png")
+```
+
+We'll create two small datasets, `jfk_flights` and `jfk_weather` that we will alter and use for testing.
+
+```{r jfk_flights}
+jfk_flights <- dfdiffs::jfk_flights
+glimpse(jfk_flights)
+```
+
+```{r jfk_weather}
+jfk_weather <- dfdiffs::jfk_weather
+glimpse(jfk_weather)
+```
+
+## Conditions
+
+Each function in the `dfdiffs` package assumes the following conditions:
+
+### Single by column conditions
+
+1)  Two datasets, compare all columns:
+
+    ```{r cond-1, eval=FALSE}
+    create_changed_data(
+      compare = ChangedData, 
+      base = InitialData)
+    ```
+
+2)  Multiple columns to compare (`cols`):
+
+    ```{r cond-2, eval=FALSE}
+    create_changed_data(
+      compare = ChangedData, 
+      base = InitialData, 
+      cols = c("text_value_a", "text_value_b"))
+    ```
+
+3)  Single `by` column, no new column name
+
+    ```{r cond-3, eval=FALSE}
+    create_changed_data(
+      compare = ChangedDataJoin, 
+      base = InitialDataJoin, 
+      by = "join_var")
+    ```
+
+4)  Single by column, new column name (`by_col`)
+
+    ```{r cond-4, eval=FALSE}
+    create_changed_data(
+      compare = ChangedDataJoin, 
+      base = InitialDataJoin, 
+      by = "join_var",
+      by_col = "new_join_var")
+    ```
+
+5)  Single `by` column, multiple compare columns `cols`
+
+    ```{r cond-5, eval=FALSE}
+    create_changed_data(
+      compare = ChangedDataJoin, 
+      base = InitialDataJoin, 
+      by = "join_var", 
+      cols = c("text_value_a", "text_value_b"))
+    ```
+
+6)  Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
+
+    ```{r cond-6, eval=FALSE}
+    create_changed_data(
+      compare = ChangedDataJoin, 
+      base = InitialDataJoin, 
+      by = "join_var", 
+      by_col = "new_join_var",
+      cols = c("text_value_a", "text_value_b"))
+    ```
+
+### Multiple by column conditions
+
+7)  Multiple `by` columns
+
+    ```{r cond-7, eval=FALSE}
+    create_changed_data(
+      compare = ChangedData, 
+      base = InitialData, 
+      by = c("subject_id", "record"))
+    ```
+
+8)  Multiple `by` columns, new column name (`by_col`)
+
+    ```{r cond-8, eval=FALSE}
+    create_changed_data(
+      compare = ChangedData, 
+      base = InitialData, 
+      by = c("subject_id", "record"), 
+      by_col = "new_join_var")
+    ```
+
+9)  Multiple `by` columns, multiple compare columns (`cols`)
+
+    ```{r cond-9, eval=FALSE}
+    create_changed_data(
+      compare = ChangedData, 
+      base = InitialData, 
+      by = c("subject_id", "record"), 
+      cols = c("text_value_a", "text_value_b"))
+    ```
+
+10) Multiple `by` columns, a new `by_col`, and `cols`
+
+    ```{r cond-10, eval=FALSE}
+    create_changed_data(
+      compare = ChangedData, 
+      base = InitialData, 
+      by = c("subject_id", "record"), 
+      cols = c("text_value_a", "text_value_b"))
+    ```
+
+## Creating a join column
+
+The new column will be named `"join_var"`, and it will be formed from `"subject_id"` and `"record"`.
+
+```{r ChangedDataJoin}
+ChangedDataJoin <- dfdiffs::create_new_column(
+  data = ChangedData, 
+  cols = c("subject_id", "record"), 
+  new_name = "join_var")
+knitr::kable(ChangedDataJoin)
+```
+
+```{r InitialDataJoin}
+InitialDataJoin <- dfdiffs::create_new_column(
+  data = InitialData, 
+  cols = c("subject_id", "record"), 
+  new_name = "join_var")
+knitr::kable(InitialDataJoin)
+```
+
+# create_changed_data()
+
+The `create_changed_data()` function arguments are below:
+
+```{r args-create_changed_data, eval=FALSE}
+create_changed_data(compare = , base = , by = , by_col = , cols = )
+```
+
+```{r SOURCE-create_changed_data, echo=FALSE, eval=TRUE}
+# run this during development
+source("../R/create_changed_data.R")
+```
+
+## Single `by` column conditions
+
+Below are the circumstances where we provide no `by` column (row-by-row comparison) or a single `by` column.
+
+### 1) Two datasets, compare all columns:
+
+In this case, two datasets are provided without a `by` joining column.
+
+```{r  cond-1-create_changed_data}
+changed_cond_1 <- create_changed_data(
+  compare = ChangedData, 
+  base = InitialData)
+glimpse(changed_cond_1)
+```
+
+```{r cond-1-create_changed_data-kable, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(changed_cond_1$num_diffs), 
+    knitr::kable(changed_cond_1$var_diffs)
+    ), format = "html")
+
+```
+
+### 2) Multiple columns to compare (`cols`):
+
+Here we have no `by` column, but specified columns to compare (with `cols`)
+
+```{r cond-2-create_changed_data}
+changed_cond_2 <- create_changed_data(
+  compare = ChangedData,
+  base = InitialData,
+  cols = c("text_value_a", "text_value_b"))
+glimpse(changed_cond_2)
+```
+
+```{r cond-2-create_changed_data-kable, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(changed_cond_2$num_diffs), 
+    knitr::kable(changed_cond_2$var_diffs)
+    ), format = "html")
+
+```
+
+### 3) Single `by` column, no new column name
+
+**This is the most common condition:** Two datasets with a single joining `by` column. No `cols` or `by_col`. We'll run this on two datasets:
+
+1.  `InitialDataJoin` vs. `ChangedDataJoin`\
+2.  `master15` vs. `master20`
+
+```{r cond-3-test, eval=FALSE, echo=FALSE, include=FALSE}
+changed_cond_3 <- diffdf::diffdf(base = master15, compare = master20,
+  keys = "playerID")
+diff_lst <- changed_cond_3
+by_keys <- "playerID"
+# extract names 
+diff_lst_nms <- base::names(diff_lst)
+num_diffs_lst <- diff_lst[stringr::str_detect(diff_lst_nms, "Num")]
+var_diffs_lst <- diff_lst[stringr::str_detect(diff_lst_nms, "Var")]
+base_diffs_lst <- diff_lst[stringr::str_detect(diff_lst_nms, "Base")]
+comp_diffs_lst <- diff_lst[stringr::str_detect(diff_lst_nms, "Comp")]
+# nums 
+num_diffs <- purrr::map_df(.x = num_diffs_lst, .f = janitor::clean_names)
+# vars
+var_diffs_chr_lst <- map(var_diffs_lst, 
+                            .f = ~mutate(.x,across(.cols = everything(), 
+                                                    .fns = as.character)))
+var_diffs <- purrr::map_df(.x = var_diffs_chr_lst, .f = janitor::clean_names)
+
+# base
+base_diffs_issue <- tibble::as_tibble(base_diffs_lst)
+base_diffs <- tidyr::unnest(base_diffs_issue, ExtRowsBase)
+base_diffs <- purrr::set_names(x = base_diffs,
+                      nm = paste0(by_keys, "s in BASE that are not in COMPARE"))
+# comp
+comp_diffs_issue <- tibble::as_tibble(comp_diffs_lst)
+comp_diffs <- tidyr::unnest(comp_diffs_issue, ExtRowsComp)
+comp_diffs <- purrr::set_names(x = comp_diffs,
+                      nm = paste0(by_keys, "s in COMPARE that are not in BASE"))
+# comp_diffs
+```
+
+```{r cond-3-1-create_changed_data}
+changed_cond_3 <- create_changed_data(
+  compare = ChangedDataJoin,
+  base = InitialDataJoin,
+  by = "join_var")
+glimpse(changed_cond_3)
+```
+
+```{r cond-3-1-create_changed_data-kables, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(changed_cond_3$num_diffs), 
+    knitr::kable(changed_cond_3$var_diffs)
+    ), format = "html")
+```
+
+For the `master15` vs. `master20`, we'll only display the head() output from the `base_diffs`, `comp_diffs`, `num_diffs` and `var_diffs`
+
+```{r cond-3-2-create_changed_data}
+changed_cond_3 <- create_changed_data(
+  compare = master20,
+  base = master15,
+  by = "playerID")
+str(changed_cond_3)
+```
+
+```{r cond-3-2-create_changed_data-base_diffs-comp_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_3$base_diffs)),
+    knitr::kable(head(changed_cond_3$comp_diffs))), format = "html")
+```
+
+```{r cond-3-2-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_3$num_diffs)),
+    knitr::kable(head(changed_cond_3$var_diffs))), format = "html")
+```
+
+### 4) Single `by` column, new column name (`by_col`)
+
+Here we have a single joining `by` column, but we're going to provide a new name with `by_col`. User supplies a `by`/`keys` column, and a new column name. This is accomplished with the `rename_join_col()` (see example below).
+
+```{r cond-4-test, eval=FALSE, echo=FALSE, include=FALSE}
+base <- master15
+compare <- master20
+by <- "playerID"
+by_col <- "join_col"
+compare_join_cols <- rename_join_col(compare, by = by, by_col = by_col)
+base_join_cols <- rename_join_col(base, by = by, by_col = by_col)
+diff_lst <- suppressWarnings(suppressMessages(
+            diffdf::diffdf(base = base_join_cols, 
+              compare = compare_join_cols, keys = by_col)))
+# extract_df_tables(diffdf_list = diff_lst, by_keys = by_col)
+# extract names 
+diff_lst_nms <- base::names(diff_lst)
+num_diffs_lst <- diff_lst[stringr::str_detect(diff_lst_nms, "Num")]
+var_diffs_lst <- diff_lst[stringr::str_detect(diff_lst_nms, "Var")]
+base_diffs_lst <- diff_lst[stringr::str_detect(diff_lst_nms, "Base")]
+comp_diffs_lst <- diff_lst[stringr::str_detect(diff_lst_nms, "Comp")]
+# nums 
+num_diffs <- purrr::map_df(.x = num_diffs_lst, .f = janitor::clean_names)
+# vars
+var_diffs_chr_lst <- map(var_diffs_lst, 
+                            .f = ~mutate(.x,across(.cols = everything(), 
+                                                    .fns = as.character)))
+var_diffs <- purrr::map_df(.x = var_diffs_chr_lst, .f = janitor::clean_names)
+
+# base
+base_diffs_issue <- tibble::as_tibble(base_diffs_lst)
+base_diffs <- tidyr::unnest(base_diffs_issue, ExtRowsBase)
+base_diffs <- purrr::set_names(x = base_diffs,
+                      nm = paste0(by_col, "s in BASE that are not in COMPARE"))
+# base_diffs
+# comp
+comp_diffs_issue <- tibble::as_tibble(comp_diffs_lst)
+comp_diffs <- tidyr::unnest(comp_diffs_issue, ExtRowsComp)
+comp_diffs <- purrr::set_names(x = comp_diffs,
+                      nm = paste0(by_col, "s in COMPARE that are not in BASE"))
+# comp_diffs
+```
+
+```{r rename_join_col}
+# rename join column 
+new_join_col <- "join_col"
+rename_join_col(data = master15, 
+  by = "playerID", 
+  by_col = new_join_col) |> 
+  select(contains(new_join_col)) |> 
+  head()
+```
+
+We will run this condition using `InitialDataJoin` vs. `ChangedDataJoin`
+
+```{r cond-4-create_changed_data}
+changed_cond_4 <- create_changed_data(
+      compare = ChangedDataJoin,
+      base = InitialDataJoin,
+      by = "join_var",
+      by_col = "new_join_var")
+glimpse(changed_cond_4)
+```
+
+```{r cond-4-1-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_4$num_diffs)),
+    knitr::kable(head(changed_cond_4$var_diffs))), format = "html")
+```
+
+And run this condition using `master15` vs. `master20` (but only show the `head()` of the output tables).
+
+```{r cond-4-2-create_changed_data}
+changed_cond_4 <- create_changed_data(
+      compare = master20,
+      base = master15,
+      by = "playerID",
+      by_col = "new_join_var")
+glimpse(changed_cond_4)
+```
+
+```{r cond-4-2-create_changed_data-base_diffs-comp_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_4$base_diffs)),
+    knitr::kable(head(changed_cond_4$comp_diffs))), format = "html")
+```
+
+```{r cond-4-2-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_4$num_diffs)),
+    knitr::kable(head(changed_cond_4$var_diffs))), format = "html")
+```
+
+### 5) Single `by` column, multiple compare columns `cols`
+
+User provides a `by`/`keys` column, and only wants to view the comparison of a select number of columns from each dataset.
+
+```{r cond-5-1-create_changed_data}
+changed_cond_5 <- create_changed_data(
+  compare = ChangedDataJoin,
+  base = InitialDataJoin,
+  by = "join_var",
+  cols = c("text_value_a", "text_value_b"))
+glimpse(changed_cond_5)
+```
+
+```{r cond-5-1-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(changed_cond_5$num_diffs),
+    knitr::kable(changed_cond_5$var_diffs)), format = "html")
+```
+
+We'll also check this on the `master15` vs. `master20` dataset.
+
+```{r cond-5-test, eval=FALSE, echo=FALSE, include=FALSE}
+diffdf::diffdf(base = master15, compare = master20, keys = "playerID")
+```
+
+```{r cond-5-2-create_changed_data}
+changed_cond_5 <- create_changed_data(
+  compare = master20,
+  base = master15,
+  by = "playerID",
+  cols = c("nameFirst", "nameLast", "nameGiven"))
+glimpse(changed_cond_5)
+```
+
+```{r cond-5-2-create_changed_data-base_diffs-comp_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_5$base_diffs)),
+    knitr::kable(head(changed_cond_5$comp_diffs))), format = "html")
+```
+
+```{r cond-5-2-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_5$num_diffs)),
+    knitr::kable(head(changed_cond_5$var_diffs))), format = "html")
+```
+
+### 6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
+
+User supplies a `by`/`keys` variable, a new column name for the join column (`by_col`), and a select number of columns to compare and view.
+
+First we test on `InitialDataJoin` vs `ChangedDataJoin`:
+
+```{r cond-6-1-create_changed_data}
+changed_cond_6 <- create_changed_data(
+  compare = ChangedDataJoin,
+  base = InitialDataJoin,
+  by = "join_var",
+  by_col = "new_join_var",
+  cols = c("text_value_a", "text_value_b"))
+glimpse(changed_cond_6)
+```
+
+```{r cond-6-1-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(changed_cond_6$num_diffs),
+    knitr::kable(changed_cond_6$var_diffs)), format = "html")
+```
+
+Now we'll test this on the `master15` and `master20` datasets.
+
+```{r cond-6-2-create_changed_data}
+changed_cond_6 <- create_changed_data(
+  compare = master15,
+  base = master20,
+  by = "playerID",
+  by_col = "new_join_var",
+  cols = c("nameFirst", "nameLast", "nameGiven"))
+glimpse(changed_cond_6)
+```
+
+```{r cond-6-2-create_changed_data-base_diffs-comp_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_6$base_diffs)),
+    knitr::kable(head(changed_cond_6$comp_diffs))), format = "html")
+```
+
+```{r cond-6-2-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_6$num_diffs)),
+    knitr::kable(head(changed_cond_6$var_diffs))), format = "html")
+```
+
+We also want to test the condition in which the `by` column is included with the compare columns (`cols` ).
+
+```{r cond-6.1-create_changed_data, error=TRUE}
+changed_cond_6.1 <- create_changed_data(
+  compare = master15,
+  base = master20,
+  by = "playerID",
+  by_col = "new_join_var",
+  cols = c("playerID", "nameFirst", "nameLast", "nameGiven"))
+```
+
+Here we get an error--the `by` column is included in the `cols` argument. This will be included in the application as a warning.
+
+## Multiple `by` column conditions
+
+These conditions are slightly different than the previous six because we're going to be building the join column using the `create_join_column()` function we covered above.
+
+### 7) Multiple `by` columns
+
+User provides multiple `by` columns, but no `by_col`, so the new join column is named a generic `"join"`.
+
+We'll start by testing this with the smaller datasets, `InitialData` and `ChangedData`, and create a new join column using `subject_id` and `record`.
+
+```{r cond-7-1-create_changed_data}
+changed_cond_7 <- create_changed_data(
+  compare = ChangedData,
+  base = InitialData,
+  by = c("subject_id", "record"))
+glimpse(changed_cond_7)
+```
+
+```{r cond-7-1-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(changed_cond_7$num_diffs),
+    knitr::kable(changed_cond_7$var_diffs)), format = "html")
+```
+
+```{r cond-7-test, eval=FALSE, echo=FALSE, include=FALSE}
+diffdf::diffdf(base = master15, compare = master20, keys = c("playerID", "nameGiven"))
+```
+
+And now we'll test this on `master15` vs. `master20` using the `"playerID"` and `"nameGiven"` as join variables.
+
+```{r cond-7-2-create_changed_data}
+changed_cond_7 <- create_changed_data(
+  compare = master20,
+  base = master15,
+  by = c("playerID", "nameGiven"))
+glimpse(changed_cond_7)
+```
+
+```{r cond-7-2-create_changed_data-base_diffs-comp_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_7$base_diffs)),
+    knitr::kable(head(changed_cond_7$comp_diffs))), format = "html")
+```
+
+```{r cond-7-2-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_7$num_diffs)),
+    knitr::kable(head(changed_cond_7$var_diffs))), format = "html")
+```
+
+### 8) Multiple `by` columns, new column name (`by_col`)
+
+```{r cond-8-1-create_changed_data, eval=TRUE}
+changed_cond_8 <- create_changed_data(
+  compare = ChangedData,
+  base = InitialData,
+  by = c("subject_id", "record"),
+  by_col = "new_join_var")
+glimpse(changed_cond_8)
+```
+
+```{r cond-8-1-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(changed_cond_8$num_diffs),
+    knitr::kable(changed_cond_8$var_diffs)), format = "html")
+```
+
+Now we test this on `master15` and `master20` using `playerID` and `nameGiven` using the new column name `new_join_var`
+
+```{r cond-8-2-create_changed_data}
+changed_cond_8 <- create_changed_data(
+  compare = master20,
+  base = master15,
+  by = c("playerID", "nameGiven"),
+  by_col = "new_join_var")
+glimpse(changed_cond_8)
+```
+
+```{r cond-8-2-create_changed_data-base_diffs-comp_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_8$base_diffs)),
+    knitr::kable(head(changed_cond_8$comp_diffs))), format = "html")
+```
+
+```{r cond-8-2-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_8$num_diffs)),
+    knitr::kable(head(changed_cond_8$var_diffs))), format = "html")
+```
+
+### 9) Multiple `by` columns, multiple compare columns (`cols`)
+
+User provides `by`/`keys` and columns to compare, but no new `by_col`. We will test this with `InitialData` vs. `ChangedData`.
+
+```{r cond-9-create_changed_data}
+changed_cond_9 <- create_changed_data(
+  compare = ChangedData,
+  base = InitialData,
+  by = c("subject_id", "record"),
+  cols = c("text_value_a", "text_value_b"))
+glimpse(changed_cond_9)
+```
+
+```{r cond-9-1-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(changed_cond_9$num_diffs),
+    knitr::kable(changed_cond_9$var_diffs)), format = "html")
+```
+
+And we will test this with the larger `master15` vs. `master20` datasets, using `"playerID"` and `"nameGiven"` as the `by`/`keys` and the `"nameFirst"` and `"nameLast"` as the `cols`.
+
+```{r cond-9-2-create_changed_data}
+changed_cond_9 <- create_changed_data(
+  compare = master20,
+  base = master15,
+  by = c("playerID", "nameGiven"),
+  cols = c("nameFirst", "nameLast"))
+glimpse(changed_cond_9)
+```
+
+```{r cond-9-2-create_changed_data-base_diffs-comp_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_9$base_diffs)),
+    knitr::kable(head(changed_cond_9$comp_diffs))), format = "html")
+```
+
+```{r cond-9-2-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_9$num_diffs)),
+    knitr::kable(head(changed_cond_9$var_diffs))), format = "html")
+```
+
+### 10) Multiple `by` columns, a new `by_col`, and `cols`
+
+User provides multiple `by` columns, a new name for the `by_col`, and a select number of columns to compare `col`.
+
+We will start by testing this condition on the `InitialData` vs. the `ChangedData`, using `"subject_id"` and `"record"` as the `by`/`keys`, `"new_join_var"` as the new `by_col`, and `"text_value_a"`, `"text_value_b"` as the `cols`.
+
+```{r cond-10-1-create_changed_data}
+changed_cond_10 <- create_changed_data(
+  compare = ChangedData,
+  base = InitialData,
+  by = c("subject_id", "record"),
+  by_col = "new_join_var",
+  cols = c("text_value_a", "text_value_b"))
+```
+
+```{r cond-10-1-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(changed_cond_10$num_diffs),
+    knitr::kable(changed_cond_10$var_diffs)), format = "html")
+```
+
+Now we will test this condition on the `master15` vs. the `master20`, using `"playerID"` and `"nameGiven"` as the `by`/`keys`, `"new_join_var"` as the new `by_col`, and `"nameFirst"`, `"nameLast"` as the `cols`.
+
+```{r cond-10-2-create_changed_data}
+changed_cond_10 <- create_changed_data(
+  compare = master20,
+  base = master15,
+  by = c("playerID", "nameGiven"),
+  cols = c("nameFirst", "nameLast"))
+glimpse(changed_cond_10)
+```
+
+```{r cond-10-2-create_changed_data-base_diffs-comp_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_10$base_diffs)),
+    knitr::kable(head(changed_cond_10$comp_diffs))), format = "html")
+```
+
+```{r cond-10-2-create_changed_data-num_diffs-var_diffs, echo=FALSE}
+knitr::kables(
+  x = list(
+    knitr::kable(head(changed_cond_10$num_diffs)),
+    knitr::kable(head(changed_cond_10$var_diffs))), format = "html")
+```

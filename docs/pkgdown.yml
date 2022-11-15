@@ -1,0 +1,18 @@
+pandoc: 2.17.1.1
+pkgdown: 2.0.5
+pkgdown_sha: ~
+articles:
+  create-changed-data: create-changed-data.html
+  create-deleted-data: create-deleted-data.html
+  create-join-column: create-join-column.html
+  create-modified-data: create-modified-data.html
+  create-new-data: create-new-data.html
+  function-checks: function-checks.html
+  getting-started: getting-started.html
+  similar-work: similar-work.html
+  upload-data: upload-data.html
+last_built: 2022-07-19T15:04Z
+urls:
+  reference: https://mjfrigaard.github.io/dfdiffs/reference
+  article: https://mjfrigaard.github.io/dfdiffs/articles
+
