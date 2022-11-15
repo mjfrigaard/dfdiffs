@@ -1,0 +1,103 @@
+---
+title: "comparison-datasets"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{comparison-datasets}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+library(janitor) # compare_df_cols
+library(arsenal) # comparedf
+library(diffdf)  # diffdf
+library(testthat) # expect_equal
+library(vetr) # alike
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>", 
+  error = TRUE
+)
+options(
+  str = strOptions(strict.width = "wrap"),
+  width = 75,
+  rmarkdown.html_vignette.check_title = FALSE,
+  tibble.print_max = Inf)
+```
+
+```{r pkg}
+library(dfdiffs)
+```
+
+# Motivation
+
+The goal of the `dfdiffs` is to answer the following questions:
+
+1.  What rows are here now that weren't here before?
+2.  What rows were here before that aren't here now?
+3.  **What values have been changed?**
+
+## Packages
+
+```{r usr-pkgs, message=FALSE, warning=FALSE, results='hide'}
+library(dplyr)
+library(stringr)
+library(forcats)
+library(lubridate)
+library(fs)
+library(vctrs)
+library(glue)
+library(purrr)
+library(vroom)
+library(haven)
+library(readxl)
+library(dfdiffs)
+library(kableExtra)
+```
+
+
+# Data for comparison
+
+Below we introduce multiple data files for comparison. 
+
+## Lahman datasets
+
+We will also import two master datasets from the `Lahman` baseball package because they're larger and have unique keys.
+
+### Master (2015)
+
+```{r master15, echo=TRUE}
+master15 <- dfdiffs::master15
+glimpse(master15)
+```
+
+### Master (2020)
+
+```{r master20, echo=TRUE}
+master20 <- dfdiffs::master20
+glimpse(master20)
+```
+
+## `nycflights13` data
+
+We'll also test this with some data from the `nycflights13`.
+
+```{r nycflights13}
+library(nycflights13)
+```
+
+```{r relational-nycflights, echo=FALSE, out.width='80%'}
+knitr::include_graphics(path = "../man/figures/relational-nycflights.png")
+```
+
+We'll create two small datasets, `jfk_flights` and `jfk_weather` that we will alter and use for testing.
+
+```{r jfk_flights}
+jfk_flights <- dfdiffs::jfk_flights
+glimpse(jfk_flights)
+```
+
+```{r jfk_weather}
+jfk_weather <- dfdiffs::jfk_weather
+glimpse(jfk_weather)
+```

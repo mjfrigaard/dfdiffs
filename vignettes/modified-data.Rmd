@@ -1,0 +1,116 @@
+---
+title: "modified-data"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 4
+vignette: >
+  %\VignetteIndexEntry{modified-data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+library(janitor) # compare_df_cols
+library(arsenal) # comparedf
+library(diffdf)  # diffdf
+library(testthat) # expect_equal
+library(vetr) # alike
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>", 
+  error = TRUE
+)
+options(
+  str = strOptions(strict.width = "wrap"),
+  width = 75,
+  rmarkdown.html_vignette.check_title = FALSE,
+  tibble.print_max = Inf)
+```
+
+# Motivation
+
+The goal of the `dfdiffs` is to answer the following questions:
+
+1.  What rows are here now that weren't here before?
+2.  What rows were here before that aren't here now?
+3.  **What values have been changed?**
+
+This vignette takes us through the `create_modified_data()` function, which answers the "*What values have been changed?*". We also have another function that detects modified data, `create_changed_data()`.
+
+## Packages
+
+```{r pkgs, message=FALSE, warning=FALSE, results='hide'}
+library(dplyr)
+library(stringr)
+library(forcats)
+library(lubridate)
+library(fs)
+library(vctrs)
+library(glue)
+library(purrr)
+library(vroom)
+library(haven)
+library(readxl)
+library(dfdiffs)
+library(kableExtra)
+```
+
+## Changed data
+
+We have two datasets to test what's been modified:
+
+### Initial Data
+
+```{r InitialData}
+InitialData <- dfdiffs::InitialData
+```
+
+```{r InitialData-show, echo=FALSE}
+knitr::kable(InitialData, caption = "InitialData") |> 
+  kableExtra::kable_paper()
+```
+
+### Changed Data
+
+```{r ChangedData}
+ChangedData <- dfdiffs::ChangedData
+```
+
+```{r ChangedData-show, echo=FALSE}
+knitr::kable(ChangedData, caption = "ChangedData") |> 
+  kableExtra::kable_paper()
+```
+
+These data do not have a unique identifier, but we can create one with the `create_join_column()` function.
+
+```{r InitialDataID}
+InitialDataID <- create_join_column(df = InitialData, 
+  by_colums = c('subject_id', 'record'), 
+  new_by_column_name = 'subrecid')
+```
+
+```{r InitialDataID-show, echo=FALSE}
+knitr::kable(InitialDataID, caption = "InitialDataID") |> 
+  kableExtra::kable_paper()
+```
+
+```{r ChangedDataID}
+ChangedDataID <- create_join_column(df = ChangedData, 
+  by_colums = c('subject_id', 'record'), 
+  new_by_column_name = 'subrecid')
+```
+
+```{r ChangedDataID-show, echo=FALSE}
+knitr::kable(ChangedDataID, caption = "ChangedDataID") |> 
+  kableExtra::kable_paper()
+```
+
+```{r create_modified_data}
+create_modified_data(compare = ChangedDataID, 
+  base = InitialDataID, 
+  by = "subrecid")
+```
+
+
+
