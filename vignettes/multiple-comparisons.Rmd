@@ -1,0 +1,244 @@
+---
+title: "multiple-comparisons"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 4
+vignette: >
+  %\VignetteIndexEntry{multiple-comparisons}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+library(tidyverse)
+library(labelled)
+library(gt)
+library(gtsummary)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>", 
+  error = TRUE,
+  message = FALSE,
+  warning = FALSE,
+  echo = TRUE
+)
+options(
+  rmarkdown.html_vignette.check_title = FALSE,
+  tibble.print_max = Inf)
+extdata_folder <- "../inst/extdata/"
+```
+
+# Motivation 
+
+This vignette covers how to apply the functions in `dfdiffs` to multiple datasets (separated by folder)
+
+## Packages 
+
+Our package
+
+```{r dfdiffs, echo = TRUE}
+library(dfdiffs)
+```
+
+
+Similar packages 
+
+```{r similar-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
+library(janitor) # compare_df_cols
+library(arsenal) # comparedf
+library(diffdf)  # diffdf
+library(testthat) # expect_equal
+library(vetr) # alike
+```
+
+## Folder structure 
+
+Below is a folder structure of datasets separated by year. 
+
+```{r eval=FALSE, echo=FALSE}
+People20 <- readr::read_csv("../inst/extdata/csv/by-year/People2020.csv")
+PlayerBirth20 <- People20 |> select(playerID, starts_with("birth"))
+write_csv(x = PlayerBirth20, "../inst/extdata/csv/by-year/20/PlayerBirth.csv")
+PlayerDeath20 <- People20 |> select(playerID, starts_with("death"))
+write_csv(x = PlayerDeath20, "../inst/extdata/csv/by-year/20/PlayerDeath.csv")
+PlayerName20 <- People20 |> select(playerID, starts_with("name"))
+write_csv(x = PlayerName20, "../inst/extdata/csv/by-year/20/PlayerName.csv")
+
+People21 <- readr::read_csv("../inst/extdata/csv/by-year/People2021.csv")
+PlayerBirth21 <- People21 |> select(playerID, starts_with("birth"))
+write_csv(x = PlayerBirth21, "../inst/extdata/csv/by-year/21/PlayerBirth.csv")
+PlayerDeath21 <- People21 |> select(playerID, starts_with("death"))
+write_csv(x = PlayerDeath21, "../inst/extdata/csv/by-year/21/PlayerDeath.csv")
+PlayerName21 <- People21 |> select(playerID, starts_with("name"))
+write_csv(x = PlayerName21, "../inst/extdata/csv/by-year/21/PlayerName.csv")
+```
+
+```{r lahman-tree}
+fs::dir_tree("../inst/extdata/csv/by-year")
+```
+
+We start by storing these files in a vector with `list.files()`, then we clean up the names a bit, and pass the list of paths to `readr::read_csv` with `purrr::map()`:
+
+```{r base_files}
+base_files <- list.files(path = "../inst/extdata/csv/by-year/20", 
+  pattern = ".csv", recursive = TRUE, full.names = TRUE)
+base_files_nms <- map_chr(base_files, base::basename)
+base_dfs <- base_files |> 
+  purrr::set_names(base_files_nms) |> 
+  purrr::map(readr::read_csv)
+```
+
+```{r compare_files}
+compare_files <- list.files(path = "../inst/extdata/csv/by-year/21", 
+  pattern = ".csv", recursive = TRUE, full.names = TRUE)
+compare_files_nms <- map_chr(compare_files, base::basename)
+compare_dfs <- compare_files |> 
+  purrr::set_names(compare_files_nms) |> 
+  purrr::map(readr::read_csv)
+```
+
+# Iteration
+
+We're going to follow the iteration steps from [Charlotte Wickham's Happy R Users Purrr Tutorial](https://www.rstudio.com/resources/rstudioconf-2017/happy-r-users-purrr-tutorial-/)
+
+1. DO IT FOR ONE   
+2. TURN IT INTO A RECIPE  
+3. DO IT FOR ALL!  
+
+# Do it for one (or two)
+
+We're going to use the `arsenal::comparedf()` function first. Remember that this function requires an additional `summary()` call! 
+
+## `arsenal::comparedf`
+
+```{r cdf_people}
+by_var <- "playerID"
+cdf_people <- arsenal::comparedf(
+  x = base_dfs$PlayerName.csv, 
+  y = compare_dfs$PlayerName.csv, 
+  by = by_var)
+sumcdf_people <- summary(cdf_people)
+names(sumcdf_people)
+```
+
+
+## `diffdf::diffdf`
+
+Next we'll use the `diffdf::diffdf()` function.
+
+```{r diffdf_people}
+diffdf_people <- diffdf::diffdf(
+  compare = compare_dfs$PlayerName.csv, 
+  base = base_dfs$PlayerName.csv, 
+  keys = "playerID")
+diffdf_people |> names()
+```
+
+
+Just to ensure we're getting the same display in the output from both functions, we're going to use the `diffs.byvar.table`/`NumDiff` tables, and the `diffs.table`/ `VarDiff_` tables. 
+
+### `diffs.byvar.table`
+
+```{r diffs.byvar.table}
+sumcdf_people[["diffs.byvar.table"]] |> 
+  select(Variable = var.x, 
+         `No of Differences` = n) |> 
+  knitr::kable(caption = "diffs.byvar.table") |> 
+  kableExtra::kable_paper()
+```
+
+### `NumDiff`
+
+```{r NumDiff}
+diffdf_people[["NumDiff"]] |> 
+  knitr::kable(caption = "NumDiff") |> 
+  kableExtra::kable_paper()
+```
+
+
+### `diffs.table`
+
+```{r diffs.table}
+sumcdf_people[["diffs.table"]] |> 
+  unnest(values.x) |> 
+  unnest(values.y) |> 
+  select(
+    VARIABLE = var.x,
+    all_of(by_var),
+    BASE = values.x,
+    COMPARE = values.y
+  ) |> 
+  knitr::kable(caption = "diffs.table") |> 
+  kableExtra::kable_paper()
+```
+
+
+### `VarDiff_` tables
+
+```{r VarDiff_tables}
+tbl_names <- names(diffdf_people)
+vardiff_tbls <- tbl_names[stringr::str_detect(tbl_names, "VarDiff_")]
+bind_rows(diffdf_people[vardiff_tbls]) |> 
+  knitr::kable(caption = "'VarDiff_' tables") |> 
+  kableExtra::kable_paper()
+```
+
+## Turn it into a recipe
+
+We have two vectors with file paths (`.x` and `.y`)
+
+```{r x-y, eval=FALSE}
+map2(.x = base_dfs, .y = compare_files, )
+```
+
+And the `.f` is our `arsenal::comparedf` or `diffdf::diffdf` functions. 
+
+```{r function-map2, eval=FALSE}
+map2(.x = base_dfs, .y = compare_files, .f = arsenal::comparedf)
+map2(.x = compare_files, .y = base_dfs, .f = diffdf::diffdf)
+```
+
+We can pass the `by` and `keys` arguments to `...`.
+
+```{r eval=FALSE}
+purrr::map2(.x =  base_dfs, .y = compare_dfs, 
+            .f = arsenal::comparedf, by = "playerID")
+```
+
+```{r eval=FALSE}
+purrr::map2(.x =  compare_dfs,  .y = base_dfs, 
+            .f = diffdf::diffdf, keys = "playerID")
+```
+
+
+## Do it for all
+
+### `map2()` + `arsenal::comparedf`
+
+Now we use the `purrr::map2()` function to compare all of the items in `base_dfs` to `compare_dfs`.
+
+```{r all_cdfs}
+all_cdfs <- purrr::map2(
+  .x =  base_dfs, 
+  .y = compare_dfs, 
+  .f = arsenal::comparedf, 
+  by = "playerID")
+all_scdfs <- map(all_cdfs, .f = summary)
+all_scdfs[["PlayerName.csv"]] |> names()
+```
+
+### `map2()` + `diffdf::diffdf`
+
+```{r all_diffdfs}
+all_diffdfs <- purrr::map2(
+  .x =  base_dfs, 
+  .y = compare_dfs, 
+  .f = diffdf::diffdf, 
+  keys = "playerID")
+all_diffdfs[["PlayerName.csv"]] |> names()
+```
+
+## Extracting tables 
+
+

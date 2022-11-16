@@ -65,34 +65,76 @@ We can check this against the `NewData` dataset (which should match the output f
 ```{r T1Data-T2Data-NewData, echo=TRUE}
 T1Data <- dfdiffs::T1Data
 T2Data <- dfdiffs::T2Data
-create_new_data(newdf = T2Data, olddf = T1Data)
+T1T2New <- create_new_data(compare = T2Data, base = T1Data)
+T1T2New |> 
+  knitr::kable(caption = "New data T1 > T2") |> 
+  kableExtra::kable_paper()
 ```
 
 ```{r NewData, echo=TRUE}
 NewData <- dfdiffs::NewData
-NewData
+NewData |> 
+  knitr::kable(caption = "New data (Comparison)") |> 
+  kableExtra::kable_paper()
+```
+
+
+We can see the only differences between the datasets are the formats of the date columns:
+
+```{r waldo-compare-T1T2New-NewData}
+waldo::compare(x = T1T2New, y = NewData)
 ```
 
 
 ###  Deleted data 
 
-To test for the deleted data, we use the `CompleteData`, `IncompleteData`, and `DeletedData`. `CompleteData` represents a 'complete' set of data, and `IncompleteData` is a dataset with rows removed from `CompleteData`. 
+To test for the deleted data, we use the `CompleteData`, `IncompleteData`, and `DeletedData`. 
+
+`CompleteData` represents a 'complete' set of data, 
+
+```{r CompleteData}
+CompleteData <- dfdiffs::CompleteData
+CompleteData |> 
+  knitr::kable(caption = "CompleteData") |> 
+  kableExtra::kable_paper()
+```
+
+
+and `IncompleteData` is a dataset with rows removed from `CompleteData`. 
+
+```{r IncompleteData}
+IncompleteData <- dfdiffs::IncompleteData
+IncompleteData |> 
+  knitr::kable(caption = "IncompleteData") |> 
+  kableExtra::kable_paper()
+```
+
 
 When we run the `create_deleted_data()`, we check for the deleted rows between `IncompleteData` and `CompleteData`.
 
 ```{r CompleteData-IncompleteData, echo = TRUE}
-CompleteData <- dfdiffs::CompleteData
-IncompleteData <- dfdiffs::IncompleteData
-create_deleted_data(newdf = IncompleteData, olddf = CompleteData)
+IncompCompDiff <- create_deleted_data(
+  compare = IncompleteData, 
+  base = CompleteData) |> 
+  arrange(subject)
+IncompCompDiff |> 
+  knitr::kable(caption = "IncompCompDiff") |> 
+  kableExtra::kable_paper()
 ```
 
 This is identical to the data stored in `DeletedData`
 
 ```{r DeletedData}
 DeletedData <- dfdiffs::DeletedData
-DeletedData
+DeletedData |> 
+  knitr::kable(caption = "DeletedData") |> 
+  kableExtra::kable_paper()
 ```
 
+
+```{r waldo-compare-IncompCompDiff-DeletedData}
+waldo::compare(x = IncompCompDiff, y = DeletedData)
+```
 
 ### Modified Data 
 
@@ -102,33 +144,34 @@ To check for changes between two datasets, we uses the `InitialData` and `Change
 InitialData <- dfdiffs::InitialData
 ChangedData <- dfdiffs::ChangedData
 mods <- create_modified_data(
-  newdf = ChangedData, 
-  olddf = InitialData)
+  compare = ChangedData, base = InitialData)
 ```
 
 The changes by variable are stored in `diffs_byvar`.
 
 ```{r diffs_byvar}
-mods$diffs_byvar
+mods$diffs_byvar |> 
+  knitr::kable(caption = "diffs_byvar") |> 
+  kableExtra::kable_paper()
 ```
 
 The changes by row are stored in `diffs`.
 
 ```{r diffs}
-mods$diffs
+mods$diffs |> 
+  knitr::kable(caption = "diffs") |> 
+  kableExtra::kable_paper()
 ```
 
 ## Lahman datasets 
 
 We will also import two master datasets from the `Lahman` baseball package. 
 
-```{r , echo=TRUE}
-master15 <- readxl::read_excel(
-  path = "../inst/extdata/xlsx/lahman_compare.xlsx", 
-  sheet = "master-2015")
-master20 <- readxl::read_excel(
-  path = "../inst/extdata/xlsx/lahman_compare.xlsx", 
-  sheet = "master-2020")
+```{r masters, echo=TRUE}
+master15 <- readr::read_csv(
+  file = "../inst/extdata/app-testing/csv/2015-baseballdatabank/Master.csv")
+master20 <- readr::read_csv(
+  file = "../inst/extdata/app-testing/csv/2020-baseballdatabank/People.csv")
 ```
 
 ### Master (2015)
@@ -174,8 +217,7 @@ diffdf_output <- diffdf::diffdf(base = InitialData , compare = ChangedData)
 str(diffdf_output)
 ```
 
-This list contains objects named according to `NumDiff` and `VarDiff`. We will test this with the larger master datasets. 
-
+This list contains objects named according to `NumDiff` and `VarDiff`. 
 
 ## `testthat::expect_equal()`
 
@@ -188,7 +230,6 @@ testthat::expect_equal(object = InitialData, expected = ChangedData)
 ```{r , error=TRUE}
 testthat::expect_equal(object = T1Data, expected = T2Data)
 ```
-
 
 
 ## vetr::alike()

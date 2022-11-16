@@ -249,7 +249,9 @@ knitr::kables(
 2.  `master15` vs. `master20`
 
 ```{r cond-3-test, eval=FALSE, echo=FALSE, include=FALSE}
-changed_cond_3 <- diffdf::diffdf(base = master15, compare = master20,
+changed_cond_3 <- diffdf::diffdf(
+  base = master15, 
+  compare = master20,
   keys = "playerID")
 diff_lst <- changed_cond_3
 by_keys <- "playerID"
