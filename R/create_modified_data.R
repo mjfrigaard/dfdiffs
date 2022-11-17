@@ -6,7 +6,8 @@
 #' @param by_col A new name for the joining column.
 #' @param cols Columns to be compared.
 #'
-#' @importFrom arsenal comparedf
+#' @import arsenal
+#' @import diffdf
 #' @importFrom dplyr mutate
 #' @importFrom dplyr across
 #' @importFrom dplyr select

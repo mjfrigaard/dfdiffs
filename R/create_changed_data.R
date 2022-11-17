@@ -4,6 +4,8 @@
 #' @param by_keys `keys` argument from `diffdf::diffdf()`/`by` argument from
 #'      `create_changed_data()`
 #'
+#' @import arsenal
+#' @import diffdf
 #' @importFrom stringr str_detect
 #' @importFrom dplyr mutate
 #' @importFrom stringr str_detect
