@@ -1,11 +1,12 @@
 ---
-title: "create-modified-data"
+title: "changed-modified-data"
 output: 
   rmarkdown::html_vignette:
     toc: yes
     toc_depth: 3
+    df_print: kable
 vignette: >
-  %\VignetteIndexEntry{create-modified-data}
+  %\VignetteIndexEntry{changed-modified-data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -29,10 +30,14 @@ The goal of the `dfdiffs` is to answer the following questions:
 1. What rows are here now that weren't here before?  
 2. What rows were here before that aren't here now?   
 **3. What values have been changed?**   
-4. What columns have been moved?    
-5. What rows have been moved?    
 
-This vignette takes us through the `create_modified_data()` function, which answers the "*What values have been changed?*"
+This vignette takes us through two functions: 
+
+1. `create_changed_data()`: which uses the `arsenal::comparedf()` function
+
+2. `create_modified_data()`: which uses the `diffdf::diffdf()` function
+
+Both functions answers the "*What values have been changed?*"
 
 ## Packages
 
@@ -51,7 +56,7 @@ library(haven)
 library(readxl)
 ```
 
-## Modified data 
+## Changed data 
 
 We have two datasets to test what's been modified:
 
@@ -62,7 +67,8 @@ InitialData <- dfdiffs::InitialData
 ```
 
 ```{r InitialData-show, echo=FALSE}
-knitr::kable(InitialData)
+knitr::kable(InitialData, caption = "InitialData") |> 
+  kableExtra::kable_paper()
 ```
 
 ### Changed Data
@@ -72,9 +78,9 @@ ChangedData <- dfdiffs::ChangedData
 ```
 
 ```{r ChangedData-show, echo=FALSE}
-knitr::kable(ChangedData)
+knitr::kable(ChangedData, caption = "ChangedData") |> 
+  kableExtra::kable_paper()
 ```
-
 
 
 ## Creating join columns
@@ -94,7 +100,8 @@ ChangedDataJoin <- dfdiffs::create_new_column(
   data = ChangedData, 
   cols = c("subject_id", "record"), 
   new_name = "join_var")
-knitr::kable(ChangedDataJoin)
+knitr::kable(ChangedDataJoin, caption = "ChangedDataJoin") |> 
+  kableExtra::kable_paper()
 ```
 
 ```{r InitialDataJoin, eval=FALSE}
@@ -110,116 +117,288 @@ InitialDataJoin <- dfdiffs::create_new_column(
   data = InitialData, 
   cols = c("subject_id", "record"), 
   new_name = "join_var")
-knitr::kable(InitialDataJoin)
+knitr::kable(InitialDataJoin, caption = "InitialDataJoin") |> 
+  kableExtra::kable_paper()
 ```
 
-## Conditions 
+
+# create_changed_data()
 
 Each function in the `dfdiffs` package assumes the following conditions: 
 
-### Single by column conditions
+1) Two datasets
 
-1) Two datasets, compare all columns:
+2) Multiple columns to compare (`cols`)
 
-    ```{r cond-1, eval=FALSE}
-    create_modified_data(
-      compare = ChangedData, 
-      base = InitialData)
-    ```
+3) Single by column
 
-2) Multiple columns to compare (`cols`): 
+4) Single `by` column, new column name (`by_col`)
 
-    ```{r cond-2, eval=FALSE}
-    create_modified_data(
-      compare = ChangedData, 
-      base = InitialData, 
-      cols = c("text_value_a", "text_value_b"))
-    ```
+5) Single `by` column, multiple compare columns (`cols`)
 
-
-3) Single `by` column, no new column name
-
-    ```{r cond-3, eval=FALSE}
-    create_modified_data(
-      compare = ChangedDataJoin, 
-      base = InitialDataJoin, 
-      by = "join_var")
-    ```
-
-4) Single by column, new column name (`by_col`)
-
-    ```{r cond-4, eval=FALSE}
-    create_modified_data(
-      compare = ChangedDataJoin, 
-      base = InitialDataJoin, 
-      by = "join_var",
-      by_col = "new_join_var")
-    ```
-
-5) Single `by` column, multiple compare columns `cols`
-
-    ```{r cond-5, eval=FALSE}
-    create_modified_data(
-      compare = ChangedDataJoin, 
-      base = InitialDataJoin, 
-      by = "join_var", 
-      cols = c("text_value_a", "text_value_b"))
-    ```
-
-6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
-
-    ```{r cond-6, eval=FALSE}
-    create_modified_data(
-      compare = ChangedDataJoin, 
-      base = InitialDataJoin, 
-      by = "join_var", 
-      by_col = "new_join_var",
-      cols = c("text_value_a", "text_value_b"))
-    ```
-
-
-### Multiple by column conditions
+6) `Single` by column, new column name (`by_col`), multiple compare columns (`cols`)
 
 7) Multiple `by` columns
 
-    ```{r cond-7, eval=FALSE}
-    create_modified_data(
-      compare = ChangedData, 
-      base = InitialData, 
-      by = c("subject_id", "record"))
-    ```
-
-
 8) Multiple `by` columns, new column name (`by_col`)
-
-    ```{r cond-8, eval=FALSE}
-    create_modified_data(
-      compare = ChangedData, 
-      base = InitialData, 
-      by = c("subject_id", "record"), 
-      by_col = "new_join_var")
-    ```
 
 9) Multiple `by` columns, multiple compare columns (`cols`)
 
-    ```{r cond-9, eval=FALSE}
-    create_modified_data(
-      compare = ChangedData, 
-      base = InitialData, 
-      by = c("subject_id", "record"), 
-      cols = c("text_value_a", "text_value_b"))
-    ```
-
 10) Multiple `by` columns, a new `by_col`, and `cols`
 
-    ```{r cond-10, eval=FALSE}
-    create_modified_data(
-      compare = ChangedData, 
-      base = InitialData, 
-      by = c("subject_id", "record"), 
-      cols = c("text_value_a", "text_value_b"))
-    ```
 
+## Single by column conditions
+
+### 1) Two datasets
+
+compare all columns:
+
+```{r cond_1, eval=FALSE}
+create_changed_data(
+  compare = ChangedData, 
+  base = InitialData)
+```
+
+```{r , echo=FALSE}
+changed <- create_changed_data(
+  compare = ChangedData, 
+  base = InitialData)
+knitr::kables(
+  x = list(
+    knitr::kable(changed$num_diffs), 
+    knitr::kable(changed$var_diffs)
+    ), format = "html") |> 
+  kableExtra::kable_paper()
+```
+
+### 2) Multiple columns to compare (`cols`)
+
+```{r cond-2, eval=FALSE}
+create_changed_data(
+  compare = ChangedData, 
+  base = InitialData, 
+  cols = c("text_value_a", "text_value_b"))
+```
+
+```{r, echo=FALSE}
+changed <- create_changed_data(
+  compare = ChangedData, 
+  base = InitialData, 
+  cols = c("text_value_a", "text_value_b"))
+knitr::kables(
+  x = list(
+    knitr::kable(changed$num_diffs), 
+    knitr::kable(changed$var_diffs)
+    ), format = "html") |> 
+  kableExtra::kable_paper()
+```
+
+
+
+### 3) Single `by` column
+
+No new column name
+
+```{r cond-3, eval=FALSE}
+create_changed_data(
+  compare = ChangedDataJoin, 
+  base = InitialDataJoin, 
+  by = "join_var")
+```
+
+```{r, echo=FALSE}
+changed <- create_changed_data(
+  compare = ChangedDataJoin, 
+  base = InitialDataJoin, 
+  by = "join_var")
+knitr::kables(
+  x = list(
+    knitr::kable(changed$num_diffs), 
+    knitr::kable(changed$var_diffs)
+    ), format = "html") |> 
+  kableExtra::kable_paper()
+```
+
+
+### 4) Single `by` column, new column name (`by_col`)
+
+```{r cond-4, eval=FALSE}
+create_changed_data(
+  compare = ChangedDataJoin, 
+  base = InitialDataJoin, 
+  by = "join_var",
+  by_col = "join")
+```
+
+```{r, echo=FALSE}
+changed <- create_changed_data(
+  compare = ChangedDataJoin, 
+  base = InitialDataJoin, 
+  by = "join_var",
+  by_col = "join")
+knitr::kables(
+  x = list(
+    knitr::kable(changed$num_diffs), 
+    knitr::kable(changed$var_diffs)
+    ), format = "html") |> 
+  kableExtra::kable_paper()
+```
+
+
+### 5) Single `by` column, multiple compare columns (`cols`)
+
+```{r cond-5, eval=FALSE}
+create_changed_data(
+  compare = ChangedDataJoin, 
+  base = InitialDataJoin, 
+  by = "join_var", 
+  cols = c("text_value_a", "text_value_b"))
+```
+
+```{r, echo=FALSE}
+changed <- create_changed_data(
+  compare = ChangedDataJoin, 
+  base = InitialDataJoin, 
+  by = "join_var", 
+  cols = c("text_value_a", "text_value_b"))
+knitr::kables(
+  x = list(
+    knitr::kable(changed$num_diffs), 
+    knitr::kable(changed$var_diffs)
+    ), format = "html") |> 
+  kableExtra::kable_paper()
+```
+
+
+### 6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
+
+```{r cond-6, eval=FALSE}
+create_changed_data(
+  compare = ChangedDataJoin, 
+  base = InitialDataJoin, 
+  by = "join_var", 
+  by_col = "join",
+  cols = c("text_value_a", "text_value_b"))
+```
+
+```{r, echo=FALSE}
+changed <- create_changed_data(
+  compare = ChangedDataJoin, 
+  base = InitialDataJoin, 
+  by = "join_var", 
+  by_col = "join",
+  cols = c("text_value_a", "text_value_b"))
+knitr::kables(
+  x = list(
+    knitr::kable(changed$num_diffs), 
+    knitr::kable(changed$var_diffs)
+    ), format = "html") |> 
+  kableExtra::kable_paper()
+```
+
+
+
+## Multiple by column conditions
+
+### 7) Multiple `by` columns
+
+```{r cond-7, eval=FALSE}
+create_changed_data(
+  compare = ChangedData, 
+  base = InitialData, 
+  by = c("subject_id", "record"))
+```
+
+```{r, echo=FALSE}
+changed <- create_changed_data(
+  compare = ChangedData, 
+  base = InitialData, 
+  by = c("subject_id", "record"))
+knitr::kables(
+  x = list(
+    knitr::kable(changed$num_diffs), 
+    knitr::kable(changed$var_diffs)
+    ), format = "html") |> 
+  kableExtra::kable_paper()
+```
+
+
+
+### 8) Multiple `by` columns, new column name (`by_col`)
+
+```{r cond-8, eval=FALSE}
+create_changed_data(
+  compare = ChangedData, 
+  base = InitialData, 
+  by = c("subject_id", "record"), 
+  by_col = "new_join_var")
+```
+
+```{r, echo=FALSE}
+changed <- create_changed_data(
+  compare = ChangedData, 
+  base = InitialData, 
+  by = c("subject_id", "record"), 
+  by_col = "new_join_var")
+knitr::kables(
+  x = list(
+    knitr::kable(changed$num_diffs), 
+    knitr::kable(changed$var_diffs)
+    ), format = "html") |> 
+  kableExtra::kable_paper()
+```
+
+
+### 9) Multiple `by` columns, multiple compare columns (`cols`)
+
+```{r cond-9, eval=FALSE}
+create_changed_data(
+  compare = ChangedData, 
+  base = InitialData, 
+  by = c("subject_id", "record"), 
+  cols = c("text_value_a", "text_value_b"))
+```
+
+```{r, echo=FALSE}
+changed <- create_changed_data(
+  compare = ChangedData, 
+  base = InitialData, 
+  by = c("subject_id", "record"), 
+  cols = c("text_value_a", "text_value_b"))
+knitr::kables(
+  x = list(
+    knitr::kable(changed$num_diffs), 
+    knitr::kable(changed$var_diffs)
+    ), format = "html") |> 
+  kableExtra::kable_paper()
+```
+
+
+### 10) Multiple `by` columns, a new `by_col`, and `cols`
+
+```{r cond-10, eval=FALSE}
+create_changed_data(
+  compare = ChangedData, 
+  base = InitialData, 
+  by = c("subject_id", "record"), 
+  by_col = "join",
+  cols = c("text_value_a", "text_value_b"))
+```
+
+```{r, echo=FALSE}
+changed <- create_changed_data(
+  compare = ChangedData, 
+  base = InitialData, 
+  by = c("subject_id", "record"), 
+  by_col = "join",
+  cols = c("text_value_a", "text_value_b"))
+knitr::kables(
+  x = list(
+    knitr::kable(changed$num_diffs), 
+    knitr::kable(changed$var_diffs)
+    ), format = "html") |> 
+  kableExtra::kable_paper()
+```
 
 
 # create_modified_data()
@@ -250,7 +429,8 @@ knitr::kables(
   x = list(
     knitr::kable(compare_list$diffs_byvar), 
     knitr::kable(compare_list$diffs)
-    ), format = "html")
+    ), format = "html") |> 
+  kableExtra::kable_paper()
 ```
 
 
@@ -274,7 +454,8 @@ knitr::kables(
   x = list(
     knitr::kable(compare_list$diffs_byvar), 
     knitr::kable(compare_list$diffs)
-    ), format = "html")
+    ), format = "html") |> 
+  kableExtra::kable_paper()
 ```
 
 ### 3) Single `by` column
@@ -297,7 +478,8 @@ knitr::kables(
   x = list(
     knitr::kable(compare_list$diffs_byvar), 
     knitr::kable(compare_list$diffs)
-    ), format = "html")
+    ), format = "html") |> 
+  kableExtra::kable_paper()
 ```
 
 ### 4) Single `by` column, new column name (`by_col`)
@@ -323,7 +505,8 @@ knitr::kables(
   x = list(
     knitr::kable(compare_list$diffs_byvar), 
     knitr::kable(compare_list$diffs)
-    ), format = "html")
+    ), format = "html") |> 
+  kableExtra::kable_paper()
 ```
 
 ### 5) Single `by` column, multiple compare columns `cols`
@@ -348,7 +531,8 @@ knitr::kables(
   x = list(
     knitr::kable(compare_list$diffs_byvar), 
     knitr::kable(compare_list$diffs)
-    ), format = "html")
+    ), format = "html") |> 
+  kableExtra::kable_paper()
 ```
 
 ### 6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
@@ -375,7 +559,8 @@ knitr::kables(
   x = list(
     knitr::kable(compare_list$diffs_byvar), 
     knitr::kable(compare_list$diffs)
-    ), format = "html")
+    ), format = "html") |> 
+  kableExtra::kable_paper()
 ```
 
 ## Multiple `by` column conditions
@@ -402,7 +587,8 @@ knitr::kables(
   x = list(
     knitr::kable(compare_list$diffs_byvar), 
     knitr::kable(compare_list$diffs)
-    ), format = "html")
+    ), format = "html") |> 
+  kableExtra::kable_paper()
 ```
 
 This creates a `join` column from the `by` columns. 
@@ -429,7 +615,8 @@ knitr::kables(
   x = list(
     knitr::kable(compare_list$diffs_byvar), 
     knitr::kable(compare_list$diffs)
-    ), format = "html")
+    ), format = "html") |> 
+  kableExtra::kable_paper()
 ```
 
 ### 9) Multiple `by` columns, multiple compare columns (`cols`)  
@@ -454,7 +641,8 @@ knitr::kables(
   x = list(
     knitr::kable(compare_list$diffs_byvar), 
     knitr::kable(compare_list$diffs)
-    ), format = "html")
+    ), format = "html") |> 
+  kableExtra::kable_paper()
 ```
 
 This creates a `join` column from the `by` columns. 
@@ -483,34 +671,8 @@ knitr::kables(
   x = list(
     knitr::kable(compare_list$diffs_byvar), 
     knitr::kable(compare_list$diffs)
-    ), format = "html")
-```
-
-## App testing 
-
-We'll test this function on the `Lahman` master dataset--it's a little larger data, and more similar to data that will be used in the app: 
-
-```{r import-master}
-master15 <- readxl::read_excel(
-  path = "../inst/extdata/xlsx/lahman_compare.xlsx", 
-  sheet = "master-2015")
-master20 <- readxl::read_excel(
-  path = "../inst/extdata/xlsx/lahman_compare.xlsx", 
-  sheet = "master-2020")
-modified_master_15_20 <- create_modified_data(
-  compare = master20, 
-  base = master15, 
-  by = "playerID",
-  cols = c("playerID", "nameGiven", "height", "bats", "throws"))
-
-```
-
-```{r modified_master_15_20-diffs}
-glimpse(modified_master_15_20$diffs)
-```
-
-```{r modified_master_15_20-diffs_byvar}
-knitr::kable(modified_master_15_20$diffs_byvar)
+    ), format = "html") |> 
+  kableExtra::kable_paper()
 ```
 
 ```{r app-data, include=FALSE, eval=FALSE}

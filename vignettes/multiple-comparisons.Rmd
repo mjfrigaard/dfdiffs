@@ -224,7 +224,7 @@ all_cdfs <- purrr::map2(
   .y = compare_dfs, 
   .f = arsenal::comparedf, 
   by = "playerID")
-all_scdfs <- map(all_cdfs, .f = summary)
+all_scdfs <- purrr::map(all_cdfs, .f = summary)
 all_scdfs[["PlayerName.csv"]] |> names()
 ```
 
@@ -241,4 +241,4 @@ all_diffdfs[["PlayerName.csv"]] |> names()
 
 ## Extracting tables 
 
-
+Now that we have two lists with multiple comparisons, we need to be able to extract the two table 

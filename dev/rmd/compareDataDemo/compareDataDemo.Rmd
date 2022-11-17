@@ -109,8 +109,8 @@ master15 <- readr::read_csv("data/csv/m15.csv")
 
 Our 'compare' or 'new' dataset is the 2020 People dataset
 
-```{r master20, message=FALSE, warning=FALSE}
-master20 <- readr::read_csv("data/csv/m20.csv")
+```{r master22, message=FALSE, warning=FALSE}
+master22 <- readr::read_csv("data/csv/m22.csv")
 ```
 
 
@@ -153,11 +153,11 @@ master20 <- readr::read_csv("data/csv/m20.csv")
 #   write_csv("data/csv/m15.csv")
 # 
 # select(
-#   master20,
+#   master22,
 #   playerID, contains("name"),
 #   contains("birth"), contains("death")
 # ) |>
-#   write_csv(file = "data/csv/m20.csv")
+#   write_csv(file = "data/csv/m22.csv")
 ```
 
 # Data displays
@@ -201,7 +201,7 @@ comp_react_theme <- reactableTheme(
   pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
   pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
 )
-reactable::reactable(master20,
+reactable::reactable(master22,
   theme = comp_react_theme
 )
 ```
@@ -212,7 +212,7 @@ We'll test the `create_new_data()` function on the 2015 vs. 2020 Master data.
 
 ```{r create_new_data, class.source='fold-show'}
 # run new data function
-new <- create_new_data(master20, master15,
+new <- create_new_data(master22, master15,
   by = "playerID",
   cols = c("playerID", "nameFirst", "nameLast", "nameGiven", "birthCity")
 )
@@ -271,7 +271,7 @@ We're going to check the deleted records using the `create_deleted_data()` funct
 
 ```{r create_deleted_data, class.source='fold-show'}
 deleted <- create_deleted_data(
-  compare = master20,
+  compare = master22,
   base = master15,
   by = "playerID",
   cols = c("playerID", "nameFirst", "nameLast", "nameGiven", "birthCity")
@@ -313,16 +313,16 @@ This tells us there were 625 deleted records between 2015 and 2020 in the master
 Below we create three variations of the changed data.
 
 ```{r changes, class.source='fold-show'}
-change_row_by_row <- create_changed_data(compare = master20, master15, 
+change_row_by_row <- create_changed_data(compare = master22, master15, 
                                   cols = c("playerID", "nameFirst", 
                                            "nameLast", "nameGiven", 
                                            "birthCity"))
-change_single_id  <- create_changed_data(compare = master20, master15,
+change_single_id  <- create_changed_data(compare = master22, master15,
                                   by = "playerID", 
                                   by_col = "join_column",
                                   cols = c("nameFirst", "nameLast",
                                            "nameGiven", "birthCity"))
-change_multiple_ids <- create_changed_data(compare = master20, master15,
+change_multiple_ids <- create_changed_data(compare = master22, master15,
                                   by = c("playerID", "nameGiven"),
                                   by_col = "join_column",
                                   cols = c("playerID", "nameFirst", 
@@ -481,12 +481,12 @@ The color palette on this graph needs to be updated with appropriate colors. See
 
 Below are the variable differences (`var_diffs`) for `change_row_by_row`, `change_single_id`, and `change_multiple_ids`. The `var_diffs` table contains row-by-row differences.
 
-If `create_changed_data()` is made using a row-by-row comparison, these differences are joined to the compare data (`master20`) on the `compare` column. 
+If `create_changed_data()` is made using a row-by-row comparison, these differences are joined to the compare data (`master22`) on the `compare` column. 
 
-First we add a `rownumber` column to `master20`
+First we add a `rownumber` column to `master22`
 
 ```{r compare}
-compare <- master20 %>% 
+compare <- master22 %>% 
   mutate(rownumber = row_number(),
          rownumber = as.character(rownumber)) |> 
   relocate(rownumber, .before = 1)
@@ -518,7 +518,7 @@ reactable(
 If `create_changed_data()` is used with a single id, the `var_diffs` table is joined to `compare` on the `join_column`. 
 
 ```{r compare_single_id}
-compare_single_id <- create_join_column(df = master20, 
+compare_single_id <- create_join_column(df = master22, 
                    by_colums = "playerID", 
                    new_by_column_name = "join_column")
 ```
@@ -546,7 +546,7 @@ reactable(
 If `create_changed_data()` is used with multiple ids, the `var_diffs` table is joined to `compare` on the `join_column`. 
 
 ```{r compare_multiple_ids}
-compare_multiple_ids <- create_join_column(df = master20, 
+compare_multiple_ids <- create_join_column(df = master22, 
                    by_colums = c("playerID", "nameGiven"),
                    new_by_column_name = "join_column")
 ```
@@ -2685,7 +2685,7 @@ Below we test our modified function, `create_modified_data()`, which returns a l
 
 ```{r create_modified_data, class.source='fold-show'}
 modified <- create_modified_data(
-  compare = master20,
+  compare = master22,
   base = master15,
   by = "playerID",
   cols = c("playerID", "nameFirst", "nameLast", "nameGiven", "birthCity")

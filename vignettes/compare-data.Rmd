@@ -1,0 +1,205 @@
+---
+title: "compare-data"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 3
+    df_print: kable
+vignette: >
+  %\VignetteIndexEntry{compare-data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>", 
+  error = TRUE
+)
+options(
+  rmarkdown.html_vignette.check_title = FALSE,
+  tibble.print_max = Inf)
+```
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(dfdiffs)
+library(openxlsx)
+library(tidyverse)
+library(janitor) 
+library(arsenal) # comparedf
+library(diffdf)  # diffdf
+```
+
+
+# Motivation
+
+The goal of the `dfdiffs` is to answer the following questions: 
+
+1. What rows are here now that weren't here before?  
+2. What rows were here before that aren't here now?   
+3. What values have been changed?
+
+## Test data 
+
+These are two Masters tables from the [Lahman baseball database.](https://www.seanlahman.com/baseball-archive/statistics/) 
+
+```{r masters}
+m15 <- dfdiffs::master15 |> 
+  dplyr::slice_sample(n = 3000, replace = FALSE)
+max(m15$debut, na.rm = TRUE)
+m22 <- dfdiffs::master22 |> 
+  dplyr::slice_sample(n = 3000, replace = FALSE)
+max(m22$debut, na.rm = TRUE)
+```
+
+## The `compare_data()` function 
+
+```{r compare_data-args, eval=FALSE}
+compare_data(compare = , base = , by = , by_col = , cols = )
+```
+
+```{r compare_data, echo=FALSE, eval=FALSE}
+compare_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
+  
+  new_data <- create_new_data(
+    compare = compare, base = base, by = by, by_col = by_col, cols = cols)
+  
+  deleted_data <- create_deleted_data(
+    compare = compare, base = base, by = by, by_col = by_col, cols = cols)
+  
+  changed_data <- create_changed_data(
+    compare = compare, base = base, by = by, by_col = by_col, cols = cols)
+  
+  changed_num_diffs <- changed_data$num_diffs
+  changed_var_diffs <- changed_data$var_diffs
+  
+  return(list(
+    'new_data' = new_data,
+    'deleted_data' = deleted_data,
+    'changed_num_diffs' = changed_num_diffs,
+    'changed_var_diffs' = changed_var_diffs
+  ))
+}
+```
+
+```{r test-compare_data}
+comparisons <- compare_data(
+  compare = m22, base = m15, 
+  by = "playerID", by_col = "join", 
+  cols = c("nameFirst", "nameLast", "nameGiven", "height"))
+names(comparisons)
+```
+
+
+## `$new_data`
+
+```{r new_data, eval=FALSE}
+comparisons$new_data
+```
+
+```{r , echo=FALSE}
+knitr::kable(head(comparisons$new_data), caption = "head(comparisons$new_data)") |> 
+  kableExtra::kable_paper()
+```
+
+
+## `$deleted_data`
+
+```{r deleted_data, eval=FALSE}
+comparisons$deleted_data
+```
+
+```{r , echo=FALSE}
+knitr::kable(head(comparisons$deleted_data), 
+  caption = "head(comparisons$deleted_data)") |> 
+  kableExtra::kable_paper()
+```
+
+
+## `$changed_num_diffs`
+
+```{r changed_num_diffs, eval=FALSE}
+comparisons$changed_num_diffs
+```
+
+```{r , echo=FALSE}
+knitr::kable(comparisons$changed_num_diffs, 
+  caption = "comparisons$changed_num_diffs") |> 
+  kableExtra::kable_paper()
+```
+
+
+## `$changed_var_diffs`
+
+```{r changed_var_diffs, eval=FALSE}
+comparisons$changed_var_diffs
+```
+
+```{r , echo=FALSE}
+knitr::kable(comparisons$changed_var_diffs, 
+  caption = "comparisons$changed_var_diffs") |> 
+  kableExtra::kable_paper()
+```
+
+
+## `generate_compare_report()`
+
+The `generate_compare_report()` function is a wrapper around `compare_data()` that will write the report to an excel file. 
+
+```{r generate_compare_report-args, eval=FALSE}
+generate_compare_report(compare = , base = , by = , by_col = , cols = , path = )
+```
+
+
+```{r generate_compare_report, eval=FALSE, echo=FALSE}
+generate_compare_report <- function(compare, base, by = NULL, by_col = NULL, cols = NULL, path) {
+  
+  comparisons <- compare_data(
+    compare = compare, base = base, by = by, by_col = by_col, cols = cols)
+  
+  compare_wb <- openxlsx::createWorkbook()
+  
+  openxlsx::addWorksheet(wb = compare_wb,
+    sheetName = "new data",
+    gridLines = FALSE)
+  openxlsx::addWorksheet(wb = compare_wb,
+    sheetName = "deleted data",
+    gridLines = FALSE)
+  openxlsx::addWorksheet(compare_wb,
+    sheetName = "change frequency",
+    gridLines = FALSE)
+  openxlsx::addWorksheet(wb = compare_wb,
+    sheetName = "changes",
+    gridLines = FALSE)
+  
+  openxlsx::writeDataTable(wb = compare_wb,
+    sheet = "new data", x = comparisons$new_data, 
+    colNames = TRUE, rowNames = FALSE, 
+    withFilter = FALSE
+  )
+  openxlsx::writeDataTable(wb = compare_wb, 
+    sheet = "deleted data", x = comparisons$deleted_data, 
+    colNames = TRUE, rowNames = FALSE, withFilter = FALSE
+  )
+  openxlsx::writeDataTable(wb = compare_wb,
+    sheet = "change frequency", x = comparisons$changed_num_diffs, 
+    colNames = TRUE, rowNames = FALSE, withFilter = FALSE
+  )
+  openxlsx::writeDataTable(compare_wb,
+    sheet = "changes", x = comparisons$changed_var_diffs, 
+    colNames = TRUE, rowNames = FALSE,  withFilter = FALSE
+  )
+  # export xlsx 
+  openxlsx::saveWorkbook(wb = compare_wb, file = path, overwrite = TRUE)
+}
+```
+
+```{r}
+generate_compare_report(
+  compare = m22, base = m15, 
+  by = "playerID", by_col = "join", 
+  cols = c("nameFirst", "nameLast", "nameGiven", "height"), 
+  path = "../inst/extdata/xlsx/compare-report-text.xlsx")
+```
+

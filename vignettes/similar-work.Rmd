@@ -46,8 +46,6 @@ Similar packages
 
 ```{r similar-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
 library(janitor) # compare_df_cols
-library(arsenal) # comparedf
-library(diffdf)  # diffdf
 library(testthat) # expect_equal
 library(vetr) # alike
 ```
@@ -136,7 +134,7 @@ DeletedData |>
 waldo::compare(x = IncompCompDiff, y = DeletedData)
 ```
 
-### Modified Data 
+### InitialData/ChangedData Data 
 
 To check for changes between two datasets, we uses the `InitialData` and `ChangedData`. 
 
@@ -168,10 +166,8 @@ mods$diffs |>
 We will also import two master datasets from the `Lahman` baseball package. 
 
 ```{r masters, echo=TRUE}
-master15 <- readr::read_csv(
-  file = "../inst/extdata/app-testing/csv/2015-baseballdatabank/Master.csv")
-master20 <- readr::read_csv(
-  file = "../inst/extdata/app-testing/csv/2020-baseballdatabank/People.csv")
+master15 <- dfdiffs::master15
+master20 <- dfdiffs::master20
 ```
 
 ### Master (2015)
@@ -198,26 +194,6 @@ compare_df_cols_same(InitialData, ChangedData, strict_description = FALSE)
 ```
 
 All of our test datasets meet this condition, but this could be used as a step in one our `create_` functions (to see if they can be successfully bound together).
-
-## `diffdf::diffdf()`
-
-The `diffdf()` function is very similar to `arsenal::comparedf()`
-
-If we run the function without assigning the output to an object, we see the following: 
-
-```{r diffdf, echo=TRUE}
-diffdf::diffdf(base = InitialData , compare = ChangedData)
-```
-
-If we assign the output to an object (`diffdf_output`), we can check it's structure:
-
-```{r diffdf_output, echo=TRUE}
-# assign to an output
-diffdf_output <- diffdf::diffdf(base = InitialData , compare = ChangedData)
-str(diffdf_output)
-```
-
-This list contains objects named according to `NumDiff` and `VarDiff`. 
 
 ## `testthat::expect_equal()`
 

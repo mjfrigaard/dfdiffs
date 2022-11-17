@@ -4,18 +4,17 @@ output: github_document
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r setup, include = TRUE}
+```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
-# devtools::install_github("mjfrigaard/dfdiffs")
-library(dfdiffs)
 ```
 
 # dfdiffs
+
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -41,7 +40,8 @@ devtools::install_github("mjfrigaard/dfdiffs")
 
 Dependencies
 
-```{r similar-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
+```{r pkgs, message=FALSE, warning=FALSE, echo = TRUE}
+library(dfdiffs)
 library(dplyr)
 library(stringr)
 library(forcats)
@@ -55,6 +55,7 @@ library(haven)
 library(readxl)
 library(janitor) 
 library(arsenal) 
+library(diffdf)  
 library(gt)
 library(labelled)
 library(gtsummary)
@@ -79,7 +80,7 @@ NewData <- dfdiffs::NewData
 These data represent data taken at T1. 
 
 ```{r T1Data}
-T1Data |> knitr::kable(format = "pipe")
+T1Data |> gt::gt()
 ```
 
 ### Timepoint 2 data (new)
@@ -87,7 +88,7 @@ T1Data |> knitr::kable(format = "pipe")
 This is a 'new' dataset representing T2.
 
 ```{r T2Data}
-T2Data |> knitr::kable(format = "pipe")
+T2Data |> gt::gt()
 ```
 
 ### `create_new_data()`
@@ -98,13 +99,13 @@ The `create_new_data()` function shows us the 'new data' (i.e. what is here now 
 create_new_data(
   compare = T2Data, 
   base = T1Data) |> 
-  knitr::kable(format = "pipe")
+  gt::gt()
 ```
 
 We can check this against the `NewData` dataset (which should match the output from `create_new_data()`)
 
 ```{r NewData}
-NewData |> knitr::kable(format = "pipe")
+NewData |> gt::gt()
 ```
 
 ## *What rows were here before that aren't here now?*
@@ -122,7 +123,7 @@ DeletedData <- dfdiffs::DeletedData
 `CompleteData` represents a 'complete' set of data. 
 
 ```{r CompleteData}
-CompleteData |> knitr::kable(format = "pipe")
+CompleteData |> gt::gt()
 ```
 
 
@@ -131,7 +132,7 @@ CompleteData |> knitr::kable(format = "pipe")
 This is a dataset with rows removed from `CompleteData`.
 
 ```{r IncompleteData}
-IncompleteData |> knitr::kable(format = "pipe")
+IncompleteData |> gt::gt()
 ```
 
 ### `create_deleted_data()`
@@ -142,7 +143,7 @@ When we run the `create_deleted_data()`, we check for the deleted rows between `
 create_deleted_data(
   compare = IncompleteData, 
   base = CompleteData) |> 
-  knitr::kable(format = "pipe")
+  gt::gt()
 ```
 
 ### The deleted data 
@@ -150,7 +151,7 @@ create_deleted_data(
 This is identical to the data stored in `DeletedData`
 
 ```{r DeletedData}
-DeletedData |> knitr::kable(format = "pipe")
+DeletedData |> gt::gt()
 ```
 
 ## *What values have been changed?*
@@ -171,13 +172,13 @@ ChangedData <- dfdiffs::ChangedData
 ### Initial data 
 
 ```{r InitialData}
-InitialData |> knitr::kable(format = "pipe")
+InitialData |> gt::gt()
 ```
 
 ### Changed data
 
 ```{r ChangedData}
-ChangedData |> knitr::kable(format = "pipe")
+ChangedData |> gt::gt()
 ```
 
 ### `create_changed_data()` 
@@ -196,7 +197,7 @@ names(changed)
 The counts of changes by variable are stored in `num_diffs`.
 
 ```{r num_diffs}
-changed$num_diffs |> knitr::kable(format = "pipe")
+changed$num_diffs |> gt::gt()
 ```
 
 #### Changes by row (`var_diffs`)
@@ -204,7 +205,7 @@ changed$num_diffs |> knitr::kable(format = "pipe")
 The changes by row are stored in `var_diffs`.
 
 ```{r var_diffs}
-changed$var_diffs |> knitr::kable(format = "pipe")
+changed$var_diffs |> gt::gt()
 ```
 
 ### `create_modified_data()` 
@@ -223,7 +224,7 @@ names(modified)
 The counts of changes by variable are stored in `diffs_byvar`.
 
 ```{r diffs_byvar}
-modified$diffs_byvar |> knitr::kable(format = "pipe")
+modified$diffs_byvar |> gt::gt()
 ```
 
 #### Changes by row 
@@ -231,6 +232,6 @@ modified$diffs_byvar |> knitr::kable(format = "pipe")
 The changes by row are stored in `diffs`.
 
 ```{r diffs}
-modified$diffs |> knitr::kable(format = "pipe")
+modified$diffs |> gt::gt()
 ```
 

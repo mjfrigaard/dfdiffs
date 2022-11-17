@@ -106,11 +106,84 @@ knitr::kable(ChangedDataID, caption = "ChangedDataID") |>
   kableExtra::kable_paper()
 ```
 
-```{r create_modified_data}
-create_modified_data(compare = ChangedDataID, 
-  base = InitialDataID, 
+# `create_modified_data()`
+
+The `create_modified_data()` function is a wrapper around `arsenal::comparedf()`, but only returns a small fraction of the output. 
+
+```{r modified_cdf}
+modified_cdf <- arsenal::comparedf(
+  x = ChangedDataID,
+  y = InitialDataID, 
   by = "subrecid")
 ```
 
+This function also requires a call to `summary()` to clean up the output a bit. 
 
+```{r modified_cdf_sum}
+modified_cdf_sum <- summary(modified_cdf)
+names(modified_cdf_sum)
+```
+
+We're only interested in the `diffs.byvar.table` and the `diffs.table`. 
+
+## `comparedf()` > `diffs.byvar.table`
+
+```{r comparedf-diffs.byvar.table, eval=FALSE}
+modified_cdf_sum$diffs.byvar.table
+```
+
+```{r , echo=FALSE}
+knitr::kable(modified_cdf_sum$diffs.byvar.table, 
+  caption = "modified_cdf_sum$diffs.byvar.table") |> 
+  kableExtra::kable_paper()
+```
+
+
+## `comparedf()` > `diffs.byvar.table`
+
+```{r comparedf-diffs.table, eval=FALSE}
+modified_cdf_sum$diffs.table
+```
+
+```{r , echo=FALSE}
+knitr::kable(modified_cdf_sum$diffs.table, caption = "modified_cdf_sum$diffs.table") |> 
+  kableExtra::kable_paper()
+```
+
+```{r create_modified_data}
+modified <- create_modified_data(
+  compare = ChangedDataID, 
+  base = InitialDataID, 
+  by = "subrecid")
+names(modified)
+```
+
+## `create_modified_data()` > `diffs_byvar`
+
+We've removed the extra `var.y` (and renamed `var.x` to `Variable name`).
+
+```{r modified-diffs_byvar, eval=FALSE}
+modified$diffs_byvar
+```
+
+```{r , echo=FALSE}
+knitr::kable(modified$diffs_byvar, caption = "modified$diffs_byvar") |> 
+  kableExtra::kable_paper()
+```
+
+
+## `create_modified_data()` > `diffs`
+
+We've removed the `var.y` (and renamed `var.x` to `Variable name`). `values.x` was renamed to `Current Value`, and `values.y` was renamed to `	Previous Value`. 
+
+We've also removed the row position variables (`row.x` and `row.y`)
+
+```{r modified-diffs, eval=FALSE}
+modified$diffs
+```
+
+```{r , echo=FALSE}
+knitr::kable(modified$diffs, caption = "modified$diffs") |> 
+  kableExtra::kable_paper()
+```
 

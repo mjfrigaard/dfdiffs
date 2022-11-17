@@ -656,32 +656,3 @@ create_new_data(
   cols = c("subject", "record", "text_var", "factor_var"))
 )
 ```
-
-## App testing 
-
-We'll test this function on the Lahman master dataset--it's a little larger data, and more similar to data that will be used in the app: 
-
-```{r import-master}
-master15 <- readxl::read_excel(
-  path = "../inst/extdata/xlsx/lahman_compare.xlsx", 
-  sheet = "master-2015")
-master20 <- readxl::read_excel(
-  path = "../inst/extdata/xlsx/lahman_compare.xlsx", 
-  sheet = "master-2020")
-new_master_15_20 <- create_new_data(
-  compare = master20, 
-  base = master15, 
-  by = "playerID",
-  cols = c("playerID", "nameGiven", "height", "bats", "throws"))
-```
-
-```{r new_master_15_20}
-glimpse(new_master_15_20)
-```
-
-
-
-
-
-
-

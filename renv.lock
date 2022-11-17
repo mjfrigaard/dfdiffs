@@ -77,6 +77,16 @@
       "Hash": "60818466bde87943f750b33b5ef5217b",
       "Requirements": []
     },
+    "arsenal": {
+      "Package": "arsenal",
+      "Version": "3.6.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "e16d280d498f4d8f2316a01dc3eed9b6",
+      "Requirements": [
+        "knitr"
+      ]
+    },
     "askpass": {
       "Package": "askpass",
       "Version": "1.1",
@@ -128,6 +138,14 @@
       "Requirements": [
         "bit"
       ]
+    },
+    "bitops": {
+      "Package": "bitops",
+      "Version": "1.0-7",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "b7d8d8ee39869c18d8846a184dd8a1af",
+      "Requirements": []
     },
     "blob": {
       "Package": "blob",
@@ -185,6 +203,25 @@
         "generics",
         "ggplot2",
         "glue",
+        "purrr",
+        "rlang",
+        "stringr",
+        "tibble",
+        "tidyr"
+      ]
+    },
+    "broom.helpers": {
+      "Package": "broom.helpers",
+      "Version": "1.9.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "d9413c4a2cb1dcd4e4a851d290323591",
+      "Requirements": [
+        "broom",
+        "cli",
+        "dplyr",
+        "labelled",
+        "lifecycle",
         "purrr",
         "rlang",
         "stringr",
@@ -414,6 +451,16 @@
         "urlchecker",
         "usethis",
         "withr"
+      ]
+    },
+    "diffdf": {
+      "Package": "diffdf",
+      "Version": "1.0.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "9ddedef46959baad2080047a1b0117fe",
+      "Requirements": [
+        "tibble"
       ]
     },
     "diffobj": {
@@ -777,6 +824,31 @@
         "vctrs"
       ]
     },
+    "gt": {
+      "Package": "gt",
+      "Version": "0.7.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "b6f71436ae6088b9a773a5253217ade1",
+      "Requirements": [
+        "base64enc",
+        "bitops",
+        "cli",
+        "commonmark",
+        "dplyr",
+        "fs",
+        "ggplot2",
+        "glue",
+        "htmltools",
+        "magrittr",
+        "rlang",
+        "sass",
+        "scales",
+        "stringr",
+        "tibble",
+        "tidyselect"
+      ]
+    },
     "gtable": {
       "Package": "gtable",
       "Version": "0.3.1",
@@ -784,6 +856,29 @@
       "Repository": "CRAN",
       "Hash": "36b4265fb818f6a342bed217549cd896",
       "Requirements": []
+    },
+    "gtsummary": {
+      "Package": "gtsummary",
+      "Version": "1.6.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "853727ca1318bc9c51b7f3cee5367dc8",
+      "Requirements": [
+        "broom",
+        "broom.helpers",
+        "cli",
+        "dplyr",
+        "forcats",
+        "glue",
+        "gt",
+        "knitr",
+        "lifecycle",
+        "purrr",
+        "rlang",
+        "stringr",
+        "tibble",
+        "tidyr"
+      ]
     },
     "haven": {
       "Package": "haven",
@@ -2029,6 +2124,14 @@
         "lifecycle",
         "rlang"
       ]
+    },
+    "vetr": {
+      "Package": "vetr",
+      "Version": "0.2.14",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "c8f36b8f581230d0166e617fb6530884",
+      "Requirements": []
     },
     "viridisLite": {
       "Package": "viridisLite",

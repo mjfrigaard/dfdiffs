@@ -1,4 +1,4 @@
-## code to prepare `extdata_files` dataset goes here
+## code to prepare `lahman500` dataset goes here
 
 # packages ------------------------------------------
 library(shiny)
@@ -13,19 +13,11 @@ library(readxl)
 library(Lahman)
 library(fivethirtyeight)
 
-# diffs -------------------------------------------------------------------
-diff_current_modified <- load_flat_file(path = "./inst/extdata/csv/diffs/diff_current_modified.csv")
-diff_previous_modified <- load_flat_file(path = "./inst/extdata/csv/diffs/diff_previous_modified.csv")
-
-diff_modified_data <- list("diff_current_modified" = diff_current_modified,
-  "diff_previous_modified" = diff_previous_modified)
-
 
 # create Lahman workbook --------------------------------------------------
 lahman_wb <- createWorkbook()
+
 # create lahman datasets
-
-
 # People ------------------------------------------------------------------
 People <- Lahman::People
 People500 <- dplyr::slice_sample(
@@ -110,10 +102,18 @@ writeDataTable(lahman_wb,
   x = Salaries500, colNames = TRUE,
   rowNames = FALSE, withFilter = FALSE
 )
-
-
 # export xlsx -------------------------------------------------------------
 saveWorkbook(lahman_wb, "./inst/extdata/xlsx/lahman500.xlsx", overwrite = TRUE)
+
+lahman500 <- list(
+  'People500' = People500,
+  'Pitching' = Pitching,
+  'Batting500' = Batting500,
+  'Teams500' = Teams500,
+  'Salaries500' = Salaries500
+)
+usethis::use_data(lahman500, overwrite = TRUE)
+
 
 
 
