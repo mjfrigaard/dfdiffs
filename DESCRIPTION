@@ -13,32 +13,38 @@ RoxygenNote: 7.2.2
 Depends: 
     R (>= 2.10)
 LazyData: true
-Suggests: 
-    knitr,
-    rmarkdown
 VignetteBuilder: knitr
 URL: https://mjfrigaard.github.io/dfdiffs/
 Imports: 
     arsenal,
+    bs4Dash,
     data.table,
     diffdf,
     dplyr,
     flextable,
     forcats,
+    fresh,
     fs,
     glue,
     gt,
     gtsummary,
     haven,
+    hrbrthemes,
     janitor,
     kableExtra,
+    knitr,
     lubridate,
+    markdown,
     openxlsx,
     purrr,
+    RColorBrewer,
     reactable,
     readr,
     readxl,
+    rmarkdown,
+    rmdformats,
     shiny,
+    shinythemes,
     stringr,
     testthat,
     vctrs,
