@@ -2,6 +2,13 @@
 library(knitr)
 library(arsenal)
 library(diffdf)
+library(stringr)
+library(janitor)
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(lubridate)
+library(purrr)
 library(rmdformats)
 library(devtools)
 library(hrbrthemes)
@@ -24,9 +31,131 @@ options(shiny.maxRequestSize = 2000 * 1024^2)
   match(x, table, nomatch = 0L) == 0L
 }
 # "A" %in% "B"
+# fresh theme ------------------------------------------------------------------
+## dfdiffs_fresh_theme -----
+dfdiffs_fresh_theme <- function() {
+  fresh::create_theme(
+    # theme vars  -------
+    fresh::bs4dash_vars(
+      navbar_light_color = "#353d98", # purple
+      navbar_light_active_color = "#353d98", # purple
+      navbar_light_hover_color = "#f26631" # orange
+    ),
+    # # theme yiq ------
+    fresh::bs4dash_yiq(
+      contrasted_threshold = 255,
+      text_dark = "#0a0a0a", # dark_gray_s10
+      text_light = "#f5f5f5" # gray_t10
+    ),
+    # theme layout ------
+    fresh::bs4dash_layout(
+      main_bg = NULL, # #ececec
+      font_size_root = 12
+    ),
+    # theme sidebar_light ------
+    fresh::bs4dash_sidebar_light(
+      header_color = "#ccd5dd", # light blue
+      bg = "#eaebf4", # background of entire side-bar
+      color = "#002E56", # text color (no hover)
+      hover_color = "#ee304e", # text color on hover
+      hover_bg = "#353D98", # color on hover
+      active_color = "#f26631", # color is actually the 'primary' status color
+      submenu_bg = "#f5f5f5", # purple
+      submenu_color = "#002444",
+      submenu_hover_color = "#353D98" # purple
+    ),
+    # # theme sidebar_dark ------
+    fresh::bs4dash_sidebar_dark(
+      header_color = "#ccd5dd",
+      bg = "#1a1e4c",
+      color = "#EE304E", # text color (no hover)
+      hover_bg = "#aeb1d5", # color on hover
+      hover_color = "#EE304E", # text color on hover
+      active_color = "#f26631" # color is actually the 'primary' status color
+    ),
+    # theme status ------
+    fresh::bs4dash_status(
+      dark = "#323232",
+      light = "#A0A0A0", # gray
+      warning = "#F26631", # orange
+      primary = "#A9218E", # violet = #A9218E, blue = #00509C
+      secondary = "#353D98", # purple
+      success = "#00509C", # blue
+      danger = "#EE304E", # red
+      info = "#A0A0A0" # gray
+    ),
+    # theme color ------
+    fresh::bs4dash_color(
+      gray_900 = "#1f245b",
+      gray_800 = "#646464",
+      lightblue = "#6696c3",
+      blue = "#00509C"
+    )
+  )
+}
+# reactable themes --------------------------------------------------------
+## base_react_theme ------
+base_react_theme <- reactableTheme(
+          color = "#FFFFFF",
+          backgroundColor = "#761763",
+          borderColor = "#646464",
+          stripedColor = "hsl(233, 12%, 22%)",
+          highlightColor = "#a9218e",
+          inputStyle = list(backgroundColor = "#3A3B45"),
+          selectStyle = list(backgroundColor = "#3A3B45"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+## comp_react_theme -------
+comp_react_theme <- reactableTheme(
+          color = "#FFFFFF",
+          backgroundColor = "#2f3688",
+          borderColor = "#646464",
+          stripedColor = "hsl(233, 12%, 22%)",
+          highlightColor = "#353d98",
+          inputStyle = list(backgroundColor = "#3A3B45"),
+          selectStyle = list(backgroundColor = "#3A3B45"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+## new_react_theme -------
+new_react_theme <- reactableTheme(
+          color = "#00509C",
+          backgroundColor = "#FFFFFF",
+          borderColor = "#A0A0A0",
+          stripedColor = "#3A3B45",
+          highlightColor = "#eeeeee",
+          inputStyle = list(backgroundColor = "#eeeeee"),
+          selectStyle = list(backgroundColor = "#eeeeee"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+# deleted_react_theme --------
+deleted_react_theme <- reactableTheme(
+          color = "#d62b46",
+          backgroundColor = "#FFFFFF",
+          borderColor = "#A0A0A0",
+          stripedColor = "#3A3B45",
+          highlightColor = "#eeeeee",
+          inputStyle = list(backgroundColor = "#eeeeee"),
+          selectStyle = list(backgroundColor = "#eeeeee"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+# changed_react_theme -----
+changed_react_theme <- reactableTheme(
+          color = "#c15127",
+          backgroundColor = "#FFFFFF",
+          borderColor = "#646464",
+          stripedColor = "#3A3B45",
+          highlightColor = "#eeeeee",
+          inputStyle = list(backgroundColor = "#eeeeee"),
+          selectStyle = list(backgroundColor = "#eeeeee"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
 
 # UPLOAD ------------------------------------------------------------------
-# load_flat_file ----------------------------------------------------------
 load_flat_file <- function(path) {
   ext <- tools::file_ext(path)
   data <- switch(ext,
@@ -41,7 +170,6 @@ load_flat_file <- function(path) {
   return_data <- tibble::as_tibble(data)
   return(return_data)
 }
-# upload_data -------------------------------------------------------------
 upload_data <- function(path, sheet = NULL) {
   ext <- tools::file_ext(path)
   if (ext == "xlsx") {
@@ -56,7 +184,7 @@ upload_data <- function(path, sheet = NULL) {
   return(uploaded)
 }
 # COMPARE ---------------------------------------------------------
-## rename_join_col ------
+
 rename_join_col <- function(data, by, by_col) {
     # names(data)[names(data) == by] <- by_col
     renamed_data <-  dplyr::rename_with(.data = data,
@@ -90,33 +218,6 @@ create_new_column <- function(data, cols, new_name) {
     return(join_col_data)
   }
 ## create_new_data ------
-#' Create a table of new records
-#'
-#' @param compare a 'new' or 'current' dataset
-#' @param base an 'old' or 'previous' dataset
-#' @param by the joining column between the two datasets
-#' @param by_col name of the new joining column
-#' @param  cols names of columns to compare
-#'
-#' @return new_data
-#' @export create_new_data
-#'
-#' @importFrom dplyr anti_join
-#' @importFrom dplyr distinct
-#' @importFrom dplyr select
-#' @importFrom dplyr intersect
-#' @importFrom dplyr relocate
-#' @importFrom tidyr unite
-#' @importFrom tibble add_column
-#'
-#' @examples # using local data
-#' T2Data <- dfdiffs::T2Data
-#' T1Data <- dfdiffs::T1Data
-#' create_new_data(compare = T2Data, base = T1Data,
-#'                 by = c('subject', 'record'))
-#' create_new_data(compare = T2Data, base = T1Data,
-#'                 by = c('subject', 'record'),
-#'                 cols = c("text_var", "factor_var"))
 create_new_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
   # convert all columns to character
   compare <- mutate(compare, across(.cols = everything(), .fns = as.character))
@@ -223,39 +324,6 @@ create_new_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL
   return(new_data)
 }
 ## create_deleted_data ------
-#' Create a dataset of deleted records
-#'
-#' @param compare a 'new' or 'current' dataset
-#' @param base an 'old' or 'previous' dataset
-#' @param by the joining column between the two datasets
-#' @param by_col name of the new joining column
-#' @param  cols names of columns to compare
-#'
-#' @return deleted_data
-#' @export create_deleted_data
-#'
-#' @importFrom dplyr anti_join
-#' @importFrom dplyr distinct
-#' @importFrom dplyr select
-#' @importFrom dplyr intersect
-#' @importFrom dplyr relocate
-#' @importFrom tidyr unite
-#' @importFrom tibble add_column
-#'
-#' @examples # using local data
-#' CompleteData <- dfdiffs::CompleteData
-#' IncompleteData <- dfdiffs::IncompleteData
-#' create_deleted_data(compare = IncompleteData, base = CompleteData,
-#'                     by = c("subject", "record"))
-#' create_deleted_data(compare = IncompleteData, base = CompleteData,
-#'                     by = c("subject", "record")
-#'                     by_col = "join_var"
-#'                     )
-#' create_deleted_data(compare = IncompleteData, base = CompleteData,
-#'                     by = c("subject", "record")
-#'                     by_col = "join_var",
-#'                     cols = c("subject", "record")
-#'                     )
 create_deleted_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
   # convert all columns to character
   compare <- mutate(compare, across(.cols = everything(), .fns = as.character))
@@ -368,16 +436,6 @@ create_deleted_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
   return(deleted_data)
 }
 ## extract_df_tables ------
-#' Extract tables from `diffdf::diffdf` list
-#'
-#' @param diffdf_list output from `diffdf::diffdf()` function
-#' @param by_keys `keys` argument from `diffdf::diffdf()`/`by` argument from
-#'      `create_changed_data()`
-#'
-#' @return diff_tbls list of diff tables
-#' @export extract_df_tables
-#'
-#' @description This is a sub-function for create_changed_data()
 extract_df_tables <- function(diffdf_list, by_keys) {
   diff_lst_nms <- base::names(diffdf_list)
   num_diffs_lst <- diffdf_list[stringr::str_detect(diff_lst_nms, "Num")]
@@ -435,40 +493,6 @@ extract_df_tables <- function(diffdf_list, by_keys) {
   return(diff_tbls)
 }
 ## create_changed_data ------
-#' Create changed data
-#'
-#' @param compare A 'current' or 'new' dataset (tibble or data.frame)
-#' @param base A 'previous' or 'old' dataset (tibble or data.frame)
-#' @param by A join column between the two datasets, or any combination of columns that constitute a unique row.
-#' @param by_col A new name for the joining column.
-#' @param cols Columns to be compared.
-#'
-#' @importFrom diffdf diffdf
-#' @importFrom dplyr mutate
-#' @importFrom dplyr across
-#' @importFrom dplyr select
-#' @importFrom dplyr contains
-#' @importFrom dplyr relocate
-#' @importFrom dplyr row_number
-#' @importFrom tibble as_tibble
-#'
-#' @return modified data
-#' @export create_changed_data
-#'
-#' @examples # with local data
-#' ChangedData <- dfdiffs::ChangedData
-#' InitialData <- dfdiffs::InitialData
-#' create_changed_data(
-#'   compare = ChangedData,
-#'   base = InitialData,
-#'   by = c("subject_id", "record"),
-#'   cols = c("text_value_a", "text_value_b", "updated_date")
-#' )
-#' create_changed_data(
-#'   compare = ChangedData,
-#'   base = InitialData,
-#'   by = c("subject_id", "record")
-#' )
 create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
   # check to see if by is included in cols
   if (sum(by %in% cols) > 0) {
@@ -649,38 +673,6 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
   return(changed_data)
 }
 ## create_modified_data ------
-#' Create modified data
-#'
-#' @param compare A 'current' or 'new' dataset (tibble or data.frame)
-#' @param base A 'previous' or 'old' dataset (tibble or data.frame)
-#' @param by A join column between the two datasets, or any combination of columns that constitute a unique row.
-#' @param by_col A new name for the joining column.
-#' @param cols Columns to be compared.
-#'
-#' @importFrom arsenal comparedf
-#' @importFrom dplyr mutate
-#' @importFrom dplyr across
-#' @importFrom dplyr select
-#' @importFrom dplyr contains
-#' @importFrom dplyr relocate
-#' @importFrom dplyr row_number
-#' @importFrom tibble as_tibble
-#'
-#' @return modified data
-#' @export create_modified_data
-#'
-#' @examples # with local data
-#' CurrentData <- dfdiffs::ChangedData
-#' PreviousData <- dfdiffs::InitialData
-#' create_modified_data(
-#'            compare = CurrentData,
-#'            base = PreviousData,
-#'            by = c("subject_id", "record"),
-#'            cols = c("text_value_a", "text_value_b", "updated_date"))
-#' create_modified_data(
-#'            compare = CurrentData,
-#'            base = PreviousData,
-#'            by = c("subject_id", "record"))
 create_modified_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
     # convert all columns to character
     compare <- dplyr::mutate(compare,
@@ -1001,127 +993,3 @@ create_modified_data <- function(compare, base, by = NULL, by_col = NULL, cols =
     }
     return(mod_data)
 }
-
-# THEMES ------------------------------------------------------------------
-## dfdiffs_fresh_theme -----
-dfdiffs_fresh_theme <- function() {
-  fresh::create_theme(
-    # theme vars  -------
-    fresh::bs4dash_vars(
-      navbar_light_color = "#353d98", # purple
-      navbar_light_active_color = "#353d98", # purple
-      navbar_light_hover_color = "#f26631" # orange
-    ),
-    # # theme yiq ------
-    fresh::bs4dash_yiq(
-      contrasted_threshold = 255,
-      text_dark = "#0a0a0a", # dark_gray_s10
-      text_light = "#f5f5f5" # gray_t10
-    ),
-    # theme layout ------
-    fresh::bs4dash_layout(
-      main_bg = NULL, # #ececec
-      font_size_root = 12
-    ),
-    # theme sidebar_light ------
-    fresh::bs4dash_sidebar_light(
-      header_color = "#ccd5dd", # light blue
-      bg = "#eaebf4", # background of entire side-bar
-      color = "#002E56", # text color (no hover)
-      hover_color = "#ee304e", # text color on hover
-      hover_bg = "#353D98", # color on hover
-      active_color = "#f26631", # color is actually the 'primary' status color
-      submenu_bg = "#f5f5f5", # purple
-      submenu_color = "#002444",
-      submenu_hover_color = "#353D98" # purple
-    ),
-    # # theme sidebar_dark ------
-    fresh::bs4dash_sidebar_dark(
-      header_color = "#ccd5dd",
-      bg = "#1a1e4c",
-      color = "#EE304E", # text color (no hover)
-      hover_bg = "#aeb1d5", # color on hover
-      hover_color = "#EE304E", # text color on hover
-      active_color = "#f26631" # color is actually the 'primary' status color
-    ),
-    # theme status ------
-    fresh::bs4dash_status(
-      dark = "#323232",
-      light = "#A0A0A0", # gray
-      warning = "#F26631", # orange
-      primary = "#A9218E", # violet = #A9218E, blue = #00509C
-      secondary = "#353D98", # purple
-      success = "#00509C", # blue
-      danger = "#EE304E", # red
-      info = "#A0A0A0" # gray
-    ),
-    # theme color ------
-    fresh::bs4dash_color(
-      gray_900 = "#1f245b",
-      gray_800 = "#646464",
-      lightblue = "#6696c3",
-      blue = "#00509C"
-    )
-  )
-}
-# reactable themes --------------------------------------------------------
-## base_react_theme ------
-base_react_theme <- reactableTheme(
-          color = "#FFFFFF",
-          backgroundColor = "#761763",
-          borderColor = "#646464",
-          stripedColor = "hsl(233, 12%, 22%)",
-          highlightColor = "#a9218e",
-          inputStyle = list(backgroundColor = "#3A3B45"),
-          selectStyle = list(backgroundColor = "#3A3B45"),
-          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
-        )
-## comp_react_theme -------
-comp_react_theme <- reactableTheme(
-          color = "#FFFFFF",
-          backgroundColor = "#2f3688",
-          borderColor = "#646464",
-          stripedColor = "hsl(233, 12%, 22%)",
-          highlightColor = "#353d98",
-          inputStyle = list(backgroundColor = "#3A3B45"),
-          selectStyle = list(backgroundColor = "#3A3B45"),
-          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
-        )
-## new_react_theme -------
-new_react_theme <- reactableTheme(
-          color = "#00509C",
-          backgroundColor = "#FFFFFF",
-          borderColor = "#A0A0A0",
-          stripedColor = "#3A3B45",
-          highlightColor = "#eeeeee",
-          inputStyle = list(backgroundColor = "#eeeeee"),
-          selectStyle = list(backgroundColor = "#eeeeee"),
-          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
-        )
-# deleted_react_theme --------
-deleted_react_theme <- reactableTheme(
-          color = "#d62b46",
-          backgroundColor = "#FFFFFF",
-          borderColor = "#A0A0A0",
-          stripedColor = "#3A3B45",
-          highlightColor = "#eeeeee",
-          inputStyle = list(backgroundColor = "#eeeeee"),
-          selectStyle = list(backgroundColor = "#eeeeee"),
-          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
-        )
-# changed_react_theme -----
-changed_react_theme <- reactableTheme(
-          color = "#c15127",
-          backgroundColor = "#FFFFFF",
-          borderColor = "#646464",
-          stripedColor = "#3A3B45",
-          highlightColor = "#eeeeee",
-          inputStyle = list(backgroundColor = "#eeeeee"),
-          selectStyle = list(backgroundColor = "#eeeeee"),
-          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
-        )

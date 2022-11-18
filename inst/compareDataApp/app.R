@@ -1,4 +1,4 @@
-source("helpers.R")
+source("app_utils.R")
 ## set theme ---------------------------------------------------------------
 compare_theme <- dfdiffs_fresh_theme()
 #' uploadDataUI()
@@ -894,6 +894,13 @@ compareDataUI <- function(id) {
               )
             )
           )
+        ),
+        fluidRow(
+          column(width = 12,
+            downloadButton(outputId =
+                NS(namespace = id, id = "download"),
+              label = "Download Report")
+            )
         )
       )
     ),
@@ -1438,6 +1445,140 @@ compareDataServer <- function(id, data_selected) {
         })
       }
     })
+    
+#### DOWNLOAD REPORT = report  ---------------
+    output$download <- downloadHandler(
+
+      filename = function() {
+        paste(Sys.Date(), "-comparison-report",
+              ".xlsx", sep = "")
+      },
+      content = function(file) {
+        # create workbook
+        comp_wb <- openxlsx::createWorkbook()
+
+        # add sheets
+        openxlsx::addWorksheet(wb = comp_wb,
+                               sheetName = "New Data")
+        openxlsx::addWorksheet(wb = comp_wb,
+                               sheetName = "Deleted Data")
+        openxlsx::addWorksheet(wb = comp_wb,
+                               sheetName = "Changed Data")
+        openxlsx::addWorksheet(wb = comp_wb,
+                               sheetName = "Review Changes")
+
+        #### DATA download ----
+          if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
+             #### NEW DATA ----
+             new <- create_new_data(
+                compare = comp_join_data(),
+                base = base_join_data(),
+                by = "join_column"
+              )
+              #### DELETED DATA ----
+              deleted <- create_deleted_data(
+                compare = comp_join_data(),
+                base = base_join_data(),
+                by = "join_column"
+              )
+              #### CHANGED DATA ----
+              #### remove data_source
+              comp_join_data <- select(comp_join_data(), -data_source)
+              base_join_data <- select(base_join_data(), -data_source)
+              # changed_data
+              # create changed_data with by column
+              changed_data <- create_changed_data(
+                compare = comp_join_data,
+                base = base_join_data,
+                by = "join_column"
+              )
+              ##### num_diffs_dwnld ----
+              num_diffs_dwnld <- dplyr::rename(
+                changed_data()$num_diffs,
+                Variable = variable,
+                `Differences` = no_of_differences)
+              ##### comp_var_diffs_dwnld ----
+                comp_var_diffs_dwnld <- left_join(
+                      x = changed_data()$var_diffs,
+                      y = comp_join_data(),
+                      by = "join_column"
+                    )
+
+          } else {
+            #### NEW DATA ----
+            new <- create_new_data(
+              compare = comp_join_data(),
+              base = base_join_data()
+            )
+            #### DELETED DATA ----
+            deleted <- create_deleted_data(
+              compare = comp_join_data(),
+              base = base_join_data()
+            )
+            #### CHANGED DATA ----
+            comp_join_data <- select(comp_join_data(), -data_source)
+            base_join_data <- select(base_join_data(), -data_source)
+            changed_data <- create_changed_data(
+              compare = comp_join_data,
+              base = base_join_data
+            )
+            ##### num_diffs_dwnld ----
+            num_diffs_dwnld <- dplyr::rename(
+                changed_data()$num_diffs,
+                Variable = variable,
+                `Differences` = no_of_differences)
+            ##### comp_var_diffs_dwnld ----
+            ###### ROW-BY-ROW comparison ----
+            comp_var_diffs_dwnld <- comp_join_data() |>
+              mutate(
+                rownumber = row_number(),
+                rownumber = as.character(rownumber)
+              ) |>
+              relocate(rownumber, .before = 1)
+              # join to var_diffs
+              left_join(
+                x = changed_data()$var_diffs,
+                y = compare_row_by_row,
+                by = "rownumber"
+              )
+          }
+        #### write NEW DATA ----
+        openxlsx::writeData(
+          wb = comp_wb,
+          sheet = "New Data",
+          x = new,
+          startCol = 1,
+          startRow = 1
+        )
+        #### write DELETED DATA ----
+        openxlsx::writeData(
+          wb = comp_wb,
+          sheet = "Deleted Data",
+          x = deleted,
+          startCol = 1,
+          startRow = 1
+        )
+        #### write NUM DIFFS DATA ----
+        openxlsx::writeData(
+          wb = comp_wb,
+          sheet = "Changed Data",
+          x = num_diffs_dwnld,
+          startCol = 1,
+          startRow = 1
+        )
+        #### write NUM DIFFS DATA ----
+        openxlsx::writeData(
+          wb = comp_wb,
+          sheet = "Review Changes",
+          x = comp_var_diffs_dwnld,
+          startCol = 1,
+          startRow = 1
+        )
+
+        openxlsx::saveWorkbook(comp_wb, file = file, overwrite = TRUE)
+      }
+    )
+    
   })
 }
 #' compareDataApp

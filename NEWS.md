@@ -1,5 +1,11 @@
 # dfdiffs 0.1.0
 
+## 0.0.0.9000
+
+ - [x] new vignettes  
+ - [x] dev app (https://mjfrigaard.shinyapps.io/compareDataDemo/)
+ - [x] uat app (https://mjfrigaard.shinyapps.io/compareDataApp/)
+
 ## 2022-07-16
 
 - [x] Development version of modules have the following prefix: `dev_` 

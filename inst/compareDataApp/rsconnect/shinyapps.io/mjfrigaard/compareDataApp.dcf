@@ -4,10 +4,10 @@ username:
 account: mjfrigaard
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
-appId: 6643448
-bundleId: 6109026
+appId: 7674260
+bundleId: 6530551
 url: https://mjfrigaard.shinyapps.io/compareDataApp/
-when: 1658167760.01566
-lastSyncTime: 1658167760.01567
+when: 1668801255.01285
+lastSyncTime: 1668801255.01289
 asMultiple: FALSE
 asStatic: FALSE
