@@ -68,7 +68,7 @@ See the first module for the application, `uploadDataDemo` module [here.](https:
 This document contains to following elements:
 
 - Application themes
-  - `bmrn_fresh_theme()` is built using the `fresh::create_theme()`   
+  - `dfdiffs_fresh_theme()` is built using the `fresh::create_theme()`   
 - `uploadDataUI()`/`uploadDataServer()`   
 - `selectDataUI`/`selectDataServer()`/`selectDataDemo`  
   - this module inherits the uploaded data from the `uploadData` module and displays it in the **Select Data** tab
@@ -83,10 +83,10 @@ source("helpers.R")
 
 ## App theme 
 
-We define the `bmrn_fresh_theme()` using `fresh::create_theme()`. 
+We define the `dfdiffs_fresh_theme()` using `fresh::create_theme()`. 
 
-```{r bmrn_fresh_theme}
-bmrn_fresh_theme <- function() {
+```{r dfdiffs_fresh_theme}
+dfdiffs_fresh_theme <- function() {
   fresh::create_theme(
     # theme vars  -------------------------------------------------------------
     fresh::bs4dash_vars(
@@ -154,7 +154,7 @@ Both base and compare datasets will be differentiated by color in the applicatio
 
 ### Base display
 
-The base color will use the `#761763` background color (based on the bmrn violet (`#a9218e`) :
+The base color will use the `#761763` background color (based on the  violet (`#a9218e`) :
 
 ```{r base_react_theme}
 base_react_theme <- reactableTheme(
@@ -172,7 +172,7 @@ base_react_theme <- reactableTheme(
 
 ### Compare display
 
-The compare color will use the `#2f3688` background color (based on the bmrn purple (`#353d98`) :
+The compare color will use the `#2f3688` background color (based on the  purple (`#353d98`) :
 
 ```{r comp_react_theme}
 comp_react_theme <- reactableTheme(
@@ -1691,7 +1691,7 @@ selectDataServer <- function(id, data_upload) {
 Below we define a theme as `select_data_theme`, and build `selectDataDemo()`, which includes both `uploadData` and `selectData` modules. 
 
 ```{r selectDataDemo}
-select_data_theme <- bmrn_fresh_theme()
+select_data_theme <- dfdiffs_fresh_theme()
 selectDataDemo <- function() {
   ui <- bs4Dash::dashboardPage(
     title = "(dev) selectDataDemo",

@@ -1,6 +1,6 @@
 source("helpers.R")
 ## set theme -------
-compare_theme <- bmrn_fresh_theme()
+compare_theme <- dfdiffs_fresh_theme()
 # dev_uploadDataUI --------------------------------------------------------
 #' dev_uploadDataUI()
 #'

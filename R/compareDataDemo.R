@@ -1,5 +1,5 @@
 ## set theme ---------------------------------------------------------------
-compare_theme <- bmrn_fresh_theme()
+compare_theme <- dfdiffs_fresh_theme()
 
 #' compareDataDemo
 #'

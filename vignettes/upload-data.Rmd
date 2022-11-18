@@ -97,10 +97,10 @@ lahman_2010_csv_paths <- list.files(path = "../inst/extdata/csv/2010-lahman", fu
 head(lahman_2010_csv_paths)
 ```
 
-Test this on `lahman_2010_csv_paths[13]`
+Test this on `lahman_2010_csv_paths[3]`
 
 ```{r test-load_flat_file-1}
-master_2010 <- load_flat_file(path = lahman_2010_csv_paths[4])
+master_2010 <- load_flat_file(path = lahman_2010_csv_paths[3])
 glimpse(master_2010)
 ```
 
@@ -111,10 +111,10 @@ lahman_2015_csv_paths <- list.files(path = "../inst/extdata/csv/2015-baseballdat
 head(lahman_2015_csv_paths)
 ```
 
-Test this on `lahman_2015_csv_paths[4]`
+Test this on `lahman_2015_csv_paths[3]`
 
 ```{r test-master_2015}
-master_csv_2015 <- load_flat_file(path = lahman_2015_csv_paths[4])
+master_csv_2015 <- load_flat_file(path = lahman_2015_csv_paths[3])
 glimpse(master_csv_2015)
 ```
 

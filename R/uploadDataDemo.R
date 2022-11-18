@@ -1,5 +1,5 @@
 # set theme ---------------------------------------------------------------
-upload_theme <- bmrn_fresh_theme()
+upload_theme <- dfdiffs_fresh_theme()
 
 #' uploadDataDemo
 #'

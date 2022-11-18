@@ -16,12 +16,6 @@
     <loc>https://mjfrigaard.github.io/dfdiffs/articles/compare-data.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/dfdiffs/articles/comparison-conditions.html</loc>
-  </url>
-  <url>
-    <loc>https://mjfrigaard.github.io/dfdiffs/articles/comparison-datasets.html</loc>
-  </url>
-  <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/articles/create-deleted-data.html</loc>
   </url>
   <url>
@@ -149,6 +143,9 @@
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/dev_uploadDataUI.html</loc>
+  </url>
+  <url>
+    <loc>https://mjfrigaard.github.io/dfdiffs/reference/dfdiffs_fresh_theme.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/displayDataDemo.html</loc>

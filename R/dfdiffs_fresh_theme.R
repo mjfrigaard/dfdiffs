@@ -1,10 +1,10 @@
-#' BioMarin theme (fresh <> bs4Dash)
+#' custom theme (fresh <> bs4Dash)
 #'
 #' @return theme shiny app
-#' @export bmrn_fresh_theme
+#' @export dfdiffs_fresh_theme
 #'
-#' @description this is the fresh theme with BioMarin colors.
-bmrn_fresh_theme <- function() {
+#' @description this is the fresh theme with custom colors.
+dfdiffs_fresh_theme <- function() {
   fresh::create_theme(
     # theme vars  -------------------------------------------------------------
     fresh::bs4dash_vars(

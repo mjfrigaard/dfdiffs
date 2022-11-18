@@ -38,6 +38,26 @@ Our package
 library(dfdiffs)
 ```
 
+Packages for import/export, iteration, wrangling, etc. 
+
+```{r more-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
+library(readr)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(purrr)
+library(glue)
+```
+
+Packages for tables.
+
+```{r tbl-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
+library(labelled)
+library(gt)
+library(gtsummary)
+library(kableExtra)
+```
+
 
 Similar packages 
 
@@ -161,27 +181,6 @@ mods$diffs |>
   kableExtra::kable_paper()
 ```
 
-## Lahman datasets 
-
-We will also import two master datasets from the `Lahman` baseball package. 
-
-```{r masters, echo=TRUE}
-master15 <- dfdiffs::master15
-master20 <- dfdiffs::master20
-```
-
-### Master (2015)
-
-```{r master15, echo=TRUE}
-glimpse(master15)
-```
-
-### Master (2020)
-
-```{r master20, echo=TRUE}
-glimpse(master20)
-```
-
 
 ## `janitor::compare_df_cols_same()`
 
@@ -199,16 +198,16 @@ All of our test datasets meet this condition, but this could be used as a step i
 
 This works, but returns the result as an error. 
 
-```{r , error=TRUE}
+```{r expect_equal-initial-changed, error=TRUE}
 testthat::expect_equal(object = InitialData, expected = ChangedData)
 ```
 
-```{r , error=TRUE}
+```{r expect_equal-t1data-t2data, error=TRUE}
 testthat::expect_equal(object = T1Data, expected = T2Data)
 ```
 
 
-## vetr::alike()
+## `vetr::alike()`
 
 ```{r}
 vetr::alike(target = InitialData, current = ChangedData)

@@ -40,8 +40,6 @@ The goal of the `dfdiffs` is to answer the following questions:
 1. What rows are here now that weren't here before?  
 2. *What rows were here before that aren't here now?*
 3. What values have been changed?   
-4. What columns have been moved?    
-5. What rows have been moved?    
 
 This vignette takes us through the `create_deleted_data()` function, which answers the "*What rows were here before that aren't here now?*"  
 
@@ -58,6 +56,7 @@ library(fs)
 library(vctrs)
 library(glue)
 library(purrr)
+library(flextable)
 ```
 
 ## What rows were here before that aren't here now? 
@@ -89,7 +88,7 @@ flextable::qflextable(IncompleteData) |>
 
 ```{r DeletedData}
 DeletedData <- dfdiffs::DeletedData
-flextable::qflextable(DeletedData, cwidth = ) |>
+flextable::qflextable(DeletedData) |>
   flextable::set_table_properties(layout = "autofit")
 ```
 
@@ -108,7 +107,7 @@ Each function in the `dfdiffs` package assumes the following conditions:
 
 1) Two datasets, compare all columns:
 
-    ```{r cond-21, eval=FALSE}
+    ```{r cond-1, eval=FALSE}
     create_deleted_data(
       compare = IncompleteData, 
       base = CompleteData)
@@ -253,6 +252,8 @@ IncompleteDataJoin <- create_new_column(
 flextable::qflextable(IncompleteDataJoin) |>
   flextable::set_table_properties(layout = "autofit")
 ```
+
+<br><br>
 
 # create_deleted_data() 
 

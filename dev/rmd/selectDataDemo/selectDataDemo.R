@@ -1170,7 +1170,7 @@ selectDataServer <- function(id, data_upload) {
 
 
 # select_data_theme -------------------------------------------------------
-select_data_theme <- bmrn_fresh_theme()
+select_data_theme <- dfdiffs_fresh_theme()
 
 # selectDataDemo ----------------------------------------------------------
 selectDataDemo <- function() {

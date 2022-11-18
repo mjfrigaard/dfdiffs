@@ -65,8 +65,8 @@ upload_data <- function(path, sheet = NULL) {
 }
 
 
-# bmrn_fresh_theme --------------------------------------------------------
-bmrn_fresh_theme <- function() {
+# dfdiffs_fresh_theme --------------------------------------------------------
+dfdiffs_fresh_theme <- function() {
   fresh::create_theme(
     # theme vars  -------------------------------------------------------------
     fresh::bs4dash_vars(

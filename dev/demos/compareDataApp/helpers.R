@@ -26,8 +26,8 @@ options(shiny.maxRequestSize = 2000 * 1024^2)
 }
 # "A" %in% "B"
 # fresh theme ------------------------------------------------------------------
-## bmrn_fresh_theme -----
-bmrn_fresh_theme <- function() {
+## dfdiffs_fresh_theme -----
+dfdiffs_fresh_theme <- function() {
   fresh::create_theme(
     # theme vars  -------
     fresh::bs4dash_vars(

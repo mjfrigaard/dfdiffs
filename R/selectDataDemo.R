@@ -1,5 +1,5 @@
-# bmrn_fresh_theme --------------------------------------------------------
-select_data_theme <- bmrn_fresh_theme()
+# dfdiffs_fresh_theme --------------------------------------------------------
+select_data_theme <- dfdiffs_fresh_theme()
 
 
 #' selectDataDemo

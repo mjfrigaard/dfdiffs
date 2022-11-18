@@ -14,14 +14,14 @@ library(shinythemes)
 library(bs4Dash)
 
 
-# bmrn_fresh_theme --------------------------------------------------------
-#' BioMarin theme (fresh <> bs4Dash)
+# dfdiffs_fresh_theme --------------------------------------------------------
+#' custom theme (fresh <> bs4Dash)
 #'
 #' @return theme shiny app
-#' @export bmrn_fresh_theme
+#' @export dfdiffs_fresh_theme
 #'
-#' @description this is the fresh theme with BioMarin colors.
-bmrn_fresh_theme <- function() {
+#' @description this is the fresh theme with custom colors.
+dfdiffs_fresh_theme <- function() {
   fresh::create_theme(
     # theme vars  -------------------------------------------------------------
     fresh::bs4dash_vars(
@@ -81,7 +81,7 @@ bmrn_fresh_theme <- function() {
     )
   )
 }
-select_data_theme <- bmrn_fresh_theme()
+select_data_theme <- dfdiffs_fresh_theme()
 
 # reactable theme ---------------------------------------------------------
 options(reactable.theme = reactableTheme(

@@ -3,7 +3,6 @@ library(knitr)
 library(arsenal)
 library(diffdf)
 library(rmdformats)
-
 library(devtools)
 library(hrbrthemes)
 library(fs)
@@ -25,147 +24,9 @@ options(shiny.maxRequestSize = 2000 * 1024^2)
   match(x, table, nomatch = 0L) == 0L
 }
 # "A" %in% "B"
-# fresh theme ------------------------------------------------------------------
-## bmrn_fresh_theme -----
-bmrn_fresh_theme <- function() {
-  fresh::create_theme(
-    # theme vars  -------
-    fresh::bs4dash_vars(
-      navbar_light_color = "#353d98", # purple
-      navbar_light_active_color = "#353d98", # purple
-      navbar_light_hover_color = "#f26631" # orange
-    ),
-    # # theme yiq ------
-    fresh::bs4dash_yiq(
-      contrasted_threshold = 255,
-      text_dark = "#0a0a0a", # dark_gray_s10
-      text_light = "#f5f5f5" # gray_t10
-    ),
-    # theme layout ------
-    fresh::bs4dash_layout(
-      main_bg = NULL, # #ececec
-      font_size_root = 12
-    ),
-    # theme sidebar_light ------
-    fresh::bs4dash_sidebar_light(
-      header_color = "#ccd5dd", # light blue
-      bg = "#eaebf4", # background of entire side-bar
-      color = "#002E56", # text color (no hover)
-      hover_color = "#ee304e", # text color on hover
-      hover_bg = "#353D98", # color on hover
-      active_color = "#f26631", # color is actually the 'primary' status color
-      submenu_bg = "#f5f5f5", # purple
-      submenu_color = "#002444",
-      submenu_hover_color = "#353D98" # purple
-    ),
-    # # theme sidebar_dark ------
-    fresh::bs4dash_sidebar_dark(
-      header_color = "#ccd5dd",
-      bg = "#1a1e4c",
-      color = "#EE304E", # text color (no hover)
-      hover_bg = "#aeb1d5", # color on hover
-      hover_color = "#EE304E", # text color on hover
-      active_color = "#f26631" # color is actually the 'primary' status color
-    ),
-    # theme status ------
-    fresh::bs4dash_status(
-      dark = "#323232",
-      light = "#A0A0A0", # gray
-      warning = "#F26631", # orange
-      primary = "#A9218E", # violet = #A9218E, blue = #00509C
-      secondary = "#353D98", # purple
-      success = "#00509C", # blue
-      danger = "#EE304E", # red
-      info = "#A0A0A0" # gray
-    ),
-    # theme color ------
-    fresh::bs4dash_color(
-      gray_900 = "#1f245b",
-      gray_800 = "#646464",
-      lightblue = "#6696c3",
-      blue = "#00509C"
-    )
-  )
-}
-# reactable themes --------------------------------------------------------
-## base_react_theme ------
-base_react_theme <- reactableTheme(
-          color = "#FFFFFF",
-          backgroundColor = "#761763",
-          borderColor = "#646464",
-          stripedColor = "hsl(233, 12%, 22%)",
-          highlightColor = "#a9218e",
-          inputStyle = list(backgroundColor = "#3A3B45"),
-          selectStyle = list(backgroundColor = "#3A3B45"),
-          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
-        )
-## comp_react_theme -------
-comp_react_theme <- reactableTheme(
-          color = "#FFFFFF",
-          backgroundColor = "#2f3688",
-          borderColor = "#646464",
-          stripedColor = "hsl(233, 12%, 22%)",
-          highlightColor = "#353d98",
-          inputStyle = list(backgroundColor = "#3A3B45"),
-          selectStyle = list(backgroundColor = "#3A3B45"),
-          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
-        )
-## new_react_theme -------
-new_react_theme <- reactableTheme(
-          color = "#00509C",
-          backgroundColor = "#FFFFFF",
-          borderColor = "#A0A0A0",
-          stripedColor = "#3A3B45",
-          highlightColor = "#eeeeee",
-          inputStyle = list(backgroundColor = "#eeeeee"),
-          selectStyle = list(backgroundColor = "#eeeeee"),
-          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
-        )
-# deleted_react_theme --------
-deleted_react_theme <- reactableTheme(
-          color = "#d62b46",
-          backgroundColor = "#FFFFFF",
-          borderColor = "#A0A0A0",
-          stripedColor = "#3A3B45",
-          highlightColor = "#eeeeee",
-          inputStyle = list(backgroundColor = "#eeeeee"),
-          selectStyle = list(backgroundColor = "#eeeeee"),
-          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
-        )
-# changed_react_theme -----
-changed_react_theme <- reactableTheme(
-          color = "#c15127",
-          backgroundColor = "#FFFFFF",
-          borderColor = "#646464",
-          stripedColor = "#3A3B45",
-          highlightColor = "#eeeeee",
-          inputStyle = list(backgroundColor = "#eeeeee"),
-          selectStyle = list(backgroundColor = "#eeeeee"),
-          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
-        )
 
 # UPLOAD ------------------------------------------------------------------
-#' Load flat data files
-#'
-#' @param path path to data file (with extension)
-#'
-#' @return return_data
-#' @export load_flat_file
-#' @importFrom data.table fread
-#' @importFrom haven read_sas
-#' @importFrom haven read_sav
-#' @importFrom haven read_dta
-#' @importFrom tools file_ext
-#' @importFrom tibble as_tibble
-#'
-#' @examples # from local
-#' load_flat_file(path = "inst/extdata/csv/2015-baseballdatabank/core/AllstarFull.csv")
-#'
+# load_flat_file ----------------------------------------------------------
 load_flat_file <- function(path) {
   ext <- tools::file_ext(path)
   data <- switch(ext,
@@ -180,27 +41,7 @@ load_flat_file <- function(path) {
   return_data <- tibble::as_tibble(data)
   return(return_data)
 }
-#' Upload data to app `upload_data()`
-#'
-#' @param path path to data file (with extension)
-#' @param sheet excel sheet (if excel file)
-#'
-#' @return uploaded
-#' @export upload_data
-#' @importFrom readxl read_excel
-#' @importFrom tools file_ext
-#' @importFrom tibble as_tibble
-#'
-#'
-#' @examples # not run
-#' upload_data(path = "inst/extdata/app-testing/lahman_compare.xlsx",
-#'             sheet = "master-2015")
-#' upload_data(path = "inst/extdata/app-testing/m15.csv")
-#' upload_data(path = "inst/extdata/dta/iris.dta")
-#' upload_data(path = "inst/extdata/sas7bdat/iris.sas7bdat")
-#' upload_data(path = "inst/extdata/sav/iris.sav")
-#' upload_data(path = "inst/extdata/tsv/Batting.tsv")
-#' upload_data(path = "inst/extdata/txt/Batting.txt")
+# upload_data -------------------------------------------------------------
 upload_data <- function(path, sheet = NULL) {
   ext <- tools::file_ext(path)
   if (ext == "xlsx") {
@@ -216,19 +57,6 @@ upload_data <- function(path, sheet = NULL) {
 }
 # COMPARE ---------------------------------------------------------
 ## rename_join_col ------
-#' Rename join column name
-#'
-#' @param data a tibble or data.frame
-#' @param by_col new join column name
-#' @param by join column name
-#'
-#' @return renamed_data
-#' @export rename_join_col
-#'
-#' @importFrom dplyr rename
-#' @importFrom dplyr across
-#' @importFrom dplyr select
-#' @importFrom dplyr relocate
 rename_join_col <- function(data, by, by_col) {
     # names(data)[names(data) == by] <- by_col
     renamed_data <-  dplyr::rename_with(.data = data,
@@ -237,29 +65,6 @@ rename_join_col <- function(data, by, by_col) {
     return(return_data)
 }
 ## create_new_column ------
-#' Create new (joining) column
-#'
-#' @param data a tibble or data.frame
-#' @param cols cols to create new column from (they will be pasted together with "-")
-#' @param new_name new column name
-#'
-#' @importFrom dplyr relocate
-#' @importFrom tidyr unite
-#'
-#' @return new_col_data data with new column
-#' @export create_new_column
-#'
-#' @examples
-#' library(dplyr)
-#' library(tidyr)
-#' CompleteData <- dfdiffs::CompleteData
-#' IncompleteData <- dfdiffs::IncompleteData
-#' CompleteDataJoin <- create_new_column(data = CompleteData,
-#'                                        cols = c("subject", "record"),
-#'                                        new_name = "join_var")
-#' IncompleteDataJoin <- create_new_column(data = IncompleteData,
-#'                                        cols = c("subject", "record"),
-#'                                        new_name = "join_var")
 create_new_column <- function(data, cols, new_name) {
     new_col_data <- data %>%
       tidyr::unite({{new_name}}, {{cols}}, remove = FALSE, sep = "-") %>%
@@ -267,22 +72,6 @@ create_new_column <- function(data, cols, new_name) {
     return(new_col_data)
 }
 ## create_join_column ------
-#' Create unique row identifier
-#'
-#' @param df a data.frame or tibble
-#' @param by_colums columns to uniquely identify a row
-#' @param new_by_column_name the new column name
-#'
-#' @return join_col_data
-#' @export create_join_column
-#'
-#' @examples # using dfdiffs::diff_modified_data
-#' diff_modified_data <- dfdiffs::diff_modified_data
-#' current_modified <- diff_modified_data$diff_current_modified
-#' previous_modified <- diff_modified_data$diff_previous_modified
-#' create_join_column(df = current_modified,
-#'                    by_columns = c("subject_id", "record"),
-#'                    new_by_column_name = "join")
   create_join_column <- function(df, by_colums, new_by_column_name) {
     # select by_vars
     tmp <- dplyr::select(df, all_of(by_colums))
@@ -1212,3 +1001,127 @@ create_modified_data <- function(compare, base, by = NULL, by_col = NULL, cols =
     }
     return(mod_data)
 }
+
+# THEMES ------------------------------------------------------------------
+## dfdiffs_fresh_theme -----
+dfdiffs_fresh_theme <- function() {
+  fresh::create_theme(
+    # theme vars  -------
+    fresh::bs4dash_vars(
+      navbar_light_color = "#353d98", # purple
+      navbar_light_active_color = "#353d98", # purple
+      navbar_light_hover_color = "#f26631" # orange
+    ),
+    # # theme yiq ------
+    fresh::bs4dash_yiq(
+      contrasted_threshold = 255,
+      text_dark = "#0a0a0a", # dark_gray_s10
+      text_light = "#f5f5f5" # gray_t10
+    ),
+    # theme layout ------
+    fresh::bs4dash_layout(
+      main_bg = NULL, # #ececec
+      font_size_root = 12
+    ),
+    # theme sidebar_light ------
+    fresh::bs4dash_sidebar_light(
+      header_color = "#ccd5dd", # light blue
+      bg = "#eaebf4", # background of entire side-bar
+      color = "#002E56", # text color (no hover)
+      hover_color = "#ee304e", # text color on hover
+      hover_bg = "#353D98", # color on hover
+      active_color = "#f26631", # color is actually the 'primary' status color
+      submenu_bg = "#f5f5f5", # purple
+      submenu_color = "#002444",
+      submenu_hover_color = "#353D98" # purple
+    ),
+    # # theme sidebar_dark ------
+    fresh::bs4dash_sidebar_dark(
+      header_color = "#ccd5dd",
+      bg = "#1a1e4c",
+      color = "#EE304E", # text color (no hover)
+      hover_bg = "#aeb1d5", # color on hover
+      hover_color = "#EE304E", # text color on hover
+      active_color = "#f26631" # color is actually the 'primary' status color
+    ),
+    # theme status ------
+    fresh::bs4dash_status(
+      dark = "#323232",
+      light = "#A0A0A0", # gray
+      warning = "#F26631", # orange
+      primary = "#A9218E", # violet = #A9218E, blue = #00509C
+      secondary = "#353D98", # purple
+      success = "#00509C", # blue
+      danger = "#EE304E", # red
+      info = "#A0A0A0" # gray
+    ),
+    # theme color ------
+    fresh::bs4dash_color(
+      gray_900 = "#1f245b",
+      gray_800 = "#646464",
+      lightblue = "#6696c3",
+      blue = "#00509C"
+    )
+  )
+}
+# reactable themes --------------------------------------------------------
+## base_react_theme ------
+base_react_theme <- reactableTheme(
+          color = "#FFFFFF",
+          backgroundColor = "#761763",
+          borderColor = "#646464",
+          stripedColor = "hsl(233, 12%, 22%)",
+          highlightColor = "#a9218e",
+          inputStyle = list(backgroundColor = "#3A3B45"),
+          selectStyle = list(backgroundColor = "#3A3B45"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+## comp_react_theme -------
+comp_react_theme <- reactableTheme(
+          color = "#FFFFFF",
+          backgroundColor = "#2f3688",
+          borderColor = "#646464",
+          stripedColor = "hsl(233, 12%, 22%)",
+          highlightColor = "#353d98",
+          inputStyle = list(backgroundColor = "#3A3B45"),
+          selectStyle = list(backgroundColor = "#3A3B45"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+## new_react_theme -------
+new_react_theme <- reactableTheme(
+          color = "#00509C",
+          backgroundColor = "#FFFFFF",
+          borderColor = "#A0A0A0",
+          stripedColor = "#3A3B45",
+          highlightColor = "#eeeeee",
+          inputStyle = list(backgroundColor = "#eeeeee"),
+          selectStyle = list(backgroundColor = "#eeeeee"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+# deleted_react_theme --------
+deleted_react_theme <- reactableTheme(
+          color = "#d62b46",
+          backgroundColor = "#FFFFFF",
+          borderColor = "#A0A0A0",
+          stripedColor = "#3A3B45",
+          highlightColor = "#eeeeee",
+          inputStyle = list(backgroundColor = "#eeeeee"),
+          selectStyle = list(backgroundColor = "#eeeeee"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )
+# changed_react_theme -----
+changed_react_theme <- reactableTheme(
+          color = "#c15127",
+          backgroundColor = "#FFFFFF",
+          borderColor = "#646464",
+          stripedColor = "#3A3B45",
+          highlightColor = "#eeeeee",
+          inputStyle = list(backgroundColor = "#eeeeee"),
+          selectStyle = list(backgroundColor = "#eeeeee"),
+          pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
+          pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+        )

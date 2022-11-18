@@ -24,8 +24,8 @@ library(RColorBrewer)
 # "A" %in% "B"
 
 # themes ------------------------------------------------------------------
-## bmrn_fresh_theme --------------------------------------------------------
-bmrn_fresh_theme <- function() {
+## dfdiffs_fresh_theme --------------------------------------------------------
+dfdiffs_fresh_theme <- function() {
   fresh::create_theme(
     # theme vars  -------------------------------------------------------------
     fresh::bs4dash_vars(
@@ -87,7 +87,7 @@ bmrn_fresh_theme <- function() {
 }
 
 ## set theme ---------------------------------------------------------------
-compare_theme <- bmrn_fresh_theme()
+compare_theme <- dfdiffs_fresh_theme()
 
 ## base_react_theme --------------------------------------------------------
 base_react_theme <- reactableTheme(

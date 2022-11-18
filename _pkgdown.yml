@@ -1,4 +1,32 @@
 url: https://mjfrigaard.github.io/dfdiffs/
 template:
   bootstrap: 5
+  bootswatch: minty
+  theme: atom-one-dark
+
+navbar:
+ components:
+   articles:
+    text: Articles
+    menu:
+    - text: Comparisons
+    - text: Getting Started
+      href: articles/getting-started.html
+    - text: New Data
+      href: articles/create-new-data.html
+    - text: Deleted Data
+      href: articles/create-deleted-data.html
+    - text: Changed/Modified Data
+      href: articles/changed-modified-data.html
+    - text: -------
+    - text: More Comparisons
+    - text: Run all comparisons
+      href: articles/compare-data.html
+    - text: Multiple comparisons
+      href: articles/multiple-comparisons.html
+    - text: Similar work
+      href: articles/similar-work.html
+    - text: Uploading data (shiny app)
+      href: articles/upload-data.html
+
 

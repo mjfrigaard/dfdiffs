@@ -144,8 +144,8 @@ upload_data <- function(path, sheet = NULL) {
 }
 
 
-# bmrn_fresh_theme --------------------------------------------------------
-bmrn_fresh_theme <- function() {
+# dfdiffs_fresh_theme --------------------------------------------------------
+dfdiffs_fresh_theme <- function() {
   fresh::create_theme(
     # theme vars  -------------------------------------------------------------
     fresh::bs4dash_vars(
@@ -886,7 +886,7 @@ Both base and compare datasets will be differentiated by color in the applicatio
 
 ### Base display
 
-The base color will use the `#761763` background color (based on the bmrn violet (`#a9218e`) :
+The base color will use the `#761763` background color (based on the  violet (`#a9218e`) :
 
 
 ```{r base_react_theme}
@@ -906,7 +906,7 @@ base_react_theme <- reactableTheme(
 
 ### Compare display
 
-The compare color will use the `#2f3688` background color (based on the bmrn purple (`#353d98`) :
+The compare color will use the `#2f3688` background color (based on the  purple (`#353d98`) :
 
 ```{r compare_react_theme}
 # comp_react_theme ------------
@@ -927,8 +927,8 @@ comp_react_theme <- reactableTheme(
 
 Below we define the app theme using **`fresh::create_theme()`**:
 
-```{r bmrn_fresh_theme}
-bmrn_fresh_theme <- function() {
+```{r dfdiffs_fresh_theme}
+dfdiffs_fresh_theme <- function() {
   fresh::create_theme(
     # theme vars  -------------------------------------------------------------
     fresh::bs4dash_vars(
@@ -996,7 +996,7 @@ We define `uploadDataDemo()`, a function for running our application:
 
 ```{r uploadDataDemo}
 # set theme ---------------------------------------------------------------
-upload_theme <- bmrn_fresh_theme()
+upload_theme <- dfdiffs_fresh_theme()
 
 uploadDataDemo <- function() {
   ui <- bs4Dash::dashboardPage(
