@@ -99,7 +99,10 @@ datasets to each other.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor" class="external-link">janitor</a></span><span class="op">)</span> <span class="co"># compare_df_cols</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org" class="external-link">testthat</a></span><span class="op">)</span> <span class="co"># expect_equal</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/brodieG/vetr" class="external-link">vetr</a></span><span class="op">)</span> <span class="co"># alike</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/brodieG/vetr" class="external-link">vetr</a></span><span class="op">)</span> <span class="co"># alike</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://larmarange.github.io/labelled/" class="external-link">labelled</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gt.rstudio.com/" class="external-link">gt</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary" class="external-link">gtsummary</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
@@ -745,131 +748,11 @@ deleted rows between <code>IncompleteData</code> and
 <span>  compare <span class="op">=</span> <span class="va">IncompleteData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">CompleteData</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">subject</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in arrange(create_deleted_data(compare = IncompleteData, base = CompleteData), : could not find function "arrange"</span></span>
 <span><span class="va">IncompCompDiff</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"IncompCompDiff"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
-<caption>
-IncompCompDiff
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-subject
-</th>
-<th style="text-align:left;">
-record
-</th>
-<th style="text-align:left;">
-start_date
-</th>
-<th style="text-align:left;">
-mid_date
-</th>
-<th style="text-align:left;">
-end_date
-</th>
-<th style="text-align:left;">
-text_var
-</th>
-<th style="text-align:left;">
-factor_var
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-A
-</td>
-<td style="text-align:left;">
-2
-</td>
-<td style="text-align:left;">
-2021-12-28
-</td>
-<td style="text-align:left;">
-2022-01-27
-</td>
-<td style="text-align:left;">
-2022-02-26
-</td>
-<td style="text-align:left;">
-Mark the spot with a sign painted red.
-</td>
-<td style="text-align:left;">
-state
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-B
-</td>
-<td style="text-align:left;">
-3
-</td>
-<td style="text-align:left;">
-2021-12-26
-</td>
-<td style="text-align:left;">
-2022-01-25
-</td>
-<td style="text-align:left;">
-2022-02-24
-</td>
-<td style="text-align:left;">
-A blue crane is a tall wading bird.
-</td>
-<td style="text-align:left;">
-shut
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C
-</td>
-<td style="text-align:left;">
-1
-</td>
-<td style="text-align:left;">
-2021-12-30
-</td>
-<td style="text-align:left;">
-2022-01-29
-</td>
-<td style="text-align:left;">
-2022-02-28
-</td>
-<td style="text-align:left;">
-It’s easy to tell the depth of a well.
-</td>
-<td style="text-align:left;">
-grant
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-D
-</td>
-<td style="text-align:left;">
-1
-</td>
-<td style="text-align:left;">
-2021-12-27
-</td>
-<td style="text-align:left;">
-2022-01-26
-</td>
-<td style="text-align:left;">
-2022-02-25
-</td>
-<td style="text-align:left;">
-The sky that morning was clear and bright blue.
-</td>
-<td style="text-align:left;">
-tape
-</td>
-</tr>
-</tbody>
-</table>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Error in knitr::kable(IncompCompDiff, caption = "IncompCompDiff"): object 'IncompCompDiff' not found</span></span></code></pre></div>
 <p>This is identical to the data stored in <code>DeletedData</code></p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DeletedData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/DeletedData.html">DeletedData</a></span></span>
@@ -1000,17 +883,7 @@ tape
 </table>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">IncompCompDiff</span>, y <span class="op">=</span> <span class="va">DeletedData</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `old$record` is <span style="color: #00BB00;">a character vector</span> ('2', '3', '1', '1')</span></span>
-<span><span class="co">#&gt; `new$record` is <span style="color: #00BB00;">an integer vector</span> (2, 3, 1, 1)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; `old$start_date` is <span style="color: #00BB00;">a character vector</span> ('2021-12-28', '2021-12-26', '2021-12-30', '2021-12-27')</span></span>
-<span><span class="co">#&gt; `new$start_date` is <span style="color: #00BB00;">an S3 object of class &lt;Date&gt;, a double vector</span></span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; `old$mid_date` is <span style="color: #00BB00;">a character vector</span> ('2022-01-27', '2022-01-25', '2022-01-29', '2022-01-26')</span></span>
-<span><span class="co">#&gt; `new$mid_date` is <span style="color: #00BB00;">an S3 object of class &lt;Date&gt;, a double vector</span></span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; `old$end_date` is <span style="color: #00BB00;">a character vector</span> ('2022-02-26', '2022-02-24', '2022-02-28', '2022-02-25')</span></span>
-<span><span class="co">#&gt; `new$end_date` is <span style="color: #00BB00;">an S3 object of class &lt;Date&gt;, a double vector</span></span></span></code></pre></div>
+<span><span class="co">#&gt; Error in is_missing(x): object 'IncompCompDiff' not found</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="initialdatachangeddata-data">InitialData/ChangedData Data<a class="anchor" aria-label="anchor" href="#initialdatachangeddata-data"></a>
@@ -1303,64 +1176,14 @@ baseball package.</p>
 </h4>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">master15</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 18,846</span></span>
-<span><span class="co">#&gt; Columns: 24</span></span>
-<span><span class="co">#&gt; $ playerID     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aardsda01", "aaronha01", "aaronto01", "aasedo01", "abada…</span></span>
-<span><span class="co">#&gt; $ birthYear    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1981, 1934, 1939, 1954, 1972, 1985, 1854, 1877, 1869, 186…</span></span>
-<span><span class="co">#&gt; $ birthMonth   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 12, 2, 8, 9, 8, 12, 11, 4, 11, 10, 3, 10, 2, 8, 9, 6, 2, …</span></span>
-<span><span class="co">#&gt; $ birthDay     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 27, 5, 5, 8, 25, 17, 4, 15, 11, 14, 16, 22, 16, 17, 19, 2…</span></span>
-<span><span class="co">#&gt; $ birthCountry <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "USA", "USA", "USA", "USA", "USA", "D.R.", "USA", "USA", …</span></span>
-<span><span class="co">#&gt; $ birthState   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "CO", "AL", "AL", "CA", "FL", "La Romana", "PA", "PA", "V…</span></span>
-<span><span class="co">#&gt; $ birthCity    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Denver", "Mobile", "Mobile", "Orange", "Palm Beach", "La…</span></span>
-<span><span class="co">#&gt; $ deathYear    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> NA, NA, 1984, NA, NA, NA, 1905, 1957, 1962, 1926, 1930, 1…</span></span>
-<span><span class="co">#&gt; $ deathMonth   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> NA, NA, 8, NA, NA, NA, 5, 1, 6, 4, 2, 6, NA, NA, NA, NA, …</span></span>
-<span><span class="co">#&gt; $ deathDay     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> NA, NA, 16, NA, NA, NA, 17, 6, 11, 27, 13, 11, NA, NA, NA…</span></span>
-<span><span class="co">#&gt; $ deathCountry <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> NA, NA, "USA", NA, NA, NA, "USA", "USA", "USA", "USA", "U…</span></span>
-<span><span class="co">#&gt; $ deathState   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> NA, NA, "GA", NA, NA, NA, "NJ", "FL", "VT", "CA", "MI", "…</span></span>
-<span><span class="co">#&gt; $ deathCity    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> NA, NA, "Atlanta", NA, NA, NA, "Pemberton", "Fort Lauderd…</span></span>
-<span><span class="co">#&gt; $ nameFirst    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "David", "Hank", "Tommie", "Don", "Andy", "Fernando", "Jo…</span></span>
-<span><span class="co">#&gt; $ nameLast     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Aardsma", "Aaron", "Aaron", "Aase", "Abad", "Abad", "Aba…</span></span>
-<span><span class="co">#&gt; $ nameGiven    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "David Allan", "Henry Louis", "Tommie Lee", "Donald Willi…</span></span>
-<span><span class="co">#&gt; $ weight       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 220, 180, 190, 190, 184, 220, 192, 170, 175, 169, 190, 18…</span></span>
-<span><span class="co">#&gt; $ height       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 75, 72, 75, 75, 73, 73, 72, 71, 71, 68, 71, 70, 78, 74, 7…</span></span>
-<span><span class="co">#&gt; $ bats         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "R", "R", "R", "R", "L", "L", "R", "R", "R", "L", "R", "R…</span></span>
-<span><span class="co">#&gt; $ throws       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "R", "R", "R", "R", "L", "L", "R", "R", "R", "L", "R", "R…</span></span>
-<span><span class="co">#&gt; $ debut        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "2004-04-06", "1954-04-13", "1962-04-10", "1977-07-26", "…</span></span>
-<span><span class="co">#&gt; $ finalGame    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "2015-08-23", "1976-10-03", "1971-09-26", "1990-10-03", "…</span></span>
-<span><span class="co">#&gt; $ retroID      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aardd001", "aaroh101", "aarot101", "aased001", "abada001…</span></span>
-<span><span class="co">#&gt; $ bbrefID      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aardsda01", "aaronha01", "aaronto01", "aasedo01", "abada…</span></span></code></pre></div>
+<span><span class="co">#&gt; Error in glimpse(master15): could not find function "glimpse"</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="master-2020">Master (2020)<a class="anchor" aria-label="anchor" href="#master-2020"></a>
 </h4>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">master20</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 20,437</span></span>
-<span><span class="co">#&gt; Columns: 24</span></span>
-<span><span class="co">#&gt; $ playerID     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aardsda01", "aaronha01", "aaronto01", "aasedo01", "abada…</span></span>
-<span><span class="co">#&gt; $ birthYear    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 1981, 1934, 1939, 1954, 1972, 1985, 1850, 1877, 1869, 186…</span></span>
-<span><span class="co">#&gt; $ birthMonth   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 12, 2, 8, 9, 8, 12, 11, 4, 11, 10, 9, 3, 10, 2, 8, 9, 6, …</span></span>
-<span><span class="co">#&gt; $ birthDay     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 27, 5, 5, 8, 25, 17, 4, 15, 11, 14, 20, 16, 22, 16, 17, 1…</span></span>
-<span><span class="co">#&gt; $ birthCountry <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "USA", "USA", "USA", "USA", "USA", "D.R.", "USA", "USA", …</span></span>
-<span><span class="co">#&gt; $ birthState   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "CO", "AL", "AL", "CA", "FL", "La Romana", "PA", "PA", "V…</span></span>
-<span><span class="co">#&gt; $ birthCity    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Denver", "Mobile", "Mobile", "Orange", "Palm Beach", "La…</span></span>
-<span><span class="co">#&gt; $ deathYear    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> NA, 2021, 1984, NA, NA, NA, 1905, 1957, 1962, 1926, NA, 1…</span></span>
-<span><span class="co">#&gt; $ deathMonth   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> NA, 1, 8, NA, NA, NA, 5, 1, 6, 4, NA, 2, 6, NA, NA, NA, N…</span></span>
-<span><span class="co">#&gt; $ deathDay     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> NA, 22, 16, NA, NA, NA, 17, 6, 11, 27, NA, 13, 11, NA, NA…</span></span>
-<span><span class="co">#&gt; $ deathCountry <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> NA, "USA", "USA", NA, NA, NA, "USA", "USA", "USA", "USA",…</span></span>
-<span><span class="co">#&gt; $ deathState   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> NA, "GA", "GA", NA, NA, NA, "NJ", "FL", "VT", "CA", NA, "…</span></span>
-<span><span class="co">#&gt; $ deathCity    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> NA, "Atlanta", "Atlanta", NA, NA, NA, "Pemberton", "Fort …</span></span>
-<span><span class="co">#&gt; $ nameFirst    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "David", "Hank", "Tommie", "Don", "Andy", "Fernando", "Jo…</span></span>
-<span><span class="co">#&gt; $ nameLast     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Aardsma", "Aaron", "Aaron", "Aase", "Abad", "Abad", "Aba…</span></span>
-<span><span class="co">#&gt; $ nameGiven    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "David Allan", "Henry Louis", "Tommie Lee", "Donald Willi…</span></span>
-<span><span class="co">#&gt; $ weight       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 215, 180, 190, 190, 184, 235, 192, 170, 175, 169, 220, 19…</span></span>
-<span><span class="co">#&gt; $ height       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 75, 72, 75, 75, 73, 74, 72, 71, 71, 68, 74, 71, 70, 78, 7…</span></span>
-<span><span class="co">#&gt; $ bats         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "R", "R", "R", "R", "L", "L", "R", "R", "R", "L", "R", "R…</span></span>
-<span><span class="co">#&gt; $ throws       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "R", "R", "R", "R", "L", "L", "R", "R", "R", "L", "R", "R…</span></span>
-<span><span class="co">#&gt; $ debut        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "2004-04-06", "1954-04-13", "1962-04-10", "1977-07-26", "…</span></span>
-<span><span class="co">#&gt; $ finalGame    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "2015-08-23", "1976-10-03", "1971-09-26", "1990-10-03", "…</span></span>
-<span><span class="co">#&gt; $ retroID      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aardd001", "aaroh101", "aarot101", "aased001", "abada001…</span></span>
-<span><span class="co">#&gt; $ bbrefID      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aardsda01", "aaronha01", "aaronto01", "aasedo01", "abada…</span></span></code></pre></div>
+<span><span class="co">#&gt; Error in glimpse(master20): could not find function "glimpse"</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">

@@ -25,10 +25,20 @@ options(
 ```{r pkgs, message=FALSE, warning=FALSE}
 library(dfdiffs)
 library(openxlsx)
-library(tidyverse)
 library(janitor) 
 library(arsenal) # comparedf
 library(diffdf)  # diffdf
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(forcats)
+library(glue)
+library(purrr)
+library(vroom)
+library(reactable)
+library(haven)
+library(readxl)
 ```
 
 

@@ -11,10 +11,7 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-library(tidyverse)
-library(labelled)
-library(gt)
-library(gtsummary)
+library(knitr)
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>", 
@@ -48,6 +45,9 @@ Similar packages
 library(janitor) # compare_df_cols
 library(testthat) # expect_equal
 library(vetr) # alike
+library(labelled)
+library(gt)
+library(gtsummary)
 ```
 
 ## Data 

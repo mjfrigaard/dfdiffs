@@ -19,18 +19,26 @@ options(
 
 # Motivation
 
-This vignette walks through the `upload-data()` function, which is used for loading a variety of file types into the `dfdiffs` shiny application. 
+This vignette walks through the `upload_data()` function, which is used for loading a variety of file types into the `dfdiffs` shiny application. 
 
 ```{r pkgs, message=FALSE, warning=FALSE}
 library(dfdiffs)
 library(shiny)
 library(data.table)
-library(tidyverse)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(forcats)
+library(glue)
 library(purrr)
 library(vroom)
 library(reactable)
 library(haven)
 library(readxl)
+library(labelled)
+library(gt)
+library(gtsummary)
 ```
 
 ## External Data 

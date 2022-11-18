@@ -30,13 +30,25 @@ extdata_folder <- "../inst/extdata/"
 This vignette walks through the `create_join_column()` function, which is used for creating new columns in the `dfdiffs` shiny application. 
 
 ```{r pkgs, message=FALSE, warning=FALSE}
+library(dfdiffs)
 library(shiny)
-library(tidyverse)
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(stringr)
+library(lubridate)
+library(forcats)
+library(glue)
 library(purrr)
 library(vroom)
 library(reactable)
 library(haven)
 library(readxl)
+library(janitor) # compare_df_cols
+library(arsenal) # comparedf
+library(diffdf)  # diffdf
+library(testthat) # expect_equal
+library(vetr) # alike
 ```
 
 ## create_join_column()
