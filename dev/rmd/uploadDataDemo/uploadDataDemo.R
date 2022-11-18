@@ -1,7 +1,7 @@
 # packages ----
 library(shiny)
 library(bs4Dash)
-library(tidyverse)
+
 library(reactable)
 
 

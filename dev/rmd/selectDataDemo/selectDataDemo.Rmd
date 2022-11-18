@@ -16,7 +16,7 @@ runtime: shiny
 ```{r setup, include=FALSE}
 library(knitr)
 library(rmdformats)
-library(tidyverse)
+
 library(devtools)
 library(hrbrthemes)
 library(fs)

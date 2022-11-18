@@ -3,7 +3,7 @@ library(knitr)
 library(arsenal)
 library(diffdf)
 library(rmdformats)
-library(tidyverse)
+
 library(devtools)
 library(hrbrthemes)
 library(fs)

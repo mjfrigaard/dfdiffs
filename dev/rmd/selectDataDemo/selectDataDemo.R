@@ -1,7 +1,7 @@
 
 # packages ----------------------------------------------------------------
 library(fresh)
-library(tidyverse)
+
 library(devtools)
 library(hrbrthemes)
 library(fs)

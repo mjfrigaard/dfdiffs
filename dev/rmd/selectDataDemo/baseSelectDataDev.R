@@ -3,7 +3,7 @@
 
 library(knitr)
 library(rmdformats)
-library(tidyverse)
+
 library(devtools)
 library(hrbrthemes)
 library(fs)
