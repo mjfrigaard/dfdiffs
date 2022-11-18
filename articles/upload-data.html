@@ -22,7 +22,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
@@ -41,18 +41,17 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/changed-modified-data.html">changed-modified-data</a>
-    <a class="dropdown-item" href="../articles/compare-data.html">compare-data</a>
-    <a class="dropdown-item" href="../articles/comparison-conditions.html">comparison-conditions</a>
-    <a class="dropdown-item" href="../articles/comparison-datasets.html">comparison-datasets</a>
-    <a class="dropdown-item" href="../articles/create-deleted-data.html">create-deleted-data</a>
-    <a class="dropdown-item" href="../articles/create-join-column.html">create-join-column</a>
-    <a class="dropdown-item" href="../articles/create-new-data.html">create-new-data</a>
-    <a class="dropdown-item" href="../articles/getting-started.html">getting-started</a>
-    <a class="dropdown-item" href="../articles/modified-data.html">modified-data</a>
-    <a class="dropdown-item" href="../articles/multiple-comparisons.html">multiple-comparisons</a>
-    <a class="dropdown-item" href="../articles/similar-work.html">similar-work</a>
-    <a class="dropdown-item" href="../articles/upload-data.html">upload-data</a>
+    <h6 class="dropdown-header" data-toc-skip>Comparisons</h6>
+    <a class="dropdown-item" href="../articles/getting-started.html">Getting Started</a>
+    <a class="dropdown-item" href="../articles/create-new-data.html">New Data</a>
+    <a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a>
+    <a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>More Comparisons</h6>
+    <a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a>
+    <a class="dropdown-item" href="../articles/multiple-comparisons.html">Multiple comparisons</a>
+    <a class="dropdown-item" href="../articles/similar-work.html">Similar work</a>
+    <a class="dropdown-item" href="../articles/upload-data.html">Uploading data (shiny app)</a>
   </div>
 </li>
 <li class="nav-item">
@@ -130,11 +129,11 @@ folder:</p>
 <span><span class="co">#&gt; │   ├── <span style="color: #0000BB; font-weight: bold;">by-year</span></span></span>
 <span><span class="co">#&gt; │   │   ├── <span style="color: #0000BB; font-weight: bold;">20</span></span></span>
 <span><span class="co">#&gt; │   │   │   ├── PlayerBirth.csv</span></span>
-<span><span class="co">#&gt; │   │   │   ├── PlayerDeath.csv</span></span>
+<span><span class="co">#&gt; │   │   │   ├── PlayerDebut.csv</span></span>
 <span><span class="co">#&gt; │   │   │   └── PlayerName.csv</span></span>
 <span><span class="co">#&gt; │   │   └── <span style="color: #0000BB; font-weight: bold;">21</span></span></span>
 <span><span class="co">#&gt; │   │       ├── PlayerBirth.csv</span></span>
-<span><span class="co">#&gt; │   │       ├── PlayerDeath.csv</span></span>
+<span><span class="co">#&gt; │   │       ├── PlayerDebut.csv</span></span>
 <span><span class="co">#&gt; │   │       └── PlayerName.csv</span></span>
 <span><span class="co">#&gt; │   ├── <span style="color: #0000BB; font-weight: bold;">diffs</span></span></span>
 <span><span class="co">#&gt; │   │   ├── diff_current.csv</span></span>
@@ -225,12 +224,45 @@ to <code>sheet</code>.</p>
 <span><span class="co">#&gt; [1] "../inst/extdata/csv/2010-lahman/Batting.csv" </span></span>
 <span><span class="co">#&gt; [2] "../inst/extdata/csv/2010-lahman/Fielding.csv"</span></span>
 <span><span class="co">#&gt; [3] "../inst/extdata/csv/2010-lahman/Master.csv"</span></span></code></pre></div>
-<p>Test this on <code>lahman_2010_csv_paths[13]</code></p>
+<p>Test this on <code>lahman_2010_csv_paths[3]</code></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">master_2010</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_flat_file.html">load_flat_file</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">lahman_2010_csv_paths</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">master_2010</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_flat_file.html">load_flat_file</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">lahman_2010_csv_paths</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">master_2010</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 0</span></span>
-<span><span class="co">#&gt; Columns: 0</span></span></code></pre></div>
+<span><span class="co">#&gt; Rows: 17,674</span></span>
+<span><span class="co">#&gt; Columns: 33</span></span>
+<span><span class="co">#&gt; $ lahmanID     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17…</span></span>
+<span><span class="co">#&gt; $ playerID     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aaronha01", "aaronto01", "aasedo01", "abadan01", "abadij…</span></span>
+<span><span class="co">#&gt; $ managerID    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "", "", "", "", "", "", "", "", "", "", "", "", "", "", "…</span></span>
+<span><span class="co">#&gt; $ hofID        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aaronha01h", "", "", "", "", "", "", "", "", "", "", "",…</span></span>
+<span><span class="co">#&gt; $ birthYear    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1934, 1939, 1954, 1972, 1854, 1877, 1869, 1866, 1862, 187…</span></span>
+<span><span class="co">#&gt; $ birthMonth   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 2, 8, 9, 8, 11, 4, 11, 10, 3, 10, 2, 8, 9, 6, 2, 9, 9, 7,…</span></span>
+<span><span class="co">#&gt; $ birthDay     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 5, 5, 8, 25, 4, 15, 29, 14, 16, 22, 16, 17, 19, 2, 18, 5,…</span></span>
+<span><span class="co">#&gt; $ birthCountry <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "USA", "USA", "USA", "USA", "USA", "USA", "USA", "USA", "…</span></span>
+<span><span class="co">#&gt; $ birthState   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "AL", "AL", "CA", "FL", "PA", "PA", "VT", "NE", "OH", "OH…</span></span>
+<span><span class="co">#&gt; $ birthCity    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Mobile", "Mobile", "Orange", "West Palm Beach", "Philade…</span></span>
+<span><span class="co">#&gt; $ deathYear    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> NA, 1984, NA, NA, 1905, 1957, 1962, 1926, 1930, 1935, NA,…</span></span>
+<span><span class="co">#&gt; $ deathMonth   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> NA, 8, NA, NA, 5, 1, 6, 4, 2, 6, NA, NA, NA, NA, NA, 4, N…</span></span>
+<span><span class="co">#&gt; $ deathDay     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> NA, 16, NA, NA, 17, 6, 11, 27, 13, 11, NA, NA, NA, NA, NA…</span></span>
+<span><span class="co">#&gt; $ deathCountry <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "", "USA", "", "", "USA", "USA", "USA", "USA", "USA", "US…</span></span>
+<span><span class="co">#&gt; $ deathState   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "", "GA", "", "", "NJ", "FL", "VT", "CA", "MI", "CA", "",…</span></span>
+<span><span class="co">#&gt; $ deathCity    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "", "Atlanta", "", "", "Pemberton", "Ft.Lauderdale", "Ess…</span></span>
+<span><span class="co">#&gt; $ nameFirst    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Hank", "Tommie", "Don", "Andy", "John", "Ed", "Bert", "C…</span></span>
+<span><span class="co">#&gt; $ nameLast     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Aaron", "Aaron", "Aase", "Abad", "Abadie", "Abbaticchio"…</span></span>
+<span><span class="co">#&gt; $ nameNote     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "", "", "", "", "", "", "", "", "", "born Harry Frederick…</span></span>
+<span><span class="co">#&gt; $ nameGiven    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Henry Louis", "Tommie Lee", "Donald William", "", "John"…</span></span>
+<span><span class="co">#&gt; $ nameNick     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Hammer,Hammerin' Hank,Bad Henry", "", "", "", "", "Batty…</span></span>
+<span><span class="co">#&gt; $ weight       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 180, 190, 190, 184, 192, 170, 175, 169, 190, 180, 200, 19…</span></span>
+<span><span class="co">#&gt; $ height       <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 72, 75, 75, 73, 72, 71, 71, 68, 71, 70, 78, 74, 75, 71, 7…</span></span>
+<span><span class="co">#&gt; $ bats         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "R", "R", "R", "L", "R", "R", "R", "L", "R", "R", "R", "R…</span></span>
+<span><span class="co">#&gt; $ throws       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "R", "R", "R", "L", "R", "R", "R", "", "R", "R", "R", "L"…</span></span>
+<span><span class="co">#&gt; $ debut        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "4/13/1954 0:00:00", "4/10/1962 0:00:00", "7/26/1977 0:00…</span></span>
+<span><span class="co">#&gt; $ finalGame    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "10/3/1976 0:00:00", "9/26/1971 0:00:00", "10/3/1990 0:00…</span></span>
+<span><span class="co">#&gt; $ college      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "", "", "Cal St. Fullerton", "Middle Georgia JC", "", "",…</span></span>
+<span><span class="co">#&gt; $ lahman40ID   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aaronha01", "aaronto01", "aasedo01", "abadan01", "abadij…</span></span>
+<span><span class="co">#&gt; $ lahman45ID   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aaronha01", "aaronto01", "aasedo01", "abadan01", "abadij…</span></span>
+<span><span class="co">#&gt; $ retroID      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aaroh101", "aarot101", "aased001", "abada001", "abadj101…</span></span>
+<span><span class="co">#&gt; $ holtzID      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aaronha01", "aaronto01", "aasedo01", "abadan01", "abadij…</span></span>
+<span><span class="co">#&gt; $ bbrefID      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aaronha01", "aaronto01", "aasedo01", "abadan01", "abadij…</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="lahamn-csvs-1">2015 Lahamn CSVs<a class="anchor" aria-label="anchor" href="#lahamn-csvs-1"></a>
@@ -241,12 +273,36 @@ to <code>sheet</code>.</p>
 <span><span class="co">#&gt; [1] "../inst/extdata/csv/2015-baseballdatabank/Batting.csv" </span></span>
 <span><span class="co">#&gt; [2] "../inst/extdata/csv/2015-baseballdatabank/Fielding.csv"</span></span>
 <span><span class="co">#&gt; [3] "../inst/extdata/csv/2015-baseballdatabank/Master.csv"</span></span></code></pre></div>
-<p>Test this on <code>lahman_2015_csv_paths[4]</code></p>
+<p>Test this on <code>lahman_2015_csv_paths[3]</code></p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">master_csv_2015</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_flat_file.html">load_flat_file</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">lahman_2015_csv_paths</span><span class="op">[</span><span class="fl">4</span><span class="op">]</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">master_csv_2015</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/load_flat_file.html">load_flat_file</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">lahman_2015_csv_paths</span><span class="op">[</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">master_csv_2015</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Rows: 0</span></span>
-<span><span class="co">#&gt; Columns: 0</span></span></code></pre></div>
+<span><span class="co">#&gt; Rows: 18,846</span></span>
+<span><span class="co">#&gt; Columns: 24</span></span>
+<span><span class="co">#&gt; $ playerID     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aardsda01", "aaronha01", "aaronto01", "aasedo01", "abada…</span></span>
+<span><span class="co">#&gt; $ birthYear    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 1981, 1934, 1939, 1954, 1972, 1985, 1854, 1877, 1869, 186…</span></span>
+<span><span class="co">#&gt; $ birthMonth   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 12, 2, 8, 9, 8, 12, 11, 4, 11, 10, 3, 10, 2, 8, 9, 6, 2, …</span></span>
+<span><span class="co">#&gt; $ birthDay     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 27, 5, 5, 8, 25, 17, 4, 15, 11, 14, 16, 22, 16, 17, 19, 2…</span></span>
+<span><span class="co">#&gt; $ birthCountry <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "USA", "USA", "USA", "USA", "USA", "D.R.", "USA", "USA", …</span></span>
+<span><span class="co">#&gt; $ birthState   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "CO", "AL", "AL", "CA", "FL", "La Romana", "PA", "PA", "V…</span></span>
+<span><span class="co">#&gt; $ birthCity    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Denver", "Mobile", "Mobile", "Orange", "Palm Beach", "La…</span></span>
+<span><span class="co">#&gt; $ deathYear    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> NA, NA, 1984, NA, NA, NA, 1905, 1957, 1962, 1926, 1930, 1…</span></span>
+<span><span class="co">#&gt; $ deathMonth   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> NA, NA, 8, NA, NA, NA, 5, 1, 6, 4, 2, 6, NA, NA, NA, NA, …</span></span>
+<span><span class="co">#&gt; $ deathDay     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> NA, NA, 16, NA, NA, NA, 17, 6, 11, 27, 13, 11, NA, NA, NA…</span></span>
+<span><span class="co">#&gt; $ deathCountry <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "", "", "USA", "", "", "", "USA", "USA", "USA", "USA", "U…</span></span>
+<span><span class="co">#&gt; $ deathState   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "", "", "GA", "", "", "", "NJ", "FL", "VT", "CA", "MI", "…</span></span>
+<span><span class="co">#&gt; $ deathCity    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "", "", "Atlanta", "", "", "", "Pemberton", "Fort Lauderd…</span></span>
+<span><span class="co">#&gt; $ nameFirst    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "David", "Hank", "Tommie", "Don", "Andy", "Fernando", "Jo…</span></span>
+<span><span class="co">#&gt; $ nameLast     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Aardsma", "Aaron", "Aaron", "Aase", "Abad", "Abad", "Aba…</span></span>
+<span><span class="co">#&gt; $ nameGiven    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "David Allan", "Henry Louis", "Tommie Lee", "Donald Willi…</span></span>
+<span><span class="co">#&gt; $ weight       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 220, 180, 190, 190, 184, 220, 192, 170, 175, 169, 190, 18…</span></span>
+<span><span class="co">#&gt; $ height       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> 75, 72, 75, 75, 73, 73, 72, 71, 71, 68, 71, 70, 78, 74, 7…</span></span>
+<span><span class="co">#&gt; $ bats         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "R", "R", "R", "R", "L", "L", "R", "R", "R", "L", "R", "R…</span></span>
+<span><span class="co">#&gt; $ throws       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "R", "R", "R", "R", "L", "L", "R", "R", "R", "L", "R", "R…</span></span>
+<span><span class="co">#&gt; $ debut        <span style="color: #949494; font-style: italic;">&lt;IDate&gt;</span> 2004-04-06, 1954-04-13, 1962-04-10, 1977-07-26, 2001-09…</span></span>
+<span><span class="co">#&gt; $ finalGame    <span style="color: #949494; font-style: italic;">&lt;IDate&gt;</span> 2015-08-23, 1976-10-03, 1971-09-26, 1990-10-03, 2006-04…</span></span>
+<span><span class="co">#&gt; $ retroID      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aardd001", "aaroh101", "aarot101", "aased001", "abada001…</span></span>
+<span><span class="co">#&gt; $ bbrefID      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "aardsda01", "aaronha01", "aaronto01", "aasedo01", "abada…</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="list-of-2010-csvs">List of 2010 csvs<a class="anchor" aria-label="anchor" href="#list-of-2010-csvs"></a>
