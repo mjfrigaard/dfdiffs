@@ -46,6 +46,7 @@
     <a class="dropdown-item" href="../articles/create-new-data.html">New Data</a>
     <a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a>
     <a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a>
+    <a class="dropdown-item" href="../articles/create-comparison-report.html">Creating a comparison report</a>
     <div class="dropdown-divider"></div>
     <h6 class="dropdown-header" data-toc-skip>More Comparisons</h6>
     <a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a>
@@ -121,11 +122,11 @@ baseball database.</a></p>
 <code class="sourceCode R"><span><span class="va">m15</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master15</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3000</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">m15</span><span class="op">$</span><span class="va">debut</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2015-09-26"</span></span>
+<span><span class="co">#&gt; [1] "2015-09-27"</span></span>
 <span><span class="va">m20</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master20</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3000</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">m20</span><span class="op">$</span><span class="va">debut</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2019-09-14"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "2019-09-09"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="the-compare_data-function">The <code>compare_data()</code> function<a class="anchor" aria-label="anchor" href="#the-compare_data-function"></a>
@@ -171,50 +172,33 @@ height
 <tbody>
 <tr>
 <td style="text-align:left;">
-jamesbe02
+burnspe01
 </td>
 <td style="text-align:left;">
-Bernie
+Pete
 </td>
 <td style="text-align:left;">
-James
+Burnside
 </td>
 <td style="text-align:left;">
-Robert Byrne
+Peter Willits
 </td>
 <td style="text-align:left;">
-69
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-walkemy01
-</td>
-<td style="text-align:left;">
-Mysterious
-</td>
-<td style="text-align:left;">
-Walker
-</td>
-<td style="text-align:left;">
-Frederick Mitchell
-</td>
-<td style="text-align:left;">
-70
+74
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-stoneri01
+taylodu01
 </td>
 <td style="text-align:left;">
-Ricky
+Dummy
 </td>
 <td style="text-align:left;">
-Stone
+Taylor
 </td>
 <td style="text-align:left;">
-Ricky L.
+Luther Haden
 </td>
 <td style="text-align:left;">
 73
@@ -222,16 +206,50 @@ Ricky L.
 </tr>
 <tr>
 <td style="text-align:left;">
-blashja01
+mechegi01
 </td>
 <td style="text-align:left;">
-Jabari
+Gil
 </td>
 <td style="text-align:left;">
-Blash
+Meche
 </td>
 <td style="text-align:left;">
-Jabari Jerell
+Gilbert Allen
+</td>
+<td style="text-align:left;">
+75
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+wagnele01
+</td>
+<td style="text-align:left;">
+Leon
+</td>
+<td style="text-align:left;">
+Wagner
+</td>
+<td style="text-align:left;">
+Leon Lamar
+</td>
+<td style="text-align:left;">
+73
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sturtta01
+</td>
+<td style="text-align:left;">
+Tanyon
+</td>
+<td style="text-align:left;">
+Sturtze
+</td>
+<td style="text-align:left;">
+Tanyon James
 </td>
 <td style="text-align:left;">
 77
@@ -239,36 +257,19 @@ Jabari Jerell
 </tr>
 <tr>
 <td style="text-align:left;">
-obriepe04
+stewafr01
 </td>
 <td style="text-align:left;">
-Peter
+Frank
 </td>
 <td style="text-align:left;">
-O’Brien
+Stewart
 </td>
 <td style="text-align:left;">
-Peter Robert
+Frank
 </td>
 <td style="text-align:left;">
-76
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-mooreto01
-</td>
-<td style="text-align:left;">
-Tommy
-</td>
-<td style="text-align:left;">
-Moore
-</td>
-<td style="text-align:left;">
-Tommy Joe
-</td>
-<td style="text-align:left;">
-71
+73
 </td>
 </tr>
 </tbody>
@@ -304,16 +305,50 @@ height
 <tbody>
 <tr>
 <td style="text-align:left;">
-quentca01
+doylede01
 </td>
 <td style="text-align:left;">
-Carlos
+Denny
 </td>
 <td style="text-align:left;">
-Quentin
+Doyle
 </td>
 <td style="text-align:left;">
-Carlos Jose
+Robert Dennis
+</td>
+<td style="text-align:left;">
+69
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+saundde01
+</td>
+<td style="text-align:left;">
+Dennis
+</td>
+<td style="text-align:left;">
+Saunders
+</td>
+<td style="text-align:left;">
+Dennis James
+</td>
+<td style="text-align:left;">
+75
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+baylodo01
+</td>
+<td style="text-align:left;">
+Don
+</td>
+<td style="text-align:left;">
+Baylor
+</td>
+<td style="text-align:left;">
+Don Edward
 </td>
 <td style="text-align:left;">
 73
@@ -321,87 +356,53 @@ Carlos Jose
 </tr>
 <tr>
 <td style="text-align:left;">
-murphwi01
+bradyst01
 </td>
 <td style="text-align:left;">
-Willie
+Steve
 </td>
 <td style="text-align:left;">
-Murphy
+Brady
 </td>
 <td style="text-align:left;">
-William H.
+Stephen A.
 </td>
 <td style="text-align:left;">
-71
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-grothjo01
-</td>
-<td style="text-align:left;">
-Johnny
-</td>
-<td style="text-align:left;">
-Groth
-</td>
-<td style="text-align:left;">
-John Thomas
-</td>
-<td style="text-align:left;">
-72
+69
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-higuete01
+jordasl01
 </td>
 <td style="text-align:left;">
-Teddy
+Slats
 </td>
 <td style="text-align:left;">
-Higuera
+Jordan
 </td>
 <td style="text-align:left;">
-Teodoro Valenzuela
-</td>
-<td style="text-align:left;">
-70
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-suthedi01
-</td>
-<td style="text-align:left;">
-Dizzy
-</td>
-<td style="text-align:left;">
-Sutherland
-</td>
-<td style="text-align:left;">
-Howard Alvin
-</td>
-<td style="text-align:left;">
-72
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-mortogu01
-</td>
-<td style="text-align:left;">
-Guy
-</td>
-<td style="text-align:left;">
-Morton
-</td>
-<td style="text-align:left;">
-Guy
+Clarence Veasey
 </td>
 <td style="text-align:left;">
 73
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+crozier01
+</td>
+<td style="text-align:left;">
+Eric
+</td>
+<td style="text-align:left;">
+Crozier
+</td>
+<td style="text-align:left;">
+Eric Le Roi
+</td>
+<td style="text-align:left;">
+76
 </td>
 </tr>
 </tbody>
@@ -428,10 +429,18 @@ no_of_differences
 <tbody>
 <tr>
 <td style="text-align:left;">
+nameFirst
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
 nameGiven
 </td>
 <td style="text-align:right;">
-4
+5
 </td>
 </tr>
 <tr>
@@ -439,7 +448,7 @@ nameGiven
 height
 </td>
 <td style="text-align:right;">
-8
+7
 </td>
 </tr>
 </tbody>
@@ -472,16 +481,44 @@ compare
 <tbody>
 <tr>
 <td style="text-align:left;">
-nameGiven
+nameFirst
 </td>
 <td style="text-align:left;">
-fifest01
+couloda01
 </td>
 <td style="text-align:left;">
-Stephen J.
+Daniel
 </td>
 <td style="text-align:left;">
-Stephen Joseph
+Danny
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+nameFirst
+</td>
+<td style="text-align:left;">
+dorseje01
+</td>
+<td style="text-align:left;">
+Jerry
+</td>
+<td style="text-align:left;">
+Joseph
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+nameFirst
+</td>
+<td style="text-align:left;">
+reynoch01
+</td>
+<td style="text-align:left;">
+Charlie
+</td>
+<td style="text-align:left;">
+Thomas
 </td>
 </tr>
 <tr>
@@ -489,27 +526,13 @@ Stephen Joseph
 nameGiven
 </td>
 <td style="text-align:left;">
-gardnbr01
+davisju01
 </td>
 <td style="text-align:left;">
-Brett M.
+James J.
 </td>
 <td style="text-align:left;">
-Brett Michael
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-nameGiven
-</td>
-<td style="text-align:left;">
-jacobar01
-</td>
-<td style="text-align:left;">
-Arthur Edward
-</td>
-<td style="text-align:left;">
-Arthur Evan
+James Joseph
 </td>
 </tr>
 <tr>
@@ -517,13 +540,55 @@ Arthur Evan
 nameGiven
 </td>
 <td style="text-align:left;">
-perezto01
+dorseje01
 </td>
 <td style="text-align:left;">
-Atanasio
+Michael Jeremiah
 </td>
 <td style="text-align:left;">
-Atanacio
+Joseph Wilbur
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+nameGiven
+</td>
+<td style="text-align:left;">
+jonesad01
+</td>
+<td style="text-align:left;">
+Adam La Marque
+</td>
+<td style="text-align:left;">
+Adam LaMarque
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+nameGiven
+</td>
+<td style="text-align:left;">
+reynoch01
+</td>
+<td style="text-align:left;">
+Charles E.
+</td>
+<td style="text-align:left;">
+Thomas Hart
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+nameGiven
+</td>
+<td style="text-align:left;">
+zimmejo02
+</td>
+<td style="text-align:left;">
+Jordan M.
+</td>
+<td style="text-align:left;">
+Jordan Michael
 </td>
 </tr>
 <tr>
@@ -531,24 +596,10 @@ Atanacio
 height
 </td>
 <td style="text-align:left;">
-belisma01
+craigge01
 </td>
 <td style="text-align:left;">
-76
-</td>
-<td style="text-align:left;">
-75
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-height
-</td>
-<td style="text-align:left;">
-gardnbr01
-</td>
-<td style="text-align:left;">
-70
+NA
 </td>
 <td style="text-align:left;">
 71
@@ -559,13 +610,27 @@ gardnbr01
 height
 </td>
 <td style="text-align:left;">
-honanma01
+feldmsc01
+</td>
+<td style="text-align:left;">
+79
+</td>
+<td style="text-align:left;">
+78
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+height
+</td>
+<td style="text-align:left;">
+maddefr01
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
-70
+68
 </td>
 </tr>
 <tr>
@@ -573,27 +638,13 @@ NA
 height
 </td>
 <td style="text-align:left;">
-kazmase01
+novaiv01
 </td>
 <td style="text-align:left;">
-69
+76
 </td>
 <td style="text-align:left;">
-70
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-height
-</td>
-<td style="text-align:left;">
-macgaed01
-</td>
-<td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-73
+77
 </td>
 </tr>
 <tr>
@@ -601,7 +652,7 @@ NA
 height
 </td>
 <td style="text-align:left;">
-rufda01
+pressry01
 </td>
 <td style="text-align:left;">
 75
@@ -615,13 +666,13 @@ rufda01
 height
 </td>
 <td style="text-align:left;">
-wongko01
+thompta01
 </td>
 <td style="text-align:left;">
-69
+77
 </td>
 <td style="text-align:left;">
-67
+76
 </td>
 </tr>
 <tr>
@@ -629,13 +680,13 @@ wongko01
 height
 </td>
 <td style="text-align:left;">
-wrighst01
-</td>
-<td style="text-align:left;">
-73
+uptonju01
 </td>
 <td style="text-align:left;">
 74
+</td>
+<td style="text-align:left;">
+73
 </td>
 </tr>
 </tbody>
