@@ -1,9 +1,11 @@
-# dfdiffs 0.1.0
+# dfdiffs 0.0.0.9000
+
+
 
 ## 0.0.0.9000
 
 -   [x] new vignettes
--   [x] dev app (<https://mjfrigaard.shinyapps.io/compareDataDemo/>)
+-   [x] dev app (<https://mjfrigaard.shinyapps.io/compareDataDev/>)
 -   [x] uat app (<https://mjfrigaard.shinyapps.io/compareDataApp/>)
 
 ## 2022-07-16
