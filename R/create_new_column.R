@@ -1,13 +1,13 @@
-#' Create new (joining) column
+#' Create new (joining) bs4Dash::column
 #'
 #' @param data a tibble or data.frame
-#' @param cols cols to create new column from (they will be pasted together with "-")
-#' @param new_name new column name
+#' @param cols cols to create new bs4Dash::column from (they will be pasted together with "-")
+#' @param new_name new bs4Dash::column name
 #'
 #' @importFrom dplyr relocate
 #' @importFrom tidyr unite
 #'
-#' @return new_col_data data with new column
+#' @return new_col_data data with new bs4Dash::column
 #' @export create_new_column
 #'
 #' @examples

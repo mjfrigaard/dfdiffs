@@ -1,8 +1,8 @@
-#' Rename join column name
+#' Rename join bs4Dash::column name
 #'
 #' @param data a tibble or data.frame
-#' @param by_col new join column name
-#' @param by join column name
+#' @param by_col new join bs4Dash::column name
+#' @param by join bs4Dash::column name
 #'
 #' @return renamed_data
 #' @export rename_join_col

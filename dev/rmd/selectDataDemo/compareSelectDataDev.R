@@ -150,7 +150,7 @@ h3("Upload a ", strong("compare"), " (current) data source"),
           closable = FALSE,
           title = tags$strong("Upload Excel File (compare)"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               fileInput(
                 ## |-- INPUT [xlsx_file_comp] -------
@@ -162,7 +162,7 @@ h3("Upload a ", strong("compare"), " (current) data source"),
                 accept = c(".xlsx")
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [xlsx_sheets_comp] ---------
               selectInput(
@@ -176,7 +176,7 @@ h3("Upload a ", strong("compare"), " (current) data source"),
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- OUTPUT [xlsx_filename_comp] ---------
               tags$strong("Excel Data File:"),
@@ -187,7 +187,7 @@ h3("Upload a ", strong("compare"), " (current) data source"),
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [xlsx_new_name_comp] ---------
               textInput(
@@ -202,7 +202,7 @@ h3("Upload a ", strong("compare"), " (current) data source"),
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               br(), br(),
               ## |-- OUTPUT [xlsx_upload_comp] ---------
@@ -231,7 +231,7 @@ h3("Upload a ", strong("compare"), " (current) data source"),
           closable = FALSE,
           title = tags$strong("Upload Flat Data File (compare)"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               fileInput(
                 ## |-- INPUT [flat_file_comp] -------
@@ -248,7 +248,7 @@ h3("Upload a ", strong("compare"), " (current) data source"),
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- OUTPUT [flat_filename_comp] ---------
               tags$strong("Flat file data:"),
@@ -259,7 +259,7 @@ h3("Upload a ", strong("compare"), " (current) data source"),
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [flat_file_new_name_comp] ---------
               textInput(
@@ -274,7 +274,7 @@ h3("Upload a ", strong("compare"), " (current) data source"),
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               ## |-- OUTPUT [flat_file_upload_comp] -------
               reactable::reactableOutput(

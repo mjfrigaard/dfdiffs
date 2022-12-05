@@ -2,20 +2,20 @@
 % Please edit documentation in R/rename_join_col.R
 \name{rename_join_col}
 \alias{rename_join_col}
-\title{Rename join column name}
+\title{Rename join bs4Dash::column name}
 \usage{
 rename_join_col(data, by, by_col)
 }
 \arguments{
 \item{data}{a tibble or data.frame}
 
-\item{by}{join column name}
+\item{by}{join bs4Dash::column name}
 
-\item{by_col}{new join column name}
+\item{by_col}{new join bs4Dash::column name}
 }
 \value{
 renamed_data
 }
 \description{
-Rename join column name
+Rename join bs4Dash::column name
 }

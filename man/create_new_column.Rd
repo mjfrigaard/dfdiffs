@@ -2,22 +2,22 @@
 % Please edit documentation in R/create_new_column.R
 \name{create_new_column}
 \alias{create_new_column}
-\title{Create new (joining) column}
+\title{Create new (joining) bs4Dash::column}
 \usage{
 create_new_column(data, cols, new_name)
 }
 \arguments{
 \item{data}{a tibble or data.frame}
 
-\item{cols}{cols to create new column from (they will be pasted together with "-")}
+\item{cols}{cols to create new bs4Dash::column from (they will be pasted together with "-")}
 
-\item{new_name}{new column name}
+\item{new_name}{new bs4Dash::column name}
 }
 \value{
-new_col_data data with new column
+new_col_data data with new bs4Dash::column
 }
 \description{
-Create new (joining) column
+Create new (joining) bs4Dash::column
 }
 \examples{
 library(dplyr)

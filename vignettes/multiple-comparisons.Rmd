@@ -28,6 +28,12 @@ extdata_folder <- "../inst/extdata/"
 
 # Motivation 
 
+The goal of the `dfdiffs` is to answer the following questions:
+
+1.  What rows are here now that weren't here before?
+2.  What rows were here before that aren't here now?
+3.  **What values have been changed?**
+
 This vignette covers how to apply the functions in `dfdiffs` to multiple datasets (separated by folder)
 
 ## Packages 

@@ -4,6 +4,7 @@ pkgdown_sha: ~
 articles:
   changed-modified-data: changed-modified-data.html
   compare-data: compare-data.html
+  create-comparison-report: create-comparison-report.html
   create-deleted-data: create-deleted-data.html
   create-join-column: create-join-column.html
   create-new-data: create-new-data.html
@@ -12,7 +13,7 @@ articles:
   multiple-comparisons: multiple-comparisons.html
   similar-work: similar-work.html
   upload-data: upload-data.html
-last_built: 2022-12-05T07:15Z
+last_built: 2022-12-05T19:40Z
 urls:
   reference: https://mjfrigaard.github.io/dfdiffs/reference
   article: https://mjfrigaard.github.io/dfdiffs/articles

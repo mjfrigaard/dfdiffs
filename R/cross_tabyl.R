@@ -1,7 +1,7 @@
 #' cross_tabyl
 #'
 #' @param df a data.frame or tibble
-#' @param col a column with categorical or factor data
+#' @param col a bs4Dash::column with categorical or factor data
 #' @description cross_tabyl() is a helper function to quickly create a
 #' cross-tabulation of the values in a categorical variable.
 #'

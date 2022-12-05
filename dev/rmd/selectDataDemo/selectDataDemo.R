@@ -32,7 +32,7 @@ uploadDataUI <- function(id) {
           width = 12,
           title = tags$strong("Upload File (base)"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               fileInput(
                 ## |-- INPUT [base_file] -------
@@ -48,7 +48,7 @@ uploadDataUI <- function(id) {
                 accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ### |-- INPUT [base_xlsx_sheets] ---------
               selectInput(
@@ -62,7 +62,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- OUTPUT [base_filename] ---------
               tags$strong("Data file name:"),
@@ -73,7 +73,7 @@ uploadDataUI <- function(id) {
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [base_new_name] ---------
               textInput(
@@ -89,7 +89,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               br(), br(),
               ## |-- OUTPUT [base_display_upload] ---------
@@ -118,7 +118,7 @@ uploadDataUI <- function(id) {
           title = "Reactive values (base)",
           strong(em("For DEV purposes only")),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_a -----
               code("base_dev_a"),
@@ -131,7 +131,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_b -----
               code("base_dev_b"),
@@ -144,7 +144,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_x -----
               code("base_dev_x"),
@@ -157,7 +157,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_y -----
               code("base_dev_y"),
@@ -188,7 +188,7 @@ uploadDataUI <- function(id) {
           closable = FALSE,
           title = tags$strong("Upload File (compare)"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               fileInput(
                 ## |-- INPUT [comp_file] -------
@@ -204,7 +204,7 @@ uploadDataUI <- function(id) {
                 accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [comp_xlsx_sheets] ---------
               selectInput(
@@ -218,7 +218,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- OUTPUT [comp_filename] ---------
               tags$strong("Data file name:"),
@@ -229,7 +229,7 @@ uploadDataUI <- function(id) {
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [comp_new_name] ---------
               textInput(
@@ -245,7 +245,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               br(), br(),
               ## |-- OUTPUT [comp_display_upload] ---------
@@ -274,7 +274,7 @@ uploadDataUI <- function(id) {
           title = "Reactive values (compare)",
           strong(em("For DEV purposes only")),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_a -----
               code("comp_dev_a"),
@@ -287,7 +287,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_b -----
               code("comp_dev_b"),
@@ -300,7 +300,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_x -----
               code("comp_dev_x"),
@@ -313,7 +313,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_y -----
               code("comp_dev_y"),
@@ -609,7 +609,7 @@ selectDataUI <- function(id) {
           title = "Reactive values (base)",
           strong(em("For DEV purposes only")),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_a -----
               strong(code("base_dev_a"), "=", code("base_data()")),
@@ -622,7 +622,7 @@ selectDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_b -----
               strong(code("base_dev_b"), "=", code("base_name()")),
@@ -635,7 +635,7 @@ selectDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_c -----
               strong(code("base_dev_c"), "=", code("input$base_col_select")),
@@ -703,7 +703,7 @@ selectDataUI <- function(id) {
           title = "Reactive values (comp)",
           strong(em("For DEV purposes only")),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_a -----
               strong(code("comp_dev_a"), "=", code("comp_data()")),
@@ -716,7 +716,7 @@ selectDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_b -----
               strong(code("comp_dev_b"), "=", code("comp_name()")),
@@ -729,7 +729,7 @@ selectDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_c -----
               strong(code("comp_dev_c"), "=", code("input$comp_col_select")),
@@ -756,7 +756,7 @@ selectDataUI <- function(id) {
           width = 12,
           title = strong("Select Join Columns"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 5,
               h5(
                 strong(
@@ -772,7 +772,7 @@ selectDataUI <- function(id) {
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               h5(
                 strong(
@@ -787,7 +787,7 @@ selectDataUI <- function(id) {
                 ),
                 label =
                   em(
-                    "Select the column (or columns) that create a unique observation between ",
+                    "Select the bs4Dash::column (or columns) that create a unique observation between ",
                     code("base"), "and ", code("compare"), ""
                   ),
                 choices = c("", NULL),
@@ -795,7 +795,7 @@ selectDataUI <- function(id) {
                 selected = c("", NULL)
               ),
               em(
-                "The join column will be named", code("join_column"),
+                "The join bs4Dash::column will be named", code("join_column"),
                 "Leave blank for a row-by-row comparison"
               ),
               br(), br(),
@@ -818,7 +818,7 @@ selectDataUI <- function(id) {
           collapsed = TRUE,
           status = "primary",
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               ## OUTPUT |-- (comp_join_col_display) ------
               reactableOutput(
@@ -840,7 +840,7 @@ selectDataUI <- function(id) {
           maximizable = TRUE,
           status = "secondary",
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               ## OUTPUT |-- (comp_join_col_display) ------
               reactableOutput(
@@ -1110,10 +1110,10 @@ selectDataServer <- function(id, data_upload) {
               # only intersecting columns
               base_join_col <- dplyr::select(base_join_col,
                 join_column, all_of(col_intersect()$Columns))
-              # join column
+              # join bs4Dash::column
               base_join_col <- tibble::add_column(.data = base_join_col,
                 join_source = input$by, .after = 1)
-              # data source column
+              # data source bs4Dash::column
               base_join_col <- tibble::add_column(.data = base_join_col,
                 data_source = base_name(), .after = 1)
             } else {
@@ -1121,10 +1121,10 @@ selectDataServer <- function(id, data_upload) {
               base_join_col <- base_select()
               base_join_col <- select(base_join_col,
                 all_of(col_intersect()$Columns))
-              # join column
+              # join bs4Dash::column
               base_join_col <- tibble::add_column(.data = base_join_col,
                 join_source = input$by, .after = 1)
-              # data source column
+              # data source bs4Dash::column
               base_join_col <- tibble::add_column(.data = base_join_col,
                 data_source = base_name(), .after = 1)
             }
@@ -1142,10 +1142,10 @@ selectDataServer <- function(id, data_upload) {
             # only intersecting columns
             comp_join_col <- select(comp_join_col,
               join_column, all_of(col_intersect()$Columns))
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(.data = comp_join_col,
                 join_source = input$by, .after = 1)
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(.data = comp_join_col,
                 data_source = comp_name(), .after = 1)
           } else {
@@ -1154,10 +1154,10 @@ selectDataServer <- function(id, data_upload) {
             # only intersecting columns
             comp_join_col <- select(comp_join_col,
               all_of(col_intersect()$Columns))
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(.data = comp_join_col,
                 join_source = input$by, .after = 1)
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(.data = comp_join_col,
                 data_source = comp_name(), .after = 1)
           }

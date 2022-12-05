@@ -11,7 +11,7 @@ create_join_column(df, by_colums, new_by_column_name)
 
 \item{by_colums}{columns to uniquely identify a row}
 
-\item{new_by_column_name}{the new column name}
+\item{new_by_column_name}{the new bs4Dash::column name}
 }
 \value{
 join_col_data

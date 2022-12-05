@@ -23,7 +23,7 @@ Quick dataset comparisons in three steps!
 
 + Click on the **Select Data** tab and review your uploaded data. If you'd like, you can reduce the columns you'd like to include in the comparison
 
-+ In the **Select Join Columns** box, you'll see a table of shared columns between `base` and `compare` (f the data has a join column (or columns), you can select them in the **Select Joining Column(s)** section)
++ In the **Select Join Columns** box, you'll see a table of shared columns between `base` and `compare` (f the data has a join bs4Dash::column (or columns), you can select them in the **Select Joining Column(s)** section)
 
 + Use the final two boxes to review the data that will be compared
 

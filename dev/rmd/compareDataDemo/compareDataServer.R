@@ -101,7 +101,7 @@ compareDataServer <- function(id, data_selected) {
     # |-- REACTIVE prev_join_var() -----
     prev_join_var <- reactive({
       req(input$new_join_col)
-      # create join column
+      # create join bs4Dash::column
       prev_join_var <- create_new_column(
         data = data_prev(),
         cols = input$new_join_col,
@@ -112,7 +112,7 @@ compareDataServer <- function(id, data_selected) {
     # |-- REACTIVE curr_join_var() -----
     curr_join_var <- reactive({
       req(input$new_join_col)
-      # create join column
+      # create join bs4Dash::column
       curr_join_var <- create_new_column(
         data = data_curr(),
         cols = input$new_join_col,

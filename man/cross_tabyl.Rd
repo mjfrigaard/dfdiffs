@@ -9,7 +9,7 @@ cross_tabyl(df, col)
 \arguments{
 \item{df}{a data.frame or tibble}
 
-\item{col}{a column with categorical or factor data}
+\item{col}{a bs4Dash::column with categorical or factor data}
 }
 \value{
 cross_tabyl

@@ -90,8 +90,8 @@ extract_df_tables <- function(diffdf_list, by_keys) {
 #'
 #' @param compare A 'current' or 'new' dataset (tibble or data.frame)
 #' @param base A 'previous' or 'old' dataset (tibble or data.frame)
-#' @param by A join column between the two datasets, or any combination of columns that constitute a unique row.
-#' @param by_col A new name for the joining column.
+#' @param by A join bs4Dash::column between the two datasets, or any combination of columns that constitute a unique row.
+#' @param by_col A new name for the joining bs4Dash::column.
 #' @param cols Columns to be compared.
 #'
 #' @importFrom diffdf diffdf
@@ -126,7 +126,7 @@ extract_df_tables <- function(diffdf_list, by_keys) {
 create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
   # check to see if 'by' is included in cols
   if (sum(by %in% cols) > 0) {
-    stop("The 'by' column is listed in the columns to compare ('cols)")
+    stop("The 'by' bs4Dash::column is listed in the columns to compare ('cols)")
   } else {
       # convert all columns to character
     compare <- mutate(compare, across(.cols = everything(), .fns = as.character))
@@ -177,14 +177,14 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
 
     changed_data <- list("num_diffs" = num_diffs, "var_diffs" = var_diffs)
   } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
-    # 3) Single 'by' column, no new column name ----
+    # 3) Single 'by' bs4Dash::column, no new bs4Dash::column name ----
     diff_lst <- suppressWarnings(suppressMessages(
       diffdf::diffdf(base = base , compare = compare, keys = by)))
 
     changed_data <- extract_df_tables(diffdf_list = diff_lst, by_keys = by)
 
   } else if (length(by) == 1 & !is.null(by_col) & is.null(cols)) {
-    # 4) Single by column, new column name (by_col) -----
+    # 4) Single by bs4Dash::column, new bs4Dash::column name (by_col) -----
       compare_join_cols <- rename_join_col(compare, by = by, by_col = by_col)
       base_join_cols <- rename_join_col(base, by = by, by_col = by_col)
       # create df list
@@ -196,7 +196,7 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
       changed_data <- extract_df_tables(diffdf_list = diff_lst,
                                           by_keys = by_col)
   } else if (length(by) == 1 & is.null(by_col) & !is.null(cols)) {
-    # 5) Single by column, multiple compare columns 'cols' ----
+    # 5) Single by bs4Dash::column, multiple compare columns 'cols' ----
       compare_join_cols <- dplyr::select(compare, {{by}}, all_of(cols))
       base_join_cols <- dplyr::select(base, {{by}}, all_of(cols))
       # create df list
@@ -209,7 +209,7 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
                                           by_keys = by)
 
   } else if (length(by) == 1 & !is.null(by_col) & !is.null(cols)) {
-    # 6) Single by column, new column name (by_col), multiple compare columns (cols) ----
+    # 6) Single by bs4Dash::column, new bs4Dash::column name (by_col), multiple compare columns (cols) ----
       compare_cols <- rename_join_col(compare, by = by, by_col = by_col)
       base_cols <- rename_join_col(base, by = by, by_col = by_col)
       compare_join_cols <- dplyr::select(compare_cols, {{by_col}}, all_of(cols))
@@ -238,7 +238,7 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
       changed_data <- extract_df_tables(diffdf_list = diff_lst,
                                           by_keys = 'join')
   } else if (length(by) > 1 & !is.null(by_col) & is.null(cols)) {
-    # 8) Multiple by columns, new column name (by_col) ----
+    # 8) Multiple by columns, new bs4Dash::column name (by_col) ----
       compare_join_cols <- create_new_column(data = compare,
                           cols = all_of(by), new_name = {{by_col}})
       base_join_cols <- create_new_column(data = base,
@@ -254,7 +254,7 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
 
   } else if (length(by) > 1 & is.null(by_col) & !is.null(cols)) {
     # 9) multiple `by` columns, multiple compare 'cols' ----
-    # create new 'join' column
+    # create new 'join' bs4Dash::column
       compare_cols <- create_new_column(data = compare,
                           cols = all_of(by), new_name = "join")
       base_cols <- create_new_column(data = base,

@@ -2,8 +2,8 @@
 #'
 #' @param compare a 'new' or 'current' dataset
 #' @param base an 'old' or 'previous' dataset
-#' @param by the joining column between the two datasets
-#' @param by_col name of the new joining column
+#' @param by the joining bs4Dash::column between the two datasets
+#' @param by_col name of the new joining bs4Dash::column
 #' @param  cols names of columns to compare
 #'
 #' @return deleted_data
@@ -45,12 +45,12 @@ create_deleted_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
                                       y = names(compare_cols)))
     deleted_data <- dplyr::distinct(deleted_join)
   } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
-     # 3) single 'by' column ----
+     # 3) single 'by' bs4Dash::column ----
      deleted_join <- dplyr::anti_join(x = base, y = compare,
                                         by = {{by}})
      deleted_data <- dplyr::distinct(deleted_join)
   } else if (length(by) == 1 & !is.null(by_col) & is.null(cols)) {
-    # 4) single `by` column, new `by_col` ----
+    # 4) single `by` bs4Dash::column, new `by_col` ----
     compare_cols <- rename_join_col(data = compare, by = by, by_col = by_col)
     base_cols <- rename_join_col(data = base, by = by, by_col = by_col)
     deleted_join <- dplyr::anti_join(x = base_cols, y = compare_cols,
@@ -91,7 +91,7 @@ create_deleted_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
                                       y = names(compare_join)))
       deleted_data <- dplyr::distinct(deleted_join)
   } else if (length(by) > 1 & !is.null(by_col) & is.null(cols)) {
-      # 8) multiple 'by', new column ('by_col') -----
+      # 8) multiple 'by', new bs4Dash::column ('by_col') -----
       # no compare 'cols'
       base_join <- create_new_column(data = base,
                         cols = all_of(by), new_name = {{by_col}})
@@ -117,7 +117,7 @@ create_deleted_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
                                       y = names(compare_join)))
       deleted_data <- dplyr::distinct(deleted_join)
   } else if (length(by) > 1 & !is.null(by_col) & !is.null(cols)) {
-    # 10) multiple 'by', new column ('by_col'), multiple compare 'cols' -----
+    # 10) multiple 'by', new bs4Dash::column ('by_col'), multiple compare 'cols' -----
       compare_cols <- create_new_column(data = compare,
                         cols = all_of(by), new_name = {{by_col}})
       base_cols <- create_new_column(data = base,

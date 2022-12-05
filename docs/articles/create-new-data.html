@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -420,6 +420,25 @@ create a unique identifier named <code>join_var</code></p>
 </h3>
 <p>Each function in the <code>dfdiffs</code> package assumes the
 following conditions:</p>
+<ol style="list-style-type: decimal">
+<li><p>Two datasets</p></li>
+<li><p>Multiple columns to compare (<code>cols</code>)</p></li>
+<li><p>Single by column</p></li>
+<li><p>Single <code>by</code> column, new column name
+(<code>by_col</code>)</p></li>
+<li><p>Single <code>by</code> column, multiple compare columns
+(<code>cols</code>)</p></li>
+<li><p><code>Single</code> by column, new column name
+(<code>by_col</code>), multiple compare columns
+(<code>cols</code>)</p></li>
+<li><p>Multiple <code>by</code> columns</p></li>
+<li><p>Multiple <code>by</code> columns, new column name
+(<code>by_col</code>)</p></li>
+<li><p>Multiple <code>by</code> columns, multiple compare columns
+(<code>cols</code>)</p></li>
+<li><p>Multiple <code>by</code> columns, a new <code>by_col</code>, and
+<code>cols</code></p></li>
+</ol>
 <div class="section level4">
 <h4 id="single-by-column-conditions">Single by column conditions<a class="anchor" aria-label="anchor" href="#single-by-column-conditions"></a>
 </h4>

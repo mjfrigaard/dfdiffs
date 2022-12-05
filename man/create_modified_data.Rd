@@ -11,9 +11,9 @@ create_modified_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 
 \item{base}{A 'previous' or 'old' dataset (tibble or data.frame)}
 
-\item{by}{A join column between the two datasets, or any combination of columns that constitute a unique row.}
+\item{by}{A join bs4Dash::column between the two datasets, or any combination of columns that constitute a unique row.}
 
-\item{by_col}{A new name for the joining column.}
+\item{by_col}{A new name for the joining bs4Dash::column.}
 
 \item{cols}{Columns to be compared.}
 }

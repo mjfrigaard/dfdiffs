@@ -16,7 +16,7 @@ compareDataUI <- function(id) {
           width = 12,
           title = "Join data tables",
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               ## OUTPUT |-- (intersecting_cols) ------
               strong(em("The following columns are in both tables:")),
@@ -27,7 +27,7 @@ compareDataUI <- function(id) {
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## OUTPUT |-- (new_join_col) ------
               selectizeInput(
@@ -35,7 +35,7 @@ compareDataUI <- function(id) {
                   namespace = id,
                   id = "new_join_col"
                 ),
-                label = strong(em("Select the column (or columns) for joining the two datasets:")),
+                label = strong(em("Select the bs4Dash::column (or columns) for joining the two datasets:")),
                 choices = c("", NULL),
                 multiple = TRUE,
                 selected = c("", NULL)

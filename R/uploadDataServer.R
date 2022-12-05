@@ -1,5 +1,38 @@
 #' uploadDataServer()
 #'
+#' @importFrom bs4Dash dashboardPage
+#' @importFrom bs4Dash insertTab
+#' @importFrom bs4Dash actionButton
+#' @importFrom bs4Dash tabsetPanel
+#' @importFrom bs4Dash column
+#' @importFrom bs4Dash menuItem
+#' @importFrom bs4Dash renderMenu
+#' @importFrom bs4Dash sidebarUserPanel
+#' @importFrom bs4Dash valueBox
+#' @importFrom bs4Dash dropdownMenu
+#' @importFrom bs4Dash dropdownMenuOutput
+#' @importFrom bs4Dash renderInfoBox
+#' @importFrom bs4Dash messageItem
+#' @importFrom bs4Dash sidebarMenu
+#' @importFrom bs4Dash dashboardBody
+#' @importFrom bs4Dash tabItems
+#' @importFrom bs4Dash notificationItem
+#' @importFrom bs4Dash dashboardHeader
+#' @importFrom bs4Dash renderValueBox
+#' @importFrom bs4Dash menuSubItem
+#' @importFrom bs4Dash dashboardSidebar
+#' @importFrom bs4Dash updateTabItems
+#' @importFrom bs4Dash tabItem
+#' @importFrom bs4Dash box
+#' @importFrom bs4Dash infoBox
+#' @importFrom bs4Dash taskItem
+#' @importFrom bs4Dash sidebarMenuOutput
+#' @importFrom bs4Dash tabBox
+#' @importFrom bs4Dash infoBoxOutput
+#' @importFrom bs4Dash valueBoxOutput
+#' @importFrom bs4Dash menuItemOutput
+#' @importFrom bs4Dash dashboardPage
+#'
 #' @param id module id
 #'
 #' @export uploadDataServer
@@ -63,6 +96,31 @@ uploadDataServer <- function(id) {
       )
     })
 
+    ## DEV OUTPUT |-- (base_dev_a) ---------
+    # output$base_dev_a <- renderPrint({
+    #   print(
+    #     paste0("input$base_filename = ", input$base_file$name)
+    #   )
+    # })
+    ## DEV OUTPUT |-- (base_dev_b) ---------
+    # output$base_dev_b <- renderPrint({
+    #   print(
+    #     base_data()
+    #   )
+    # })
+    ## DEV OUTPUT |-- (base_dev_x) ---------
+    # output$base_dev_x <- renderPrint({
+    #   print(
+    #     paste0("input$base_xlsx_sheets = ", as.character(input$base_xlsx_sheets))
+    #   )
+    # })
+    ## DEV OUTPUT |-- (base_dev_y) ---------
+    # output$base_dev_y <- renderPrint({
+    #   print(
+    #     paste0("input$base_new_name = ", as.character(input$base_new_name))
+    #   )
+    # })
+
 
     # |-- INPUT [comp] comp_xlsx_sheets -----
     observeEvent(eventExpr = input$comp_file, handlerExpr = {
@@ -118,6 +176,31 @@ uploadDataServer <- function(id) {
         )
       )
     })
+
+    # ## DEV OUTPUT |-- (comp_dev_a) ---------
+    # output$comp_dev_a <- renderPrint({
+    #   print(
+    #     paste0("input$comp_filename = ", as.character(input$comp_file$name))
+    #   )
+    # })
+    # ## DEV OUTPUT |-- comp_dev_y (dev) ---------
+    # output$comp_dev_b <- renderPrint({
+    #   print(
+    #     comp_data()
+    #   )
+    # })
+    # ## DEV OUTPUT |-- comp_dev_a (dev) ---------
+    # output$comp_dev_x <- renderPrint({
+    #   print(
+    #     paste0("input$comp_xlsx_sheets = ", as.character(input$comp_xlsx_sheets))
+    #   )
+    # })
+    # ## DEV OUTPUT |-- comp_dev_b (dev) ---------
+    # output$comp_dev_y <- renderPrint({
+    #   print(
+    #     paste0("input$comp_new_name = ", as.character(input$comp_new_name))
+    #   )
+    # })
 
     # |---- return list -----
     # assign this as 'upload_data_list'
