@@ -18,6 +18,8 @@ navbar:
       href: articles/create-deleted-data.html
     - text: Changed/Modified Data
       href: articles/changed-modified-data.html
+    - text: Creating a comparison report
+      href: articles/create-comparison-report.html
     - text: -------
     - text: More Comparisons
     - text: Run all comparisons
