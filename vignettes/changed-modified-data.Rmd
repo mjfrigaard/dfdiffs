@@ -193,8 +193,6 @@ knitr::kables(
   kableExtra::kable_paper()
 ```
 
-
-
 ### 3) Single `by` column
 
 No new column name

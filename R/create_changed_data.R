@@ -64,7 +64,8 @@ extract_df_tables <- function(diffdf_list, by_keys) {
                     nm = paste0(by_keys, "s in BASE that are not in COMPARE"))
     diff_tbls <- list(
       "base_diffs" = base_diffs,
-      "num_diffs" = num_diffs, "var_diffs" = var_diffs
+      "num_diffs" = num_diffs,
+      "var_diffs" = var_diffs
       )
   } else if (length(base_diffs_lst) == 0 & length(comp_diffs_lst) > 0) {
     # comps
@@ -74,7 +75,8 @@ extract_df_tables <- function(diffdf_list, by_keys) {
                       nm = paste0(by_keys, "s in COMPARE that are not in BASE"))
     diff_tbls <- list(
       "comp_diffs" = comp_diffs,
-      "num_diffs" = num_diffs, "var_diffs" = var_diffs,
+      "num_diffs" = num_diffs,
+      "var_diffs" = var_diffs,
       )
   } else {
     diff_tbls <- list(
@@ -122,7 +124,7 @@ extract_df_tables <- function(diffdf_list, by_keys) {
 #'   by = c("subject_id", "record")
 #' )
 create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
-  # check to see if by is included in cols
+  # check to see if 'by' is included in cols
   if (sum(by %in% cols) > 0) {
     stop("The 'by' column is listed in the columns to compare ('cols)")
   } else {

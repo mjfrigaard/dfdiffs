@@ -23,7 +23,7 @@ datasets)
 
 ***What values have been changed?***
 
-    create_changed_data(compare = , base = , by = )
+    create_modified_data(compare = , base = , by = )
 
 ### Comparison to SAS `PROC COMPARE`
 

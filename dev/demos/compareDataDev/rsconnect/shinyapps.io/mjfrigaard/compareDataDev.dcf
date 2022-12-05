@@ -1,0 +1,13 @@
+name: compareDataDev
+title: compareDataDev
+username:
+account: mjfrigaard
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 7813724
+bundleId: 6592090
+url: https://mjfrigaard.shinyapps.io/compareDataDev/
+when: 1670221511.15373
+lastSyncTime: 1670221511.15374
+asMultiple: FALSE
+asStatic: FALSE

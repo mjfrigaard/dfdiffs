@@ -25,6 +25,8 @@ The goal of `dfdiffs` is to is to answer the following questions:
 2. What rows were here before that aren't here now?   
 3. What values have been changed?   
 
+The `dfdiffs` package and application wouldn't be possible without the previous work from the authors of the [`arsenal`](https://mayoverse.github.io/arsenal/reference/arsenal.html) and [`diffdf`](https://gowerc.github.io/diffdf/) packages.
+
 You can access a development version of the application [here.](https://mjfrigaard.shinyapps.io/compareDataApp/) 
 
 ## Installation
@@ -36,12 +38,15 @@ You can install the development version of dfdiffs from [GitHub](https://github.
 devtools::install_github("mjfrigaard/dfdiffs")
 ```
 
+```{r pkg}
+library(dfdiffs)
+```
+
 ## Packages 
 
 Dependencies
 
-```{r pkgs, message=FALSE, warning=FALSE, echo = TRUE}
-library(dfdiffs)
+```{r dep-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
 library(dplyr)
 library(stringr)
 library(forcats)
