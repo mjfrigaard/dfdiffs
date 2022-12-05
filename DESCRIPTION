@@ -1,6 +1,6 @@
 Package: dfdiffs
 Title: Data Frame Differences (What's New, Deleted, and Changed?)
-Version: 0.0.0.9000
+Version: 0.1.0
 Authors@R: 
     person("Martin", "Frigaard", , "mjfrigaard@pm.me", role = c("aut", "cre"),
            comment = c(ORCID = "YOUR-ORCID-ID"))
