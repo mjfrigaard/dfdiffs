@@ -11,9 +11,9 @@ compare_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 
 \item{base}{base data table}
 
-\item{by}{join column}
+\item{by}{join bs4Dash::column}
 
-\item{by_col}{new join column name}
+\item{by_col}{new join bs4Dash::column name}
 
 \item{cols}{columns to compare}
 }

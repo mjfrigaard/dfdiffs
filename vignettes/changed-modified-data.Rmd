@@ -124,7 +124,7 @@ knitr::kable(InitialDataJoin, caption = "InitialDataJoin") |>
 
 # create_changed_data()
 
-Each function in the `dfdiffs` package assumes the following conditions: 
+Each comparison function in the `dfdiffs` package assumes `base` and `compare` datasets *might* have one of the following conditions: 
 
 1) Two datasets
 
@@ -398,6 +398,7 @@ knitr::kables(
   kableExtra::kable_paper()
 ```
 
+***
 
 # create_modified_data()
 
@@ -406,6 +407,8 @@ Below we have the `create_modified_data()` function, which takes two data frames
 ```{r args-create_modified_data, eval=FALSE}
 create_modified_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 ```
+
+We'll test this function below on all ten possible conditions for `base` and `compare`.
 
 ## Single joining (`by`) column conditions 
 

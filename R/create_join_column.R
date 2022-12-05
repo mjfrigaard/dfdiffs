@@ -2,7 +2,7 @@
 #'
 #' @param df a data.frame or tibble
 #' @param by_colums columns to uniquely identify a row
-#' @param new_by_column_name the new column name
+#' @param new_by_column_name the new bs4Dash::column name
 #'
 #' @return join_col_data
 #' @export create_join_column

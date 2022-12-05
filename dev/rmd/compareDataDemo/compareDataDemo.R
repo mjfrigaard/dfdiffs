@@ -18,7 +18,7 @@ dev_uploadDataUI <- function(id) {
           width = 12,
           title = tags$strong("Upload File (base)"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               fileInput(
                 ## |-- INPUT [base_file] -------
@@ -34,7 +34,7 @@ dev_uploadDataUI <- function(id) {
                 accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ### |-- INPUT [base_xlsx_sheets] ---------
               selectInput(
@@ -48,7 +48,7 @@ dev_uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- OUTPUT [base_filename] ---------
               tags$strong("Data file name:"),
@@ -59,7 +59,7 @@ dev_uploadDataUI <- function(id) {
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [base_new_name] ---------
               textInput(
@@ -75,7 +75,7 @@ dev_uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               br(), br(),
               ## |-- OUTPUT [base_display_upload] ---------
@@ -104,7 +104,7 @@ dev_uploadDataUI <- function(id) {
           title = "Reactive values (base)",
           strong(em("For DEV purposes only")),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_a -----
               code("base_dev_a"),
@@ -117,7 +117,7 @@ dev_uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_b -----
               code("base_dev_b"),
@@ -130,7 +130,7 @@ dev_uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_x -----
               code("base_dev_x"),
@@ -143,7 +143,7 @@ dev_uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_y -----
               code("base_dev_y"),
@@ -174,7 +174,7 @@ dev_uploadDataUI <- function(id) {
           closable = FALSE,
           title = tags$strong("Upload File (compare)"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               fileInput(
                 ## |-- INPUT [comp_file] -------
@@ -190,7 +190,7 @@ dev_uploadDataUI <- function(id) {
                 accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [comp_xlsx_sheets] ---------
               selectInput(
@@ -204,7 +204,7 @@ dev_uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- OUTPUT [comp_filename] ---------
               tags$strong("Data file name:"),
@@ -215,7 +215,7 @@ dev_uploadDataUI <- function(id) {
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [comp_new_name] ---------
               textInput(
@@ -231,7 +231,7 @@ dev_uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               br(), br(),
               ## |-- OUTPUT [comp_display_upload] ---------
@@ -260,7 +260,7 @@ dev_uploadDataUI <- function(id) {
           title = "Reactive values (compare)",
           strong(em("For DEV purposes only")),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_a -----
               code("comp_dev_a"),
@@ -273,7 +273,7 @@ dev_uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_b -----
               code("comp_dev_b"),
@@ -286,7 +286,7 @@ dev_uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_x -----
               code("comp_dev_x"),
@@ -299,7 +299,7 @@ dev_uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_y -----
               code("comp_dev_y"),
@@ -591,7 +591,7 @@ dev_selectDataUI <- function(id) {
           title = "Reactive values (base)",
           strong(em("For DEV purposes only")),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_a -----
               strong(code("base_dev_a"), "=", code("base_data()")),
@@ -604,7 +604,7 @@ dev_selectDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_b -----
               strong(code("base_dev_b"), "=", code("input$by")),
@@ -617,7 +617,7 @@ dev_selectDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## base_dev_c -----
               strong(code("base_dev_c"), "=", code("input$base_col_select")),
@@ -685,7 +685,7 @@ dev_selectDataUI <- function(id) {
           title = "Reactive values (comp)",
           strong(em("For DEV purposes only")),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_a -----
               strong(code("comp_dev_a"), "=", code("comp_data()")),
@@ -698,7 +698,7 @@ dev_selectDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_b -----
               strong(code("comp_dev_b"), "=", code("input$by")),
@@ -711,7 +711,7 @@ dev_selectDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               12,
               ## comp_dev_c -----
               strong(code("comp_dev_c"), "=", code("input$comp_col_select")),
@@ -738,7 +738,7 @@ dev_selectDataUI <- function(id) {
           width = 12,
           title = strong("Select Join Columns"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 5,
               h5(
                 strong(
@@ -754,7 +754,7 @@ dev_selectDataUI <- function(id) {
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               h5(
                 strong(
@@ -769,7 +769,7 @@ dev_selectDataUI <- function(id) {
                 ),
                 label =
                   em(
-                    "Select the column (or columns) that create a unique observation between ",
+                    "Select the bs4Dash::column (or columns) that create a unique observation between ",
                     code("base"), "and ", code("compare"), ""
                   ),
                 choices = c("", NULL),
@@ -777,7 +777,7 @@ dev_selectDataUI <- function(id) {
                 selected = c("", NULL)
               ),
               em(
-                "The join column will be named", code("join_column"),
+                "The join bs4Dash::column will be named", code("join_column"),
                 "Leave blank for a row-by-row comparison"
               ),
               br(), br(),
@@ -800,7 +800,7 @@ dev_selectDataUI <- function(id) {
           collapsed = TRUE,
           status = "primary",
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               ## OUTPUT |-- (comp_join_col_display) ------
               reactableOutput(
@@ -822,7 +822,7 @@ dev_selectDataUI <- function(id) {
           maximizable = TRUE,
           status = "secondary",
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               ## OUTPUT |-- (comp_join_col_display) ------
               reactableOutput(
@@ -1103,12 +1103,12 @@ dev_selectDataServer <- function(id, data_upload) {
               base_join_col,
               join_column, all_of(col_intersect()$Columns)
             )
-            # join column
+            # join bs4Dash::column
             base_join_col <- tibble::add_column(
               .data = base_join_col,
               join_source = by_cols, .after = 1
             )
-            # data source column
+            # data source bs4Dash::column
             base_join_col <- tibble::add_column(
               .data = base_join_col,
               data_source = base_name(), .after = 1
@@ -1120,7 +1120,7 @@ dev_selectDataServer <- function(id, data_upload) {
               base_join_col,
               all_of(col_intersect()$Columns)
             )
-            # data source column
+            # data source bs4Dash::column
             base_join_col <- tibble::add_column(
               .data = base_join_col,
               data_source = base_name(), .after = 1
@@ -1143,12 +1143,12 @@ dev_selectDataServer <- function(id, data_upload) {
               comp_join_col,
               join_column, all_of(col_intersect()$Columns)
             )
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(
               .data = comp_join_col,
               join_source = by_cols, .after = 1
             )
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(
               .data = comp_join_col,
               data_source = comp_name(), .after = 1
@@ -1161,7 +1161,7 @@ dev_selectDataServer <- function(id, data_upload) {
               comp_join_col,
               all_of(col_intersect()$Columns)
             )
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(
               .data = comp_join_col,
               data_source = comp_name(), .after = 1
@@ -1233,7 +1233,7 @@ dev_compareDataUI <- function(id) {
         collapsed = FALSE,
         status = "info",
         fluidRow(
-          column(
+          bs4Dash::column(
             width = 6,
             h5(
               "The comparison information between", code("base"),
@@ -1255,7 +1255,7 @@ dev_compareDataUI <- function(id) {
               )
             )
           ),
-          column(
+          bs4Dash::column(
             6,
             ## OUTPUT |-- (info) ------
             uiOutput(
@@ -1288,14 +1288,14 @@ dev_compareDataUI <- function(id) {
         fluidRow(
           sortable(
             width = 12,
-            column(
+            bs4Dash::column(
               width = 12,
               ## INPUT |-- (go_new_data) ------
               h5(
                 "The new data between", code("base"),
                 " and ", code("compare"), " are below:"
               ),
-              actionButton(
+              shiny::actionButton(
                 inputId = NS(
                   namespace = id,
                   id = "go_new_data"
@@ -1328,14 +1328,14 @@ dev_compareDataUI <- function(id) {
         fluidRow(
           sortable(
             width = 12,
-            column(
+            bs4Dash::column(
               width = 12,
               h5(
                 "The deleted data between", code("base"),
                 " and ", code("compare"), " are below:"
               ),
               ## INPUT |-- (go_deleted_data) ------
-              actionButton(
+              shiny::actionButton(
                 inputId = NS(
                   namespace = id,
                   id = "go_deleted_data"
@@ -1366,14 +1366,14 @@ dev_compareDataUI <- function(id) {
         maximizable = TRUE,
         status = "warning",
         fluidRow(
-          column(
+          bs4Dash::column(
             width = 12,
             ## OUTPUT |-- (go_changed_data) ------
             h5(
               "The changed data between", code("base"),
               " and ", code("compare"), " are below:"
             ),
-            actionButton(
+            shiny::actionButton(
               inputId = NS(
                 namespace = id,
                 id = "go_changed_data"
@@ -1386,7 +1386,7 @@ dev_compareDataUI <- function(id) {
         br(), br(),
         p(strong("Differences by Variable:")),
         fluidRow(
-          column(
+          bs4Dash::column(
             width = 5,
             ## OUTPUT |-- (num_diffs_display) ------
             reactableOutput(
@@ -1396,7 +1396,7 @@ dev_compareDataUI <- function(id) {
               )
             )
           ),
-          column(
+          bs4Dash::column(
             width = 7,
             ## OUTPUT |-- (num_diffs_graph) ------
             plotOutput(outputId = NS(
@@ -1417,14 +1417,14 @@ dev_compareDataUI <- function(id) {
         maximizable = TRUE,
         status = "warning",
         fluidRow(
-          column(
+          bs4Dash::column(
             width = 12,
             h5(
               "Review the changes between", code("base"),
               " and ", code("compare"), " below:"
             ),
             ## OUTPUT |-- (go_changed_data) ------
-            actionButton(
+            shiny::actionButton(
               inputId = NS(
                 namespace = id,
                 id = "go_review_changed_data"
@@ -1437,7 +1437,7 @@ dev_compareDataUI <- function(id) {
               code("compare"),
               " columns have been included with the row-by-row changes:")),
             fluidRow(
-              column(
+              bs4Dash::column(
                 width = 12,
                 ## OUTPUT |-- (var_diffs_display) ------
                 reactableOutput(
@@ -1464,7 +1464,7 @@ dev_compareDataUI <- function(id) {
         title = "Reactive values (base)",
         strong(em("For DEV purposes only")),
         fluidRow(
-          column(
+          bs4Dash::column(
             12,
             ## dev_a -----
             strong(code("dev_a"), "=", code("base_join_data()")),
@@ -1477,7 +1477,7 @@ dev_compareDataUI <- function(id) {
           )
         ),
         fluidRow(
-          column(
+          bs4Dash::column(
             12,
             ## dev_b -----
             strong(code("dev_b"), "=", code("comp_join_data()")),
@@ -1490,7 +1490,7 @@ dev_compareDataUI <- function(id) {
           )
         ),
         fluidRow(
-          column(
+          bs4Dash::column(
             12,
             ## dev_c -----
             strong(code("dev_c"), "=", code("compare_cols()")),
@@ -1537,7 +1537,7 @@ dev_compareDataServer <- function(id, data_selected) {
       compare_cols_tbl <- tibble::tibble(
         `Compare Columns` = compare_cols()
       )
-      # remove join column, data_source, join_source
+      # remove join bs4Dash::column, data_source, join_source
       compare_cols_tbl <- filter(
         compare_cols_tbl,
         `Compare Columns` %nin% c("join_column", "data_source", "join_source")
@@ -1591,7 +1591,7 @@ dev_compareDataServer <- function(id, data_selected) {
           code("base"), " and ", code("compare"),
           " datasets are joined using the ",
           strong(unique(base_join_data()$join_source)),
-          " column(s). The columns being compared are:"
+          " bs4Dash::column(s). The columns being compared are:"
         ))
       } else {
         HTML(paste0(
@@ -1627,14 +1627,14 @@ dev_compareDataServer <- function(id, data_selected) {
     ## NEW DATA --------------------------------------------------------
     ###  |-- REACTIVE  new data ---------
     new_data <- reactive({
-      # join column
+      # join bs4Dash::column
       if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
         new <- create_new_data(
           compare = comp_join_data(),
           base = base_join_data(),
           by = "join_column"
         )
-        # no join column
+        # no join bs4Dash::column
       } else {
         new <- create_new_data(
           compare = comp_join_data(),
@@ -1665,14 +1665,14 @@ dev_compareDataServer <- function(id, data_selected) {
     ## DELETED DATA --------------------------------------------------------
     ### |-- REACTIVE  deleted data ---------
     deleted_data <- reactive({
-      # join column
+      # join bs4Dash::column
       if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
         deleted <- create_deleted_data(
           compare = comp_join_data(),
           base = base_join_data(),
           by = "join_column"
         )
-        # no join column
+        # no join bs4Dash::column
       } else {
         deleted <- create_deleted_data(
           compare = comp_join_data(),
@@ -1702,7 +1702,7 @@ dev_compareDataServer <- function(id, data_selected) {
     ## CHANGED DATA --------------------------------------------------------
     ### |-- REACTIVE  changed_data ---------
     changed_data <- reactive({
-      # join column
+      # join bs4Dash::column
       if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
           # remove data source
           comp_join_data <- select(comp_join_data(), -data_source)
@@ -1713,7 +1713,7 @@ dev_compareDataServer <- function(id, data_selected) {
           base = base_join_data,
           by = "join_column"
         )
-        # no join column
+        # no join bs4Dash::column
       } else {
           # remove data source
           comp_join_data <- select(comp_join_data(), -data_source)
@@ -1932,7 +1932,7 @@ compareDataDemo <- function() {
       pinned = TRUE,
       collapsed = FALSE,
       skin = "light",
-      column(
+      bs4Dash::column(
         width = 12,
         br(),
         shiny::includeMarkdown(path = "assets/intro.md")

@@ -11,9 +11,9 @@ create_new_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 
 \item{base}{an 'old' or 'previous' dataset}
 
-\item{by}{the joining column between the two datasets}
+\item{by}{the joining bs4Dash::column between the two datasets}
 
-\item{by_col}{name of the new joining column}
+\item{by_col}{name of the new joining bs4Dash::column}
 
 \item{cols}{names of columns to compare}
 }

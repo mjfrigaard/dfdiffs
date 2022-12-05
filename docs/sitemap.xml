@@ -19,6 +19,9 @@
     <loc>https://mjfrigaard.github.io/dfdiffs/articles/compare-data.html</loc>
   </url>
   <url>
+    <loc>https://mjfrigaard.github.io/dfdiffs/articles/create-comparison-report.html</loc>
+  </url>
+  <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/articles/create-deleted-data.html</loc>
   </url>
   <url>
@@ -97,6 +100,9 @@
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/compareDataDemo.html</loc>
   </url>
   <url>
+    <loc>https://mjfrigaard.github.io/dfdiffs/reference/compareDataDev.html</loc>
+  </url>
+  <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/compareDataServer.html</loc>
   </url>
   <url>
@@ -109,7 +115,13 @@
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.html</loc>
   </url>
   <url>
+    <loc>https://mjfrigaard.github.io/dfdiffs/reference/create_comparison_report.html</loc>
+  </url>
+  <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.html</loc>
+  </url>
+  <url>
+    <loc>https://mjfrigaard.github.io/dfdiffs/reference/create_empty_tbl.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/create_join_column.html</loc>

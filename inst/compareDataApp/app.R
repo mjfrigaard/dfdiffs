@@ -75,7 +75,7 @@ compareDataApp <- function() {
       pinned = TRUE,
       collapsed = FALSE,
       skin = "light",
-      column(
+      bs4Dash::column(
         width = 12,
         br(),
         shiny::includeMarkdown(path = "assets/intro.md")

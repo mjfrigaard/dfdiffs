@@ -2,8 +2,8 @@
 #'
 #' @param compare comparison data table
 #' @param base base data table
-#' @param by join column
-#' @param by_col new join column name
+#' @param by join bs4Dash::column
+#' @param by_col new join bs4Dash::column name
 #' @param cols columns to compare
 #'
 #' @return list of comparison tables

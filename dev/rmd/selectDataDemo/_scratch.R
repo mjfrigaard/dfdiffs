@@ -268,11 +268,11 @@ return(
     # textInput(
     #   inputId = NS(namespace = id, id = "by_col"),
     #   label =
-    #     em("Provide an optional name for the joining column (or columns)"),
+    #     em("Provide an optional name for the joining bs4Dash::column (or columns)"),
     #   value = NULL
     # ),
     # em(
-    #   "If no name is provided, the join column will be named",
+    #   "If no name is provided, the join bs4Dash::column will be named",
     #   code("join")
 # This is the server component:
     # ##  REACTIVE |--  base_join_col_data

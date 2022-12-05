@@ -2,8 +2,8 @@
 #'
 #' @param compare A 'current' or 'new' dataset (tibble or data.frame)
 #' @param base A 'previous' or 'old' dataset (tibble or data.frame)
-#' @param by A join column between the two datasets, or any combination of columns that constitute a unique row.
-#' @param by_col A new name for the joining column.
+#' @param by A join bs4Dash::column between the two datasets, or any combination of columns that constitute a unique row.
+#' @param by_col A new name for the joining bs4Dash::column.
 #' @param cols Columns to be compared.
 #'
 #' @import arsenal
@@ -95,7 +95,7 @@ create_modified_data <- function(compare, base, by = NULL, by_col = NULL, cols =
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
 
     } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
-      # 3) Single 'by' column ----
+      # 3) Single 'by' bs4Dash::column ----
       compare_join_cols <- dplyr::relocate(compare, {{by}}, everything())
       base_join_cols <- dplyr::relocate(base, {{by}}, everything())
       # check
@@ -126,7 +126,7 @@ create_modified_data <- function(compare, base, by = NULL, by_col = NULL, cols =
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
 
     } else if (length(by) == 1 & !is.null(by_col) & is.null(cols)) {
-      # 3) Single 'by' column, new column ('by_col') ----
+      # 3) Single 'by' bs4Dash::column, new bs4Dash::column ('by_col') ----
       compare_join_cols <- rename_join_col(compare, by = by, by_col = by_col)
       base_join_cols <- rename_join_col(base, by = by, by_col = by_col)
 
@@ -156,7 +156,7 @@ create_modified_data <- function(compare, base, by = NULL, by_col = NULL, cols =
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
 
     } else if (length(by) == 1 & is.null(by_col) & !is.null(cols)) {
-      # 5) Single 'by' column, multiple compare cols ('cols') ----
+      # 5) Single 'by' bs4Dash::column, multiple compare cols ('cols') ----
       compare_join_cols <- dplyr::select(compare, {{by}}, all_of(cols))
       base_join_cols <- dplyr::select(base, {{by}}, all_of(cols))
 
@@ -186,7 +186,7 @@ create_modified_data <- function(compare, base, by = NULL, by_col = NULL, cols =
       mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
 
     } else if (length(by) == 1 & !is.null(by_col) & !is.null(cols)) {
-      # 6) Single 'by' column, new 'by_col', multiple compare 'cols' ----
+      # 6) Single 'by' bs4Dash::column, new 'by_col', multiple compare 'cols' ----
       compare_cols <- rename_join_col(compare, by = by, by_col = by_col)
       base_cols <- rename_join_col(base, by = by, by_col = by_col)
       compare_join_cols <- dplyr::select(compare_cols, {{by_col}}, all_of(cols))

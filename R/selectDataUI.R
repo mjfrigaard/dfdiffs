@@ -1,5 +1,38 @@
 #' selectDataUI
 #'
+#' @importFrom bs4Dash dashboardPage
+#' @importFrom bs4Dash insertTab
+#' @importFrom bs4Dash actionButton
+#' @importFrom bs4Dash tabsetPanel
+#' @importFrom bs4Dash column
+#' @importFrom bs4Dash menuItem
+#' @importFrom bs4Dash renderMenu
+#' @importFrom bs4Dash sidebarUserPanel
+#' @importFrom bs4Dash valueBox
+#' @importFrom bs4Dash dropdownMenu
+#' @importFrom bs4Dash dropdownMenuOutput
+#' @importFrom bs4Dash renderInfoBox
+#' @importFrom bs4Dash messageItem
+#' @importFrom bs4Dash sidebarMenu
+#' @importFrom bs4Dash dashboardBody
+#' @importFrom bs4Dash tabItems
+#' @importFrom bs4Dash notificationItem
+#' @importFrom bs4Dash dashboardHeader
+#' @importFrom bs4Dash renderValueBox
+#' @importFrom bs4Dash menuSubItem
+#' @importFrom bs4Dash dashboardSidebar
+#' @importFrom bs4Dash updateTabItems
+#' @importFrom bs4Dash tabItem
+#' @importFrom bs4Dash box
+#' @importFrom bs4Dash infoBox
+#' @importFrom bs4Dash taskItem
+#' @importFrom bs4Dash sidebarMenuOutput
+#' @importFrom bs4Dash tabBox
+#' @importFrom bs4Dash infoBoxOutput
+#' @importFrom bs4Dash valueBoxOutput
+#' @importFrom bs4Dash menuItemOutput
+#' @importFrom bs4Dash dashboardPage
+#'
 #' @param id module id
 #'
 #' @export selectDataUI
@@ -92,12 +125,12 @@ selectDataUI <- function(id) {
         width = 12,
         bs4Dash::box(
           solidHeader = FALSE,
-          collapsed = TRUE,
+          collapsed = FALSE,
           status = "info",
           width = 12,
           title = strong("Select Join Columns"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 5,
               h5(
                 strong(
@@ -113,7 +146,7 @@ selectDataUI <- function(id) {
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               h5(
                 strong(
@@ -128,7 +161,7 @@ selectDataUI <- function(id) {
                 ),
                 label =
                   em(
-                    "Select the column (or columns) that create a unique observation between ",
+                    "Select the bs4Dash::column (or columns) that create a unique observation between ",
                     code("base"), "and ", code("compare"), ""
                   ),
                 choices = c("", NULL),
@@ -136,7 +169,7 @@ selectDataUI <- function(id) {
                 selected = c("", NULL)
               ),
               em(
-                "The join column will be named", code("join_column"),
+                "The join bs4Dash::column will be named", code("join_column"),
                 "Leave blank for a row-by-row comparison"
               ),
               br(), br(),
@@ -159,7 +192,7 @@ selectDataUI <- function(id) {
           collapsed = TRUE,
           status = "primary",
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               ## OUTPUT |-- (comp_join_col_display) ------
               reactableOutput(
@@ -181,7 +214,7 @@ selectDataUI <- function(id) {
           maximizable = TRUE,
           status = "secondary",
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               ## OUTPUT |-- (comp_join_col_display) ------
               reactableOutput(

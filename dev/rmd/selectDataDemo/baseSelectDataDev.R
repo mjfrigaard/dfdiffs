@@ -149,7 +149,7 @@ baseUploadDataUI <- function(id) {
           width = 12,
           title = tags$strong("Upload Excel File (base)"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               fileInput(
                 ## |-- INPUT [xlsx_file_base] -------
@@ -161,7 +161,7 @@ baseUploadDataUI <- function(id) {
                 accept = c(".xlsx")
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ### |-- INPUT [xlsx_sheets_base] ---------
               selectInput(
@@ -175,7 +175,7 @@ baseUploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- OUTPUT [xlsx_filename_base] ---------
               tags$strong("Excel data file:"),
@@ -186,7 +186,7 @@ baseUploadDataUI <- function(id) {
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [xlsx_new_name_base] ---------
               textInput(
@@ -201,7 +201,7 @@ baseUploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               br(), br(),
               ## |-- OUTPUT [xlsx_upload_base] ---------
@@ -230,7 +230,7 @@ baseUploadDataUI <- function(id) {
           width = 12,
           title = tags$strong("Upload Flat Data File (base)"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               fileInput(
                 ## |-- INPUT [flat_file_base] -------
@@ -247,7 +247,7 @@ baseUploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- OUTPUT [flat_filename_base] ---------
               tags$strong("Flat file data:"),
@@ -258,7 +258,7 @@ baseUploadDataUI <- function(id) {
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [flat_file_new_name_base] ---------
               textInput(
@@ -273,7 +273,7 @@ baseUploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               ## |-- OUTPUT [flat_file_upload_base] -------
               reactable::reactableOutput(
@@ -510,7 +510,7 @@ baseSelectDataUI <- function(id) {
           title = "Reactive values (base)",
           strong(em("For DEV purposes only")),
           fluidRow(
-            column(6,
+            bs4Dash::column(6,
               ## base_dev_x -----
               code("base_dev_x"),
           verbatimTextOutput(
@@ -519,7 +519,7 @@ baseSelectDataUI <- function(id) {
               id = "base_dev_x"
             )
           )),
-            column(6,
+            bs4Dash::column(6,
               ## base_dev_y -----
               code("base_dev_y"),
           verbatimTextOutput(
@@ -546,7 +546,7 @@ baseSelectDataUI <- function(id) {
           title = "Reactive values (base)",
           strong(em("For DEV purposes only")),
           fluidRow(
-            column(6,
+            bs4Dash::column(6,
               ## base_dev_a -----
               code("base_dev_a"),
           verbatimTextOutput(
@@ -555,7 +555,7 @@ baseSelectDataUI <- function(id) {
               id = "base_dev_a"
             )
           )),
-            column(6,
+            bs4Dash::column(6,
               ## base_dev_b -----
               code("base_dev_b"),
           verbatimTextOutput(

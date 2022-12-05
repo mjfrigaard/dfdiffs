@@ -29,14 +29,14 @@ source("app_server.R")
 ## set theme -------
 compare_theme <- dfdiffs_fresh_theme()
 
-#' compareDataDemo
+#' compareDataDev
 #'
-#' @export compareDataDemo
+#' @export compareDataDev
 #' @description demo app for comparisons
 #'
 #' @examples
-#' compareDataDemo()
-compareDataDemo <- function() {
+#' compareDataDev()
+compareDataDev <- function() {
   ui <- bs4Dash::dashboardPage(
     skin = "light",
     freshTheme = compare_theme,
@@ -101,7 +101,7 @@ compareDataDemo <- function() {
       pinned = FALSE,
       collapsed = TRUE,
       skin = "light",
-      column(
+      bs4Dash::column(
         width = 12,
         br(),
         shiny::includeMarkdown(path = "assets/intro.md")
@@ -129,6 +129,6 @@ compareDataDemo <- function() {
   )
 }
 
-# run compareDataDemo --------------
+# run compareDataDev --------------
 
-compareDataDemo()
+compareDataDev()

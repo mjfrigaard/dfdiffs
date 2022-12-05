@@ -2,8 +2,8 @@
 #'
 #' @param compare a 'new' or 'current' dataset
 #' @param base an 'old' or 'previous' dataset
-#' @param by the joining column between the two datasets
-#' @param by_col name of the new joining column
+#' @param by the joining bs4Dash::column between the two datasets
+#' @param by_col name of the new joining bs4Dash::column
 #' @param  cols names of columns to compare
 #'
 #' @return new_data
@@ -48,24 +48,24 @@ create_new_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL
                                                   y = names(base_join_cols)))
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
-    # 3) single 'by' column ----
+    # 3) single 'by' bs4Dash::column ----
     new_data_join <- dplyr::anti_join(x = compare, y = base, by = {{by}})
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) == 1 & length(by_col) == 1 & is.null(cols)) {
-    # 4) single 'by' column, new 'by_col' ----
+    # 4) single 'by' bs4Dash::column, new 'by_col' ----
     compare <- rename_join_col(compare, by = by, by_col = by_col)
     base <- rename_join_col(base, by = by, by_col = by_col)
     new_data_join <- dplyr::anti_join(x = compare, y = base, by = {{by_col}})
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) == 1 & is.null(by_col) & !is.null(cols)) {
-    # 5) single 'by' column, multiple compare 'cols' ----
+    # 5) single 'by' bs4Dash::column, multiple compare 'cols' ----
     compare_cols <- select(compare, matches(by), all_of(cols))
     base_cols <- select(base, matches(by), all_of(cols))
     new_data_join <- dplyr::anti_join(x = compare_cols, y = base_cols,
                                       by = {{by}})
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) == 1 & !is.null(by_col) & !is.null(cols)) {
-    # 6) single 'by' column, new 'by_col', multiple compare 'cols' ----
+    # 6) single 'by' bs4Dash::column, new 'by_col', multiple compare 'cols' ----
     compare_cols <- rename_join_col(compare, by = by, by_col = by_col)
     base_cols <- rename_join_col(base, by = by, by_col = by_col)
     compare_join <- select(compare_cols, matches(by_col), all_of(cols))

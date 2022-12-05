@@ -1,7 +1,7 @@
 
 
         fluidRow(
-          column(
+          bs4Dash::column(
             width = 6,
             ## OUTPUT |-- (base_diffs_display) ------
             reactableOutput(
@@ -11,7 +11,7 @@
               )
             )
           ),
-          column(
+          bs4Dash::column(
             width = 6,
             ## OUTPUT |-- (comp_diffs_display) ------
             reactableOutput(

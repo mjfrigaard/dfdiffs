@@ -1,5 +1,38 @@
 #' selectDataServer
 #'
+#' @importFrom bs4Dash dashboardPage
+#' @importFrom bs4Dash insertTab
+#' @importFrom bs4Dash actionButton
+#' @importFrom bs4Dash tabsetPanel
+#' @importFrom bs4Dash column
+#' @importFrom bs4Dash menuItem
+#' @importFrom bs4Dash renderMenu
+#' @importFrom bs4Dash sidebarUserPanel
+#' @importFrom bs4Dash valueBox
+#' @importFrom bs4Dash dropdownMenu
+#' @importFrom bs4Dash dropdownMenuOutput
+#' @importFrom bs4Dash renderInfoBox
+#' @importFrom bs4Dash messageItem
+#' @importFrom bs4Dash sidebarMenu
+#' @importFrom bs4Dash dashboardBody
+#' @importFrom bs4Dash tabItems
+#' @importFrom bs4Dash notificationItem
+#' @importFrom bs4Dash dashboardHeader
+#' @importFrom bs4Dash renderValueBox
+#' @importFrom bs4Dash menuSubItem
+#' @importFrom bs4Dash dashboardSidebar
+#' @importFrom bs4Dash updateTabItems
+#' @importFrom bs4Dash tabItem
+#' @importFrom bs4Dash box
+#' @importFrom bs4Dash infoBox
+#' @importFrom bs4Dash taskItem
+#' @importFrom bs4Dash sidebarMenuOutput
+#' @importFrom bs4Dash tabBox
+#' @importFrom bs4Dash infoBoxOutput
+#' @importFrom bs4Dash valueBoxOutput
+#' @importFrom bs4Dash menuItemOutput
+#' @importFrom bs4Dash dashboardPage
+#'
 #' @param id module id
 #'
 #' @export selectDataServer
@@ -27,6 +60,24 @@ selectDataServer <- function(id, data_upload) {
         selected = data_choices
       )
     })
+    # ## DEV OUTPUT |-- base_dev_x (dev) ---------
+    # output$base_dev_a <- renderPrint({
+    #   print(
+    #     base_select()
+    #   )
+    # })
+    # ## DEV OUTPUT |-- base_dev_y (dev) ---------
+    # output$base_dev_b <- renderPrint({
+    #   print(
+    #     paste0(input$by, collapse = "-")
+    #   )
+    # })
+    # ## DEV OUTPUT |-- base_dev_a (dev) ---------
+    # output$base_dev_c <- renderPrint({
+    #   print(
+    #     as.character(input$base_col_select)
+    #   )
+    # })
     ## BASE OUTPUT |-- base_data_display (display) ---------
     output$base_data_display <- reactable::renderReactable({
       req(input$base_col_select)
@@ -34,8 +85,10 @@ selectDataServer <- function(id, data_upload) {
         need(base_data(), "please upload data")
       )
       reactable::reactable(
-        data = select(base_data(),
-                      all_of(input$base_col_select)),
+        data = select(
+          base_data(),
+          all_of(input$base_col_select)
+        ),
         theme = base_react_theme,
         defaultPageSize = 10,
         resizable = TRUE,
@@ -73,6 +126,25 @@ selectDataServer <- function(id, data_upload) {
         selected = data_choices
       )
     })
+    # ## |-- DEV OUTPUT |-- comp_dev_x (dev) ---------
+    # output$comp_dev_a <- renderPrint({
+    #   print(
+    #     comp_select()
+    #   )
+    # })
+    # ## |-- DEV OUTPUT |-- comp_dev_y (dev) ---------
+    # output$comp_dev_b <- renderPrint({
+    #   print(
+    #     paste0(input$by, collapse = "-")
+    #   )
+    # })
+    # ## |-- DEV OUTPUT |-- comp_dev_a (dev) ---------
+    # output$comp_dev_c <- renderPrint({
+    #   print(
+    #     as.character(input$comp_col_select)
+    #   )
+    # })
+
     ## |-- COMP OUTPUT |-- comp_data_display (display) ---------
     output$comp_data_display <- reactable::renderReactable({
       req(input$comp_col_select)
@@ -80,8 +152,10 @@ selectDataServer <- function(id, data_upload) {
         need(comp_data(), "please upload data")
       )
       reactable::reactable(
-        data = select(comp_data(),
-                      all_of(input$comp_col_select)),
+        data = select(
+          comp_data(),
+          all_of(input$comp_col_select)
+        ),
         theme = comp_react_theme,
         defaultPageSize = 10,
         resizable = TRUE,
@@ -221,7 +295,7 @@ selectDataServer <- function(id, data_upload) {
           if (length(input$by) > 0) {
             # by columns
             by_cols <- paste0(input$by, collapse = "-")
-            # create new column(s)
+            # create new bs4Dash::column(s)
             base_join_col <- create_join_column(
               df = base_select(),
               by_colums = input$by,
@@ -232,12 +306,12 @@ selectDataServer <- function(id, data_upload) {
               base_join_col,
               join_column, all_of(col_intersect()$Columns)
             )
-            # join column
+            # join bs4Dash::column
             base_join_col <- tibble::add_column(
               .data = base_join_col,
               join_source = by_cols, .after = 1
             )
-            # data source column
+            # data source bs4Dash::column
             base_join_col <- tibble::add_column(
               .data = base_join_col,
               data_source = base_name(), .after = 1
@@ -249,7 +323,7 @@ selectDataServer <- function(id, data_upload) {
               base_join_col,
               all_of(col_intersect()$Columns)
             )
-            # data source column
+            # data source bs4Dash::column
             base_join_col <- tibble::add_column(
               .data = base_join_col,
               data_source = base_name(), .after = 1
@@ -263,7 +337,7 @@ selectDataServer <- function(id, data_upload) {
           if (length(input$by) > 0) {
             # by columns
             by_cols <- paste0(input$by, collapse = "-")
-            # create new column(s)
+            # create new bs4Dash::column(s)
             comp_join_col <- create_join_column(
               df = comp_select(),
               by_colums = input$by,
@@ -274,12 +348,12 @@ selectDataServer <- function(id, data_upload) {
               comp_join_col,
               join_column, all_of(col_intersect()$Columns)
             )
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(
               .data = comp_join_col,
               join_source = by_cols, .after = 1
             )
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(
               .data = comp_join_col,
               data_source = comp_name(), .after = 1
@@ -292,7 +366,7 @@ selectDataServer <- function(id, data_upload) {
               comp_join_col,
               all_of(col_intersect()$Columns)
             )
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(
               .data = comp_join_col,
               data_source = comp_name(), .after = 1
@@ -302,6 +376,5 @@ selectDataServer <- function(id, data_upload) {
         })
       )
     )
-
   })
 }

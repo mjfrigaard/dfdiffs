@@ -23,7 +23,7 @@ uploadDataUI <- function(id) {
           width = 12,
           title = tags$strong("Upload File (base)"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               fileInput(
                 ## |-- INPUT [base_file] -------
@@ -38,7 +38,7 @@ uploadDataUI <- function(id) {
                   accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ### |-- INPUT [base_xlsx_sheets] ---------
               selectInput(
@@ -52,7 +52,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- OUTPUT [base_filename] ---------
               tags$strong("Data file name:"),
@@ -63,7 +63,7 @@ uploadDataUI <- function(id) {
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [base_new_name] ---------
               textInput(
@@ -79,7 +79,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               br(), br(),
               ## |-- OUTPUT [base_display_upload] ---------
@@ -108,7 +108,7 @@ uploadDataUI <- function(id) {
           title = "Reactive values (base)",
           strong(em("For DEV purposes only")),
           fluidRow(
-            column(12,
+            bs4Dash::column(12,
               ## base_dev_a -----
               code("base_dev_a"),
           verbatimTextOutput(
@@ -118,7 +118,7 @@ uploadDataUI <- function(id) {
             )
           ))),
           fluidRow(
-            column(12,
+            bs4Dash::column(12,
               ## base_dev_b -----
               code("base_dev_b"),
           verbatimTextOutput(
@@ -129,7 +129,7 @@ uploadDataUI <- function(id) {
           ))
           ),
           fluidRow(
-            column(12,
+            bs4Dash::column(12,
               ## base_dev_x -----
               code("base_dev_x"),
           verbatimTextOutput(
@@ -139,7 +139,7 @@ uploadDataUI <- function(id) {
             )
           ))),
           fluidRow(
-            column(12,
+            bs4Dash::column(12,
               ## base_dev_y -----
               code("base_dev_y"),
           verbatimTextOutput(
@@ -168,7 +168,7 @@ uploadDataUI <- function(id) {
           closable = FALSE,
           title = tags$strong("Upload File (compare)"),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               fileInput(
                 ## |-- INPUT [comp_file] -------
@@ -183,7 +183,7 @@ uploadDataUI <- function(id) {
                   accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [comp_xlsx_sheets] ---------
               selectInput(
@@ -197,7 +197,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- OUTPUT [comp_filename] ---------
               tags$strong("Data file name:"),
@@ -208,7 +208,7 @@ uploadDataUI <- function(id) {
                 )
               )
             ),
-            column(
+            bs4Dash::column(
               width = 6,
               ## |-- INPUT [comp_new_name] ---------
               textInput(
@@ -224,7 +224,7 @@ uploadDataUI <- function(id) {
             )
           ),
           fluidRow(
-            column(
+            bs4Dash::column(
               width = 12,
               br(), br(),
               ## |-- OUTPUT [comp_display_upload] ---------
@@ -253,7 +253,7 @@ uploadDataUI <- function(id) {
           title = "Reactive values (compare)",
           strong(em("For DEV purposes only")),
           fluidRow(
-            column(12,
+            bs4Dash::column(12,
               ## comp_dev_a -----
               code("comp_dev_a"),
           verbatimTextOutput(
@@ -263,7 +263,7 @@ uploadDataUI <- function(id) {
             )
           ))),
           fluidRow(
-            column(12,
+            bs4Dash::column(12,
               ## comp_dev_b -----
               code("comp_dev_b"),
           verbatimTextOutput(
@@ -274,7 +274,7 @@ uploadDataUI <- function(id) {
           ))
           ),
           fluidRow(
-            column(12,
+            bs4Dash::column(12,
               ## comp_dev_x -----
               code("comp_dev_x"),
           verbatimTextOutput(
@@ -284,7 +284,7 @@ uploadDataUI <- function(id) {
             )
           ))),
           fluidRow(
-            column(12,
+            bs4Dash::column(12,
               ## comp_dev_y -----
               code("comp_dev_y"),
           verbatimTextOutput(

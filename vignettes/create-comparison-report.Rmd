@@ -1,0 +1,258 @@
+---
+title: "create-comparison-report"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 3
+    df_print: kable
+vignette: >
+  %\VignetteIndexEntry{create-comparison-report}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+```{r setup, include = FALSE}
+library(janitor) # compare_df_cols
+library(arsenal) # comparedf
+library(diffdf) # diffdf
+library(testthat) # expect_equal
+library(vetr) # alike
+library(vroom)
+library(haven)
+library(readxl)
+library(shiny)
+library(data.table)
+library(flextable)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  error = TRUE
+)
+options(
+  rmarkdown.html_vignette.check_title = FALSE,
+  tibble.print_max = Inf
+)
+```
+
+# Motivation
+
+The goal of the `dfdiffs` is to answer the following questions: 
+
+1. What rows are here now that weren't here before?  
+2. *What rows were here before that aren't here now?*
+3. What values have been changed?   
+
+This vignette takes us through the `create_comparison_report()` function, which runs all three comparison functions and exports the results to an excel file. 
+
+## Packages
+
+```{r pkg}
+library(dfdiffs)
+```
+
+
+```{r dep-pkgs, message=FALSE, warning=FALSE, results='hide'}
+library(janitor) # compare_df_cols
+library(arsenal) # comparedf
+library(diffdf) # diffdf
+library(testthat) # expect_equal
+library(dplyr)
+library(tidyr)
+library(tibble)
+library(stringr)
+library(forcats)
+library(lubridate)
+library(fs)
+library(vctrs)
+library(glue)
+library(purrr)
+library(flextable)
+```
+
+
+## Lahman data 
+
+We have four `Lahman` master (People) datasets to use for comparisons
+
+```{r master-data}
+master15 <- dfdiffs::master15
+max(master15$debut, na.rm = TRUE)
+master20 <- dfdiffs::master20
+max(master20$debut, na.rm = TRUE)
+master21 <- dfdiffs::master21
+max(master21$debut, na.rm = TRUE)
+master22 <- dfdiffs::master22
+max(master22$debut, na.rm = TRUE)
+```
+
+# `create_comparison_report()`
+
+Below is the `create_comparison_report()` function.
+
+```{r create_comparison_report}
+create_comparison_report <- function(compare, base, by = NULL, by_col = NULL, cols = NULL, file) {
+  # convert to tibble
+  comp_tbl <- tibble::as_tibble(compare)
+  base_tbl <- tibble::as_tibble(base)
+  # get names
+  comp_nms <- colnames(compare)
+  base_nms <- colnames(base)
+  compare_nms <- intersect(comp_nms, base_nms)
+
+  # args
+  BY <- by
+  BY_COL <- by_col
+  COLS <- cols
+
+  # create new data
+  new <- create_new_data(
+    compare = comp_tbl, base = base_tbl,
+    by = BY, by_col = BY_COL, cols = COLS
+  )
+  # create new data
+  deleted <- create_deleted_data(
+    compare = comp_tbl, base = base_tbl,
+    by = BY, by_col = BY_COL, cols = COLS
+  )
+  # create new data
+  changed <- create_modified_data(
+    compare = comp_tbl, base = base_tbl,
+    by = BY, by_col = BY_COL, cols = COLS
+  )
+  # this creates a list of $diffs and $diffs_byvar
+
+  # check for rows in new
+  if (nrow(new) == 1) {
+    new_data <- create_empty_tbl(tbl = base_tbl)
+  } else {
+    new_data <- new
+  }
+  # check for rows in deleted
+  if (nrow(deleted) == 1) {
+    deleted_data <- create_empty_tbl(tbl = base_tbl)
+  } else {
+    deleted_data <- deleted
+  }
+  # check for rows in diffs_byvar
+  if (is.null(changed[["diffs_byvar"]])) {
+    diffs_byvar_data <- tibble::tibble(
+      `Variable name` = 0,
+      `Modified Values` = 0
+    )
+  } else {
+    diffs_byvar_data <- changed$diffs_byvar
+  }
+  # check for rows in diffs
+  if (is.null(changed[["diffs"]])) {
+    diffs_data <- tibble::tibble(
+      `Variable name` = 0,
+      `Current Value` = 0,
+      `Previous Value` = 0
+    )
+  } else {
+    diffs_data <- changed$diffs
+  }
+  # comparison list
+  comparisons <- list(
+    "new" = new_data,
+    "deleted" = deleted_data,
+    "diffs_byvar" = diffs_byvar_data,
+    "diffs" = diffs_data,
+    "base" = base_tbl,
+    "compare" = comp_tbl
+  )
+
+  # create workbook
+  comp_wb <- openxlsx::createWorkbook()
+  # add sheets
+  openxlsx::addWorksheet(
+    wb = comp_wb,
+    sheetName = "New Data"
+  )
+  openxlsx::addWorksheet(
+    wb = comp_wb,
+    sheetName = "Deleted Data"
+  )
+  openxlsx::addWorksheet(
+    wb = comp_wb,
+    sheetName = "Changed Data"
+  )
+  openxlsx::addWorksheet(
+    wb = comp_wb,
+    sheetName = "Review Changes"
+  )
+  openxlsx::addWorksheet(
+    wb = comp_wb,
+    sheetName = "Base Data"
+  )
+  openxlsx::addWorksheet(
+    wb = comp_wb,
+    sheetName = "Compare Data"
+  )
+
+  #### write NEW DATA ----
+  openxlsx::writeData(
+    wb = comp_wb,
+    sheet = "New Data",
+    x = comparisons$new,
+    startCol = 1,
+    startRow = 1
+  )
+  #### write DELETED DATA ----
+  openxlsx::writeData(
+    wb = comp_wb,
+    sheet = "Deleted Data",
+    x = comparisons$deleted,
+    startCol = 1,
+    startRow = 1
+  )
+  #### write NUM DIFFS DATA ----
+  openxlsx::writeData(
+    wb = comp_wb,
+    sheet = "Changed Data",
+    x = comparisons$diffs_byvar,
+    startCol = 1,
+    startRow = 1
+  )
+  #### write VAR DIFFS DATA ----
+  openxlsx::writeData(
+    wb = comp_wb,
+    sheet = "Review Changes",
+    x = comparisons$diffs,
+    startCol = 1,
+    startRow = 1
+  )
+  #### write BASE DATA ----
+  openxlsx::writeData(
+    wb = comp_wb,
+    sheet = "Base Data",
+    x = comparisons$base,
+    startCol = 1,
+    startRow = 1
+  )
+  #### write COMPARE DATA ----
+  openxlsx::writeData(
+    wb = comp_wb,
+    sheet = "Compare Data",
+    x = comparisons$compare,
+    startCol = 1,
+    startRow = 1
+  )
+
+  openxlsx::saveWorkbook(comp_wb, file = file, overwrite = TRUE)
+}
+```
+
+## Test `create_comparison_report()`
+
+We test this below with `master20` and `master15`:
+
+```{r test-create_comparison_report}
+create_comparison_report(
+  compare = master20,
+  base = master15,
+  by = "playerID",
+  file = "../inst/out/compare-report-lahman-15-20.xlsx"
+)
+```

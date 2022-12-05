@@ -103,6 +103,26 @@ dplyr::all_equal(target = bind_rows(IncompleteData, DeletedData),
 
 Each function in the `dfdiffs` package assumes the following conditions: 
 
+1) Two datasets
+
+2) Multiple columns to compare (`cols`)
+
+3) Single by column
+
+4) Single `by` column, new column name (`by_col`)
+
+5) Single `by` column, multiple compare columns (`cols`)
+
+6) `Single` by column, new column name (`by_col`), multiple compare columns (`cols`)
+
+7) Multiple `by` columns
+
+8) Multiple `by` columns, new column name (`by_col`)
+
+9) Multiple `by` columns, multiple compare columns (`cols`)
+
+10) Multiple `by` columns, a new `by_col`, and `cols`
+
 ### Single by column conditions
 
 1) Two datasets, compare all columns:

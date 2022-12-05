@@ -516,7 +516,7 @@ selectDataServer <- function(id, data_upload) {
           if (length(input$by) > 0) {
             # by columns
             by_cols <- paste0(input$by, collapse = "-")
-            # create new column(s)
+            # create new bs4Dash::column(s)
             base_join_col <- create_join_column(
               df = base_select(),
               by_colums = input$by,
@@ -527,12 +527,12 @@ selectDataServer <- function(id, data_upload) {
               base_join_col,
               join_column, all_of(col_intersect()$Columns)
             )
-            # join column
+            # join bs4Dash::column
             base_join_col <- tibble::add_column(
               .data = base_join_col,
               join_source = by_cols, .after = 1
             )
-            # data source column
+            # data source bs4Dash::column
             base_join_col <- tibble::add_column(
               .data = base_join_col,
               data_source = base_name(), .after = 1
@@ -544,7 +544,7 @@ selectDataServer <- function(id, data_upload) {
               base_join_col,
               all_of(col_intersect()$Columns)
             )
-            # data source column
+            # data source bs4Dash::column
             base_join_col <- tibble::add_column(
               .data = base_join_col,
               data_source = base_name(), .after = 1
@@ -558,7 +558,7 @@ selectDataServer <- function(id, data_upload) {
           if (length(input$by) > 0) {
             # by columns
             by_cols <- paste0(input$by, collapse = "-")
-            # create new column(s)
+            # create new bs4Dash::column(s)
             comp_join_col <- create_join_column(
               df = comp_select(),
               by_colums = input$by,
@@ -569,12 +569,12 @@ selectDataServer <- function(id, data_upload) {
               comp_join_col,
               join_column, all_of(col_intersect()$Columns)
             )
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(
               .data = comp_join_col,
               join_source = by_cols, .after = 1
             )
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(
               .data = comp_join_col,
               data_source = comp_name(), .after = 1
@@ -587,7 +587,7 @@ selectDataServer <- function(id, data_upload) {
               comp_join_col,
               all_of(col_intersect()$Columns)
             )
-            # data source column
+            # data source bs4Dash::column
             comp_join_col <- tibble::add_column(
               .data = comp_join_col,
               data_source = comp_name(), .after = 1
@@ -638,7 +638,7 @@ compareDataServer <- function(id, data_selected) {
       compare_cols_tbl <- tibble::tibble(
         `Compare Columns` = compare_cols()
       )
-      # remove join column, data_source, join_source
+      # remove join bs4Dash::column, data_source, join_source
       compare_cols_tbl <- filter(
         compare_cols_tbl,
         `Compare Columns` %nin% c("join_column", "data_source", "join_source")
@@ -686,7 +686,7 @@ compareDataServer <- function(id, data_selected) {
           code("base"), " and ", code("compare"),
           " datasets are joined using the ",
           strong(unique(base_join_data()$join_source)),
-          " column(s). The columns being compared are:"
+          " bs4Dash::column(s). The columns being compared are:"
         ))
       } else {
         HTML(paste0(
@@ -720,14 +720,14 @@ compareDataServer <- function(id, data_selected) {
     ## NEW DATA --------------------------------------------------------
     ###  |-- REACTIVE  new data ---------
     new_data <- reactive({
-      # join column
+      # join bs4Dash::column
       if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
         new <- create_new_data(
           compare = comp_join_data(),
           base = base_join_data(),
           by = "join_column"
         )
-        # no join column
+        # no join bs4Dash::column
       } else {
         new <- create_new_data(
           compare = comp_join_data(),
@@ -758,14 +758,14 @@ compareDataServer <- function(id, data_selected) {
     ## DELETED DATA ----------------------------------
     ### |-- REACTIVE  deleted data ---------
     deleted_data <- reactive({
-      # join column
+      # join bs4Dash::column
       if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
         deleted <- create_deleted_data(
           compare = comp_join_data(),
           base = base_join_data(),
           by = "join_column"
         )
-        # no join column
+        # no join bs4Dash::column
       } else {
         deleted <- create_deleted_data(
           compare = comp_join_data(),
@@ -796,7 +796,7 @@ compareDataServer <- function(id, data_selected) {
     ### |-- REACTIVE  changed_data ---------
     ### this creates $diffs and $diffs_byvar
     changed_data <- reactive({
-      # join column
+      # join bs4Dash::column
       if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
         # remove data source
         comp_join_data <- select(comp_join_data(), -data_source)
@@ -807,7 +807,7 @@ compareDataServer <- function(id, data_selected) {
           base = base_join_data,
           by = "join_column"
         )
-        # no join column
+        # no join bs4Dash::column
       } else {
         # remove data source
         comp_join_data <- select(comp_join_data(), -data_source)
@@ -877,7 +877,7 @@ compareDataServer <- function(id, data_selected) {
     observeEvent(input$go_changed_data, {
       output$num_diffs_graph <- renderPlot({
         diffs_byvar <- tibble::as_tibble(changed_data()$diffs_byvar)
-        # rename column names
+        # rename bs4Dash::column names
         rename(diffs_byvar,
           variable = `Variable name`,
           mod_values = `Modified Values`) |>
@@ -1011,7 +1011,7 @@ compareDataServer <- function(id, data_selected) {
               comp_join_data <- select(comp_join_data(), -data_source)
               base_join_data <- select(base_join_data(), -data_source)
               # changed_data
-              # create changed_data with by column
+              # create changed_data with by bs4Dash::column
               changed_data <- create_modified_data(
                 compare = comp_join_data,
                 base = base_join_data,

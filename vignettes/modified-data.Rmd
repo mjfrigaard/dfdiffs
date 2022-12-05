@@ -82,7 +82,14 @@ knitr::kable(ChangedData, caption = "ChangedData") |>
   kableExtra::kable_paper()
 ```
 
+## Add join column
+
 These data do not have a unique identifier, but we can create one with the `create_join_column()` function.
+
+
+### InitialDataID
+
+We create a join column using the `subject_id` and `record` columns.
 
 ```{r InitialDataID}
 InitialDataID <- create_join_column(df = InitialData, 
@@ -95,6 +102,10 @@ knitr::kable(InitialDataID, caption = "InitialDataID") |>
   kableExtra::kable_paper()
 ```
 
+### ChangedDataID
+
+We create an identical join column in the `ChangedData`
+
 ```{r ChangedDataID}
 ChangedDataID <- create_join_column(df = ChangedData, 
   by_colums = c('subject_id', 'record'), 
@@ -105,6 +116,8 @@ ChangedDataID <- create_join_column(df = ChangedData,
 knitr::kable(ChangedDataID, caption = "ChangedDataID") |> 
   kableExtra::kable_paper()
 ```
+
+Now we can test row-by-row comparisons and comparisons with a `by` column.
 
 # `create_modified_data()`
 
@@ -126,7 +139,7 @@ names(modified_cdf_sum)
 
 We're only interested in the `diffs.byvar.table` and the `diffs.table`. 
 
-## `comparedf()` > `diffs.byvar.table`
+## `comparedf()` -> `diffs.byvar.table`
 
 ```{r comparedf-diffs.byvar.table, eval=FALSE}
 modified_cdf_sum$diffs.byvar.table
@@ -139,7 +152,7 @@ knitr::kable(modified_cdf_sum$diffs.byvar.table,
 ```
 
 
-## `comparedf()` > `diffs.byvar.table`
+## `comparedf()` -> `diffs.byvar.table`
 
 ```{r comparedf-diffs.table, eval=FALSE}
 modified_cdf_sum$diffs.table
@@ -158,7 +171,7 @@ modified <- create_modified_data(
 names(modified)
 ```
 
-## `create_modified_data()` > `diffs_byvar`
+## `create_modified_data()` -> `diffs_byvar`
 
 We've removed the extra `var.y` (and renamed `var.x` to `Variable name`).
 
@@ -172,7 +185,7 @@ knitr::kable(modified$diffs_byvar, caption = "modified$diffs_byvar") |>
 ```
 
 
-## `create_modified_data()` > `diffs`
+## `create_modified_data()` -> `diffs`
 
 We've removed the `var.y` (and renamed `var.x` to `Variable name`). `values.x` was renamed to `Current Value`, and `values.y` was renamed to `	Previous Value`. 
 
