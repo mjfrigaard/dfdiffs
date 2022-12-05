@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -121,11 +121,11 @@ baseball database.</a></p>
 <code class="sourceCode R"><span><span class="va">m15</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master15</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3000</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">m15</span><span class="op">$</span><span class="va">debut</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2015-09-27"</span></span>
-<span><span class="va">m22</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master22</span> <span class="op">|&gt;</span> </span>
+<span><span class="co">#&gt; [1] "2015-09-26"</span></span>
+<span><span class="va">m20</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master20</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3000</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">m22</span><span class="op">$</span><span class="va">debut</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2022-04-22"</span></span></code></pre></div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">m20</span><span class="op">$</span><span class="va">debut</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "2019-09-14"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="the-compare_data-function">The <code>compare_data()</code> function<a class="anchor" aria-label="anchor" href="#the-compare_data-function"></a>
@@ -134,7 +134,7 @@ baseball database.</a></p>
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/compare_data.html">compare_data</a></span><span class="op">(</span>compare <span class="op">=</span> , base <span class="op">=</span> , by <span class="op">=</span> , by_col <span class="op">=</span> , cols <span class="op">=</span> <span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comparisons</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_data.html">compare_data</a></span><span class="op">(</span></span>
-<span>  compare <span class="op">=</span> <span class="va">m22</span>, base <span class="op">=</span> <span class="va">m15</span>, </span>
+<span>  compare <span class="op">=</span> <span class="va">m20</span>, base <span class="op">=</span> <span class="va">m15</span>, </span>
 <span>  by <span class="op">=</span> <span class="st">"playerID"</span>, by_col <span class="op">=</span> <span class="st">"join"</span>, </span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nameFirst"</span>, <span class="st">"nameLast"</span>, <span class="st">"nameGiven"</span>, <span class="st">"height"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">comparisons</span><span class="op">)</span></span>
@@ -171,67 +171,84 @@ height
 <tbody>
 <tr>
 <td style="text-align:left;">
-michaca01
+jamesbe02
 </td>
 <td style="text-align:left;">
-Cass
+Bernie
 </td>
 <td style="text-align:left;">
-Michaels
+James
 </td>
 <td style="text-align:left;">
-Casimir Eugene
+Robert Byrne
 </td>
 <td style="text-align:left;">
-71
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-gorsijo01
-</td>
-<td style="text-align:left;">
-Johnny
-</td>
-<td style="text-align:left;">
-Gorsica
-</td>
-<td style="text-align:left;">
-John Joseph Perry
-</td>
-<td style="text-align:left;">
-74
+69
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-barteki01
+walkemy01
 </td>
 <td style="text-align:left;">
-Kimera
+Mysterious
 </td>
 <td style="text-align:left;">
-Bartee
+Walker
 </td>
 <td style="text-align:left;">
-Kimera Anotchi
+Frederick Mitchell
 </td>
 <td style="text-align:left;">
-72
+70
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-theodge01
+stoneri01
 </td>
 <td style="text-align:left;">
-George
+Ricky
 </td>
 <td style="text-align:left;">
-Theodore
+Stone
 </td>
 <td style="text-align:left;">
-George Basil
+Ricky L.
+</td>
+<td style="text-align:left;">
+73
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+blashja01
+</td>
+<td style="text-align:left;">
+Jabari
+</td>
+<td style="text-align:left;">
+Blash
+</td>
+<td style="text-align:left;">
+Jabari Jerell
+</td>
+<td style="text-align:left;">
+77
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+obriepe04
+</td>
+<td style="text-align:left;">
+Peter
+</td>
+<td style="text-align:left;">
+O’Brien
+</td>
+<td style="text-align:left;">
+Peter Robert
 </td>
 <td style="text-align:left;">
 76
@@ -239,36 +256,19 @@ George Basil
 </tr>
 <tr>
 <td style="text-align:left;">
-pillty01
+mooreto01
 </td>
 <td style="text-align:left;">
-Tyler
+Tommy
 </td>
 <td style="text-align:left;">
-Pill
+Moore
 </td>
 <td style="text-align:left;">
-Tyler Stephen
+Tommy Joe
 </td>
 <td style="text-align:left;">
-74
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-hubbebi01
-</td>
-<td style="text-align:left;">
-Bill
-</td>
-<td style="text-align:left;">
-Hubbell
-</td>
-<td style="text-align:left;">
-Wilbert William
-</td>
-<td style="text-align:left;">
-73
+71
 </td>
 </tr>
 </tbody>
@@ -304,50 +304,16 @@ height
 <tbody>
 <tr>
 <td style="text-align:left;">
-batesdi01
+quentca01
 </td>
 <td style="text-align:left;">
-Dick
+Carlos
 </td>
 <td style="text-align:left;">
-Bates
+Quentin
 </td>
 <td style="text-align:left;">
-Charles Richard
-</td>
-<td style="text-align:left;">
-72
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-spratha01
-</td>
-<td style="text-align:left;">
-Harry
-</td>
-<td style="text-align:left;">
-Spratt
-</td>
-<td style="text-align:left;">
-Henry Lee
-</td>
-<td style="text-align:left;">
-68
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-mcnaugo01
-</td>
-<td style="text-align:left;">
-Gordon
-</td>
-<td style="text-align:left;">
-McNaughton
-</td>
-<td style="text-align:left;">
-Gordon Joseph
+Carlos Jose
 </td>
 <td style="text-align:left;">
 73
@@ -355,53 +321,87 @@ Gordon Joseph
 </tr>
 <tr>
 <td style="text-align:left;">
-gormato04
+murphwi01
 </td>
 <td style="text-align:left;">
-Thomas
+Willie
 </td>
 <td style="text-align:left;">
-Gorman
+Murphy
 </td>
 <td style="text-align:left;">
-Thomas
+William H.
 </td>
 <td style="text-align:left;">
-NA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-bailesc01
-</td>
-<td style="text-align:left;">
-Scott
-</td>
-<td style="text-align:left;">
-Bailes
-</td>
-<td style="text-align:left;">
-Scott Alan
-</td>
-<td style="text-align:left;">
-74
+71
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-wilsoha01
+grothjo01
 </td>
 <td style="text-align:left;">
-Hack
+Johnny
 </td>
 <td style="text-align:left;">
-Wilson
+Groth
 </td>
 <td style="text-align:left;">
-Lewis Robert
+John Thomas
 </td>
 <td style="text-align:left;">
-66
+72
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+higuete01
+</td>
+<td style="text-align:left;">
+Teddy
+</td>
+<td style="text-align:left;">
+Higuera
+</td>
+<td style="text-align:left;">
+Teodoro Valenzuela
+</td>
+<td style="text-align:left;">
+70
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+suthedi01
+</td>
+<td style="text-align:left;">
+Dizzy
+</td>
+<td style="text-align:left;">
+Sutherland
+</td>
+<td style="text-align:left;">
+Howard Alvin
+</td>
+<td style="text-align:left;">
+72
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+mortogu01
+</td>
+<td style="text-align:left;">
+Guy
+</td>
+<td style="text-align:left;">
+Morton
+</td>
+<td style="text-align:left;">
+Guy
+</td>
+<td style="text-align:left;">
+73
 </td>
 </tr>
 </tbody>
@@ -428,18 +428,10 @@ no_of_differences
 <tbody>
 <tr>
 <td style="text-align:left;">
-nameFirst
-</td>
-<td style="text-align:right;">
-1
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
 nameGiven
 </td>
 <td style="text-align:right;">
-2
+4
 </td>
 </tr>
 <tr>
@@ -447,7 +439,7 @@ nameGiven
 height
 </td>
 <td style="text-align:right;">
-11
+8
 </td>
 </tr>
 </tbody>
@@ -480,16 +472,16 @@ compare
 <tbody>
 <tr>
 <td style="text-align:left;">
-nameFirst
+nameGiven
 </td>
 <td style="text-align:left;">
-willijo99
+fifest01
 </td>
 <td style="text-align:left;">
-Smokey Joe
+Stephen J.
 </td>
 <td style="text-align:left;">
-Joe
+Stephen Joseph
 </td>
 </tr>
 <tr>
@@ -497,13 +489,13 @@ Joe
 nameGiven
 </td>
 <td style="text-align:left;">
-gradyjo01
+gardnbr01
 </td>
 <td style="text-align:left;">
-John J.
+Brett M.
 </td>
 <td style="text-align:left;">
-John F.
+Brett Michael
 </td>
 </tr>
 <tr>
@@ -511,13 +503,27 @@ John F.
 nameGiven
 </td>
 <td style="text-align:left;">
-mcgarda01
+jacobar01
 </td>
 <td style="text-align:left;">
-Daniel Francis
+Arthur Edward
 </td>
 <td style="text-align:left;">
-Daniel John
+Arthur Evan
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+nameGiven
+</td>
+<td style="text-align:left;">
+perezto01
+</td>
+<td style="text-align:left;">
+Atanasio
+</td>
+<td style="text-align:left;">
+Atanacio
 </td>
 </tr>
 <tr>
@@ -525,24 +531,10 @@ Daniel John
 height
 </td>
 <td style="text-align:left;">
-begleed01
+belisma01
 </td>
 <td style="text-align:left;">
-NA
-</td>
-<td style="text-align:left;">
-68
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-height
-</td>
-<td style="text-align:left;">
-bethach01
-</td>
-<td style="text-align:left;">
-74
+76
 </td>
 <td style="text-align:left;">
 75
@@ -553,10 +545,52 @@ bethach01
 height
 </td>
 <td style="text-align:left;">
-colomal01
+gardnbr01
 </td>
 <td style="text-align:left;">
-74
+70
+</td>
+<td style="text-align:left;">
+71
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+height
+</td>
+<td style="text-align:left;">
+honanma01
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:left;">
+70
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+height
+</td>
+<td style="text-align:left;">
+kazmase01
+</td>
+<td style="text-align:left;">
+69
+</td>
+<td style="text-align:left;">
+70
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+height
+</td>
+<td style="text-align:left;">
+macgaed01
+</td>
+<td style="text-align:left;">
+NA
 </td>
 <td style="text-align:left;">
 73
@@ -567,52 +601,10 @@ colomal01
 height
 </td>
 <td style="text-align:left;">
-dullry01
-</td>
-<td style="text-align:left;">
-70
-</td>
-<td style="text-align:left;">
-69
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-height
-</td>
-<td style="text-align:left;">
-gradyjo01
-</td>
-<td style="text-align:left;">
-67
-</td>
-<td style="text-align:left;">
-72
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-height
-</td>
-<td style="text-align:left;">
-knebeco01
-</td>
-<td style="text-align:left;">
-76
+rufda01
 </td>
 <td style="text-align:left;">
 75
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-height
-</td>
-<td style="text-align:left;">
-kneppch01
-</td>
-<td style="text-align:left;">
-76
 </td>
 <td style="text-align:left;">
 74
@@ -623,27 +615,13 @@ kneppch01
 height
 </td>
 <td style="text-align:left;">
-mcgarda01
+wongko01
 </td>
 <td style="text-align:left;">
-NA
+69
 </td>
 <td style="text-align:left;">
-68
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-height
-</td>
-<td style="text-align:left;">
-mcgeeja01
-</td>
-<td style="text-align:left;">
-75
-</td>
-<td style="text-align:left;">
-76
+67
 </td>
 </tr>
 <tr>
@@ -651,47 +629,17 @@ mcgeeja01
 height
 </td>
 <td style="text-align:left;">
-samarje01
+wrighst01
 </td>
 <td style="text-align:left;">
-77
+73
 </td>
 <td style="text-align:left;">
-76
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-height
-</td>
-<td style="text-align:left;">
-willijo99
-</td>
-<td style="text-align:left;">
-76
-</td>
-<td style="text-align:left;">
-75
+74
 </td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section level3">
-<h3 id="generate_compare_report">
-<code>generate_compare_report()</code><a class="anchor" aria-label="anchor" href="#generate_compare_report"></a>
-</h3>
-<p>The <code><a href="../reference/generate_compare_report.html">generate_compare_report()</a></code> function is a wrapper
-around <code><a href="../reference/compare_data.html">compare_data()</a></code> that will write the report to an
-excel file.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/generate_compare_report.html">generate_compare_report</a></span><span class="op">(</span>compare <span class="op">=</span> , base <span class="op">=</span> , by <span class="op">=</span> , by_col <span class="op">=</span> , cols <span class="op">=</span> , path <span class="op">=</span> <span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/generate_compare_report.html">generate_compare_report</a></span><span class="op">(</span></span>
-<span>  compare <span class="op">=</span> <span class="va">m22</span>, base <span class="op">=</span> <span class="va">m15</span>, </span>
-<span>  by <span class="op">=</span> <span class="st">"playerID"</span>, by_col <span class="op">=</span> <span class="st">"join"</span>, </span>
-<span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nameFirst"</span>, <span class="st">"nameLast"</span>, <span class="st">"nameGiven"</span>, <span class="st">"height"</span><span class="op">)</span>, </span>
-<span>  path <span class="op">=</span> <span class="st">"../inst/extdata/xlsx/compare-report-text.xlsx"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>

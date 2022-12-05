@@ -26,7 +26,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -776,8 +776,9 @@ Joint pain
 <div class="section level2">
 <h2 id="create_changed_data">create_changed_data()<a class="anchor" aria-label="anchor" href="#create_changed_data"></a>
 </h2>
-<p>Each function in the <code>dfdiffs</code> package assumes the
-following conditions:</p>
+<p>Each comparison function in the <code>dfdiffs</code> package assumes
+<code>base</code> and <code>compare</code> datasets <em>might</em> have
+one of the following conditions:</p>
 <ol style="list-style-type: decimal">
 <li><p>Two datasets</p></li>
 <li><p>Multiple columns to compare (<code>cols</code>)</p></li>
@@ -2628,6 +2629,7 @@ Joint pain, stiffness and swelling
 </table>
 </td>
 </tr></tbody></table>
+<hr>
 </div>
 </div>
 </div>
@@ -2639,6 +2641,8 @@ takes two data frames (<code>compare</code> and <code>base</code>), a
 <code>by</code> column, and the <code>cols</code> to compare.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span><span class="va">compare</span>, <span class="va">base</span>, by <span class="op">=</span> <span class="cn">NULL</span>, by_col <span class="op">=</span> <span class="cn">NULL</span>, cols <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<p>We’ll test this function below on all ten possible conditions for
+<code>base</code> and <code>compare</code>.</p>
 <div class="section level3">
 <h3 id="single-joining-by-column-conditions">Single joining (<code>by</code>) column conditions<a class="anchor" aria-label="anchor" href="#single-joining-by-column-conditions"></a>
 </h3>
