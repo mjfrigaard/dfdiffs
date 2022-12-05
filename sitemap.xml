@@ -16,6 +16,9 @@
     <loc>https://mjfrigaard.github.io/dfdiffs/articles/compare-data.html</loc>
   </url>
   <url>
+    <loc>https://mjfrigaard.github.io/dfdiffs/articles/create-comparison-report.html</loc>
+  </url>
+  <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/articles/create-deleted-data.html</loc>
   </url>
   <url>
@@ -88,7 +91,7 @@
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/compareDataApp.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/dfdiffs/reference/compareDataDemo.html</loc>
+    <loc>https://mjfrigaard.github.io/dfdiffs/reference/compareDataDev.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/compareDataServer.html</loc>
@@ -103,7 +106,13 @@
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.html</loc>
   </url>
   <url>
+    <loc>https://mjfrigaard.github.io/dfdiffs/reference/create_comparison_report.html</loc>
+  </url>
+  <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.html</loc>
+  </url>
+  <url>
+    <loc>https://mjfrigaard.github.io/dfdiffs/reference/create_empty_tbl.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/create_join_column.html</loc>
@@ -155,9 +164,6 @@
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/extract_df_tables.html</loc>
-  </url>
-  <url>
-    <loc>https://mjfrigaard.github.io/dfdiffs/reference/generate_compare_report.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/dfdiffs/reference/grapes-nin-grapes.html</loc>
