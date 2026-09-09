@@ -5,68 +5,58 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<meta name="description" content="dfdiffs">
 <title>changed-modified-data • dfdiffs</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.1.3/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.1.3/bootstrap.bundle.min.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
-<!-- bootstrap-toc --><script src="https://cdn.rawgit.com/afeld/bootstrap-toc/v1.0.1/dist/bootstrap-toc.min.js"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- search --><script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/6.4.6/fuse.js" integrity="sha512-zv6Ywkjyktsohkbp9bb45V6tEMoWhzFzXis+LrMehmJZZSys19Yxf1dopHx7WzIKxr5tK2dVcYmaCk2uqdjF4A==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/autocomplete.js/0.38.0/autocomplete.jquery.min.js" integrity="sha512-GU9ayf+66Xx2TmpxqJpliWbT5PiGYxpaG8rfnBEk1LL8l1KGkRShhngwdXK1UgqhAzWpZHSiYPc09/NwDQIGyg==" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js" integrity="sha512-5CYOlHXGh6QpOFA/TeTylKLWfB3ftPsde7AnmhuitiTX4K5SqCLBeKro6sPS8ilsz1Q4NRx3v8Ko2IBiszzdww==" crossorigin="anonymous"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="changed-modified-data">
-<meta property="og:description" content="dfdiffs">
-<!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
-<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
-<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-<![endif]-->
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="changed-modified-data">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
-    
 
-    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
-    
+
+    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
+
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
     <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
 
-    
+
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="../reference/index.html">Reference</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="active nav-item dropdown">
-  <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
-  <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <h6 class="dropdown-header" data-toc-skip>Comparisons</h6>
-    <a class="dropdown-item" href="../articles/getting-started.html">Getting Started</a>
-    <a class="dropdown-item" href="../articles/create-new-data.html">New Data</a>
-    <a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a>
-    <a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a>
-    <a class="dropdown-item" href="../articles/create-comparison-report.html">Creating a comparison report</a>
-    <div class="dropdown-divider"></div>
-    <h6 class="dropdown-header" data-toc-skip>More Comparisons</h6>
-    <a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a>
-    <a class="dropdown-item" href="../articles/multiple-comparisons.html">Multiple comparisons</a>
-    <a class="dropdown-item" href="../articles/similar-work.html">Similar work</a>
-    <a class="dropdown-item" href="../articles/upload-data.html">Uploading data (shiny app)</a>
-  </div>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><h6 class="dropdown-header" data-toc-skip>Comparisons</h6></li>
+    <li><a class="dropdown-item" href="../articles/getting-started.html">Getting Started</a></li>
+    <li><a class="dropdown-item" href="../articles/create-new-data.html">New Data</a></li>
+    <li><a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a></li>
+    <li><a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a></li>
+    <li><a class="dropdown-item" href="../articles/create-comparison-report.html">Creating a comparison report</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>More Comparisons</h6></li>
+    <li><a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a></li>
+    <li><a class="dropdown-item" href="../articles/multiple-comparisons.html">Multiple comparisons</a></li>
+    <li><a class="dropdown-item" href="../articles/similar-work.html">Similar work</a></li>
+    <li><a class="dropdown-item" href="../articles/upload-data.html">Uploading data (shiny app)</a></li>
+  </ul>
 </li>
-<li class="nav-item">
-  <a class="nav-link" href="../news/index.html">Changelog</a>
-</li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul>
-<form class="form-inline my-2 my-lg-0" role="search">
-        <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off">
-</form>
-
-      <ul class="navbar-nav"></ul>
+<ul class="navbar-nav">
+<li class="nav-item"><form class="form-inline" role="search">
+ <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
+</form></li>
+      </ul>
 </div>
 
-    
+
   </div>
 </nav><div class="container template-article">
 
@@ -75,10 +65,11 @@
 <script src="changed-modified-data_files/kePrint-0.0.1/kePrint.js"></script><link href="changed-modified-data_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="" class="logo" alt=""><h1>changed-modified-data</h1>
+
+      <h1>changed-modified-data</h1>
             
       
-      
+
       <div class="d-none name"><code>changed-modified-data.Rmd</code></div>
     </div>
 
@@ -100,7 +91,7 @@ questions:</p>
 <li><p><code><a href="../reference/create_changed_data.html">create_changed_data()</a></code>: which uses the
 <code><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">arsenal::comparedf()</a></code> function</p></li>
 <li><p><code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>: which uses the
-<code><a href="https://rdrr.io/pkg/diffdf/man/diffdf.html" class="external-link">diffdf::diffdf()</a></code> function</p></li>
+<code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf()</a></code> function</p></li>
 </ol>
 <p>Both functions answers the “<em>What values have been
 changed?</em>”</p>
@@ -115,9 +106,9 @@ changed?</em>”</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org" class="external-link">lubridate</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fs.r-lib.org" class="external-link">fs</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://vctrs.r-lib.org/" class="external-link">vctrs</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidyverse/glue" class="external-link">glue</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glue.tidyverse.org/" class="external-link">glue</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://vroom.r-lib.org" class="external-link">vroom</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://vroom.tidyverse.org" class="external-link">vroom</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://haven.tidyverse.org" class="external-link">haven</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://readxl.tidyverse.org" class="external-link">readxl</a></span><span class="op">)</span></span></code></pre></div>
 </div>
@@ -440,338 +431,20 @@ Joint pain
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject_id"</span>, <span class="st">"record"</span><span class="op">)</span>, </span>
 <span>  new_name <span class="op">=</span> <span class="st">"join_var"</span><span class="op">)</span></span>
 <span><span class="va">ChangedDataJoin</span></span></code></pre></div>
-<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
-<caption>
-ChangedDataJoin
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-join_var
-</th>
-<th style="text-align:left;">
-subject_id
-</th>
-<th style="text-align:right;">
-record
-</th>
-<th style="text-align:left;">
-text_value_a
-</th>
-<th style="text-align:left;">
-text_value_b
-</th>
-<th style="text-align:left;">
-created_date
-</th>
-<th style="text-align:left;">
-updated_date
-</th>
-<th style="text-align:left;">
-entered_date
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-A
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-Issue resolved
-</td>
-<td style="text-align:left;">
-Fatigue
-</td>
-<td style="text-align:left;">
-2021-07-29
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-A
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-Issue resolved
-</td>
-<td style="text-align:left;">
-Fatigue
-</td>
-<td style="text-align:left;">
-2021-07-29
-</td>
-<td style="text-align:left;">
-2021-11-27
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-B
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:left;">
-Issue resolved
-</td>
-<td style="text-align:left;">
-Fever
-</td>
-<td style="text-align:left;">
-2021-07-16
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-<td style="text-align:left;">
-2021-11-21
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-C
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:left;">
-Issue resolved
-</td>
-<td style="text-align:left;">
-Joint pain, stiffness and swelling
-</td>
-<td style="text-align:left;">
-2021-08-24
-</td>
-<td style="text-align:left;">
-2021-10-13
-</td>
-<td style="text-align:left;">
-2021-11-11
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-C
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:left;">
-Issue resolved
-</td>
-<td style="text-align:left;">
-Joint pain
-</td>
-<td style="text-align:left;">
-2021-08-24
-</td>
-<td style="text-align:left;">
-2021-10-14
-</td>
-<td style="text-align:left;">
-2021-11-16
-</td>
-</tr>
-</tbody>
-</table>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'ChangedDataJoin' not found</span></span></code></pre>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">InitialDataJoin</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="fu"><a href="../reference/create_new_column.html">create_new_column</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">InitialData</span>, </span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject_id"</span>, <span class="st">"record"</span><span class="op">)</span>, </span>
 <span>  new_name <span class="op">=</span> <span class="st">"join_var"</span><span class="op">)</span></span>
 <span><span class="va">InitialDataJoin</span></span></code></pre></div>
-<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
-<caption>
-InitialDataJoin
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-join_var
-</th>
-<th style="text-align:left;">
-subject_id
-</th>
-<th style="text-align:right;">
-record
-</th>
-<th style="text-align:left;">
-text_value_a
-</th>
-<th style="text-align:left;">
-text_value_b
-</th>
-<th style="text-align:left;">
-created_date
-</th>
-<th style="text-align:left;">
-updated_date
-</th>
-<th style="text-align:left;">
-entered_date
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-A
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:left;">
-Issue unresolved
-</td>
-<td style="text-align:left;">
-Fatigue
-</td>
-<td style="text-align:left;">
-2021-07-29
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-A
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-Issue unresolved
-</td>
-<td style="text-align:left;">
-Fatigue
-</td>
-<td style="text-align:left;">
-2021-07-29
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-10-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-B
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:left;">
-Issue resolved
-</td>
-<td style="text-align:left;">
-Fever
-</td>
-<td style="text-align:left;">
-2021-07-16
-</td>
-<td style="text-align:left;">
-2021-09-02
-</td>
-<td style="text-align:left;">
-2021-08-18
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-C
-</td>
-<td style="text-align:right;">
-4
-</td>
-<td style="text-align:left;">
-Issue resolved
-</td>
-<td style="text-align:left;">
-Joint pain
-</td>
-<td style="text-align:left;">
-2021-08-24
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-C
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:left;">
-Issue resolved
-</td>
-<td style="text-align:left;">
-Joint pain
-</td>
-<td style="text-align:left;">
-2021-08-24
-</td>
-<td style="text-align:left;">
-2021-09-20
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-</tr>
-</tbody>
-</table>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'InitialDataJoin' not found</span></span></code></pre>
 </div>
 </div>
 <div class="section level2">
@@ -806,7 +479,7 @@ one of the following conditions:</p>
 <h4 id="two-datasets">1) Two datasets<a class="anchor" aria-label="anchor" href="#two-datasets"></a>
 </h4>
 <p>compare all columns:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span><span class="op">)</span></span></code></pre></div>
@@ -1064,7 +737,7 @@ entered_date
 <div class="section level4">
 <h4 id="multiple-columns-to-compare-cols">2) Multiple columns to compare (<code>cols</code>)<a class="anchor" aria-label="anchor" href="#multiple-columns-to-compare-cols"></a>
 </h4>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
@@ -1168,11 +841,13 @@ Joint pain, stiffness and swelling
 <h4 id="single-by-column">3) Single <code>by</code> column<a class="anchor" aria-label="anchor" href="#single-by-column"></a>
 </h4>
 <p>No new column name</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
 <span>  by <span class="op">=</span> <span class="st">"join_var"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'ChangedDataJoin' not found</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -1201,22 +876,6 @@ text_value_b
 1
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-</tr>
 </tbody>
 </table>
 </td>
@@ -1227,7 +886,7 @@ entered_date
 variable
 </th>
 <th style="text-align:left;">
-join_var
+rownumber
 </th>
 <th style="text-align:left;">
 base
@@ -1242,7 +901,7 @@ compare
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
+1
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -1256,7 +915,7 @@ Issue resolved
 text_value_a
 </td>
 <td style="text-align:left;">
-A-2
+2
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -1270,153 +929,13 @@ Issue resolved
 text_value_b
 </td>
 <td style="text-align:left;">
-C-4
+4
 </td>
 <td style="text-align:left;">
 Joint pain
 </td>
 <td style="text-align:left;">
 Joint pain, stiffness and swelling
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-11-27
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-09-02
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-10-13
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-09-20
-</td>
-<td style="text-align:left;">
-2021-10-14
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-10-29
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-08-18
-</td>
-<td style="text-align:left;">
-2021-11-21
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-11-11
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-<td style="text-align:left;">
-2021-11-16
 </td>
 </tr>
 </tbody>
@@ -1428,12 +947,14 @@ C-5
 <h4 id="single-by-column-new-column-name-by_col">4) Single <code>by</code> column, new column name
 (<code>by_col</code>)<a class="anchor" aria-label="anchor" href="#single-by-column-new-column-name-by_col"></a>
 </h4>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
 <span>  by <span class="op">=</span> <span class="st">"join_var"</span>,</span>
 <span>  by_col <span class="op">=</span> <span class="st">"join"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'ChangedDataJoin' not found</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -1462,22 +983,6 @@ text_value_b
 1
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-</tr>
 </tbody>
 </table>
 </td>
@@ -1488,7 +993,7 @@ entered_date
 variable
 </th>
 <th style="text-align:left;">
-join
+rownumber
 </th>
 <th style="text-align:left;">
 base
@@ -1503,7 +1008,7 @@ compare
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
+1
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -1517,7 +1022,7 @@ Issue resolved
 text_value_a
 </td>
 <td style="text-align:left;">
-A-2
+2
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -1531,153 +1036,13 @@ Issue resolved
 text_value_b
 </td>
 <td style="text-align:left;">
-C-4
+4
 </td>
 <td style="text-align:left;">
 Joint pain
 </td>
 <td style="text-align:left;">
 Joint pain, stiffness and swelling
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-11-27
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-09-02
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-10-13
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-09-20
-</td>
-<td style="text-align:left;">
-2021-10-14
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-10-29
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-08-18
-</td>
-<td style="text-align:left;">
-2021-11-21
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-11-11
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-<td style="text-align:left;">
-2021-11-16
 </td>
 </tr>
 </tbody>
@@ -1689,12 +1054,14 @@ C-5
 <h4 id="single-by-column-multiple-compare-columns-cols">5) Single <code>by</code> column, multiple compare columns
 (<code>cols</code>)<a class="anchor" aria-label="anchor" href="#single-by-column-multiple-compare-columns-cols"></a>
 </h4>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
 <span>  by <span class="op">=</span> <span class="st">"join_var"</span>, </span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text_value_a"</span>, <span class="st">"text_value_b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'ChangedDataJoin' not found</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -1733,7 +1100,7 @@ text_value_b
 variable
 </th>
 <th style="text-align:left;">
-join_var
+rownumber
 </th>
 <th style="text-align:left;">
 base
@@ -1748,7 +1115,7 @@ compare
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
+1
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -1762,7 +1129,7 @@ Issue resolved
 text_value_a
 </td>
 <td style="text-align:left;">
-A-2
+2
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -1776,7 +1143,7 @@ Issue resolved
 text_value_b
 </td>
 <td style="text-align:left;">
-C-4
+4
 </td>
 <td style="text-align:left;">
 Joint pain
@@ -1794,13 +1161,15 @@ Joint pain, stiffness and swelling
 <h4 id="single-by-column-new-column-name-by_col-multiple-compare-columns-cols">6) Single <code>by</code> column, new column name
 (<code>by_col</code>), multiple compare columns (<code>cols</code>)<a class="anchor" aria-label="anchor" href="#single-by-column-new-column-name-by_col-multiple-compare-columns-cols"></a>
 </h4>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
 <span>  by <span class="op">=</span> <span class="st">"join_var"</span>, </span>
 <span>  by_col <span class="op">=</span> <span class="st">"join"</span>,</span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text_value_a"</span>, <span class="st">"text_value_b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'ChangedDataJoin' not found</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -1839,7 +1208,7 @@ text_value_b
 variable
 </th>
 <th style="text-align:left;">
-join
+rownumber
 </th>
 <th style="text-align:left;">
 base
@@ -1854,7 +1223,7 @@ compare
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
+1
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -1868,7 +1237,7 @@ Issue resolved
 text_value_a
 </td>
 <td style="text-align:left;">
-A-2
+2
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -1882,7 +1251,7 @@ Issue resolved
 text_value_b
 </td>
 <td style="text-align:left;">
-C-4
+4
 </td>
 <td style="text-align:left;">
 Joint pain
@@ -1903,11 +1272,13 @@ Joint pain, stiffness and swelling
 <div class="section level4">
 <h4 id="multiple-by-columns">7) Multiple <code>by</code> columns<a class="anchor" aria-label="anchor" href="#multiple-by-columns"></a>
 </h4>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject_id"</span>, <span class="st">"record"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -1936,22 +1307,6 @@ text_value_b
 1
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-</tr>
 </tbody>
 </table>
 </td>
@@ -1962,7 +1317,7 @@ entered_date
 variable
 </th>
 <th style="text-align:left;">
-join
+rownumber
 </th>
 <th style="text-align:left;">
 base
@@ -1977,7 +1332,7 @@ compare
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
+1
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -1991,7 +1346,7 @@ Issue resolved
 text_value_a
 </td>
 <td style="text-align:left;">
-A-2
+2
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -2005,153 +1360,13 @@ Issue resolved
 text_value_b
 </td>
 <td style="text-align:left;">
-C-4
+4
 </td>
 <td style="text-align:left;">
 Joint pain
 </td>
 <td style="text-align:left;">
 Joint pain, stiffness and swelling
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-11-27
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-09-02
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-10-13
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-09-20
-</td>
-<td style="text-align:left;">
-2021-10-14
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-10-29
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-08-18
-</td>
-<td style="text-align:left;">
-2021-11-21
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-11-11
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-<td style="text-align:left;">
-2021-11-16
 </td>
 </tr>
 </tbody>
@@ -2163,12 +1378,14 @@ C-5
 <h4 id="multiple-by-columns-new-column-name-by_col">8) Multiple <code>by</code> columns, new column name
 (<code>by_col</code>)<a class="anchor" aria-label="anchor" href="#multiple-by-columns-new-column-name-by_col"></a>
 </h4>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject_id"</span>, <span class="st">"record"</span><span class="op">)</span>, </span>
 <span>  by_col <span class="op">=</span> <span class="st">"new_join_var"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -2197,22 +1414,6 @@ text_value_b
 1
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-</tr>
 </tbody>
 </table>
 </td>
@@ -2223,7 +1424,7 @@ entered_date
 variable
 </th>
 <th style="text-align:left;">
-new_join_var
+rownumber
 </th>
 <th style="text-align:left;">
 base
@@ -2238,7 +1439,7 @@ compare
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
+1
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -2252,7 +1453,7 @@ Issue resolved
 text_value_a
 </td>
 <td style="text-align:left;">
-A-2
+2
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -2266,153 +1467,13 @@ Issue resolved
 text_value_b
 </td>
 <td style="text-align:left;">
-C-4
+4
 </td>
 <td style="text-align:left;">
 Joint pain
 </td>
 <td style="text-align:left;">
 Joint pain, stiffness and swelling
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-11-27
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-09-02
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-10-13
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-09-20
-</td>
-<td style="text-align:left;">
-2021-10-14
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-10-29
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-08-18
-</td>
-<td style="text-align:left;">
-2021-11-21
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-11-11
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-<td style="text-align:left;">
-2021-11-16
 </td>
 </tr>
 </tbody>
@@ -2424,12 +1485,14 @@ C-5
 <h4 id="multiple-by-columns-multiple-compare-columns-cols">9) Multiple <code>by</code> columns, multiple compare columns
 (<code>cols</code>)<a class="anchor" aria-label="anchor" href="#multiple-by-columns-multiple-compare-columns-cols"></a>
 </h4>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject_id"</span>, <span class="st">"record"</span><span class="op">)</span>, </span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text_value_a"</span>, <span class="st">"text_value_b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -2468,7 +1531,7 @@ text_value_b
 variable
 </th>
 <th style="text-align:left;">
-join
+rownumber
 </th>
 <th style="text-align:left;">
 base
@@ -2483,7 +1546,7 @@ compare
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
+1
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -2497,7 +1560,7 @@ Issue resolved
 text_value_a
 </td>
 <td style="text-align:left;">
-A-2
+2
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -2511,7 +1574,7 @@ Issue resolved
 text_value_b
 </td>
 <td style="text-align:left;">
-C-4
+4
 </td>
 <td style="text-align:left;">
 Joint pain
@@ -2529,13 +1592,15 @@ Joint pain, stiffness and swelling
 <h4 id="multiple-by-columns-a-new-by_col-and-cols">10) Multiple <code>by</code> columns, a new <code>by_col</code>, and
 <code>cols</code><a class="anchor" aria-label="anchor" href="#multiple-by-columns-a-new-by_col-and-cols"></a>
 </h4>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject_id"</span>, <span class="st">"record"</span><span class="op">)</span>, </span>
 <span>  by_col <span class="op">=</span> <span class="st">"join"</span>,</span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text_value_a"</span>, <span class="st">"text_value_b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -2574,7 +1639,7 @@ text_value_b
 variable
 </th>
 <th style="text-align:left;">
-join
+rownumber
 </th>
 <th style="text-align:left;">
 base
@@ -2589,7 +1654,7 @@ compare
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
+1
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -2603,7 +1668,7 @@ Issue resolved
 text_value_a
 </td>
 <td style="text-align:left;">
-A-2
+2
 </td>
 <td style="text-align:left;">
 Issue unresolved
@@ -2617,7 +1682,7 @@ Issue resolved
 text_value_b
 </td>
 <td style="text-align:left;">
-C-4
+4
 </td>
 <td style="text-align:left;">
 Joint pain
@@ -2640,7 +1705,7 @@ Joint pain, stiffness and swelling
 <p>Below we have the <code><a href="../reference/create_modified_data.html">create_modified_data()</a></code> function, which
 takes two data frames (<code>compare</code> and <code>base</code>), a
 <code>by</code> column, and the <code>cols</code> to compare.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span><span class="va">compare</span>, <span class="va">base</span>, by <span class="op">=</span> <span class="cn">NULL</span>, by_col <span class="op">=</span> <span class="cn">NULL</span>, cols <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
 <p>We’ll test this function below on all ten possible conditions for
 <code>base</code> and <code>compare</code>.</p>
@@ -2653,7 +1718,7 @@ takes two data frames (<code>compare</code> and <code>base</code>), a
 <ul>
 <li>No <code>by</code> columns (only two datasets)</li>
 </ul>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span><span class="op">)</span></span></code></pre></div>
@@ -2921,7 +1986,7 @@ entered_date
 <li>No <code>by</code> columns (only two datasets) and multiple compare
 (<code>cols</code>)</li>
 </ul>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
@@ -3026,11 +2091,13 @@ Joint pain
 <code>InitialDataJoin</code> and <code>ChangedDataJoin</code>) datasets
 we created above.</li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
 <span>  by <span class="op">=</span> <span class="st">"join_var"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'ChangedDataJoin' not found</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -3046,28 +2113,6 @@ Missing Values
 </th>
 </tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-subject_id
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-record
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
 <tr>
 <td style="text-align:left;">
 text_value_a
@@ -3090,39 +2135,6 @@ text_value_b
 0
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-created_date
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
 </tbody>
 </table>
 </td>
@@ -3131,9 +2143,6 @@ entered_date
 <thead><tr>
 <th style="text-align:left;">
 Variable name
-</th>
-<th style="text-align:left;">
-join_var
 </th>
 <th style="text-align:left;">
 Current Value
@@ -3148,9 +2157,6 @@ Previous Value
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
 Issue resolved
 </td>
 <td style="text-align:left;">
@@ -3160,9 +2166,6 @@ Issue unresolved
 <tr>
 <td style="text-align:left;">
 text_value_a
-</td>
-<td style="text-align:left;">
-A-2
 </td>
 <td style="text-align:left;">
 Issue resolved
@@ -3176,153 +2179,10 @@ Issue unresolved
 text_value_b
 </td>
 <td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
 Joint pain, stiffness and swelling
 </td>
 <td style="text-align:left;">
 Joint pain
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-11-27
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-<td style="text-align:left;">
-2021-09-02
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-10-13
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-10-14
-</td>
-<td style="text-align:left;">
-2021-09-20
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-<td style="text-align:left;">
-2021-10-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-11-21
-</td>
-<td style="text-align:left;">
-2021-08-18
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-11-11
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-11-16
-</td>
-<td style="text-align:left;">
-2021-10-20
 </td>
 </tr>
 </tbody>
@@ -3339,12 +2199,14 @@ C-5
 identifiers) and a new name for the <code>by_col</code>
 </li>
 </ul>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
 <span>  by <span class="op">=</span> <span class="st">"join_var"</span>,</span>
 <span>  by_col <span class="op">=</span> <span class="st">"new_join_var"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'ChangedDataJoin' not found</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -3360,28 +2222,6 @@ Missing Values
 </th>
 </tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-subject_id
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-record
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
 <tr>
 <td style="text-align:left;">
 text_value_a
@@ -3404,39 +2244,6 @@ text_value_b
 0
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-created_date
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
 </tbody>
 </table>
 </td>
@@ -3445,9 +2252,6 @@ entered_date
 <thead><tr>
 <th style="text-align:left;">
 Variable name
-</th>
-<th style="text-align:left;">
-new_join_var
 </th>
 <th style="text-align:left;">
 Current Value
@@ -3462,9 +2266,6 @@ Previous Value
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
 Issue resolved
 </td>
 <td style="text-align:left;">
@@ -3474,9 +2275,6 @@ Issue unresolved
 <tr>
 <td style="text-align:left;">
 text_value_a
-</td>
-<td style="text-align:left;">
-A-2
 </td>
 <td style="text-align:left;">
 Issue resolved
@@ -3490,153 +2288,10 @@ Issue unresolved
 text_value_b
 </td>
 <td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
 Joint pain, stiffness and swelling
 </td>
 <td style="text-align:left;">
 Joint pain
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-11-27
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-<td style="text-align:left;">
-2021-09-02
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-10-13
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-10-14
-</td>
-<td style="text-align:left;">
-2021-09-20
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-<td style="text-align:left;">
-2021-10-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-11-21
-</td>
-<td style="text-align:left;">
-2021-08-18
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-11-11
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-11-16
-</td>
-<td style="text-align:left;">
-2021-10-20
 </td>
 </tr>
 </tbody>
@@ -3652,12 +2307,14 @@ C-5
 <li>Single <code>by</code> column and multiple compare columns
 (<code>cols</code>)</li>
 </ul>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
 <span>  by <span class="op">=</span> <span class="st">"join_var"</span>, </span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text_value_a"</span>, <span class="st">"text_value_b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'ChangedDataJoin' not found</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -3705,9 +2362,6 @@ text_value_b
 Variable name
 </th>
 <th style="text-align:left;">
-join_var
-</th>
-<th style="text-align:left;">
 Current Value
 </th>
 <th style="text-align:left;">
@@ -3720,9 +2374,6 @@ Previous Value
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
 Issue resolved
 </td>
 <td style="text-align:left;">
@@ -3734,9 +2385,6 @@ Issue unresolved
 text_value_a
 </td>
 <td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
 Issue resolved
 </td>
 <td style="text-align:left;">
@@ -3746,9 +2394,6 @@ Issue unresolved
 <tr>
 <td style="text-align:left;">
 text_value_b
-</td>
-<td style="text-align:left;">
-C-4
 </td>
 <td style="text-align:left;">
 Joint pain, stiffness and swelling
@@ -3771,13 +2416,15 @@ Joint pain
 (<code>by_col</code>), and multiple compare columns
 (<code>cols</code>)</li>
 </ul>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
 <span>  by <span class="op">=</span> <span class="st">"join_var"</span>, </span>
 <span>  by_col <span class="op">=</span> <span class="st">"new_join_var"</span>,</span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text_value_a"</span>, <span class="st">"text_value_b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'ChangedDataJoin' not found</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -3825,9 +2472,6 @@ text_value_b
 Variable name
 </th>
 <th style="text-align:left;">
-new_join_var
-</th>
-<th style="text-align:left;">
 Current Value
 </th>
 <th style="text-align:left;">
@@ -3840,9 +2484,6 @@ Previous Value
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
 Issue resolved
 </td>
 <td style="text-align:left;">
@@ -3854,9 +2495,6 @@ Issue unresolved
 text_value_a
 </td>
 <td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
 Issue resolved
 </td>
 <td style="text-align:left;">
@@ -3866,9 +2504,6 @@ Issue unresolved
 <tr>
 <td style="text-align:left;">
 text_value_b
-</td>
-<td style="text-align:left;">
-C-4
 </td>
 <td style="text-align:left;">
 Joint pain, stiffness and swelling
@@ -3895,11 +2530,13 @@ create a unique identifier between the two datasets.</p>
 <li>Multiple <code>by</code> columns (assuming the columns create a
 unique identifier).</li>
 </ul>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject_id"</span>, <span class="st">"record"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -3915,28 +2552,6 @@ Missing Values
 </th>
 </tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-subject_id
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-record
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
 <tr>
 <td style="text-align:left;">
 text_value_a
@@ -3959,39 +2574,6 @@ text_value_b
 0
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-created_date
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
 </tbody>
 </table>
 </td>
@@ -4000,9 +2582,6 @@ entered_date
 <thead><tr>
 <th style="text-align:left;">
 Variable name
-</th>
-<th style="text-align:left;">
-join
 </th>
 <th style="text-align:left;">
 Current Value
@@ -4017,9 +2596,6 @@ Previous Value
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
 Issue resolved
 </td>
 <td style="text-align:left;">
@@ -4029,9 +2605,6 @@ Issue unresolved
 <tr>
 <td style="text-align:left;">
 text_value_a
-</td>
-<td style="text-align:left;">
-A-2
 </td>
 <td style="text-align:left;">
 Issue resolved
@@ -4045,153 +2618,10 @@ Issue unresolved
 text_value_b
 </td>
 <td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
 Joint pain, stiffness and swelling
 </td>
 <td style="text-align:left;">
 Joint pain
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-11-27
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-<td style="text-align:left;">
-2021-09-02
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-10-13
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-10-14
-</td>
-<td style="text-align:left;">
-2021-09-20
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-<td style="text-align:left;">
-2021-10-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-11-21
-</td>
-<td style="text-align:left;">
-2021-08-18
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-11-11
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-11-16
-</td>
-<td style="text-align:left;">
-2021-10-20
 </td>
 </tr>
 </tbody>
@@ -4207,12 +2637,14 @@ columns.</p>
 </h4>
 <p>We can provide multiple <code>by</code> columns, a new
 <code>by_col</code>, and <strong>no <code>cols</code></strong></p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject_id"</span>, <span class="st">"record"</span><span class="op">)</span>, </span>
 <span>  by_col <span class="op">=</span> <span class="st">"new_join_var"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -4228,28 +2660,6 @@ Missing Values
 </th>
 </tr></thead>
 <tbody>
-<tr>
-<td style="text-align:left;">
-subject_id
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-record
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
 <tr>
 <td style="text-align:left;">
 text_value_a
@@ -4272,39 +2682,6 @@ text_value_b
 0
 </td>
 </tr>
-<tr>
-<td style="text-align:left;">
-created_date
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:right;">
-5
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
 </tbody>
 </table>
 </td>
@@ -4313,9 +2690,6 @@ entered_date
 <thead><tr>
 <th style="text-align:left;">
 Variable name
-</th>
-<th style="text-align:left;">
-new_join_var
 </th>
 <th style="text-align:left;">
 Current Value
@@ -4330,9 +2704,6 @@ Previous Value
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
 Issue resolved
 </td>
 <td style="text-align:left;">
@@ -4342,9 +2713,6 @@ Issue unresolved
 <tr>
 <td style="text-align:left;">
 text_value_a
-</td>
-<td style="text-align:left;">
-A-2
 </td>
 <td style="text-align:left;">
 Issue resolved
@@ -4358,153 +2726,10 @@ Issue unresolved
 text_value_b
 </td>
 <td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
 Joint pain, stiffness and swelling
 </td>
 <td style="text-align:left;">
 Joint pain
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-11-27
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-10-20
-</td>
-<td style="text-align:left;">
-2021-09-02
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-10-13
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-updated_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-10-14
-</td>
-<td style="text-align:left;">
-2021-09-20
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-<td style="text-align:left;">
-2021-09-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
-2021-11-30
-</td>
-<td style="text-align:left;">
-2021-10-29
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-B-3
-</td>
-<td style="text-align:left;">
-2021-11-21
-</td>
-<td style="text-align:left;">
-2021-08-18
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-4
-</td>
-<td style="text-align:left;">
-2021-11-11
-</td>
-<td style="text-align:left;">
-2021-10-03
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-entered_date
-</td>
-<td style="text-align:left;">
-C-5
-</td>
-<td style="text-align:left;">
-2021-11-16
-</td>
-<td style="text-align:left;">
-2021-10-20
 </td>
 </tr>
 </tbody>
@@ -4521,12 +2746,14 @@ C-5
 (<code>cols</code>), and <strong>no new
 <code>by_col</code></strong>.</li>
 </ul>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject_id"</span>, <span class="st">"record"</span><span class="op">)</span>, </span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text_value_a"</span>, <span class="st">"text_value_b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -4574,9 +2801,6 @@ text_value_b
 Variable name
 </th>
 <th style="text-align:left;">
-join
-</th>
-<th style="text-align:left;">
 Current Value
 </th>
 <th style="text-align:left;">
@@ -4589,9 +2813,6 @@ Previous Value
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
 Issue resolved
 </td>
 <td style="text-align:left;">
@@ -4603,9 +2824,6 @@ Issue unresolved
 text_value_a
 </td>
 <td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
 Issue resolved
 </td>
 <td style="text-align:left;">
@@ -4615,9 +2833,6 @@ Issue unresolved
 <tr>
 <td style="text-align:left;">
 text_value_b
-</td>
-<td style="text-align:left;">
-C-4
 </td>
 <td style="text-align:left;">
 Joint pain, stiffness and swelling
@@ -4641,13 +2856,15 @@ columns.</p>
 <li>We can provide multiple <code>by</code> columns, a new
 <code>by_col</code>, and multiple <code>cols</code>.</li>
 </ul>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject_id"</span>, <span class="st">"record"</span><span class="op">)</span>, </span>
 <span>  by_col <span class="op">=</span> <span class="st">"new_join_var"</span>,</span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text_value_a"</span>, <span class="st">"text_value_b"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span></code></pre>
 <table class="table kable_wrapper lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'><tbody><tr>
 <td>
 <table class="table">
@@ -4695,9 +2912,6 @@ text_value_b
 Variable name
 </th>
 <th style="text-align:left;">
-new_join_var
-</th>
-<th style="text-align:left;">
 Current Value
 </th>
 <th style="text-align:left;">
@@ -4710,9 +2924,6 @@ Previous Value
 text_value_a
 </td>
 <td style="text-align:left;">
-A-1
-</td>
-<td style="text-align:left;">
 Issue resolved
 </td>
 <td style="text-align:left;">
@@ -4724,9 +2935,6 @@ Issue unresolved
 text_value_a
 </td>
 <td style="text-align:left;">
-A-2
-</td>
-<td style="text-align:left;">
 Issue resolved
 </td>
 <td style="text-align:left;">
@@ -4736,9 +2944,6 @@ Issue unresolved
 <tr>
 <td style="text-align:left;">
 text_value_b
-</td>
-<td style="text-align:left;">
-C-4
 </td>
 <td style="text-align:left;">
 Joint pain, stiffness and swelling
@@ -4754,28 +2959,26 @@ Joint pain
 </div>
 </div>
 </div>
-  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+  </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
 </div>
 
 
 
     <footer><div class="pkgdown-footer-left">
-  <p></p>
-<p>Developed by Martin Frigaard.</p>
+  <p>Developed by Martin Frigaard.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
 </div>
 
-  
 
-  
+
+
 
   </body>
 </html>
