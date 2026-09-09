@@ -38,69 +38,81 @@ export(upload_data)
 import(arsenal)
 import(diffdf)
 import(fresh)
-import(rlang)
-importFrom(bs4Dash,actionButton)
-importFrom(bs4Dash,box)
-importFrom(bs4Dash,column)
-importFrom(bs4Dash,dashboardBody)
-importFrom(bs4Dash,dashboardHeader)
-importFrom(bs4Dash,dashboardPage)
-importFrom(bs4Dash,dashboardSidebar)
-importFrom(bs4Dash,dropdownMenu)
-importFrom(bs4Dash,dropdownMenuOutput)
-importFrom(bs4Dash,infoBox)
-importFrom(bs4Dash,infoBoxOutput)
-importFrom(bs4Dash,insertTab)
-importFrom(bs4Dash,menuItem)
-importFrom(bs4Dash,menuItemOutput)
-importFrom(bs4Dash,menuSubItem)
-importFrom(bs4Dash,messageItem)
-importFrom(bs4Dash,notificationItem)
-importFrom(bs4Dash,renderInfoBox)
-importFrom(bs4Dash,renderMenu)
-importFrom(bs4Dash,renderValueBox)
-importFrom(bs4Dash,sidebarMenu)
-importFrom(bs4Dash,sidebarMenuOutput)
-importFrom(bs4Dash,sidebarUserPanel)
-importFrom(bs4Dash,tabBox)
-importFrom(bs4Dash,tabItem)
-importFrom(bs4Dash,tabItems)
-importFrom(bs4Dash,tabsetPanel)
-importFrom(bs4Dash,taskItem)
-importFrom(bs4Dash,updateTabItems)
-importFrom(bs4Dash,valueBox)
-importFrom(bs4Dash,valueBoxOutput)
+importFrom(bs4Dash,
+  actionButton,
+  box,
+  column,
+  dashboardBody,
+  dashboardHeader,
+  dashboardPage,
+  dashboardSidebar,
+  dropdownMenu,
+  dropdownMenuOutput,
+  infoBox,
+  infoBoxOutput,
+  insertTab,
+  menuItem,
+  menuItemOutput,
+  menuSubItem,
+  messageItem,
+  notificationItem,
+  renderInfoBox,
+  renderMenu,
+  renderValueBox,
+  sidebarMenu,
+  sidebarMenuOutput,
+  sidebarUserPanel,
+  tabBox,
+  tabItem,
+  tabItems,
+  tabsetPanel,
+  taskItem,
+  updateTabItems,
+  valueBox,
+  valueBoxOutput
+)
 importFrom(data.table,fread)
 importFrom(diffdf,diffdf)
-importFrom(dplyr,across)
-importFrom(dplyr,anti_join)
-importFrom(dplyr,contains)
-importFrom(dplyr,distinct)
-importFrom(dplyr,intersect)
-importFrom(dplyr,mutate)
-importFrom(dplyr,relocate)
-importFrom(dplyr,rename)
-importFrom(dplyr,row_number)
-importFrom(dplyr,select)
-importFrom(haven,read_dta)
-importFrom(haven,read_sas)
-importFrom(haven,read_sav)
+importFrom(dplyr,
+  across,
+  anti_join,
+  contains,
+  distinct,
+  intersect,
+  mutate,
+  relocate,
+  rename,
+  row_number,
+  select
+)
+importFrom(haven,
+  read_dta,
+  read_sas,
+  read_sav
+)
 importFrom(janitor,clean_names)
 importFrom(magrittr,`%>%`)
-importFrom(openxlsx,addWorksheet)
-importFrom(openxlsx,createWorkbook)
-importFrom(openxlsx,saveWorkbook)
-importFrom(openxlsx,writeData)
-importFrom(purrr,map)
-importFrom(purrr,map_df)
-importFrom(purrr,set_names)
+importFrom(openxlsx,
+  addWorksheet,
+  createWorkbook,
+  saveWorkbook,
+  writeData
+)
+importFrom(purrr,
+  map,
+  map_df,
+  set_names
+)
 importFrom(readxl,read_excel)
+importFrom(rlang,"!!!")
 importFrom(stringr,str_detect)
-importFrom(tibble,add_column)
-importFrom(tibble,as_tibble)
-importFrom(tibble,tibble)
-importFrom(tidyr,separate)
-importFrom(tidyr,unite)
-importFrom(tidyr,unnest)
-importFrom(tidyselect,everything)
+importFrom(tibble,
+  add_column,
+  as_tibble
+)
+importFrom(tidyr,
+  separate,
+  unite,
+  unnest
+)
 importFrom(tools,file_ext)

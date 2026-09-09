@@ -21,9 +21,9 @@
 #' IncompleteDataJoin <- create_new_column(data = IncompleteData,
 #'                                        cols = c("subject", "record"),
 #'                                        new_name = "join_var")
-create_new_column <- function(data, cols, new_name) {
-    new_col_data <- data %>%
-      tidyr::unite({{new_name}}, {{cols}}, remove = FALSE, sep = "-") %>%
-      dplyr::relocate({{new_name}}, everything())
+create_new_column <- function(data, cols, new_name, sep) {
+    new_col_data <- data |>
+      tidyr::unite({{new_name}}, {{cols}}, remove = FALSE, sep = sep) |>
+      dplyr::relocate({{new_name}}, dplyr::everything())
     return(new_col_data)
 }
