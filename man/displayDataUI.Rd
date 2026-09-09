@@ -6,9 +6,6 @@
 \usage{
 displayDataUI(id)
 }
-\arguments{
-\item{id}{}
-}
 \value{
 display data UI
 }

@@ -2,12 +2,7 @@
 #'
 #' @param tbl input table
 #'
-#' @importFrom tibble tibble
-#' @importFrom purrr set_names
-#' @import rlang
-#' @importFrom dplyr mutate
-#' @importFrom dplyr across
-#' @importFrom tidyselect everything
+#' @importFrom rlang !!!
 #'
 #' @return tibble with columns from tbl, all logical
 #' @export create_empty_tbl

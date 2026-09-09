@@ -4,7 +4,7 @@
 \alias{create_new_column}
 \title{Create new (joining) bs4Dash::column}
 \usage{
-create_new_column(data, cols, new_name)
+create_new_column(data, cols, new_name, sep)
 }
 \arguments{
 \item{data}{a tibble or data.frame}
