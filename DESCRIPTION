@@ -1,9 +1,8 @@
 Package: dfdiffs
 Title: Data Frame Differences (What's New, Deleted, and Changed?)
 Version: 0.1.0
-Authors@R: 
-    person("Martin", "Frigaard", , "mjfrigaard@pm.me", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+Authors@R:
+    person("Martin", "Frigaard", , "mjfrigaard@pm.me", role = c("aut", "cre"))
 Description: dfdiffs answers three questions: What is here now that wasnt't 
     here before? What was here before that isn't here now? And what has changed?
 License: MIT + file LICENSE
@@ -14,16 +13,14 @@ Depends:
 LazyData: true
 VignetteBuilder: knitr
 URL: https://mjfrigaard.github.io/dfdiffs/
-Imports: 
+Imports:
     arsenal,
-    bs4Dash,
+    bslib,
     data.table,
-    devtools,
     diffdf,
     dplyr,
     flextable,
     forcats,
-    fresh,
     fs,
     glue,
     gt,
@@ -32,29 +29,35 @@ Imports:
     hrbrthemes,
     janitor,
     kableExtra,
-    knitr,
     labelled,
     lubridate,
-    markdown,
+    magrittr,
     openxlsx,
-    pkgdown,
     purrr,
     RColorBrewer,
     reactable,
     readr,
     readxl,
-    rmarkdown,
-    rmdformats,
+    rlang,
     shiny,
-    shinydashboard,
-    shinythemes,
     stringr,
-    styler,
-    testthat,
+    tibble,
     tidyr,
     tidyselect,
     vctrs,
     vetr,
     vroom,
     waldo
+Suggests:
+    devtools,
+    knitr,
+    markdown,
+    pkgdown,
+    pkgload,
+    rmarkdown,
+    rmdformats,
+    styler,
+    testthat,
+    withr
 Config/roxygen2/version: 8.1.0
+Config/testthat/edition: 3

@@ -406,7 +406,21 @@ create_new_data_cond_test(
 
 `cols` = the columns to compare (if none are provided, all columns are compared)
 
-## Single `by` column conditions 
+## Call structure
+
+`create_new_data()` relies on two helpers from the package: `rename_join_col()` (renames the join column) and `create_new_column()` (builds the join column from the `by` columns). The call tree below was generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in `dfdiffs` are shown.
+
+```{r call-tree-create_new_data, eval=FALSE}
+stackcallr::call_tree_dir("R", root = "create_new_data")
+```
+
+```
+█─create_new_data
+├─rename_join_col
+└─create_new_column
+```
+
+## Single `by` column conditions
 
 The function should also be able to handle multiple conditions. Below we cover the conditions for a single `by` columns (assuming there is an existing unique identifier in each dataset). But first, we'll cover a few uncommon conditions, like a missing `by` column, or a missing `by` column and specific columns selected for comparison. 
 

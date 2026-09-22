@@ -137,7 +137,21 @@ modified_cdf_sum <- summary(modified_cdf)
 names(modified_cdf_sum)
 ```
 
-We're only interested in the `diffs.byvar.table` and the `diffs.table`. 
+We're only interested in the `diffs.byvar.table` and the `diffs.table`.
+
+## Call structure
+
+Within `dfdiffs`, `create_modified_data()` calls `rename_join_col()` and `create_new_column()` to build (and name) the join column; the comparison itself comes from `arsenal::comparedf()` (from another package, so it isn't shown below). The call tree below was generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`); only functions defined in `dfdiffs` are shown.
+
+```{r call-tree-create_modified_data, eval=FALSE}
+stackcallr::call_tree_dir("R", root = "create_modified_data")
+```
+
+```
+█─create_modified_data
+├─rename_join_col
+└─create_new_column
+```
 
 ## `comparedf()` -> `diffs.byvar.table`
 

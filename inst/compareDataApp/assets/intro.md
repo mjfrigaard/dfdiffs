@@ -20,7 +20,7 @@ Quick dataset comparisons in three steps!
     comparison
 
 -   In the **Select Join Columns** box, you’ll see a table of shared
-    columns between `base` and `compare` (f the data has a join bs4Dash::column
+    columns between `base` and `compare` (f the data has a join column
     (or columns), you can select them in the **Select Joining
     Column(s)** section)
 

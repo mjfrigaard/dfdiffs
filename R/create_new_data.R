@@ -2,8 +2,8 @@
 #'
 #' @param compare a 'new' or 'current' dataset
 #' @param base an 'old' or 'previous' dataset
-#' @param by the joining bs4Dash::column between the two datasets
-#' @param by_col name of the new joining bs4Dash::column
+#' @param by the joining column between the two datasets
+#' @param by_col name of the new joining column
 #' @param  cols names of columns to compare
 #'
 #' @return new_data
@@ -27,8 +27,8 @@
 #'                 cols = c("text_var", "factor_var"))
 create_new_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
   # convert all columns to character
-  compare <- mutate(compare, across(.cols = everything(), .fns = as.character))
-  base <- mutate(base, across(.cols = everything(), .fns = as.character))
+  compare <- mutate(compare, across(.cols = tidyselect::everything(), .fns = as.character))
+  base <- mutate(base, across(.cols = tidyselect::everything(), .fns = as.character))
 
   if (is.null(by) & is.null(by_col) & is.null(cols)) {
     # 1) no 'by', no 'by_col', no 'cols' -----
@@ -40,36 +40,36 @@ create_new_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL
     new_data <- dplyr::distinct(new_data_join)
   } else if (is.null(by) & is.null(by_col) & !is.null(cols)) {
     # 2) no 'by', no 'by_col', multiple compare 'cols' -----
-    compare_join_cols <- dplyr::select(compare, all_of(cols))
-    base_join_cols <- dplyr::select(base, all_of(cols))
+    compare_join_cols <- dplyr::select(compare, tidyselect::all_of(cols))
+    base_join_cols <- dplyr::select(base, tidyselect::all_of(cols))
     new_data_join <- dplyr::anti_join(x = compare_join_cols,
                                       y = base_join_cols,
                             by = dplyr::intersect(x = names(compare_join_cols),
                                                   y = names(base_join_cols)))
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
-    # 3) single 'by' bs4Dash::column ----
+    # 3) single 'by' column ----
     new_data_join <- dplyr::anti_join(x = compare, y = base, by = {{by}})
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) == 1 & length(by_col) == 1 & is.null(cols)) {
-    # 4) single 'by' bs4Dash::column, new 'by_col' ----
+    # 4) single 'by' column, new 'by_col' ----
     compare <- rename_join_col(compare, by = by, by_col = by_col)
     base <- rename_join_col(base, by = by, by_col = by_col)
     new_data_join <- dplyr::anti_join(x = compare, y = base, by = {{by_col}})
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) == 1 & is.null(by_col) & !is.null(cols)) {
-    # 5) single 'by' bs4Dash::column, multiple compare 'cols' ----
-    compare_cols <- select(compare, matches(by), all_of(cols))
-    base_cols <- select(base, matches(by), all_of(cols))
+    # 5) single 'by' column, multiple compare 'cols' ----
+    compare_cols <- select(compare, tidyselect::matches(by), tidyselect::all_of(cols))
+    base_cols <- select(base, tidyselect::matches(by), tidyselect::all_of(cols))
     new_data_join <- dplyr::anti_join(x = compare_cols, y = base_cols,
                                       by = {{by}})
     new_data <- dplyr::distinct(new_data_join)
   } else if (length(by) == 1 & !is.null(by_col) & !is.null(cols)) {
-    # 6) single 'by' bs4Dash::column, new 'by_col', multiple compare 'cols' ----
+    # 6) single 'by' column, new 'by_col', multiple compare 'cols' ----
     compare_cols <- rename_join_col(compare, by = by, by_col = by_col)
     base_cols <- rename_join_col(base, by = by, by_col = by_col)
-    compare_join <- select(compare_cols, matches(by_col), all_of(cols))
-    base_join <- select(base_cols, matches(by_col), all_of(cols))
+    compare_join <- select(compare_cols, tidyselect::matches(by_col), tidyselect::all_of(cols))
+    base_join <- select(base_cols, tidyselect::matches(by_col), tidyselect::all_of(cols))
     new_data_join <- dplyr::anti_join(x = compare_join, y = base_join,
                                       by = {{by_col}})
     new_data <- dplyr::distinct(new_data_join)
@@ -77,9 +77,9 @@ create_new_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL
     # 7) multiple 'by' ----
     # no 'by_col', no multiple compare 'cols'
     compare_join <- create_new_column(data = compare,
-                        cols = all_of(by), new_name = "join")
+                        cols = tidyselect::all_of(by), new_name = "join")
     base_join <- create_new_column(data = base,
-                        cols = all_of(by), new_name = "join")
+                        cols = tidyselect::all_of(by), new_name = "join")
     new_data_join <- dplyr::anti_join(x = compare_join,
                                       y = base_join,
                                       by = dplyr::intersect(
@@ -90,10 +90,10 @@ create_new_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL
     # 8) multiple 'by' and 'by_col' ----
     # no multiple compare 'cols'
     compare_join <- create_new_column(data = compare,
-                                    cols = all_of(by),
+                                    cols = tidyselect::all_of(by),
                                     new_name = {{by_col}})
     base_join <- create_new_column(data = base,
-                                    cols = all_of(by),
+                                    cols = tidyselect::all_of(by),
                                     new_name = {{by_col}})
     new_data_join <- dplyr::anti_join(x = compare_join, y = base_join,
                             by = dplyr::intersect(x = names(compare_join),
@@ -103,11 +103,11 @@ create_new_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL
     # 9) multiple 'by' & multiple compare 'cols' ----
     # no 'by_col'
     compare_join <- create_new_column(data = compare,
-                        cols = all_of(by), new_name = "join")
+                        cols = tidyselect::all_of(by), new_name = "join")
     base_join <- create_new_column(data = base,
-                        cols = all_of(by), new_name = "join")
-    compare_join_cols <- dplyr::select(compare_join, join, all_of(cols))
-    base_join_cols <- dplyr::select(base_join, join, all_of(cols))
+                        cols = tidyselect::all_of(by), new_name = "join")
+    compare_join_cols <- dplyr::select(compare_join, join, tidyselect::all_of(cols))
+    base_join_cols <- dplyr::select(base_join, join, tidyselect::all_of(cols))
     new_data_join <- dplyr::anti_join(x = compare_join_cols,
                                       y = base_join_cols,
                             by = dplyr::intersect(x = names(compare_join_cols),
@@ -116,11 +116,11 @@ create_new_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL
   } else if (length(by) > 1 & !is.null(by_col) & !is.null(cols)) {
     # 10) multiple 'by', new 'by_col' & compare multiple 'cols' ----
     compare_join <- create_new_column(data = compare,
-                        cols = all_of(by), new_name = {{by_col}})
+                        cols = tidyselect::all_of(by), new_name = {{by_col}})
     base_join <- create_new_column(data = base,
-                        cols = all_of(by), new_name = {{by_col}})
-    compare_join_cols <- dplyr::select(compare_join, {{by_col}}, all_of(cols))
-    base_join_cols <- dplyr::select(base_join, {{by_col}}, all_of(cols))
+                        cols = tidyselect::all_of(by), new_name = {{by_col}})
+    compare_join_cols <- dplyr::select(compare_join, {{by_col}}, tidyselect::all_of(cols))
+    base_join_cols <- dplyr::select(base_join, {{by_col}}, tidyselect::all_of(cols))
     new_data_join <- dplyr::anti_join(x = compare_join_cols,
                                       y = base_join_cols,
                             by = dplyr::intersect(x = names(compare_join_cols),

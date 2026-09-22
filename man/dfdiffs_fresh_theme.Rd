@@ -2,13 +2,15 @@
 % Please edit documentation in R/dfdiffs_fresh_theme.R
 \name{dfdiffs_fresh_theme}
 \alias{dfdiffs_fresh_theme}
-\title{custom theme (fresh <> bs4Dash)}
+\title{custom theme (bslib)}
 \usage{
 dfdiffs_fresh_theme()
 }
 \value{
-theme shiny app
+a \code{bslib::bs_theme()} object
 }
 \description{
-this is the fresh theme with custom colors.
+A diff-tool inspired bslib theme: ink/paper neutrals, a
+violet brand accent, and semantically correct add/delete/change colors
+(green/red/amber) for the New, Deleted, and Changed Data sections.
 }
