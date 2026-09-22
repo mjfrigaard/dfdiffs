@@ -1,66 +1,28 @@
-#' custom theme (fresh <> bs4Dash)
+#' custom theme (bslib)
 #'
-#' @return theme shiny app
+#' @importFrom bslib bs_theme font_google
+#'
+#' @return a \code{bslib::bs_theme()} object
 #' @export dfdiffs_fresh_theme
 #'
-#' @description this is the fresh theme with custom colors.
+#' @description A diff-tool inspired bslib theme: ink/paper neutrals, a
+#'   violet brand accent, and semantically correct add/delete/change colors
+#'   (green/red/amber) for the New, Deleted, and Changed Data sections.
 dfdiffs_fresh_theme <- function() {
-  fresh::create_theme(
-    # theme vars  -------------------------------------------------------------
-    fresh::bs4dash_vars(
-      navbar_light_color = "#353d98", # purple
-      navbar_light_active_color = "#353d98", # purple
-      navbar_light_hover_color = "#f26631" # orange
-    ),
-    # # theme yiq -------------------------------------------------------------
-    fresh::bs4dash_yiq(
-      contrasted_threshold = 255,
-      text_dark = "#0a0a0a", # dark_gray_s10
-      text_light = "#f5f5f5" # gray_t10
-    ),
-    # theme layout ---------------------------------------------------------
-    fresh::bs4dash_layout(
-      main_bg = NULL, # #ececec
-      font_size_root = 12
-    ),
-    # theme sidebar_light -------------------------------------------------
-    fresh::bs4dash_sidebar_light(
-      header_color = "#ccd5dd", # light blue
-      bg = "#eaebf4", # background of entire side-bar
-      color = "#002E56", # text color (no hover)
-      hover_color = "#ee304e", # text color on hover
-      hover_bg = "#353D98", # color on hover
-      active_color = "#f26631", # color is actually the 'primary' status color
-      submenu_bg = "#f5f5f5", # purple
-      submenu_color = "#002444",
-      submenu_hover_color = "#353D98" # purple
-    ),
-    # # theme sidebar_dark -------------------------------------------------
-    fresh::bs4dash_sidebar_dark(
-      header_color = "#ccd5dd",
-      bg = "#1a1e4c",
-      color = "#EE304E", # text color (no hover)
-      hover_bg = "#aeb1d5", # color on hover
-      hover_color = "#EE304E", # text color on hover
-      active_color = "#f26631" # color is actually the 'primary' status color
-    ),
-    # theme status -------------------------------------------------
-    fresh::bs4dash_status(
-      dark = "#323232",
-      light = "#A0A0A0", # gray
-      warning = "#F26631", # orange
-      primary = "#A9218E", # violet = #A9218E, blue = #00509C
-      secondary = "#353D98", # purple
-      success = "#00509C", # blue
-      danger = "#EE304E", # red
-      info = "#A0A0A0" # gray
-    ),
-    # theme color -------------------------------------------------
-    fresh::bs4dash_color(
-      gray_900 = "#1f245b",
-      gray_800 = "#646464",
-      lightblue = "#6696c3",
-      blue = "#00509C"
-    )
+  bslib::bs_theme(
+    version = 5,
+    preset = "shiny",
+    bg = "#FAFAF9", # paper
+    fg = "#12151A", # ink
+    primary = "#4A2E83", # violet (brand)
+    secondary = "#6B7280", # slate (base vs. compare neutral)
+    success = "#1E7F4F", # add / new data (diff green)
+    danger = "#B3261E", # delete / deleted data (diff red)
+    warning = "#B4740E", # change / changed data (diff amber)
+    info = "#2454A6", # informational blue
+    base_font = bslib::font_google("Inter"),
+    heading_font = bslib::font_google("Space Grotesk"),
+    code_font = bslib::font_google("IBM Plex Mono")
   )
 }
+

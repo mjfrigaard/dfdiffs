@@ -18,9 +18,9 @@ create_comparison_report(
 
 \item{base}{base df}
 
-\item{by}{keys or joining bs4Dash::column}
+\item{by}{keys or joining column}
 
-\item{by_col}{bs4Dash::column name for joining bs4Dash::column}
+\item{by_col}{column name for joining column}
 
 \item{cols}{columns to compare}
 

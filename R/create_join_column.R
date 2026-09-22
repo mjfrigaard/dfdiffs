@@ -2,7 +2,7 @@
 #'
 #' @param df a data.frame or tibble
 #' @param by_colums columns to uniquely identify a row
-#' @param new_by_column_name the new bs4Dash::column name
+#' @param new_by_column_name the new column name
 #'
 #' @return join_col_data
 #' @export create_join_column
@@ -14,7 +14,7 @@
 #'                     new_by_column_name = 'join_var')
 create_join_column <- function(df, by_colums, new_by_column_name) {
     # select by_vars
-    tmp <- dplyr::select(df, all_of(by_colums))
+    tmp <- dplyr::select(df, tidyselect::all_of(by_colums))
     # convert to character
     tmp <- dplyr::mutate(tmp, dplyr::across(.cols = dplyr::everything(),
                                             .fns = as.character))
@@ -26,7 +26,7 @@ create_join_column <- function(df, by_colums, new_by_column_name) {
     names(join_col_data)[names(join_col_data) == "new_col"] <- new_by_column_name
     # relocate
     join_col_data <- dplyr::relocate(join_col_data,
-      all_of(new_by_column_name))
+      tidyselect::all_of(new_by_column_name))
     # return
     return(join_col_data)
 }

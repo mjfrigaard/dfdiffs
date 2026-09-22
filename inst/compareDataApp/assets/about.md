@@ -1,6 +1,6 @@
-## `compareDataApp()`
+## `launch_app()`
 
-The `compareDataApp()` aims to answer three questions (given two
+The `launch_app()` aims to answer three questions (given two
 datasets)
 
 1.  What rows are here now that weren’t here before?  
@@ -32,6 +32,6 @@ In SAS, the `PROC COMPARE` syntax is as follows:
     libname proclib 'SAS-library';
     options pageno=1 linesize=80 pagesize=40;
     proc compare base=[DATA X] compare=[DATA Y];
-    id [id bs4Dash::column];
-    title 'Comparing Observations that Have Matching [id bs4Dash::column]s';
+    id [id column];
+    title 'Comparing Observations that Have Matching [id column]s';
     run;

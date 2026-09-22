@@ -1,12 +1,12 @@
 #' reactable theme (base data)
 #'
 #' @description theme for base data in reactable table
-base_react_theme <- reactableTheme(
+base_react_theme <- reactable::reactableTheme(
   color = "#FFFFFF",
-  backgroundColor = "#761763",
+  backgroundColor = "#374151", # slate (secondary)
   borderColor = "#646464",
   stripedColor = "#3A3B45",
-  highlightColor = "#a9218e",
+  highlightColor = "#4B5563",
   inputStyle = list(backgroundColor = "#3A3B45"),
   selectStyle = list(backgroundColor = "#3A3B45"),
   pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
@@ -15,12 +15,12 @@ base_react_theme <- reactableTheme(
 #' reactable theme (compare data)
 #'
 #' @description theme for compare data in reactable table
-comp_react_theme <- reactableTheme(
+comp_react_theme <- reactable::reactableTheme(
   color = "#FFFFFF",
-  backgroundColor = "#2f3688",
+  backgroundColor = "#4A2E83", # violet (primary)
   borderColor = "#646464",
   stripedColor = "#3A3B45",
-  highlightColor = "#353d98",
+  highlightColor = "#5E3DA1",
   inputStyle = list(backgroundColor = "#3A3B45"),
   selectStyle = list(backgroundColor = "#3A3B45"),
   pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
@@ -29,8 +29,8 @@ comp_react_theme <- reactableTheme(
 #' reactable theme (new data)
 #'
 #' @description theme for new data in reactable table
-new_react_theme <- reactableTheme(
-  color = "#00509C",
+new_react_theme <- reactable::reactableTheme(
+  color = "#1E7F4F", # add / diff green
   backgroundColor = "#FFFFFF",
   borderColor = "#A0A0A0",
   stripedColor = "#3A3B45",
@@ -43,8 +43,8 @@ new_react_theme <- reactableTheme(
 #' reactable theme (deleted data)
 #'
 #' @description theme for deleted data in reactable table
-deleted_react_theme <- reactableTheme(
-  color = "#d62b46",
+deleted_react_theme <- reactable::reactableTheme(
+  color = "#B3261E", # delete / diff red
   backgroundColor = "#FFFFFF",
   borderColor = "#A0A0A0",
   stripedColor = "#3A3B45",
@@ -57,8 +57,8 @@ deleted_react_theme <- reactableTheme(
 #' reactable theme (changed data)
 #'
 #' @description theme for changed data in reactable table
-changed_react_theme <- reactableTheme(
-  color = "#c15127",
+changed_react_theme <- reactable::reactableTheme(
+  color = "#B4740E", # change / diff amber
   backgroundColor = "#FFFFFF",
   borderColor = "#646464",
   stripedColor = "#3A3B45",

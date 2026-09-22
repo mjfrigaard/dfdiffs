@@ -8,8 +8,8 @@
 #'
 #' @param compare compare df
 #' @param base base df
-#' @param by keys or joining bs4Dash::column
-#' @param by_col bs4Dash::column name for joining bs4Dash::column
+#' @param by keys or joining column
+#' @param by_col column name for joining column
 #' @param cols columns to compare
 #' @param file export file (with path)
 #'

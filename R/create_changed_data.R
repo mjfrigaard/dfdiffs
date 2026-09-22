@@ -38,7 +38,7 @@ extract_df_tables <- function(diffdf_list, by_keys) {
                                   .f = janitor::clean_names)
   # vars
   var_diffs_chr_lst <- purrr::map(var_diffs_lst,
-                            .f = ~dplyr::mutate(.x,across(.cols = everything(),
+                            .f = ~dplyr::mutate(.x,across(.cols = tidyselect::everything(),
                                                     .fns = as.character)))
   var_diffs <- purrr::map_df(.x = var_diffs_chr_lst, .f = janitor::clean_names)
 
@@ -90,8 +90,8 @@ extract_df_tables <- function(diffdf_list, by_keys) {
 #'
 #' @param compare A 'current' or 'new' dataset (tibble or data.frame)
 #' @param base A 'previous' or 'old' dataset (tibble or data.frame)
-#' @param by A join bs4Dash::column between the two datasets, or any combination of columns that constitute a unique row.
-#' @param by_col A new name for the joining bs4Dash::column.
+#' @param by A join column between the two datasets, or any combination of columns that constitute a unique row.
+#' @param by_col A new name for the joining column.
 #' @param cols Columns to be compared.
 #'
 #' @importFrom diffdf diffdf
@@ -126,11 +126,11 @@ extract_df_tables <- function(diffdf_list, by_keys) {
 create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
   # check to see if 'by' is included in cols
   if (sum(by %in% cols) > 0) {
-    stop("The 'by' bs4Dash::column is listed in the columns to compare ('cols)")
+    stop("The 'by' column is listed in the columns to compare ('cols)")
   } else {
       # convert all columns to character
-    compare <- mutate(compare, across(.cols = everything(), .fns = as.character))
-    base <- mutate(base, across(.cols = everything(), .fns = as.character))
+    compare <- mutate(compare, across(.cols = tidyselect::everything(), .fns = as.character))
+    base <- mutate(base, across(.cols = tidyselect::everything(), .fns = as.character))
   }
 
   if (is.null(by) & is.null(by_col) & is.null(cols)) {
@@ -156,8 +156,8 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
   } else if (is.null(by) & is.null(by_col) & !is.null(cols)) {
     # 2) Multiple columns to compare (cols): ----
     # no 'by' & no 'by_col'
-    base_cols <- dplyr::select(base, all_of(cols))
-    compare_cols <- dplyr::select(compare, all_of(cols))
+    base_cols <- dplyr::select(base, tidyselect::all_of(cols))
+    compare_cols <- dplyr::select(compare, tidyselect::all_of(cols))
     diff_lst <- suppressWarnings(suppressMessages(
       diffdf::diffdf(base = base_cols , compare = compare_cols)))
 
@@ -177,14 +177,14 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
 
     changed_data <- list("num_diffs" = num_diffs, "var_diffs" = var_diffs)
   } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
-    # 3) Single 'by' bs4Dash::column, no new bs4Dash::column name ----
+    # 3) Single 'by' column, no new column name ----
     diff_lst <- suppressWarnings(suppressMessages(
       diffdf::diffdf(base = base , compare = compare, keys = by)))
 
     changed_data <- extract_df_tables(diffdf_list = diff_lst, by_keys = by)
 
   } else if (length(by) == 1 & !is.null(by_col) & is.null(cols)) {
-    # 4) Single by bs4Dash::column, new bs4Dash::column name (by_col) -----
+    # 4) Single by column, new column name (by_col) -----
       compare_join_cols <- rename_join_col(compare, by = by, by_col = by_col)
       base_join_cols <- rename_join_col(base, by = by, by_col = by_col)
       # create df list
@@ -196,9 +196,9 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
       changed_data <- extract_df_tables(diffdf_list = diff_lst,
                                           by_keys = by_col)
   } else if (length(by) == 1 & is.null(by_col) & !is.null(cols)) {
-    # 5) Single by bs4Dash::column, multiple compare columns 'cols' ----
-      compare_join_cols <- dplyr::select(compare, {{by}}, all_of(cols))
-      base_join_cols <- dplyr::select(base, {{by}}, all_of(cols))
+    # 5) Single by column, multiple compare columns 'cols' ----
+      compare_join_cols <- dplyr::select(compare, {{by}}, tidyselect::all_of(cols))
+      base_join_cols <- dplyr::select(base, {{by}}, tidyselect::all_of(cols))
       # create df list
       diff_lst <- suppressWarnings(suppressMessages(
                     diffdf::diffdf(base = base_join_cols,
@@ -209,11 +209,11 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
                                           by_keys = by)
 
   } else if (length(by) == 1 & !is.null(by_col) & !is.null(cols)) {
-    # 6) Single by bs4Dash::column, new bs4Dash::column name (by_col), multiple compare columns (cols) ----
+    # 6) Single by column, new column name (by_col), multiple compare columns (cols) ----
       compare_cols <- rename_join_col(compare, by = by, by_col = by_col)
       base_cols <- rename_join_col(base, by = by, by_col = by_col)
-      compare_join_cols <- dplyr::select(compare_cols, {{by_col}}, all_of(cols))
-      base_join_cols <- dplyr::select(base_cols, {{by_col}}, all_of(cols))
+      compare_join_cols <- dplyr::select(compare_cols, {{by_col}}, tidyselect::all_of(cols))
+      base_join_cols <- dplyr::select(base_cols, {{by_col}}, tidyselect::all_of(cols))
       # create df list using 'by_col'
       diff_lst <- suppressWarnings(suppressMessages(
                     diffdf::diffdf(base = base_join_cols,
@@ -226,9 +226,9 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
   } else if (length(by) > 1 & is.null(by_col) & is.null(cols)) {
     # 7) Multiple by columns ----
       compare_join_cols <- create_new_column(data = compare,
-                          cols = all_of(by), new_name = 'join')
+                          cols = tidyselect::all_of(by), new_name = 'join')
       base_join_cols <- create_new_column(data = base,
-                          cols = all_of(by), new_name = 'join')
+                          cols = tidyselect::all_of(by), new_name = 'join')
       # create df list using 'join'
       diff_lst <- suppressWarnings(suppressMessages(
                     diffdf::diffdf(base = base_join_cols,
@@ -238,11 +238,11 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
       changed_data <- extract_df_tables(diffdf_list = diff_lst,
                                           by_keys = 'join')
   } else if (length(by) > 1 & !is.null(by_col) & is.null(cols)) {
-    # 8) Multiple by columns, new bs4Dash::column name (by_col) ----
+    # 8) Multiple by columns, new column name (by_col) ----
       compare_join_cols <- create_new_column(data = compare,
-                          cols = all_of(by), new_name = {{by_col}})
+                          cols = tidyselect::all_of(by), new_name = {{by_col}})
       base_join_cols <- create_new_column(data = base,
-                          cols = all_of(by), new_name = {{by_col}})
+                          cols = tidyselect::all_of(by), new_name = {{by_col}})
       # create df list using 'by_col'
       diff_lst <- suppressWarnings(suppressMessages(
                     diffdf::diffdf(base = base_join_cols,
@@ -254,16 +254,16 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
 
   } else if (length(by) > 1 & is.null(by_col) & !is.null(cols)) {
     # 9) multiple `by` columns, multiple compare 'cols' ----
-    # create new 'join' bs4Dash::column
+    # create new 'join' column
       compare_cols <- create_new_column(data = compare,
-                          cols = all_of(by), new_name = "join")
+                          cols = tidyselect::all_of(by), new_name = "join")
       base_cols <- create_new_column(data = base,
-                          cols = all_of(by), new_name = "join")
+                          cols = tidyselect::all_of(by), new_name = "join")
       # select the 'cols'
       compare_join_cols <- dplyr::select(compare_cols,
-                                      matches("join"), all_of(cols))
+                                      tidyselect::matches("join"), tidyselect::all_of(cols))
       base_join_cols <- dplyr::select(base_cols,
-                                      matches("join"), all_of(cols))
+                                      tidyselect::matches("join"), tidyselect::all_of(cols))
       # create df list using 'join'
       diff_lst <- suppressWarnings(suppressMessages(
                     diffdf::diffdf(base = base_join_cols,
@@ -276,13 +276,13 @@ create_changed_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
   } else if (length(by) > 1 & !is.null(by_col) & !is.null(cols)) {
     # 10) multiple `by` columns, new 'by_col', and 'cols' ----
       compare_cols <- create_new_column(data = compare,
-                          cols = all_of(by), new_name = {{by_col}})
+                          cols = tidyselect::all_of(by), new_name = {{by_col}})
       base_cols <- create_new_column(data = base,
-                          cols = all_of(by), new_name = {{by_col}})
+                          cols = tidyselect::all_of(by), new_name = {{by_col}})
       compare_join_cols <- dplyr::select(compare_cols,
-                                      all_of(by_col), all_of(cols))
+                                      tidyselect::all_of(by_col), tidyselect::all_of(cols))
       base_join_cols <- dplyr::select(base_cols,
-                                      all_of(by_col), all_of(cols))
+                                      tidyselect::all_of(by_col), tidyselect::all_of(cols))
       # create df list using 'by_col'
       diff_lst <- suppressWarnings(suppressMessages(
                     diffdf::diffdf(base = base_join_cols,

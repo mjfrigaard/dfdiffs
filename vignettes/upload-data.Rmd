@@ -90,6 +90,35 @@ upload_data <- function(path, sheet = NULL) {
 ```
 
 
+## Call structure
+
+`upload_data()` reads Excel workbooks (`.xlsx`) with `readxl::read_excel()` and hands every other file type to `load_flat_file()`, which picks the reader from the file extension. In the Shiny app, the upload module (`mod_upload_server()`) calls `upload_data()`. The call trees below were generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`); only functions defined in `dfdiffs` are shown.
+
+```{r call-tree-mod_upload_server, eval=FALSE}
+stackcallr::call_tree_dir("R", root = "mod_upload_server")
+```
+
+```
+█─mod_upload_server
+└─█─upload_data
+  └─load_flat_file
+```
+
+The upload demo app (`launch_upload_demo()`) shows the module's UI and server sides together:
+
+```{r call-tree-launch_upload_demo, eval=FALSE}
+stackcallr::call_tree_dir("R", root = "launch_upload_demo")
+```
+
+```
+█─launch_upload_demo
+├─dfdiffs_fresh_theme
+├─mod_upload_ui
+└─█─mod_upload_server
+  └─█─upload_data
+    └─load_flat_file
+```
+
 ## 2010 Lahamn CSVs
 
 ```{r lahman_2010_csv_paths}

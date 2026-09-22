@@ -74,7 +74,20 @@ create_join_column <- function(df, join_cols, new_col_name){
 }
 ```
 
-## Test data 
+## Call structure
+
+`create_join_column()` doesn't call any other `dfdiffs` functions. Inside the Shiny app, it's called by the select module (`mod_select_server()`) to build the `join_column` from the columns chosen in the *Select Join Columns* panel. The call tree below was generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`); only functions defined in `dfdiffs` are shown.
+
+```{r call-tree-mod_select_server, eval=FALSE}
+stackcallr::call_tree_dir("R", root = "mod_select_server")
+```
+
+```
+█─mod_select_server
+└─create_join_column
+```
+
+## Test data
 
 We will load some test data from the `Lahman` package to demonstrate how this function works: 
 
