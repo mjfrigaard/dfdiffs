@@ -8,7 +8,10 @@
 <title>modified-data • dfdiffs</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Inter-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/IBM_Plex_Mono-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/Space_Grotesk-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="modified-data">
 </head>
@@ -16,7 +19,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
@@ -45,6 +48,9 @@
     <li><a class="dropdown-item" href="../articles/multiple-comparisons.html">Multiple comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/similar-work.html">Similar work</a></li>
     <li><a class="dropdown-item" href="../articles/upload-data.html">Uploading data (shiny app)</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Development</h6></li>
+    <li><a class="dropdown-item" href="../articles/tests.html">Tests</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -794,10 +800,27 @@ up the output a bit.</p>
 <p>We’re only interested in the <code>diffs.byvar.table</code> and the
 <code>diffs.table</code>.</p>
 <div class="section level3">
+<h3 id="call-structure">Call structure<a class="anchor" aria-label="anchor" href="#call-structure"></a>
+</h3>
+<p>Within <code>dfdiffs</code>, <code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>
+calls <code><a href="../reference/rename_join_col.html">rename_join_col()</a></code> and
+<code><a href="../reference/create_new_column.html">create_new_column()</a></code> to build (and name) the join column;
+the comparison itself comes from <code><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">arsenal::comparedf()</a></code> (from
+another package, so it isn’t shown below). The call tree below was
+generated from the package source with <a href="https://github.com/mjfrigaard/stackcallr" class="external-link">stackcallr</a>
+(<code>pak::pak("mjfrigaard/stackcallr")</code>); only functions defined
+in <code>dfdiffs</code> are shown.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">stackcallr</span><span class="fu">::</span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"create_modified_data"</span><span class="op">)</span></span></code></pre></div>
+<pre><code>█─create_modified_data
+├─rename_join_col
+└─create_new_column</code></pre>
+</div>
+<div class="section level3">
 <h3 id="comparedf---diffs-byvar-table">
 <code>comparedf()</code> -&gt; <code>diffs.byvar.table</code><a class="anchor" aria-label="anchor" href="#comparedf---diffs-byvar-table"></a>
 </h3>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modified_cdf_sum</span><span class="op">$</span><span class="va">diffs.byvar.table</span></span></code></pre></div>
 <table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
 <caption>
@@ -923,7 +946,7 @@ entered_date
 <h3 id="comparedf---diffs-byvar-table-1">
 <code>comparedf()</code> -&gt; <code>diffs.byvar.table</code><a class="anchor" aria-label="anchor" href="#comparedf---diffs-byvar-table-1"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modified_cdf_sum</span><span class="op">$</span><span class="va">diffs.table</span></span></code></pre></div>
 <table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
 <caption>
@@ -1254,7 +1277,7 @@ C-5
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modified</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataID</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataID</span>, </span>
@@ -1269,7 +1292,7 @@ C-5
 </h3>
 <p>We’ve removed the extra <code>var.y</code> (and renamed
 <code>var.x</code> to <code>Variable name</code>).</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modified</span><span class="op">$</span><span class="va">diffs_byvar</span></span></code></pre></div>
 <table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
 <caption>
@@ -1377,7 +1400,7 @@ to <code>Variable name</code>). <code>values.x</code> was renamed to
 <code>Previous Value</code>.</p>
 <p>We’ve also removed the row position variables (<code>row.x</code> and
 <code>row.y</code>)</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modified</span><span class="op">$</span><span class="va">diffs</span></span></code></pre></div>
 <table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
 <caption>

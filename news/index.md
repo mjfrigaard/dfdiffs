@@ -44,22 +44,17 @@ uat app (<https://mjfrigaard.shinyapps.io/compareDataApp/>)
 
 Development version of modules have the following prefix: `dev_`
 
-[`dev_uploadDataUI()`](https://mjfrigaard.github.io/dfdiffs/reference/dev_uploadDataUI.md)/[`dev_uploadDataServer()`](https://mjfrigaard.github.io/dfdiffs/reference/dev_uploadDataServer.md)
-create the
-[`uploadDataDemo()`](https://mjfrigaard.github.io/dfdiffs/reference/uploadDataDemo.md)
-app  
+`dev_uploadDataUI()`/`dev_uploadDataServer()` create the
+`uploadDataDemo()` app  
 
-[`dev_selectDataUI()`](https://mjfrigaard.github.io/dfdiffs/reference/dev_selectDataUI.md)/[`dev_selectDataServer()`](https://mjfrigaard.github.io/dfdiffs/reference/dev_selectDataServer.md)
-create the
-[`selectDataDemo()`](https://mjfrigaard.github.io/dfdiffs/reference/selectDataDemo.md)
-app  
+`dev_selectDataUI()`/`dev_selectDataServer()` create the
+`selectDataDemo()` app  
 
-[`dev_compareDataUI()`](https://mjfrigaard.github.io/dfdiffs/reference/dev_compareDataUI.md)/[`dev_compareDataServer()`](https://mjfrigaard.github.io/dfdiffs/reference/dev_compareDataServer.md)
-create the `compareDataDemo()` app  
+`dev_compareDataUI()`/`dev_compareDataServer()` create the
+`compareDataDemo()` app  
 
-the
-[`compareDataApp()`](https://mjfrigaard.github.io/dfdiffs/reference/compareDataApp.md)
-uses the non-development versions (stored in `app/` folder)
+the `compareDataApp()` uses the non-development versions (stored in
+`app/` folder)
 
 Numbered sidebar  
 

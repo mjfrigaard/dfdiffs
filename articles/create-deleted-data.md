@@ -305,6 +305,29 @@ function, which returns a tibble of the deleted rows.
 create_deleted_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL)
 ```
 
+### Call structure
+
+[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)
+relies on the same two helpers as
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md):
+[`rename_join_col()`](https://mjfrigaard.github.io/dfdiffs/reference/rename_join_col.md)
+(renames the join column) and
+[`create_new_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_column.md)
+(builds the join column from the `by` columns, covered above). The call
+tree below was generated from the package source with
+[stackcallr](https://github.com/mjfrigaard/stackcallr)
+(`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in
+`dfdiffs` are shown.
+
+``` r
+
+stackcallr::call_tree_dir("R", root = "create_deleted_data")
+```
+
+    █─create_deleted_data
+    ├─rename_join_col
+    └─create_new_column
+
 ### Single `by` column conditions
 
 The function should also be able to handle multiple conditions. Below we

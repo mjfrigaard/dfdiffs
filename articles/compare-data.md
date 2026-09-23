@@ -65,6 +65,69 @@ names(comparisons)
 #> ! object 'comparisons' not found
 ```
 
+### Call structure
+
+[`compare_data()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_data.md)
+runs
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md),
+[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md),
+and
+[`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md),
+and returns their results in a single list. The call tree below was
+generated from the package source with
+[stackcallr](https://github.com/mjfrigaard/stackcallr)
+(`pak::pak("mjfrigaard/stackcallr")`); only functions defined in
+`dfdiffs` are shown.
+
+``` r
+
+stackcallr::call_tree_dir("R", root = "compare_data")
+```
+
+    █─compare_data
+    ├─█─create_new_data
+    │ ├─rename_join_col
+    │ └─create_new_column
+    ├─█─create_deleted_data
+    │ ├─rename_join_col
+    │ └─create_new_column
+    └─█─create_changed_data
+      ├─extract_df_tables
+      ├─rename_join_col
+      └─create_new_column
+
+The Shiny app’s compare module
+([`mod_compare_server()`](https://mjfrigaard.github.io/dfdiffs/reference/mod_compare_server.md))
+orchestrates the four comparison functions
+([`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md),
+[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md),
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md),
+and
+[`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md)),
+and uses the `%nin%` helper to drop `join_column`, `data_source`, and
+`join_source` from the list of compared columns:
+
+``` r
+
+stackcallr::call_tree_dir("R", root = "mod_compare_server")
+```
+
+    █─mod_compare_server
+    ├─%nin%
+    ├─█─create_new_data
+    │ ├─rename_join_col
+    │ └─create_new_column
+    ├─█─create_deleted_data
+    │ ├─rename_join_col
+    │ └─create_new_column
+    ├─█─create_modified_data
+    │ ├─rename_join_col
+    │ └─create_new_column
+    └─█─create_changed_data
+      ├─extract_df_tables
+      ├─rename_join_col
+      └─create_new_column
+
 ### `$new_data`
 
 ``` r

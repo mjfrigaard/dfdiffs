@@ -8,7 +8,10 @@
 <title>changed-modified-data • dfdiffs</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Inter-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/IBM_Plex_Mono-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/Space_Grotesk-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="changed-modified-data">
 </head>
@@ -16,7 +19,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
@@ -45,6 +48,9 @@
     <li><a class="dropdown-item" href="../articles/multiple-comparisons.html">Multiple comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/similar-work.html">Similar work</a></li>
     <li><a class="dropdown-item" href="../articles/upload-data.html">Uploading data (shiny app)</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Development</h6></li>
+    <li><a class="dropdown-item" href="../articles/tests.html">Tests</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -473,13 +479,33 @@ one of the following conditions:</p>
 <code>cols</code></p></li>
 </ol>
 <div class="section level3">
+<h3 id="call-structure">Call structure<a class="anchor" aria-label="anchor" href="#call-structure"></a>
+</h3>
+<p><code><a href="../reference/create_changed_data.html">create_changed_data()</a></code> is built on
+<code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf()</a></code> (from another package, so it isn’t shown
+below). Within <code>dfdiffs</code>, it calls
+<code><a href="../reference/extract_df_tables.html">extract_df_tables()</a></code> to turn the <code>diffdf</code> output
+into tables, and the same <code><a href="../reference/rename_join_col.html">rename_join_col()</a></code> and
+<code><a href="../reference/create_new_column.html">create_new_column()</a></code> helpers used by the other comparison
+functions. The call tree below was generated from the package source
+with <a href="https://github.com/mjfrigaard/stackcallr" class="external-link">stackcallr</a>
+(<code>pak::pak("mjfrigaard/stackcallr")</code>); only functions defined
+in <code>dfdiffs</code> are shown.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">stackcallr</span><span class="fu">::</span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"create_changed_data"</span><span class="op">)</span></span></code></pre></div>
+<pre><code>█─create_changed_data
+├─extract_df_tables
+├─rename_join_col
+└─create_new_column</code></pre>
+</div>
+<div class="section level3">
 <h3 id="single-by-column-conditions">Single by column conditions<a class="anchor" aria-label="anchor" href="#single-by-column-conditions"></a>
 </h3>
 <div class="section level4">
 <h4 id="two-datasets">1) Two datasets<a class="anchor" aria-label="anchor" href="#two-datasets"></a>
 </h4>
 <p>compare all columns:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span><span class="op">)</span></span></code></pre></div>
@@ -737,7 +763,7 @@ entered_date
 <div class="section level4">
 <h4 id="multiple-columns-to-compare-cols">2) Multiple columns to compare (<code>cols</code>)<a class="anchor" aria-label="anchor" href="#multiple-columns-to-compare-cols"></a>
 </h4>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
@@ -841,7 +867,7 @@ Joint pain, stiffness and swelling
 <h4 id="single-by-column">3) Single <code>by</code> column<a class="anchor" aria-label="anchor" href="#single-by-column"></a>
 </h4>
 <p>No new column name</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
@@ -947,7 +973,7 @@ Joint pain, stiffness and swelling
 <h4 id="single-by-column-new-column-name-by_col">4) Single <code>by</code> column, new column name
 (<code>by_col</code>)<a class="anchor" aria-label="anchor" href="#single-by-column-new-column-name-by_col"></a>
 </h4>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
@@ -1054,7 +1080,7 @@ Joint pain, stiffness and swelling
 <h4 id="single-by-column-multiple-compare-columns-cols">5) Single <code>by</code> column, multiple compare columns
 (<code>cols</code>)<a class="anchor" aria-label="anchor" href="#single-by-column-multiple-compare-columns-cols"></a>
 </h4>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
@@ -1161,7 +1187,7 @@ Joint pain, stiffness and swelling
 <h4 id="single-by-column-new-column-name-by_col-multiple-compare-columns-cols">6) Single <code>by</code> column, new column name
 (<code>by_col</code>), multiple compare columns (<code>cols</code>)<a class="anchor" aria-label="anchor" href="#single-by-column-new-column-name-by_col-multiple-compare-columns-cols"></a>
 </h4>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
@@ -1272,7 +1298,7 @@ Joint pain, stiffness and swelling
 <div class="section level4">
 <h4 id="multiple-by-columns">7) Multiple <code>by</code> columns<a class="anchor" aria-label="anchor" href="#multiple-by-columns"></a>
 </h4>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
@@ -1378,7 +1404,7 @@ Joint pain, stiffness and swelling
 <h4 id="multiple-by-columns-new-column-name-by_col">8) Multiple <code>by</code> columns, new column name
 (<code>by_col</code>)<a class="anchor" aria-label="anchor" href="#multiple-by-columns-new-column-name-by_col"></a>
 </h4>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
@@ -1485,7 +1511,7 @@ Joint pain, stiffness and swelling
 <h4 id="multiple-by-columns-multiple-compare-columns-cols">9) Multiple <code>by</code> columns, multiple compare columns
 (<code>cols</code>)<a class="anchor" aria-label="anchor" href="#multiple-by-columns-multiple-compare-columns-cols"></a>
 </h4>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
@@ -1592,7 +1618,7 @@ Joint pain, stiffness and swelling
 <h4 id="multiple-by-columns-a-new-by_col-and-cols">10) Multiple <code>by</code> columns, a new <code>by_col</code>, and
 <code>cols</code><a class="anchor" aria-label="anchor" href="#multiple-by-columns-a-new-by_col-and-cols"></a>
 </h4>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
@@ -1705,10 +1731,27 @@ Joint pain, stiffness and swelling
 <p>Below we have the <code><a href="../reference/create_modified_data.html">create_modified_data()</a></code> function, which
 takes two data frames (<code>compare</code> and <code>base</code>), a
 <code>by</code> column, and the <code>cols</code> to compare.</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span><span class="va">compare</span>, <span class="va">base</span>, by <span class="op">=</span> <span class="cn">NULL</span>, by_col <span class="op">=</span> <span class="cn">NULL</span>, cols <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
 <p>We’ll test this function below on all ten possible conditions for
 <code>base</code> and <code>compare</code>.</p>
+<div class="section level3">
+<h3 id="call-structure-1">Call structure<a class="anchor" aria-label="anchor" href="#call-structure-1"></a>
+</h3>
+<p><code><a href="../reference/create_modified_data.html">create_modified_data()</a></code> is built on
+<code><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">arsenal::comparedf()</a></code> (from another package, so it isn’t
+shown below). Within <code>dfdiffs</code>, it calls
+<code><a href="../reference/rename_join_col.html">rename_join_col()</a></code> and <code><a href="../reference/create_new_column.html">create_new_column()</a></code> to
+build (and name) the join column. The call tree below was generated with
+<a href="https://github.com/mjfrigaard/stackcallr" class="external-link">stackcallr</a>
+(<code>pak::pak("mjfrigaard/stackcallr")</code>); only functions defined
+in <code>dfdiffs</code> are shown.</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">stackcallr</span><span class="fu">::</span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"create_modified_data"</span><span class="op">)</span></span></code></pre></div>
+<pre><code>█─create_modified_data
+├─rename_join_col
+└─create_new_column</code></pre>
+</div>
 <div class="section level3">
 <h3 id="single-joining-by-column-conditions">Single joining (<code>by</code>) column conditions<a class="anchor" aria-label="anchor" href="#single-joining-by-column-conditions"></a>
 </h3>
@@ -1718,7 +1761,7 @@ takes two data frames (<code>compare</code> and <code>base</code>), a
 <ul>
 <li>No <code>by</code> columns (only two datasets)</li>
 </ul>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span><span class="op">)</span></span></code></pre></div>
@@ -1986,7 +2029,7 @@ entered_date
 <li>No <code>by</code> columns (only two datasets) and multiple compare
 (<code>cols</code>)</li>
 </ul>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
@@ -2091,7 +2134,7 @@ Joint pain
 <code>InitialDataJoin</code> and <code>ChangedDataJoin</code>) datasets
 we created above.</li>
 </ul>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
@@ -2199,7 +2242,7 @@ Joint pain
 identifiers) and a new name for the <code>by_col</code>
 </li>
 </ul>
-<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
@@ -2307,7 +2350,7 @@ Joint pain
 <li>Single <code>by</code> column and multiple compare columns
 (<code>cols</code>)</li>
 </ul>
-<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
@@ -2416,7 +2459,7 @@ Joint pain
 (<code>by_col</code>), and multiple compare columns
 (<code>cols</code>)</li>
 </ul>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedDataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialDataJoin</span>, </span>
@@ -2530,7 +2573,7 @@ create a unique identifier between the two datasets.</p>
 <li>Multiple <code>by</code> columns (assuming the columns create a
 unique identifier).</li>
 </ul>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
@@ -2637,7 +2680,7 @@ columns.</p>
 </h4>
 <p>We can provide multiple <code>by</code> columns, a new
 <code>by_col</code>, and <strong>no <code>cols</code></strong></p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
@@ -2746,7 +2789,7 @@ Joint pain
 (<code>cols</code>), and <strong>no new
 <code>by_col</code></strong>.</li>
 </ul>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>
@@ -2856,7 +2899,7 @@ columns.</p>
 <li>We can provide multiple <code>by</code> columns, a new
 <code>by_col</code>, and multiple <code>cols</code>.</li>
 </ul>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_list</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span>, </span>

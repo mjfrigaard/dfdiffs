@@ -3,7 +3,6 @@
 ## Authors
 
 - **Martin Frigaard**. Author, maintainer.
-  [](https://orcid.org/YOUR-ORCID-ID)
 
 ## Citation
 

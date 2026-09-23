@@ -160,6 +160,31 @@ names(modified_cdf_sum)
 
 We’re only interested in the `diffs.byvar.table` and the `diffs.table`.
 
+### Call structure
+
+Within `dfdiffs`,
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
+calls
+[`rename_join_col()`](https://mjfrigaard.github.io/dfdiffs/reference/rename_join_col.md)
+and
+[`create_new_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_column.md)
+to build (and name) the join column; the comparison itself comes from
+[`arsenal::comparedf()`](https://mayoverse.github.io/arsenal/reference/comparedf.html)
+(from another package, so it isn’t shown below). The call tree below was
+generated from the package source with
+[stackcallr](https://github.com/mjfrigaard/stackcallr)
+(`pak::pak("mjfrigaard/stackcallr")`); only functions defined in
+`dfdiffs` are shown.
+
+``` r
+
+stackcallr::call_tree_dir("R", root = "create_modified_data")
+```
+
+    █─create_modified_data
+    ├─rename_join_col
+    └─create_new_column
+
 ### `comparedf()` -\> `diffs.byvar.table`
 
 ``` r

@@ -12,4 +12,5 @@
 - [modified-data](https://mjfrigaard.github.io/dfdiffs/articles/modified-data.md):
 - [multiple-comparisons](https://mjfrigaard.github.io/dfdiffs/articles/multiple-comparisons.md):
 - [similar-work](https://mjfrigaard.github.io/dfdiffs/articles/similar-work.md):
+- [tests](https://mjfrigaard.github.io/dfdiffs/articles/tests.md):
 - [upload-data](https://mjfrigaard.github.io/dfdiffs/articles/upload-data.md):

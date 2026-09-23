@@ -20,11 +20,11 @@ create_deleted_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 
 - by:
 
-  the joining bs4Dash::column between the two datasets
+  the joining column between the two datasets
 
 - by_col:
 
-  name of the new joining bs4Dash::column
+  name of the new joining column
 
 - cols:
 

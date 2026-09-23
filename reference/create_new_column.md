@@ -1,6 +1,6 @@
-# Create new (joining) bs4Dash::column
+# Create new (joining) column
 
-Create new (joining) bs4Dash::column
+Create new (joining) column
 
 ## Usage
 
@@ -16,16 +16,15 @@ create_new_column(data, cols, new_name, sep)
 
 - cols:
 
-  cols to create new bs4Dash::column from (they will be pasted together
-  with "-")
+  cols to create new column from (they will be pasted together with "-")
 
 - new_name:
 
-  new bs4Dash::column name
+  new column name
 
 ## Value
 
-new_col_data data with new bs4Dash::column
+new_col_data data with new column
 
 ## Examples
 

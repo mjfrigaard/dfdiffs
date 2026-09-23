@@ -225,6 +225,39 @@ create_comparison_report <- function(compare, base, by = NULL, by_col = NULL, co
 }
 ```
 
+### Call structure
+
+[`create_comparison_report()`](https://mjfrigaard.github.io/dfdiffs/reference/create_comparison_report.md)
+runs the new, deleted, and modified comparisons
+([`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md),
+[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md),
+and
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)),
+and uses
+[`create_empty_tbl()`](https://mjfrigaard.github.io/dfdiffs/reference/create_empty_tbl.md)
+to supply a placeholder table when there are no new or deleted rows to
+report. The call tree below was generated from the package source with
+[stackcallr](https://github.com/mjfrigaard/stackcallr)
+(`pak::pak("mjfrigaard/stackcallr")`); only functions defined in
+`dfdiffs` are shown.
+
+``` r
+
+stackcallr::call_tree_dir("R", root = "create_comparison_report")
+```
+
+    █─create_comparison_report
+    ├─█─create_new_data
+    │ ├─rename_join_col
+    │ └─create_new_column
+    ├─█─create_deleted_data
+    │ ├─rename_join_col
+    │ └─create_new_column
+    ├─█─create_modified_data
+    │ ├─rename_join_col
+    │ └─create_new_column
+    └─create_empty_tbl
+
 ### Test `create_comparison_report()`
 
 We test this below with `master20` and `master15`:

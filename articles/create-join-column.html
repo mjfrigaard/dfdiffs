@@ -8,7 +8,10 @@
 <title>create-join-column • dfdiffs</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Inter-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/IBM_Plex_Mono-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/Space_Grotesk-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="create-join-column">
 </head>
@@ -16,7 +19,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
@@ -45,6 +48,9 @@
     <li><a class="dropdown-item" href="../articles/multiple-comparisons.html">Multiple comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/similar-work.html">Similar work</a></li>
     <li><a class="dropdown-item" href="../articles/upload-data.html">Uploading data (shiny app)</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Development</h6></li>
+    <li><a class="dropdown-item" href="../articles/tests.html">Tests</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -125,6 +131,22 @@ of column inputs.</p>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 <div class="section level3">
+<h3 id="call-structure">Call structure<a class="anchor" aria-label="anchor" href="#call-structure"></a>
+</h3>
+<p><code><a href="../reference/create_join_column.html">create_join_column()</a></code> doesn’t call any other
+<code>dfdiffs</code> functions. Inside the Shiny app, it’s called by the
+select module (<code><a href="../reference/mod_select_server.html">mod_select_server()</a></code>) to build the
+<code>join_column</code> from the columns chosen in the <em>Select Join
+Columns</em> panel. The call tree below was generated from the package
+source with <a href="https://github.com/mjfrigaard/stackcallr" class="external-link">stackcallr</a>
+(<code>pak::pak("mjfrigaard/stackcallr")</code>); only functions defined
+in <code>dfdiffs</code> are shown.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">stackcallr</span><span class="fu">::</span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"mod_select_server"</span><span class="op">)</span></span></code></pre></div>
+<pre><code>█─mod_select_server
+└─create_join_column</code></pre>
+</div>
+<div class="section level3">
 <h3 id="test-data">Test data<a class="anchor" aria-label="anchor" href="#test-data"></a>
 </h3>
 <p>We will load some test data from the <code>Lahman</code> package to
@@ -133,14 +155,14 @@ demonstrate how this function works:</p>
 <h4 id="hall-of-fame-2010">Hall of Fame (2010)<a class="anchor" aria-label="anchor" href="#hall-of-fame-2010"></a>
 </h4>
 <p>Below is the Hall of Fame data from 2010.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lahman2010_files</span> <span class="op">&lt;-</span> <span class="st">"../inst/extdata/csv/2010-lahman/"</span></span>
 <span><span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/dir_tree.html" class="external-link">dir_tree</a></span><span class="op">(</span><span class="va">lahman2010_files</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB; font-weight: bold;">../inst/extdata/csv/2010-lahman/</span></span></span>
 <span><span class="co">#&gt; ├── Batting.csv</span></span>
 <span><span class="co">#&gt; ├── Fielding.csv</span></span>
 <span><span class="co">#&gt; └── Master.csv</span></span></code></pre></div>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lahman_2010_csv_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span></span>
 <span>  path <span class="op">=</span> <span class="va">lahman2010_files</span>, </span>
 <span>  full.names <span class="op">=</span> <span class="cn">TRUE</span>, </span>
@@ -188,14 +210,14 @@ demonstrate how this function works:</p>
 <h4 id="master-data-2015">Master data (2015)<a class="anchor" aria-label="anchor" href="#master-data-2015"></a>
 </h4>
 <p>And the ‘Master’ data from 2015.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lahman2015_files</span> <span class="op">&lt;-</span> <span class="st">"../inst/extdata/csv/2015-baseballdatabank/"</span></span>
 <span><span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/dir_tree.html" class="external-link">dir_tree</a></span><span class="op">(</span><span class="va">lahman2015_files</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB; font-weight: bold;">../inst/extdata/csv/2015-baseballdatabank/</span></span></span>
 <span><span class="co">#&gt; ├── <span style="color: #00BB00; font-weight: bold;">Batting.csv</span></span></span>
 <span><span class="co">#&gt; ├── <span style="color: #00BB00; font-weight: bold;">Fielding.csv</span></span></span>
 <span><span class="co">#&gt; └── Master.csv</span></span></code></pre></div>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">lahman_2015_csv_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">lahman2015_files</span>, </span>
 <span>                                    full.names <span class="op">=</span> <span class="cn">TRUE</span>, </span>
 <span>                                    pattern <span class="op">=</span> <span class="st">".csv$"</span><span class="op">)</span></span>
@@ -231,7 +253,7 @@ demonstrate how this function works:</p>
 <p>Assume we want to create a new join column for unique rows of
 <code>nameFirst</code>, <code>nameLast</code>, and
 <code>birthYear</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">join_master_2010</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_join_column.html">create_join_column</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">master_2010</span>, </span>
 <span>  join_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nameFirst"</span>, <span class="st">"nameLast"</span>, <span class="st">"birthYear"</span><span class="op">)</span>, </span>
 <span>  new_col_name <span class="op">=</span> <span class="st">"name_birth_year_id"</span><span class="op">)</span></span>

@@ -27,11 +27,11 @@ create_comparison_report(
 
 - by:
 
-  keys or joining bs4Dash::column
+  keys or joining column
 
 - by_col:
 
-  bs4Dash::column name for joining bs4Dash::column
+  column name for joining column
 
 - cols:
 

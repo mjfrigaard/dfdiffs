@@ -323,10 +323,46 @@ testthat::expect_equal(object = InitialData, expected = ChangedData)
 #> Error:
 #> ! Expected `InitialData` to equal `ChangedData`.
 #> Differences:
-#> Component "text_value_a": 2 string mismatches
-#> Component "text_value_b": 1 string mismatch
-#> Component "updated_date": Mean relative difference: 0.001492585
-#> Component "entered_date": Mean relative difference: 0.002698184
+#> actual vs expected
+#>                     text_value_a                       text_value_b updated_date entered_date
+#> - actual[1, ]   Issue unresolved Fatigue                              2021-09-29   2021-09-29
+#> + expected[1, ] Issue resolved   Fatigue                              2021-10-03   2021-11-30
+#> - actual[2, ]   Issue unresolved Fatigue                              2021-10-03   2021-10-29
+#> + expected[2, ] Issue resolved   Fatigue                              2021-11-27   2021-11-30
+#> - actual[3, ]   Issue resolved   Fever                                2021-09-02   2021-08-18
+#> + expected[3, ] Issue resolved   Fever                                2021-10-20   2021-11-21
+#> - actual[4, ]   Issue resolved   Joint pain                           2021-10-03   2021-10-03
+#> + expected[4, ] Issue resolved   Joint pain, stiffness and swelling   2021-10-13   2021-11-11
+#> - actual[5, ]   Issue resolved   Joint pain                           2021-09-20   2021-10-20
+#> + expected[5, ] Issue resolved   Joint pain                           2021-10-14   2021-11-16
+#> 
+#>     actual$text_value_a | expected$text_value_a    
+#> [1] "Issue unresolved"  - "Issue resolved"      [1]
+#> [2] "Issue unresolved"  - "Issue resolved"      [2]
+#> [3] "Issue resolved"    | "Issue resolved"      [3]
+#> [4] "Issue resolved"    | "Issue resolved"      [4]
+#> [5] "Issue resolved"    | "Issue resolved"      [5]
+#> 
+#>     actual$text_value_b | expected$text_value_b                   
+#> [1] "Fatigue"           | "Fatigue"                            [1]
+#> [2] "Fatigue"           | "Fatigue"                            [2]
+#> [3] "Fever"             | "Fever"                              [3]
+#> [4] "Joint pain"        - "Joint pain, stiffness and swelling" [4]
+#> [5] "Joint pain"        | "Joint pain"                         [5]
+#> 
+#>     actual$updated_date | expected$updated_date    
+#> [1] "2021-09-29"        - "2021-10-03"          [1]
+#> [2] "2021-10-03"        - "2021-11-27"          [2]
+#> [3] "2021-09-02"        - "2021-10-20"          [3]
+#> [4] "2021-10-03"        - "2021-10-13"          [4]
+#> [5] "2021-09-20"        - "2021-10-14"          [5]
+#> 
+#>     actual$entered_date | expected$entered_date    
+#> [1] "2021-09-29"        - "2021-11-30"          [1]
+#> [2] "2021-10-29"        - "2021-11-30"          [2]
+#> [3] "2021-08-18"        - "2021-11-21"          [3]
+#> [4] "2021-10-03"        - "2021-11-11"          [4]
+#> [5] "2021-10-20"        - "2021-11-16"          [5]
 ```
 
 ``` r
@@ -335,16 +371,91 @@ testthat::expect_equal(object = T1Data, expected = T2Data)
 #> Error:
 #> ! Expected `T1Data` to equal `T2Data`.
 #> Differences:
-#> Attributes: < Component "row.names": Numeric: lengths (6, 9) differ >
-#> Component "subject": Lengths (6, 9) differ (string compare on first 6)
-#> Component "subject": 5 string mismatches
-#> Component "record": Numeric: lengths (6, 9) differ
-#> Component "start_date": Numeric: lengths (6, 9) differ
-#> Component "mid_date": Numeric: lengths (6, 9) differ
-#> Component "end_date": Numeric: lengths (6, 9) differ
-#> Component "text_var": Lengths (6, 9) differ (string compare on first 6)
-#> Component "text_var": 5 string mismatches
-#> ...
+#>   `attr(actual, 'row.names')[4:6]`: 4 5 6      
+#> `attr(expected, 'row.names')[4:9]`: 4 5 6 7 8 9
+#> 
+#> actual vs expected
+#>                 subject record start_date   mid_date   end_date                                    text_var factor_var
+#> - actual[1, ]         A      1 2022-01-28 2022-03-20 2022-03-30 The birch canoe slid on the smooth planks.   food     
+#> + expected[1, ]       D      5 2022-01-30 2022-03-16 2022-03-26 Rice is often served in round bowls.         regard   
+#> - actual[2, ]         A      2 2022-01-25 2022-03-15 2022-03-29 Glue the sheet to the dark blue background.  most     
+#> + expected[2, ]       D      6 2022-01-27 2022-03-17 2022-03-31 The juice of lemons makes fine punch.        law      
+#> - actual[3, ]         B      3 2022-01-26 2022-03-19 2022-03-25 It's easy to tell the depth of a well.       park     
+#> + expected[3, ]       D      5 2022-04-04 2022-04-13 2022-04-22 Four hours of steady work faced us.          associate
+#>   actual[4, ]         C      4 2022-01-29 2022-03-18 2022-03-27 These days a chicken leg is a rare dish.     between  
+#> - actual[5, ]         D      5 2022-01-30 2022-03-16 2022-03-26 Rice is often served in round bowls.         regard   
+#> - actual[6, ]         D      6 2022-01-27 2022-03-17 2022-03-31 The juice of lemons makes fine punch.        law      
+#> + expected[5, ]       B      3 2022-01-26 2022-03-19 2022-03-25 It's easy to tell the depth of a well.       park     
+#> + expected[6, ]       B      4 2022-04-02 2022-04-14 2022-04-20 The hogs were fed chopped corn and garbage.  encourage
+#> + expected[7, ]       A      1 2022-01-28 2022-03-20 2022-03-30 The birch canoe slid on the smooth planks.   food     
+#> + expected[8, ]       A      2 2022-01-25 2022-03-15 2022-03-29 Glue the sheet to the dark blue background.  most     
+#> + expected[9, ]       A      2 2022-04-04 2022-04-15 2022-04-21 The box was thrown beside the parked truck.  pension  
+#> 
+#> `actual$subject`:   "A" "A" "B" "C" "D" "D"            
+#> `expected$subject`: "D" "D" "D" "C" "B" "B" "A" "A" "A"
+#> 
+#>   `actual$record`: 1 2 3 4 5 6      
+#> `expected$record`: 5 6 5 4 3 4 1 2 2
+#> 
+#>     actual$start_date | expected$start_date    
+#> [1] "2022-01-28"      - "2022-01-30"        [1]
+#> [2] "2022-01-25"      - "2022-01-27"        [2]
+#> [3] "2022-01-26"      - "2022-04-04"        [3]
+#> [4] "2022-01-29"      | "2022-01-29"        [4]
+#> [5] "2022-01-30"      - "2022-01-26"        [5]
+#> [6] "2022-01-27"      - "2022-04-02"        [6]
+#>                       - "2022-01-28"        [7]
+#>                       - "2022-01-25"        [8]
+#>                       - "2022-04-04"        [9]
+#> 
+#>     actual$mid_date | expected$mid_date    
+#> [1] "2022-03-20"    - "2022-03-16"      [1]
+#> [2] "2022-03-15"    - "2022-03-17"      [2]
+#> [3] "2022-03-19"    - "2022-04-13"      [3]
+#> [4] "2022-03-18"    | "2022-03-18"      [4]
+#> [5] "2022-03-16"    - "2022-03-19"      [5]
+#> [6] "2022-03-17"    - "2022-04-14"      [6]
+#>                     - "2022-03-20"      [7]
+#>                     - "2022-03-15"      [8]
+#>                     - "2022-04-15"      [9]
+#> 
+#>     actual$end_date | expected$end_date    
+#> [1] "2022-03-30"    - "2022-03-26"      [1]
+#> [2] "2022-03-29"    - "2022-03-31"      [2]
+#> [3] "2022-03-25"    - "2022-04-22"      [3]
+#> [4] "2022-03-27"    | "2022-03-27"      [4]
+#> [5] "2022-03-26"    - "2022-03-25"      [5]
+#> [6] "2022-03-31"    - "2022-04-20"      [6]
+#>                     - "2022-03-30"      [7]
+#>                     - "2022-03-29"      [8]
+#>                     - "2022-04-21"      [9]
+#> 
+#> actual$text_var vs expected$text_var
+#> - "The birch canoe slid on the smooth planks."
+#> + "Rice is often served in round bowls."
+#> - "Glue the sheet to the dark blue background."
+#> + "The juice of lemons makes fine punch."
+#> - "It's easy to tell the depth of a well."
+#> + "Four hours of steady work faced us."
+#>   "These days a chicken leg is a rare dish."
+#> - "Rice is often served in round bowls."
+#> - "The juice of lemons makes fine punch."
+#> + "It's easy to tell the depth of a well."
+#> + "The hogs were fed chopped corn and garbage."
+#> + "The birch canoe slid on the smooth planks."
+#> + "Glue the sheet to the dark blue background."
+#> + "The box was thrown beside the parked truck."
+#> 
+#>     actual$factor_var | expected$factor_var    
+#> [1] "food"            - "regard"            [1]
+#> [2] "most"            - "law"               [2]
+#> [3] "park"            - "associate"         [3]
+#> [4] "between"         | "between"           [4]
+#> [5] "regard"          - "park"              [5]
+#> [6] "law"             - "encourage"         [6]
+#>                       - "food"              [7]
+#>                       - "most"              [8]
+#>                       - "pension"           [9]
 ```
 
 ### `vetr::alike()`
