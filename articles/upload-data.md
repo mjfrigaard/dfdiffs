@@ -145,6 +145,48 @@ upload_data <- function(path, sheet = NULL) {
 }
 ```
 
+### Call structure
+
+[`upload_data()`](https://mjfrigaard.github.io/dfdiffs/reference/upload_data.md)
+reads Excel workbooks (`.xlsx`) with
+[`readxl::read_excel()`](https://readxl.tidyverse.org/reference/read_excel.html)
+and hands every other file type to
+[`load_flat_file()`](https://mjfrigaard.github.io/dfdiffs/reference/load_flat_file.md),
+which picks the reader from the file extension. In the Shiny app, the
+upload module
+([`mod_upload_server()`](https://mjfrigaard.github.io/dfdiffs/reference/mod_upload_server.md))
+calls
+[`upload_data()`](https://mjfrigaard.github.io/dfdiffs/reference/upload_data.md).
+The call trees below were generated from the package source with
+[stackcallr](https://github.com/mjfrigaard/stackcallr)
+(`pak::pak("mjfrigaard/stackcallr")`); only functions defined in
+`dfdiffs` are shown.
+
+``` r
+
+stackcallr::call_tree_dir("R", root = "mod_upload_server")
+```
+
+    █─mod_upload_server
+    └─█─upload_data
+      └─load_flat_file
+
+The upload demo app
+([`launch_upload_demo()`](https://mjfrigaard.github.io/dfdiffs/reference/launch_upload_demo.md))
+shows the module’s UI and server sides together:
+
+``` r
+
+stackcallr::call_tree_dir("R", root = "launch_upload_demo")
+```
+
+    █─launch_upload_demo
+    ├─dfdiffs_fresh_theme
+    ├─mod_upload_ui
+    └─█─mod_upload_server
+      └─█─upload_data
+        └─load_flat_file
+
 ### 2010 Lahamn CSVs
 
 ``` r

@@ -103,7 +103,7 @@ base_dfs |> str()
 #>   .. ..   birthMonth = col_double(),
 #>   .. ..   birthDay = col_double()
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x560b03474b30> 
+#>   ..- attr(*, "problems")=<pointer: 0x556c759cc640> 
 #>  $ PlayerDebut.csv: spc_tbl_ [20,673 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
 #>   ..$ playerID: chr [1:20673] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...
 #>   ..$ debut   : Date[1:20673], format: "2004-04-06" "1954-04-13" ...
@@ -112,7 +112,7 @@ base_dfs |> str()
 #>   .. ..   playerID = col_character(),
 #>   .. ..   debut = col_date(format = "")
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x560afa8fef70> 
+#>   ..- attr(*, "problems")=<pointer: 0x556c78cc51b0> 
 #>  $ PlayerName.csv : spc_tbl_ [20,673 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
 #>   ..$ playerID : chr [1:20673] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...
 #>   ..$ nameGiven: chr [1:20673] "David Allan" "Henry Louis" "Tommie Lee" "Donald William" ...
@@ -121,7 +121,7 @@ base_dfs |> str()
 #>   .. ..   playerID = col_character(),
 #>   .. ..   nameGiven = col_character()
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x560b02b8f4c0>
+#>   ..- attr(*, "problems")=<pointer: 0x556c77550930>
 ```
 
 #### Import compare dfs
@@ -150,7 +150,7 @@ compare_dfs |> str()
 #>   .. ..   birthMonth = col_double(),
 #>   .. ..   birthDay = col_double()
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x560b04955c80> 
+#>   ..- attr(*, "problems")=<pointer: 0x556c7db2f4c0> 
 #>  $ PlayerDebut.csv: spc_tbl_ [20,370 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
 #>   ..$ playerID: chr [1:20370] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...
 #>   ..$ debut   : Date[1:20370], format: "2004-04-06" "1954-04-13" ...
@@ -159,7 +159,7 @@ compare_dfs |> str()
 #>   .. ..   playerID = col_character(),
 #>   .. ..   debut = col_date(format = "")
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x560b05c715d0> 
+#>   ..- attr(*, "problems")=<pointer: 0x556c79bc5840> 
 #>  $ PlayerName.csv : spc_tbl_ [20,370 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
 #>   ..$ playerID : chr [1:20370] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...
 #>   ..$ nameGiven: chr [1:20370] "David Allan" "Henry Louis" "Tommie Lee" "Donald William" ...
@@ -168,7 +168,7 @@ compare_dfs |> str()
 #>   .. ..   playerID = col_character(),
 #>   .. ..   nameGiven = col_character()
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x560b0534f0e0>
+#>   ..- attr(*, "problems")=<pointer: 0x556c78c99e90>
 ```
 
 ## Iteration

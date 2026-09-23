@@ -140,6 +140,34 @@ Each comparison function in the `dfdiffs` package assumes `base` and
 
 10. Multiple `by` columns, a new `by_col`, and `cols`
 
+### Call structure
+
+[`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md)
+is built on
+[`diffdf::diffdf()`](https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html)
+(from another package, so it isn’t shown below). Within `dfdiffs`, it
+calls
+[`extract_df_tables()`](https://mjfrigaard.github.io/dfdiffs/reference/extract_df_tables.md)
+to turn the `diffdf` output into tables, and the same
+[`rename_join_col()`](https://mjfrigaard.github.io/dfdiffs/reference/rename_join_col.md)
+and
+[`create_new_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_column.md)
+helpers used by the other comparison functions. The call tree below was
+generated from the package source with
+[stackcallr](https://github.com/mjfrigaard/stackcallr)
+(`pak::pak("mjfrigaard/stackcallr")`); only functions defined in
+`dfdiffs` are shown.
+
+``` r
+
+stackcallr::call_tree_dir("R", root = "create_changed_data")
+```
+
+    █─create_changed_data
+    ├─extract_df_tables
+    ├─rename_join_col
+    └─create_new_column
+
 ### Single by column conditions
 
 #### 1) Two datasets
@@ -315,6 +343,30 @@ create_modified_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 
 We’ll test this function below on all ten possible conditions for `base`
 and `compare`.
+
+### Call structure
+
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
+is built on
+[`arsenal::comparedf()`](https://mayoverse.github.io/arsenal/reference/comparedf.html)
+(from another package, so it isn’t shown below). Within `dfdiffs`, it
+calls
+[`rename_join_col()`](https://mjfrigaard.github.io/dfdiffs/reference/rename_join_col.md)
+and
+[`create_new_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_column.md)
+to build (and name) the join column. The call tree below was generated
+with [stackcallr](https://github.com/mjfrigaard/stackcallr)
+(`pak::pak("mjfrigaard/stackcallr")`); only functions defined in
+`dfdiffs` are shown.
+
+``` r
+
+stackcallr::call_tree_dir("R", root = "create_modified_data")
+```
+
+    █─create_modified_data
+    ├─rename_join_col
+    └─create_new_column
 
 ### Single joining (`by`) column conditions
 

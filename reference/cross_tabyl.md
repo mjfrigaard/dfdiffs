@@ -17,7 +17,7 @@ cross_tabyl(df, col)
 
 - col:
 
-  a bs4Dash::column with categorical or factor data
+  a column with categorical or factor data
 
 ## Value
 

@@ -20,12 +20,12 @@ create_changed_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 
 - by:
 
-  A join bs4Dash::column between the two datasets, or any combination of
-  columns that constitute a unique row.
+  A join column between the two datasets, or any combination of columns
+  that constitute a unique row.
 
 - by_col:
 
-  A new name for the joining bs4Dash::column.
+  A new name for the joining column.
 
 - cols:
 

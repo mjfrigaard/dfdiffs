@@ -1,6 +1,6 @@
-# Rename join bs4Dash::column name
+# Rename join column name
 
-Rename join bs4Dash::column name
+Rename join column name
 
 ## Usage
 
@@ -16,11 +16,11 @@ rename_join_col(data, by, by_col)
 
 - by:
 
-  join bs4Dash::column name
+  join column name
 
 - by_col:
 
-  new join bs4Dash::column name
+  new join column name
 
 ## Value
 

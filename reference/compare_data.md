@@ -20,11 +20,11 @@ compare_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 
 - by:
 
-  join bs4Dash::column
+  join column
 
 - by_col:
 
-  new join bs4Dash::column name
+  new join column name
 
 - cols:
 

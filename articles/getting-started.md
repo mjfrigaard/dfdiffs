@@ -48,6 +48,106 @@ We have functions for answering each of the questions posed above. Each
 function has a pair of datasets to demonstrate how they work (which
 we’ll cover below).
 
+#### Call structure
+
+The four comparison functions below are built from a few small helpers,
+and the same functions power the package’s Shiny app. The call trees in
+this section were generated from the package source with
+[stackcallr](https://github.com/mjfrigaard/stackcallr)
+(`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in
+`dfdiffs` are shown: calls to other packages (like
+[`diffdf::diffdf()`](https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html)
+or
+[`arsenal::comparedf()`](https://mayoverse.github.io/arsenal/reference/comparedf.html))
+aren’t followed.
+
+``` r
+
+library(stackcallr)
+call_tree_dir("R", root = "create_new_data")
+call_tree_dir("R", root = "create_deleted_data")
+call_tree_dir("R", root = "create_changed_data")
+call_tree_dir("R", root = "create_modified_data")
+```
+
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md),
+[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)
+and
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
+each call
+[`rename_join_col()`](https://mjfrigaard.github.io/dfdiffs/reference/rename_join_col.md)
+and
+[`create_new_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_column.md)
+to build (and name) the join column:
+
+    █─create_new_data
+    ├─rename_join_col
+    └─create_new_column
+
+    █─create_deleted_data
+    ├─rename_join_col
+    └─create_new_column
+
+    █─create_modified_data
+    ├─rename_join_col
+    └─create_new_column
+
+[`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md)
+uses the same helpers, plus
+[`extract_df_tables()`](https://mjfrigaard.github.io/dfdiffs/reference/extract_df_tables.md)
+to turn the output of
+[`diffdf::diffdf()`](https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html)
+into tables:
+
+    █─create_changed_data
+    ├─extract_df_tables
+    ├─rename_join_col
+    └─create_new_column
+
+The Shiny app
+([`launch_app()`](https://mjfrigaard.github.io/dfdiffs/reference/launch_app.md))
+wires these functions together with three modules (upload, select, and
+compare), each with a UI function and a server function.
+[`app_ui()`](https://mjfrigaard.github.io/dfdiffs/reference/app_ui.md)
+and
+[`app_server()`](https://mjfrigaard.github.io/dfdiffs/reference/app_server.md)
+assemble the modules, and
+[`dfdiffs_fresh_theme()`](https://mjfrigaard.github.io/dfdiffs/reference/dfdiffs_fresh_theme.md)
+supplies the app’s theme:
+
+``` r
+
+call_tree_dir("R", root = "launch_app")
+```
+
+    █─launch_app
+    ├─█─app_ui
+    │ ├─dfdiffs_fresh_theme
+    │ ├─mod_upload_ui
+    │ ├─mod_select_ui
+    │ └─mod_compare_ui
+    └─█─app_server
+      ├─█─mod_upload_server
+      │ └─█─upload_data
+      │   └─load_flat_file
+      ├─█─mod_select_server
+      │ └─create_join_column
+      └─█─mod_compare_server
+        ├─%nin%
+        ├─█─create_new_data
+        │ ├─rename_join_col
+        │ └─create_new_column
+        ├─█─create_deleted_data
+        │ ├─rename_join_col
+        │ └─create_new_column
+        ├─█─create_modified_data
+        │ ├─rename_join_col
+        │ └─create_new_column
+        └─█─create_changed_data
+          ├─extract_df_tables
+          ├─rename_join_col
+          └─create_new_column
+
 ### *What rows are here now that weren’t here before?*
 
 To check new data, we’re going to use `T1Data` and `T2Data`.

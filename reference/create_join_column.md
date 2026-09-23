@@ -20,7 +20,7 @@ create_join_column(df, by_colums, new_by_column_name)
 
 - new_by_column_name:
 
-  the new bs4Dash::column name
+  the new column name
 
 ## Value
 

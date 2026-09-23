@@ -8,7 +8,10 @@
 <title>getting-started • dfdiffs</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Inter-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/IBM_Plex_Mono-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/Space_Grotesk-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="getting-started">
 </head>
@@ -16,7 +19,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="dark" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
@@ -45,6 +48,9 @@
     <li><a class="dropdown-item" href="../articles/multiple-comparisons.html">Multiple comparisons</a></li>
     <li><a class="dropdown-item" href="../articles/similar-work.html">Similar work</a></li>
     <li><a class="dropdown-item" href="../articles/upload-data.html">Uploading data (shiny app)</a></li>
+    <li><hr class="dropdown-divider"></li>
+    <li><h6 class="dropdown-header" data-toc-skip>Development</h6></li>
+    <li><a class="dropdown-item" href="../articles/tests.html">Tests</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
@@ -120,6 +126,77 @@ goal of <code>dfdiffs</code> is to answer the following questions:</p>
 <p>We have functions for answering each of the questions posed above.
 Each function has a pair of datasets to demonstrate how they work (which
 we’ll cover below).</p>
+<div class="section level4">
+<h4 id="call-structure">Call structure<a class="anchor" aria-label="anchor" href="#call-structure"></a>
+</h4>
+<p>The four comparison functions below are built from a few small
+helpers, and the same functions power the package’s Shiny app. The call
+trees in this section were generated from the package source with <a href="https://github.com/mjfrigaard/stackcallr" class="external-link">stackcallr</a>
+(<code>pak::pak("mjfrigaard/stackcallr")</code>). Only functions defined
+in <code>dfdiffs</code> are shown: calls to other packages (like
+<code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf()</a></code> or <code><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">arsenal::comparedf()</a></code>)
+aren’t followed.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">stackcallr</span><span class="op">)</span></span>
+<span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"create_new_data"</span><span class="op">)</span></span>
+<span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"create_deleted_data"</span><span class="op">)</span></span>
+<span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"create_changed_data"</span><span class="op">)</span></span>
+<span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"create_modified_data"</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="../reference/create_new_data.html">create_new_data()</a></code>, <code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code>
+and <code><a href="../reference/create_modified_data.html">create_modified_data()</a></code> each call
+<code><a href="../reference/rename_join_col.html">rename_join_col()</a></code> and <code><a href="../reference/create_new_column.html">create_new_column()</a></code> to
+build (and name) the join column:</p>
+<pre><code>█─create_new_data
+├─rename_join_col
+└─create_new_column</code></pre>
+<pre><code>█─create_deleted_data
+├─rename_join_col
+└─create_new_column</code></pre>
+<pre><code>█─create_modified_data
+├─rename_join_col
+└─create_new_column</code></pre>
+<p><code><a href="../reference/create_changed_data.html">create_changed_data()</a></code> uses the same helpers, plus
+<code><a href="../reference/extract_df_tables.html">extract_df_tables()</a></code> to turn the output of
+<code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf()</a></code> into tables:</p>
+<pre><code>█─create_changed_data
+├─extract_df_tables
+├─rename_join_col
+└─create_new_column</code></pre>
+<p>The Shiny app (<code><a href="../reference/launch_app.html">launch_app()</a></code>) wires these functions
+together with three modules (upload, select, and compare), each with a
+UI function and a server function. <code><a href="../reference/app_ui.html">app_ui()</a></code> and
+<code><a href="../reference/app_server.html">app_server()</a></code> assemble the modules, and
+<code><a href="../reference/dfdiffs_fresh_theme.html">dfdiffs_fresh_theme()</a></code> supplies the app’s theme:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"launch_app"</span><span class="op">)</span></span></code></pre></div>
+<pre><code>█─launch_app
+├─█─app_ui
+│ ├─dfdiffs_fresh_theme
+│ ├─mod_upload_ui
+│ ├─mod_select_ui
+│ └─mod_compare_ui
+└─█─app_server
+  ├─█─mod_upload_server
+  │ └─█─upload_data
+  │   └─load_flat_file
+  ├─█─mod_select_server
+  │ └─create_join_column
+  └─█─mod_compare_server
+    ├─%nin%
+    ├─█─create_new_data
+    │ ├─rename_join_col
+    │ └─create_new_column
+    ├─█─create_deleted_data
+    │ ├─rename_join_col
+    │ └─create_new_column
+    ├─█─create_modified_data
+    │ ├─rename_join_col
+    │ └─create_new_column
+    └─█─create_changed_data
+      ├─extract_df_tables
+      ├─rename_join_col
+      └─create_new_column</code></pre>
+</div>
 </div>
 <div class="section level3">
 <h3 id="what-rows-are-here-now-that-werent-here-before">
@@ -127,7 +204,7 @@ we’ll cover below).</p>
 </h3>
 <p>To check new data, we’re going to use <code>T1Data</code> and
 <code>T2Data</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">T1Data</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/T1Data.html">T1Data</a></span></span>
 <span><span class="va">T2Data</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/T2Data.html">T2Data</a></span></span>
 <span><span class="va">NewData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/NewData.html">NewData</a></span></span></code></pre></div>
@@ -1218,7 +1295,7 @@ we’ll cover below).</p>
 </h4>
 <p>The <code><a href="../reference/create_new_data.html">create_new_data()</a></code> function shows us the ‘new data’
 (i.e. what is here now that wasn’t here before?)</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2Data</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1Data</span><span class="op">)</span></span></code></pre></div>
@@ -2229,7 +2306,7 @@ should match the output from <code><a href="../reference/create_new_data.html">c
 <p>To test for the deleted data, we use the <code>CompleteData</code>,
 <code>IncompleteData</code>, and check these with
 <code>DeletedData</code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">CompleteData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/CompleteData.html">CompleteData</a></span></span>
 <span><span class="va">IncompleteData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/IncompleteData.html">IncompleteData</a></span></span>
 <span><span class="va">DeletedData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/DeletedData.html">DeletedData</a></span></span></code></pre></div>
@@ -3319,7 +3396,7 @@ should match the output from <code><a href="../reference/create_new_data.html">c
 <p>When we run the <code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code>, we check for the
 deleted rows between <code>IncompleteData</code> and
 <code>CompleteData</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_deleted_data.html">create_deleted_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">IncompleteData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">CompleteData</span><span class="op">)</span> </span></code></pre></div>
@@ -4361,7 +4438,7 @@ package</a> package.</p></li>
 </ul>
 <p>To check for changes between two datasets, we use the
 <code>InitialData</code> and <code>ChangedData</code>.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">InitialData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/InitialData.html">InitialData</a></span></span>
 <span><span class="va">ChangedData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/ChangedData.html">ChangedData</a></span></span></code></pre></div>
 <div class="section level4">
@@ -5409,7 +5486,7 @@ package</a> package.</p></li>
 <code>create_changed_data()</code><a class="anchor" aria-label="anchor" href="#create_changed_data"></a>
 </h4>
 <p><code><a href="../reference/create_changed_data.html">create_changed_data()</a></code> creates a list of tables.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">changed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>,</span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span><span class="op">)</span></span>
@@ -6461,7 +6538,7 @@ package</a> package.</p></li>
 </h4>
 <p>The <code><a href="../reference/create_modified_data.html">create_modified_data()</a></code> function also creates a list
 of tables.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modified</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>,</span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span><span class="op">)</span></span>
