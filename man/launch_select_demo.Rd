@@ -10,5 +10,7 @@ launch_select_demo()
 demo of the select module (\code{mod_select_ui()}/\code{mod_select_server()})
 }
 \examples{
+\dontrun{
 launch_select_demo()
+}
 }

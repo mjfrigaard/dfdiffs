@@ -11,7 +11,7 @@ app_ui <- function() {
   bslib::page_navbar(
     title = "dfdiffs",
     theme = compare_theme,
-    navbar_options = bslib::navbar_options(bg = "#12151A", theme = "dark"),
+    navbar_options = bslib::navbar_options(bg = "#011627", theme = "dark"),
     # 1) upload data -----
     bslib::nav_panel(
       title = "1) Upload Data",
@@ -84,7 +84,9 @@ app_server <- function(input, output, session) {
 #'   app (upload, select, and compare two datasets)
 #'
 #' @examples
+#' \dontrun{
 #' launch_app()
+#' }
 launch_app <- function(options = list()) {
   # NOTE: base::options() is namespaced here because `options` is also this
   # function's argument name (the Shiny options list passed to shinyApp()).

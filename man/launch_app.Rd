@@ -17,5 +17,7 @@ Standalone launcher for the production \code{dfdiffs} comparison
 app (upload, select, and compare two datasets)
 }
 \examples{
+\dontrun{
 launch_app()
+}
 }

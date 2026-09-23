@@ -69,7 +69,7 @@ mod_compare_ui <- function(id, dev = FALSE) {
       # New Data ------
       bslib::nav_panel(
         title = "New Data",
-        icon = icon("plus", style = "color:#1E7F4F;"),
+        icon = icon("plus", style = "color:#2EC4B6;"),
         h5(
           "Rows in ", code("compare"), " not found in ", code("base"), ":"
         ),
@@ -87,7 +87,7 @@ mod_compare_ui <- function(id, dev = FALSE) {
       # Deleted Data ------
       bslib::nav_panel(
         title = "Deleted Data",
-        icon = icon("minus", style = "color:#B3261E;"),
+        icon = icon("minus", style = "color:#FF6F3C;"),
         h5(
           "Rows in ", code("base"), " not found in ", code("compare"), ":"
         ),
@@ -105,7 +105,7 @@ mod_compare_ui <- function(id, dev = FALSE) {
       # Changed Data ------
       bslib::nav_panel(
         title = "Changed Data",
-        icon = icon("pen", style = "color:#B4740E;"),
+        icon = icon("pen", style = "color:#8A6D00;"),
         h5(
           "Values that differ between ", code("base"), " and ", code("compare"), ":"
         ),
@@ -134,7 +134,7 @@ mod_compare_ui <- function(id, dev = FALSE) {
       # Review Changes ------
       bslib::nav_panel(
         title = "Review Changes",
-        icon = icon("magnifying-glass", style = "color:#B4740E;"),
+        icon = icon("magnifying-glass", style = "color:#8A6D00;"),
         h5(
           "Row-by-row changes between ", code("base"), " and ", code("compare"),
           bslib::tooltip(
@@ -301,7 +301,7 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
         bordered = TRUE,
         defaultPageSize = 5,
         theme = reactable::reactableTheme(
-          color = "#4A2E83",
+          color = "#011627",
           borderColor = "#e5eaee",
           stripedColor = "#f6f8fa",
           highlightColor = "#f0f5f9",

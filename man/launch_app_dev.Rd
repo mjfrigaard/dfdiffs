@@ -11,5 +11,7 @@ dev variant of \code{launch_app()} with the modules' debug
 reactive-value outputs turned on (\code{dev = TRUE})
 }
 \examples{
+\dontrun{
 launch_app_dev()
+}
 }
