@@ -1,0 +1,24 @@
+{
+  "permission": {
+    "read": {
+      "*/HEAD": "allow",
+      "*/COMMIT_EDITMSG": "allow"
+    },
+    "bash": {
+      "Rscript *": "allow",
+      "tail *": "allow",
+      "which *": "allow",
+      "pandoc *": "allow",
+      "head *": "allow",
+      "echo *": "allow",
+      "ls *": "allow",
+      "/opt/quarto/bin/quarto *": "allow"
+    },
+    "executeCode": {
+      "*": "allow"
+    },
+    "edit": {
+      "*.R": "allow"
+    }
+  }
+}

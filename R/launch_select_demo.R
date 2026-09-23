@@ -6,7 +6,9 @@
 #' @description demo of the select module (\code{mod_select_ui()}/\code{mod_select_server()})
 #'
 #' @examples
+#' \dontrun{
 #' launch_select_demo()
+#' }
 launch_select_demo <- function() {
   select_data_theme <- dfdiffs_fresh_theme()
   ui <- bslib::page_navbar(

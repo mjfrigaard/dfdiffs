@@ -7,13 +7,15 @@
 #'   reactive-value outputs turned on (\code{dev = TRUE})
 #'
 #' @examples
+#' \dontrun{
 #' launch_app_dev()
+#' }
 launch_app_dev <- function() {
   compare_theme <- dfdiffs_fresh_theme()
   ui <- bslib::page_navbar(
     title = "(dev) dfdiffs",
     theme = compare_theme,
-    navbar_options = bslib::navbar_options(bg = "#12151A", theme = "dark"),
+    navbar_options = bslib::navbar_options(bg = "#011627", theme = "dark"),
     # 1) upload data -----
     bslib::nav_panel(
       title = "1) Upload Data",

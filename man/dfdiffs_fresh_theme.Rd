@@ -10,7 +10,7 @@ dfdiffs_fresh_theme()
 a \code{bslib::bs_theme()} object
 }
 \description{
-A diff-tool inspired bslib theme: ink/paper neutrals, a
-violet brand accent, and semantically correct add/delete/change colors
-(green/red/amber) for the New, Deleted, and Changed Data sections.
+Atomic Age Space Race bslib theme: deep-space-navy/brushed-
+aluminum neutrals, and rocket-orange/atomic-teal/golden-yellow accents
+for the Deleted, New, and Changed Data sections.
 }
