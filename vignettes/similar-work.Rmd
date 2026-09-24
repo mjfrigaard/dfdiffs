@@ -28,57 +28,53 @@ extdata_folder <- "../inst/extdata/"
 
 # Motivation 
 
-This vignette covers similar functions/packages that compare two datasets to each other. 
+This vignette covers similar functions and packages that compare two datasets to each other.
 
-## Packages 
+## Packages
 
-Our package
+Load `dfdiffs`:
 
 ```{r dfdiffs, echo = TRUE}
 library(dfdiffs)
 ```
 
-Packages for import/export, iteration, wrangling, etc. 
+We'll also need packages for import/export, iteration, and wrangling:
 
 ```{r more-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
 library(readr)
-library(dplyr)
-library(tidyr)
 library(stringr)
 library(purrr)
 library(glue)
 ```
 
-Packages for tables.
+These packages are for building tables:
 
 ```{r tbl-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
 library(labelled)
-library(gt)
 library(gtsummary)
 library(kableExtra)
 ```
 
 
-Similar packages 
+These packages offer similar comparison functions:
 
 ```{r similar-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
 library(janitor) # compare_df_cols
 library(testthat) # expect_equal
 library(vetr) # alike
 library(labelled)
-library(gt)
 library(gtsummary)
 ```
 
 ## Data 
 
-We'll be using the data in this package to cover similar `packages::functions()`. 
+We'll use the data in this package to cover similar `packages::functions()`.
 
 ### New data
 
-To check new data, we're going to use `T1Data` and `T2Data`. The `create_new_data()` function shows us the 'new data' (i.e. what is here now that wasn't here before?)
+To check for new data, we'll use `T1Data` and `T2Data`. The `create_new_data()` function returns the 'new data' (i.e., the rows that are here now but weren't here before).
 
-We can check this against the `NewData` dataset (which should match the output from `create_new_data()`)
+We can check this against the `NewData` dataset, which should match the output from `create_new_data()`.
 
 ```{r T1Data-T2Data-NewData, echo=TRUE}
 T1Data <- dfdiffs::T1Data
@@ -106,9 +102,9 @@ waldo::compare(x = T1T2New, y = NewData)
 
 ###  Deleted data 
 
-To test for the deleted data, we use the `CompleteData`, `IncompleteData`, and `DeletedData`. 
+To test for deleted data, we'll use `CompleteData`, `IncompleteData`, and `DeletedData`.
 
-`CompleteData` represents a 'complete' set of data, 
+`CompleteData` represents a 'complete' set of data.
 
 ```{r CompleteData}
 CompleteData <- dfdiffs::CompleteData
@@ -118,7 +114,7 @@ CompleteData |>
 ```
 
 
-and `IncompleteData` is a dataset with rows removed from `CompleteData`. 
+`IncompleteData` is a dataset with rows removed from `CompleteData`.
 
 ```{r IncompleteData}
 IncompleteData <- dfdiffs::IncompleteData
@@ -128,7 +124,7 @@ IncompleteData |>
 ```
 
 
-When we run the `create_deleted_data()`, we check for the deleted rows between `IncompleteData` and `CompleteData`.
+Running `create_deleted_data()` checks for rows that were deleted between `CompleteData` and `IncompleteData`.
 
 ```{r CompleteData-IncompleteData, echo = TRUE}
 IncompCompDiff <- create_deleted_data(
@@ -140,7 +136,7 @@ IncompCompDiff |>
   kableExtra::kable_paper()
 ```
 
-This is identical to the data stored in `DeletedData`
+The output above is identical to the data stored in `DeletedData`.
 
 ```{r DeletedData}
 DeletedData <- dfdiffs::DeletedData
@@ -149,14 +145,15 @@ DeletedData |>
   kableExtra::kable_paper()
 ```
 
+We can confirm this with `waldo::compare()`:
 
 ```{r waldo-compare-IncompCompDiff-DeletedData}
 waldo::compare(x = IncompCompDiff, y = DeletedData)
 ```
 
-### InitialData/ChangedData Data 
+### Changed data
 
-To check for changes between two datasets, we uses the `InitialData` and `ChangedData`. 
+To check for changes between two datasets, we'll use `InitialData` and `ChangedData`.
 
 ```{r InitialData-ChangedData, echo=TRUE}
 InitialData <- dfdiffs::InitialData
@@ -192,11 +189,11 @@ compare_df_cols_same(CompleteData, IncompleteData, strict_description = FALSE)
 compare_df_cols_same(InitialData, ChangedData, strict_description = FALSE)
 ```
 
-All of our test datasets meet this condition, but this could be used as a step in one our `create_` functions (to see if they can be successfully bound together).
+All of our test datasets meet this condition, but this check could be used as a step in one of our `create_` functions (to confirm the datasets can be bound together).
 
 ## `testthat::expect_equal()`
 
-This works, but returns the result as an error. 
+This works, but it returns the result as an error.
 
 ```{r expect_equal-initial-changed, error=TRUE}
 testthat::expect_equal(object = InitialData, expected = ChangedData)

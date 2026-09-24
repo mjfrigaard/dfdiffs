@@ -12,15 +12,15 @@ A data frame with 9 rows and 7 variables:
 \item{start_date}{a beginning date (from 2021-12-26 to 2021-12-30)}
 \item{mid_date}{a middle date (from 2022-01-25 to 2022-01-29)}
 \item{end_date}{a last date (from 2022-02-24 to 2022-02-28)}
-\item{text_var}{a variable containing random text}
-\item{factor_var}{a categorical variable formatted as a factor}
+\item{text_var}{a visit record description (e.g. "Vital signs recorded...")}
+\item{factor_var}{the record's category (e.g. "vitals", "labs", "exam")}
 }
 }
 \usage{
 CompleteData
 }
 \description{
-A dataset containing nine rows and seven columns. The variables are as
-follows:
+Simulated clinical visit records for four subjects, used to demonstrate
+\code{create_deleted_data()}.
 }
 \keyword{datasets}

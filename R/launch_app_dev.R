@@ -13,6 +13,7 @@
 launch_app_dev <- function() {
   compare_theme <- dfdiffs_fresh_theme()
   ui <- bslib::page_navbar(
+    id = "main_nav",
     title = "(dev) dfdiffs",
     theme = compare_theme,
     navbar_options = bslib::navbar_options(bg = "#011627", theme = "dark"),
@@ -51,22 +52,67 @@ launch_app_dev <- function() {
         system.file("compareDataApp/assets/about.md", package = "dfdiffs")
       )
     ),
+    bslib::nav_item(uiOutput(outputId = "step_indicator", inline = TRUE)),
     bslib::nav_item(bslib::input_dark_mode(id = "dark_mode"))
   )
   server <- function(input, output, session) {
+    dark_mode <- reactive({
+      identical(input$dark_mode, "dark")
+    })
     # mod_upload_server --------------------
-    upload_data_list <- mod_upload_server(id = "upload_data", dev = TRUE)
+    upload_data_list <- mod_upload_server(id = "upload_data", dev = TRUE, dark_mode = dark_mode)
     # mod_select_server --------------------
     select_data_list <- mod_select_server(
       id = "select_data",
       data_upload = upload_data_list,
-      dev = TRUE
+      dev = TRUE,
+      dark_mode = dark_mode
     )
     # mod_compare_server ------------------
     mod_compare_server(
       id = "compare_data",
       data_selected = select_data_list,
-      dev = TRUE
+      dev = TRUE,
+      dark_mode = dark_mode
+    )
+
+    output$step_indicator <- renderUI({
+      nav_value <- input$main_nav
+      if (is.null(nav_value) || length(nav_value) != 1) {
+        return(NULL)
+      }
+      step <- switch(nav_value,
+        "1) Upload Data" = 1L,
+        "2) Select Data" = 2L,
+        "3) Compare Data" = 3L,
+        NA_integer_
+      )
+      if (is.na(step)) {
+        return(NULL)
+      }
+      tags$span(class = "navbar-text", paste0("Step ", step, " of 3"))
+    })
+
+    observeEvent(
+      {
+        req(upload_data_list$base_data())
+        req(upload_data_list$comp_data())
+        TRUE
+      },
+      once = TRUE,
+      {
+        bslib::nav_select(id = "main_nav", selected = "2) Select Data", session = session)
+      }
+    )
+    observeEvent(
+      {
+        req(length(select_data_list$join_selected()) > 0)
+        TRUE
+      },
+      once = TRUE,
+      {
+        bslib::nav_select(id = "main_nav", selected = "3) Compare Data", session = session)
+      }
     )
   }
 

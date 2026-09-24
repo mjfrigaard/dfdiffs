@@ -4,7 +4,10 @@
 \alias{comp_react_theme}
 \title{reactable theme (compare data)}
 \usage{
-comp_react_theme
+comp_react_theme(dark = FALSE)
+}
+\arguments{
+\item{dark}{use dark-mode colors (default FALSE)}
 }
 \description{
 theme for compare data in reactable table

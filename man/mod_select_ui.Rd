@@ -11,6 +11,10 @@ mod_select_ui(id, dev = FALSE)
 
 \item{dev}{show developer reactive-value outputs (default FALSE)}
 }
+\value{
+A \code{tagList} of the select module's UI (column selection and
+join-column accordions)
+}
 \description{
 select UI module
 }

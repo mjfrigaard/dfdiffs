@@ -4,12 +4,22 @@
 \alias{mod_select_server}
 \title{mod_select_server}
 \usage{
-mod_select_server(id, data_upload, dev = FALSE)
+mod_select_server(id, data_upload, dev = FALSE, dark_mode = reactive(FALSE))
 }
 \arguments{
 \item{id}{module id}
 
+\item{data_upload}{list of reactives returned by \code{mod_upload_server()}
+(\code{base_data}, \code{base_name}, \code{comp_data}, \code{comp_name})}
+
 \item{dev}{show developer reactive-value outputs (default FALSE)}
+
+\item{dark_mode}{reactive returning TRUE when the app is in dark mode
+(default reactive(FALSE))}
+}
+\value{
+A list of reactives: \code{join_selected}, \code{base_join_col_data},
+\code{comp_join_col_data}
 }
 \description{
 select server module

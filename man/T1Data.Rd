@@ -12,15 +12,15 @@ A data frame with 6 rows and 7 variables:
 \item{start_date}{a beginning date (from 2022-01-25 to 2022-01-30)}
 \item{mid_date}{a middle date (from 2022-03-15 to 2022-03-20)}
 \item{end_date}{a last date (from 2022-03-25 to 2022-03-31)}
-\item{text_var}{a variable containing random text}
-\item{factor_var}{a categorical variable formatted as a factor}
+\item{text_var}{a patient-reported clinical observation}
+\item{factor_var}{the observation's category (e.g. "headache", "fatigue")}
 }
 }
 \usage{
 T1Data
 }
 \description{
-A dataset containing six rows and seven columns. The variables are as
-follows:
+Simulated patient-reported clinical observations recorded at the first
+time point, used to demonstrate \code{create_new_data()}.
 }
 \keyword{datasets}

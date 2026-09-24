@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,50 +84,48 @@
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
-<p>This vignette covers similar functions/packages that compare two
+<p>This vignette covers similar functions and packages that compare two
 datasets to each other.</p>
 <div class="section level3">
 <h3 id="packages">Packages<a class="anchor" aria-label="anchor" href="#packages"></a>
 </h3>
-<p>Our package</p>
+<p>Load <code>dfdiffs</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mjfrigaard.github.io/dfdiffs/">dfdiffs</a></span><span class="op">)</span></span></code></pre></div>
-<p>Packages for import/export, iteration, wrangling, etc.</p>
+<p>We’ll also need packages for import/export, iteration, and
+wrangling:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org" class="external-link">readr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glue.tidyverse.org/" class="external-link">glue</a></span><span class="op">)</span></span></code></pre></div>
-<p>Packages for tables.</p>
+<p>These packages are for building tables:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://larmarange.github.io/labelled/" class="external-link">labelled</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gt.rstudio.com" class="external-link">gt</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary" class="external-link">gtsummary</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span></code></pre></div>
-<p>Similar packages</p>
+<p>These packages offer similar comparison functions:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor" class="external-link">janitor</a></span><span class="op">)</span> <span class="co"># compare_df_cols</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org" class="external-link">testthat</a></span><span class="op">)</span> <span class="co"># expect_equal</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/brodieG/vetr" class="external-link">vetr</a></span><span class="op">)</span> <span class="co"># alike</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://larmarange.github.io/labelled/" class="external-link">labelled</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gt.rstudio.com" class="external-link">gt</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary" class="external-link">gtsummary</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
 </h3>
-<p>We’ll be using the data in this package to cover similar
+<p>We’ll use the data in this package to cover similar
 <code>packages::functions()</code>.</p>
 <div class="section level4">
 <h4 id="new-data">New data<a class="anchor" aria-label="anchor" href="#new-data"></a>
 </h4>
-<p>To check new data, we’re going to use <code>T1Data</code> and
-<code>T2Data</code>. The <code><a href="../reference/create_new_data.html">create_new_data()</a></code> function shows
-us the ‘new data’ (i.e. what is here now that wasn’t here before?)</p>
-<p>We can check this against the <code>NewData</code> dataset (which
-should match the output from <code><a href="../reference/create_new_data.html">create_new_data()</a></code>)</p>
+<p>To check for new data, we’ll use <code>T1Data</code> and
+<code>T2Data</code>. The <code><a href="../reference/create_new_data.html">create_new_data()</a></code> function returns
+the ‘new data’ (i.e., the rows that are here now but weren’t here
+before).</p>
+<p>We can check this against the <code>NewData</code> dataset, which
+should match the output from <code><a href="../reference/create_new_data.html">create_new_data()</a></code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">T1Data</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/T1Data.html">T1Data</a></span></span>
 <span><span class="va">T2Data</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/T2Data.html">T2Data</a></span></span>
@@ -140,6 +138,8 @@ should match the output from <code><a href="../reference/create_new_data.html">c
 New data T1 &gt; T2
 </caption>
 <thead><tr>
+<th style="text-align:left;">
+</th>
 <th style="text-align:left;">
 subject
 </th>
@@ -165,6 +165,9 @@ factor_var
 <tbody>
 <tr>
 <td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
 D
 </td>
 <td style="text-align:left;">
@@ -180,13 +183,16 @@ D
 2022-04-22
 </td>
 <td style="text-align:left;">
-Four hours of steady work faced us.
+Patient reports lower back pain after activity.
 </td>
 <td style="text-align:left;">
-associate
+back pain
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+6
+</td>
 <td style="text-align:left;">
 B
 </td>
@@ -203,13 +209,16 @@ B
 2022-04-20
 </td>
 <td style="text-align:left;">
-The hogs were fed chopped corn and garbage.
+Patient reports difficulty sleeping through the night.
 </td>
 <td style="text-align:left;">
-encourage
+insomnia
 </td>
 </tr>
 <tr>
+<td style="text-align:left;">
+9
+</td>
 <td style="text-align:left;">
 A
 </td>
@@ -226,10 +235,10 @@ A
 2022-04-21
 </td>
 <td style="text-align:left;">
-The box was thrown beside the parked truck.
+Patient reports dry cough lasting several days.
 </td>
 <td style="text-align:left;">
-pension
+cough
 </td>
 </tr>
 </tbody>
@@ -284,10 +293,10 @@ D
 2022-04-22
 </td>
 <td style="text-align:left;">
-Four hours of steady work faced us.
+Patient reports lower back pain after activity.
 </td>
 <td style="text-align:left;">
-associate
+back pain
 </td>
 </tr>
 <tr>
@@ -307,10 +316,10 @@ B
 2022-04-20
 </td>
 <td style="text-align:left;">
-The hogs were fed chopped corn and garbage.
+Patient reports difficulty sleeping through the night.
 </td>
 <td style="text-align:left;">
-encourage
+insomnia
 </td>
 </tr>
 <tr>
@@ -330,10 +339,10 @@ A
 2022-04-21
 </td>
 <td style="text-align:left;">
-The box was thrown beside the parked truck.
+Patient reports dry cough lasting several days.
 </td>
 <td style="text-align:left;">
-pension
+cough
 </td>
 </tr>
 </tbody>
@@ -342,6 +351,12 @@ pension
 of the date columns:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">T1T2New</span>, y <span class="op">=</span> <span class="va">NewData</span><span class="op">)</span></span>
+<span><span class="co">#&gt; `class(old)`: <span style="color: #00BB00;">"data.frame"</span>                   </span></span>
+<span><span class="co">#&gt; `class(new)`: <span style="color: #00BB00;">"tbl_df"</span>     <span style="color: #00BB00;">"tbl"</span> <span style="color: #00BB00;">"data.frame"</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; `attr(old, 'row.names')`: <span style="color: #00BB00;">3</span> <span style="color: #00BB00;">6</span> <span style="color: #00BB00;">9</span></span></span>
+<span><span class="co">#&gt; `attr(new, 'row.names')`: <span style="color: #00BB00;">1</span> <span style="color: #00BB00;">2</span> <span style="color: #00BB00;">3</span></span></span>
+<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; `old$start_date` is <span style="color: #00BB00;">a character vector</span> ('2022-04-04', '2022-04-02', '2022-04-04')</span></span>
 <span><span class="co">#&gt; `new$start_date` is <span style="color: #00BB00;">an S3 object of class &lt;Date&gt;, a double vector</span></span></span>
 <span><span class="co">#&gt; </span></span>
@@ -354,9 +369,9 @@ of the date columns:</p>
 <div class="section level4">
 <h4 id="deleted-data">Deleted data<a class="anchor" aria-label="anchor" href="#deleted-data"></a>
 </h4>
-<p>To test for the deleted data, we use the <code>CompleteData</code>,
+<p>To test for deleted data, we’ll use <code>CompleteData</code>,
 <code>IncompleteData</code>, and <code>DeletedData</code>.</p>
-<p><code>CompleteData</code> represents a ‘complete’ set of data,</p>
+<p><code>CompleteData</code> represents a ‘complete’ set of data.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">CompleteData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/CompleteData.html">CompleteData</a></span></span>
 <span><span class="va">CompleteData</span> <span class="op">|&gt;</span> </span>
@@ -407,10 +422,10 @@ A
 2022-02-26
 </td>
 <td style="text-align:left;">
-The copper bowl shone in the sun’s rays.
+Vital signs recorded at screening visit.
 </td>
 <td style="text-align:left;">
-interest
+vitals
 </td>
 </tr>
 <tr>
@@ -430,10 +445,10 @@ A
 2022-02-26
 </td>
 <td style="text-align:left;">
-Mark the spot with a sign painted red.
+Concomitant medication reported at baseline.
 </td>
 <td style="text-align:left;">
-state
+conmed
 </td>
 </tr>
 <tr>
@@ -453,10 +468,10 @@ B
 2022-02-24
 </td>
 <td style="text-align:left;">
-Take a chance and win a china doll.
+Laboratory sample collected for hematology panel.
 </td>
 <td style="text-align:left;">
-sure
+labs
 </td>
 </tr>
 <tr>
@@ -476,10 +491,10 @@ B
 2022-02-24
 </td>
 <td style="text-align:left;">
-A cramp is no small danger on a swim.
+ECG performed during screening assessment.
 </td>
 <td style="text-align:left;">
-white
+ecg
 </td>
 </tr>
 <tr>
@@ -499,10 +514,10 @@ C
 2022-02-28
 </td>
 <td style="text-align:left;">
-It’s easy to tell the depth of a well.
+Physical exam completed with no abnormalities noted.
 </td>
 <td style="text-align:left;">
-grant
+exam
 </td>
 </tr>
 <tr>
@@ -522,10 +537,10 @@ D
 2022-02-25
 </td>
 <td style="text-align:left;">
-The sky that morning was clear and bright blue.
+Medical history reviewed and confirmed complete.
 </td>
 <td style="text-align:left;">
-tape
+history
 </td>
 </tr>
 <tr>
@@ -545,10 +560,10 @@ A
 2022-02-26
 </td>
 <td style="text-align:left;">
-Wake and rise, and step into the green outdoors.
+Vital signs recorded at follow-up visit.
 </td>
 <td style="text-align:left;">
-situate
+vitals
 </td>
 </tr>
 <tr>
@@ -568,10 +583,10 @@ B
 2022-02-24
 </td>
 <td style="text-align:left;">
-A blue crane is a tall wading bird.
+Concomitant medication updated at visit two.
 </td>
 <td style="text-align:left;">
-shut
+conmed
 </td>
 </tr>
 <tr>
@@ -591,15 +606,15 @@ D
 2022-02-25
 </td>
 <td style="text-align:left;">
-Say it slow!y but make it ring clear.
+Laboratory sample collected for chemistry panel.
 </td>
 <td style="text-align:left;">
-document
+labs
 </td>
 </tr>
 </tbody>
 </table>
-<p>and <code>IncompleteData</code> is a dataset with rows removed from
+<p><code>IncompleteData</code> is a dataset with rows removed from
 <code>CompleteData</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">IncompleteData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/IncompleteData.html">IncompleteData</a></span></span>
@@ -651,10 +666,10 @@ A
 2022-02-26
 </td>
 <td style="text-align:left;">
-The copper bowl shone in the sun’s rays.
+Vital signs recorded at screening visit.
 </td>
 <td style="text-align:left;">
-interest
+vitals
 </td>
 </tr>
 <tr>
@@ -674,10 +689,10 @@ B
 2022-02-24
 </td>
 <td style="text-align:left;">
-Take a chance and win a china doll.
+Laboratory sample collected for hematology panel.
 </td>
 <td style="text-align:left;">
-sure
+labs
 </td>
 </tr>
 <tr>
@@ -697,10 +712,10 @@ B
 2022-02-24
 </td>
 <td style="text-align:left;">
-A cramp is no small danger on a swim.
+ECG performed during screening assessment.
 </td>
 <td style="text-align:left;">
-white
+ecg
 </td>
 </tr>
 <tr>
@@ -720,10 +735,10 @@ A
 2022-02-26
 </td>
 <td style="text-align:left;">
-Wake and rise, and step into the green outdoors.
+Vital signs recorded at follow-up visit.
 </td>
 <td style="text-align:left;">
-situate
+vitals
 </td>
 </tr>
 <tr>
@@ -743,148 +758,31 @@ D
 2022-02-25
 </td>
 <td style="text-align:left;">
-Say it slow!y but make it ring clear.
+Laboratory sample collected for chemistry panel.
 </td>
 <td style="text-align:left;">
-document
+labs
 </td>
 </tr>
 </tbody>
 </table>
-<p>When we run the <code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code>, we check for the
-deleted rows between <code>IncompleteData</code> and
-<code>CompleteData</code>.</p>
+<p>Running <code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code> checks for rows that were
+deleted between <code>CompleteData</code> and
+<code>IncompleteData</code>.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">IncompCompDiff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_deleted_data.html">create_deleted_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">IncompleteData</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">CompleteData</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">subject</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `arrange()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> could not find function "arrange"</span></span>
 <span><span class="va">IncompCompDiff</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"IncompCompDiff"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
-<caption>
-IncompCompDiff
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-subject
-</th>
-<th style="text-align:left;">
-record
-</th>
-<th style="text-align:left;">
-start_date
-</th>
-<th style="text-align:left;">
-mid_date
-</th>
-<th style="text-align:left;">
-end_date
-</th>
-<th style="text-align:left;">
-text_var
-</th>
-<th style="text-align:left;">
-factor_var
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-A
-</td>
-<td style="text-align:left;">
-2
-</td>
-<td style="text-align:left;">
-2021-12-28
-</td>
-<td style="text-align:left;">
-2022-01-27
-</td>
-<td style="text-align:left;">
-2022-02-26
-</td>
-<td style="text-align:left;">
-Mark the spot with a sign painted red.
-</td>
-<td style="text-align:left;">
-state
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-B
-</td>
-<td style="text-align:left;">
-3
-</td>
-<td style="text-align:left;">
-2021-12-26
-</td>
-<td style="text-align:left;">
-2022-01-25
-</td>
-<td style="text-align:left;">
-2022-02-24
-</td>
-<td style="text-align:left;">
-A blue crane is a tall wading bird.
-</td>
-<td style="text-align:left;">
-shut
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C
-</td>
-<td style="text-align:left;">
-1
-</td>
-<td style="text-align:left;">
-2021-12-30
-</td>
-<td style="text-align:left;">
-2022-01-29
-</td>
-<td style="text-align:left;">
-2022-02-28
-</td>
-<td style="text-align:left;">
-It’s easy to tell the depth of a well.
-</td>
-<td style="text-align:left;">
-grant
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-D
-</td>
-<td style="text-align:left;">
-1
-</td>
-<td style="text-align:left;">
-2021-12-27
-</td>
-<td style="text-align:left;">
-2022-01-26
-</td>
-<td style="text-align:left;">
-2022-02-25
-</td>
-<td style="text-align:left;">
-The sky that morning was clear and bright blue.
-</td>
-<td style="text-align:left;">
-tape
-</td>
-</tr>
-</tbody>
-</table>
-<p>This is identical to the data stored in <code>DeletedData</code></p>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'IncompCompDiff' not found</span></span></code></pre></div>
+<p>The output above is identical to the data stored in
+<code>DeletedData</code>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DeletedData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/DeletedData.html">DeletedData</a></span></span>
 <span><span class="va">DeletedData</span> <span class="op">|&gt;</span> </span>
@@ -935,10 +833,10 @@ A
 2022-02-26
 </td>
 <td style="text-align:left;">
-Mark the spot with a sign painted red.
+Concomitant medication reported at baseline.
 </td>
 <td style="text-align:left;">
-state
+conmed
 </td>
 </tr>
 <tr>
@@ -958,10 +856,10 @@ B
 2022-02-24
 </td>
 <td style="text-align:left;">
-A blue crane is a tall wading bird.
+Concomitant medication updated at visit two.
 </td>
 <td style="text-align:left;">
-shut
+conmed
 </td>
 </tr>
 <tr>
@@ -981,10 +879,10 @@ C
 2022-02-28
 </td>
 <td style="text-align:left;">
-It’s easy to tell the depth of a well.
+Physical exam completed with no abnormalities noted.
 </td>
 <td style="text-align:left;">
-grant
+exam
 </td>
 </tr>
 <tr>
@@ -1004,32 +902,24 @@ D
 2022-02-25
 </td>
 <td style="text-align:left;">
-The sky that morning was clear and bright blue.
+Medical history reviewed and confirmed complete.
 </td>
 <td style="text-align:left;">
-tape
+history
 </td>
 </tr>
 </tbody>
 </table>
+<p>We can confirm this with <code><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">waldo::compare()</a></code>:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">IncompCompDiff</span>, y <span class="op">=</span> <span class="va">DeletedData</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `old$record` is <span style="color: #00BB00;">a character vector</span> ('2', '3', '1', '1')</span></span>
-<span><span class="co">#&gt; `new$record` is <span style="color: #00BB00;">an integer vector</span> (2, 3, 1, 1)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; `old$start_date` is <span style="color: #00BB00;">a character vector</span> ('2021-12-28', '2021-12-26', '2021-12-30', '2021-12-27')</span></span>
-<span><span class="co">#&gt; `new$start_date` is <span style="color: #00BB00;">an S3 object of class &lt;Date&gt;, a double vector</span></span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; `old$mid_date` is <span style="color: #00BB00;">a character vector</span> ('2022-01-27', '2022-01-25', '2022-01-29', '2022-01-26')</span></span>
-<span><span class="co">#&gt; `new$mid_date` is <span style="color: #00BB00;">an S3 object of class &lt;Date&gt;, a double vector</span></span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; `old$end_date` is <span style="color: #00BB00;">a character vector</span> ('2022-02-26', '2022-02-24', '2022-02-28', '2022-02-25')</span></span>
-<span><span class="co">#&gt; `new$end_date` is <span style="color: #00BB00;">an S3 object of class &lt;Date&gt;, a double vector</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'IncompCompDiff' not found</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="initialdatachangeddata-data">InitialData/ChangedData Data<a class="anchor" aria-label="anchor" href="#initialdatachangeddata-data"></a>
+<h4 id="changed-data">Changed data<a class="anchor" aria-label="anchor" href="#changed-data"></a>
 </h4>
-<p>To check for changes between two datasets, we uses the
+<p>To check for changes between two datasets, we’ll use
 <code>InitialData</code> and <code>ChangedData</code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">InitialData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/InitialData.html">InitialData</a></span></span>
@@ -1052,17 +942,11 @@ Variable name
 <th style="text-align:right;">
 Modified Values
 </th>
-<th style="text-align:right;">
-Missing Values
-</th>
 </tr></thead>
 <tbody>
 <tr>
 <td style="text-align:left;">
 subject_id
-</td>
-<td style="text-align:right;">
-0
 </td>
 <td style="text-align:right;">
 0
@@ -1075,9 +959,6 @@ record
 <td style="text-align:right;">
 0
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1085,9 +966,6 @@ text_value_a
 </td>
 <td style="text-align:right;">
 2
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 <tr>
@@ -1097,16 +975,10 @@ text_value_b
 <td style="text-align:right;">
 1
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
 created_date
-</td>
-<td style="text-align:right;">
-0
 </td>
 <td style="text-align:right;">
 0
@@ -1119,9 +991,6 @@ updated_date
 <td style="text-align:right;">
 5
 </td>
-<td style="text-align:right;">
-0
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
@@ -1129,9 +998,6 @@ entered_date
 </td>
 <td style="text-align:right;">
 5
-</td>
-<td style="text-align:right;">
-0
 </td>
 </tr>
 </tbody>
@@ -1149,6 +1015,9 @@ diffs
 <th style="text-align:left;">
 Variable name
 </th>
+<th style="text-align:right;">
+rownumber
+</th>
 <th style="text-align:left;">
 Current Value
 </th>
@@ -1161,6 +1030,9 @@ Previous Value
 <td style="text-align:left;">
 text_value_a
 </td>
+<td style="text-align:right;">
+1
+</td>
 <td style="text-align:left;">
 Issue resolved
 </td>
@@ -1171,6 +1043,9 @@ Issue unresolved
 <tr>
 <td style="text-align:left;">
 text_value_a
+</td>
+<td style="text-align:right;">
+2
 </td>
 <td style="text-align:left;">
 Issue resolved
@@ -1183,6 +1058,9 @@ Issue unresolved
 <td style="text-align:left;">
 text_value_b
 </td>
+<td style="text-align:right;">
+4
+</td>
 <td style="text-align:left;">
 Joint pain, stiffness and swelling
 </td>
@@ -1194,6 +1072,9 @@ Joint pain
 <td style="text-align:left;">
 updated_date
 </td>
+<td style="text-align:right;">
+1
+</td>
 <td style="text-align:left;">
 2021-10-03
 </td>
@@ -1204,6 +1085,9 @@ updated_date
 <tr>
 <td style="text-align:left;">
 updated_date
+</td>
+<td style="text-align:right;">
+2
 </td>
 <td style="text-align:left;">
 2021-11-27
@@ -1216,6 +1100,9 @@ updated_date
 <td style="text-align:left;">
 updated_date
 </td>
+<td style="text-align:right;">
+3
+</td>
 <td style="text-align:left;">
 2021-10-20
 </td>
@@ -1226,6 +1113,9 @@ updated_date
 <tr>
 <td style="text-align:left;">
 updated_date
+</td>
+<td style="text-align:right;">
+4
 </td>
 <td style="text-align:left;">
 2021-10-13
@@ -1238,6 +1128,9 @@ updated_date
 <td style="text-align:left;">
 updated_date
 </td>
+<td style="text-align:right;">
+5
+</td>
 <td style="text-align:left;">
 2021-10-14
 </td>
@@ -1248,6 +1141,9 @@ updated_date
 <tr>
 <td style="text-align:left;">
 entered_date
+</td>
+<td style="text-align:right;">
+1
 </td>
 <td style="text-align:left;">
 2021-11-30
@@ -1260,6 +1156,9 @@ entered_date
 <td style="text-align:left;">
 entered_date
 </td>
+<td style="text-align:right;">
+2
+</td>
 <td style="text-align:left;">
 2021-11-30
 </td>
@@ -1270,6 +1169,9 @@ entered_date
 <tr>
 <td style="text-align:left;">
 entered_date
+</td>
+<td style="text-align:right;">
+3
 </td>
 <td style="text-align:left;">
 2021-11-21
@@ -1282,6 +1184,9 @@ entered_date
 <td style="text-align:left;">
 entered_date
 </td>
+<td style="text-align:right;">
+4
+</td>
 <td style="text-align:left;">
 2021-11-11
 </td>
@@ -1292,6 +1197,9 @@ entered_date
 <tr>
 <td style="text-align:left;">
 entered_date
+</td>
+<td style="text-align:right;">
+5
 </td>
 <td style="text-align:left;">
 2021-11-16
@@ -1318,15 +1226,15 @@ will successfully bind together by rows.</em>”</p>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span><span class="fu"><a href="https://sfirke.github.io/janitor/reference/compare_df_cols_same.html" class="external-link">compare_df_cols_same</a></span><span class="op">(</span><span class="va">InitialData</span>, <span class="va">ChangedData</span>, strict_description <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
-<p>All of our test datasets meet this condition, but this could be used
-as a step in one our <code>create_</code> functions (to see if they can
-be successfully bound together).</p>
+<p>All of our test datasets meet this condition, but this check could be
+used as a step in one of our <code>create_</code> functions (to confirm
+the datasets can be bound together).</p>
 </div>
 <div class="section level3">
 <h3 id="testthatexpect_equal">
 <code>testthat::expect_equal()</code><a class="anchor" aria-label="anchor" href="#testthatexpect_equal"></a>
 </h3>
-<p>This works, but returns the result as an error.</p>
+<p>This works, but it returns the result as an error.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">InitialData</span>, expected <span class="op">=</span> <span class="va">ChangedData</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
@@ -1381,21 +1289,21 @@ be successfully bound together).</p>
 <span><span class="co">#&gt; `attr(expected, 'row.names')[4:9]`: <span style="color: #555555;">4</span> <span style="color: #555555;">5</span> <span style="color: #555555;">6</span> <span style="color: #0000BB;">7</span> <span style="color: #0000BB;">8</span> <span style="color: #0000BB;">9</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; actual vs expected</span></span>
-<span><span class="co">#&gt;                 <span style="font-weight: bold;">subject record start_date   mid_date   end_date                                    text_var factor_var</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">- actual[1, ]         A      1 2022-01-28 2022-03-20 2022-03-30 The birch canoe slid on the smooth planks.   food     </span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[1, ]       D      5 2022-01-30 2022-03-16 2022-03-26 Rice is often served in round bowls.         regard   </span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">- actual[2, ]         A      2 2022-01-25 2022-03-15 2022-03-29 Glue the sheet to the dark blue background.  most     </span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[2, ]       D      6 2022-01-27 2022-03-17 2022-03-31 The juice of lemons makes fine punch.        law      </span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">- actual[3, ]         B      3 2022-01-26 2022-03-19 2022-03-25 It's easy to tell the depth of a well.       park     </span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[3, ]       D      5 2022-04-04 2022-04-13 2022-04-22 Four hours of steady work faced us.          associate</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">  actual[4, ]         C      4 2022-01-29 2022-03-18 2022-03-27 These days a chicken leg is a rare dish.     between  </span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">- actual[5, ]         D      5 2022-01-30 2022-03-16 2022-03-26 Rice is often served in round bowls.         regard   </span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">- actual[6, ]         D      6 2022-01-27 2022-03-17 2022-03-31 The juice of lemons makes fine punch.        law      </span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[5, ]       B      3 2022-01-26 2022-03-19 2022-03-25 It's easy to tell the depth of a well.       park     </span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[6, ]       B      4 2022-04-02 2022-04-14 2022-04-20 The hogs were fed chopped corn and garbage.  encourage</span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[7, ]       A      1 2022-01-28 2022-03-20 2022-03-30 The birch canoe slid on the smooth planks.   food     </span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[8, ]       A      2 2022-01-25 2022-03-15 2022-03-29 Glue the sheet to the dark blue background.  most     </span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[9, ]       A      2 2022-04-04 2022-04-15 2022-04-21 The box was thrown beside the parked truck.  pension  </span></span></span>
+<span><span class="co">#&gt;                 <span style="font-weight: bold;">subject record start_date   mid_date   end_date                                               text_var factor_var</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">- actual[1, ]         A      1 2022-01-28 2022-03-20 2022-03-30 Patient reports mild headache after morning dose.       headache </span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[1, ]       D      5 2022-01-30 2022-03-16 2022-03-26 Patient reports mild rash on the left forearm.          rash     </span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">- actual[2, ]         A      2 2022-01-25 2022-03-15 2022-03-29 Patient reports occasional nausea following meals.      nausea   </span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[2, ]       D      6 2022-01-27 2022-03-17 2022-03-31 Patient reports low-grade fever in the evening.         fever    </span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">- actual[3, ]         B      3 2022-01-26 2022-03-19 2022-03-25 Patient reports persistent fatigue throughout the day.  fatigue  </span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[3, ]       D      5 2022-04-04 2022-04-13 2022-04-22 Patient reports lower back pain after activity.         back pain</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">  actual[4, ]         C      4 2022-01-29 2022-03-18 2022-03-27 Patient reports brief dizziness upon standing.          dizziness</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">- actual[5, ]         D      5 2022-01-30 2022-03-16 2022-03-26 Patient reports mild rash on the left forearm.          rash     </span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">- actual[6, ]         D      6 2022-01-27 2022-03-17 2022-03-31 Patient reports low-grade fever in the evening.         fever    </span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[5, ]       B      3 2022-01-26 2022-03-19 2022-03-25 Patient reports persistent fatigue throughout the day.  fatigue  </span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[6, ]       B      4 2022-04-02 2022-04-14 2022-04-20 Patient reports difficulty sleeping through the night.  insomnia </span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[7, ]       A      1 2022-01-28 2022-03-20 2022-03-30 Patient reports mild headache after morning dose.       headache </span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[8, ]       A      2 2022-01-25 2022-03-15 2022-03-29 Patient reports occasional nausea following meals.      nausea   </span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ expected[9, ]       A      2 2022-04-04 2022-04-15 2022-04-21 Patient reports dry cough lasting several days.         cough    </span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; `actual$subject`:   <span style="color: #00BB00;">"A"</span> <span style="color: #00BB00;">"A"</span> <span style="color: #00BB00;">"B"</span> <span style="color: #555555;">"C"</span> <span style="color: #00BB00;">"D"</span> <span style="color: #00BB00;">"D"</span>            </span></span>
 <span><span class="co">#&gt; `expected$subject`: <span style="color: #00BB00;">"D"</span> <span style="color: #00BB00;">"D"</span> <span style="color: #00BB00;">"D"</span> <span style="color: #555555;">"C"</span> <span style="color: #00BB00;">"B"</span> <span style="color: #00BB00;">"B"</span> <span style="color: #00BB00;">"A"</span> <span style="color: #00BB00;">"A"</span> <span style="color: #00BB00;">"A"</span></span></span>
@@ -1437,31 +1345,31 @@ be successfully bound together).</p>
 <span><span class="co">#&gt;                     - <span style="color: #00BB00;">"2022-04-21"</span>      [9]</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; actual$text_var vs expected$text_var</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">- "The birch canoe slid on the smooth planks."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ "Rice is often served in round bowls."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">- "Glue the sheet to the dark blue background."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ "The juice of lemons makes fine punch."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">- "It's easy to tell the depth of a well."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ "Four hours of steady work faced us."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">  "These days a chicken leg is a rare dish."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">- "Rice is often served in round bowls."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">- "The juice of lemons makes fine punch."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ "It's easy to tell the depth of a well."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ "The hogs were fed chopped corn and garbage."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ "The birch canoe slid on the smooth planks."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ "Glue the sheet to the dark blue background."</span></span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB;">+ "The box was thrown beside the parked truck."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">- "Patient reports mild headache after morning dose."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ "Patient reports mild rash on the left forearm."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">- "Patient reports occasional nausea following meals."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ "Patient reports low-grade fever in the evening."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">- "Patient reports persistent fatigue throughout the day."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ "Patient reports lower back pain after activity."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">  "Patient reports brief dizziness upon standing."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">- "Patient reports mild rash on the left forearm."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">- "Patient reports low-grade fever in the evening."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ "Patient reports persistent fatigue throughout the day."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ "Patient reports difficulty sleeping through the night."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ "Patient reports mild headache after morning dose."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ "Patient reports occasional nausea following meals."</span></span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB;">+ "Patient reports dry cough lasting several days."</span></span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     actual$factor_var | expected$factor_var    </span></span>
-<span><span class="co">#&gt; [1] <span style="color: #00BB00;">"food"</span>            - <span style="color: #00BB00;">"regard"</span>            [1]</span></span>
-<span><span class="co">#&gt; [2] <span style="color: #00BB00;">"most"</span>            - <span style="color: #00BB00;">"law"</span>               [2]</span></span>
-<span><span class="co">#&gt; [3] <span style="color: #00BB00;">"park"</span>            - <span style="color: #00BB00;">"associate"</span>         [3]</span></span>
-<span><span class="co">#&gt; [4] <span style="color: #555555;">"between"</span>         | <span style="color: #555555;">"between"</span>           [4]</span></span>
-<span><span class="co">#&gt; [5] <span style="color: #00BB00;">"regard"</span>          - <span style="color: #00BB00;">"park"</span>              [5]</span></span>
-<span><span class="co">#&gt; [6] <span style="color: #00BB00;">"law"</span>             - <span style="color: #00BB00;">"encourage"</span>         [6]</span></span>
-<span><span class="co">#&gt;                       - <span style="color: #00BB00;">"food"</span>              [7]</span></span>
-<span><span class="co">#&gt;                       - <span style="color: #00BB00;">"most"</span>              [8]</span></span>
-<span><span class="co">#&gt;                       - <span style="color: #00BB00;">"pension"</span>           [9]</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] <span style="color: #00BB00;">"headache"</span>        - <span style="color: #00BB00;">"rash"</span>              [1]</span></span>
+<span><span class="co">#&gt; [2] <span style="color: #00BB00;">"nausea"</span>          - <span style="color: #00BB00;">"fever"</span>             [2]</span></span>
+<span><span class="co">#&gt; [3] <span style="color: #00BB00;">"fatigue"</span>         - <span style="color: #00BB00;">"back pain"</span>         [3]</span></span>
+<span><span class="co">#&gt; [4] <span style="color: #555555;">"dizziness"</span>       | <span style="color: #555555;">"dizziness"</span>         [4]</span></span>
+<span><span class="co">#&gt; [5] <span style="color: #00BB00;">"rash"</span>            - <span style="color: #00BB00;">"fatigue"</span>           [5]</span></span>
+<span><span class="co">#&gt; [6] <span style="color: #00BB00;">"fever"</span>           - <span style="color: #00BB00;">"insomnia"</span>          [6]</span></span>
+<span><span class="co">#&gt;                       - <span style="color: #00BB00;">"headache"</span>          [7]</span></span>
+<span><span class="co">#&gt;                       - <span style="color: #00BB00;">"nausea"</span>            [8]</span></span>
+<span><span class="co">#&gt;                       - <span style="color: #00BB00;">"cough"</span>             [9]</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="vetralike">

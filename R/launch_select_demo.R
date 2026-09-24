@@ -45,13 +45,9 @@ launch_select_demo <- function() {
     # reactive values ------------------------------------------------
     output$upload_values <- renderPrint({
       all_values <- reactiveValuesToList(x = input, all.names = TRUE)
-      module_names <- str_detect(names(all_values), "upload_data")
+      module_names <- grepl("upload_data", names(all_values))
       module_values <- all_values[module_names]
-      reactable_names <- str_detect(
-        names(module_values),
-        "__reactable__",
-        negate = TRUE
-      )
+      reactable_names <- !grepl("__reactable__", names(module_values))
       values <- module_values[reactable_names]
       print(values)
     })

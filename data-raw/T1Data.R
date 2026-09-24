@@ -15,13 +15,13 @@ T1Data <- data.frame(
              end_date = c("2022-03-30",
                           "2022-03-29","2022-03-25","2022-03-27","2022-03-26",
                           "2022-03-31"),
-             text_var = c("The birch canoe slid on the smooth planks.",
-                          "Glue the sheet to the dark blue background.",
-                          "It's easy to tell the depth of a well.",
-                          "These days a chicken leg is a rare dish.",
-                          "Rice is often served in round bowls.",
-                          "The juice of lemons makes fine punch."),
-        factor_var = c("food", "most", "park", "between", "regard", "law")
+             text_var = c("Patient reports mild headache after morning dose.",
+                          "Patient reports occasional nausea following meals.",
+                          "Patient reports persistent fatigue throughout the day.",
+                          "Patient reports brief dizziness upon standing.",
+                          "Patient reports mild rash on the left forearm.",
+                          "Patient reports low-grade fever in the evening."),
+        factor_var = c("headache", "nausea", "fatigue", "dizziness", "rash", "fever")
    ) %>%
   # convert to date
   mutate(across(.cols = contains("date"), .fns = lubridate::ymd))

@@ -20,7 +20,6 @@ cross-tabulation of the values in a categorical variable.
 }
 \examples{
 # not run
-library(dplyr)
-cross_tabyl(starwars, "hair_color")
-cross_tabyl(starwars, "name")
+df <- data.frame(hair_color = c("blond", "brown", "brown", "black", NA))
+cross_tabyl(df, "hair_color")
 }

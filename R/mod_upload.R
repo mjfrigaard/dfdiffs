@@ -1,11 +1,13 @@
 #' mod_upload_ui()
 #'
 #' @import shiny
-#' @importFrom bslib accordion accordion_panel
+#' @importFrom bslib accordion accordion_panel layout_columns
 #'
 #' @param id module id
 #' @param dev show developer reactive-value outputs (default FALSE)
 #'
+#' @return A `tagList` of the upload module's UI (file inputs and preview
+#'   tables for `base` and `compare`)
 #' @export mod_upload_ui
 #'
 #' @description UI module for upload
@@ -15,39 +17,34 @@ mod_upload_ui <- function(id, dev = FALSE) {
     bslib::accordion_panel(
       title = "Upload File (base)",
       icon = icon("upload"),
-      fluidRow(
-        column(
-          width = 6,
-          fileInput(
-            ## |-- INPUT [base_file] -------
-            inputId = NS(
-              namespace = id,
-              id = "base_file"
-            ),
-            label = tags$strong(
-              "Accepts: ",
-              code(".sas7bdat"), code(".csv"),
-              code(".txt"), code(".tsv"), code(".xlsx")
-            ),
-            accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
-          )
+      bslib::layout_columns(
+        col_widths = c(6, 6),
+        fileInput(
+          ## |-- INPUT [base_file] -------
+          inputId = NS(
+            namespace = id,
+            id = "base_file"
+          ),
+          label = tags$strong(
+            "Accepts: ",
+            code(".sas7bdat"), code(".csv"),
+            code(".txt"), code(".tsv"), code(".xlsx")
+          ),
+          accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
         ),
-        column(
-          width = 6,
-          ### |-- INPUT [base_xlsx_sheets] ---------
-          selectInput(
-            inputId = NS(
-              namespace = id,
-              id = "base_xlsx_sheets"
-            ),
-            label = strong("Select sheet (if ", code(".xlsx"), " file):"),
-            choices = c("", NULL)
-          )
+        ### |-- INPUT [base_xlsx_sheets] ---------
+        selectInput(
+          inputId = NS(
+            namespace = id,
+            id = "base_xlsx_sheets"
+          ),
+          label = strong("Select sheet (if ", code(".xlsx"), " file):"),
+          choices = c("", NULL)
         )
       ),
-      fluidRow(
-        column(
-          width = 6,
+      bslib::layout_columns(
+        col_widths = c(6, 6),
+        tagList(
           ## |-- OUTPUT [base_filename] ---------
           tags$strong("Data file name:"),
           shiny::htmlOutput(
@@ -57,8 +54,7 @@ mod_upload_ui <- function(id, dev = FALSE) {
             )
           )
         ),
-        column(
-          width = 6,
+        tagList(
           ## |-- INPUT [base_new_name] ---------
           textInput(
             inputId = NS(
@@ -72,17 +68,12 @@ mod_upload_ui <- function(id, dev = FALSE) {
           em("Not sure what name to use? Copy + paste the file name."),
         )
       ),
-      fluidRow(
-        column(
-          width = 12,
-          br(), br(),
-          ## |-- OUTPUT [base_display_upload] ---------
-          reactable::reactableOutput(
-            outputId = NS(
-              namespace = id,
-              id = "base_display_upload"
-            )
-          )
+      br(), br(),
+      ## |-- OUTPUT [base_display_upload] ---------
+      reactable::reactableOutput(
+        outputId = NS(
+          namespace = id,
+          id = "base_display_upload"
         )
       )
     )
@@ -94,41 +85,21 @@ mod_upload_ui <- function(id, dev = FALSE) {
         title = "Reactive values (base)",
         icon = icon("bug"),
         strong(em("For DEV purposes only")),
-        fluidRow(
-          column(
-            12,
-            code("base_dev_a"),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "base_dev_a")
-            )
-          )
+        code("base_dev_a"),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "base_dev_a")
         ),
-        fluidRow(
-          column(
-            12,
-            code("base_dev_b"),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "base_dev_b")
-            )
-          )
+        code("base_dev_b"),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "base_dev_b")
         ),
-        fluidRow(
-          column(
-            12,
-            code("base_dev_x"),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "base_dev_x")
-            )
-          )
+        code("base_dev_x"),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "base_dev_x")
         ),
-        fluidRow(
-          column(
-            12,
-            code("base_dev_y"),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "base_dev_y")
-            )
-          )
+        code("base_dev_y"),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "base_dev_y")
         )
       )
     ))
@@ -139,39 +110,34 @@ mod_upload_ui <- function(id, dev = FALSE) {
     bslib::accordion_panel(
       title = "Upload File (compare)",
       icon = icon("upload"),
-      fluidRow(
-        column(
-          width = 6,
-          fileInput(
-            ## |-- INPUT [comp_file] -------
-            inputId = NS(
-              namespace = id,
-              id = "comp_file"
-            ),
-            label = tags$strong(
-              "Accepts: ",
-              code(".sas7bdat"), code(".csv"),
-              code(".txt"), code(".tsv"), code(".xlsx")
-            ),
-            accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
-          )
+      bslib::layout_columns(
+        col_widths = c(6, 6),
+        fileInput(
+          ## |-- INPUT [comp_file] -------
+          inputId = NS(
+            namespace = id,
+            id = "comp_file"
+          ),
+          label = tags$strong(
+            "Accepts: ",
+            code(".sas7bdat"), code(".csv"),
+            code(".txt"), code(".tsv"), code(".xlsx")
+          ),
+          accept = c(".sas7bdat", ".csv", ".txt", ".tsv", ".xlsx")
         ),
-        column(
-          width = 6,
-          ## |-- INPUT [comp_xlsx_sheets] ---------
-          selectInput(
-            inputId = NS(
-              namespace = id,
-              id = "comp_xlsx_sheets"
-            ),
-            label = strong("Select sheet (if ", code(".xlsx"), " file):"),
-            choices = c("", NULL)
-          )
+        ## |-- INPUT [comp_xlsx_sheets] ---------
+        selectInput(
+          inputId = NS(
+            namespace = id,
+            id = "comp_xlsx_sheets"
+          ),
+          label = strong("Select sheet (if ", code(".xlsx"), " file):"),
+          choices = c("", NULL)
         )
       ),
-      fluidRow(
-        column(
-          width = 6,
+      bslib::layout_columns(
+        col_widths = c(6, 6),
+        tagList(
           ## |-- OUTPUT [comp_filename] ---------
           tags$strong("Data file name:"),
           shiny::htmlOutput(
@@ -181,8 +147,7 @@ mod_upload_ui <- function(id, dev = FALSE) {
             )
           )
         ),
-        column(
-          width = 6,
+        tagList(
           ## |-- INPUT [comp_new_name] ---------
           textInput(
             inputId = NS(
@@ -196,17 +161,12 @@ mod_upload_ui <- function(id, dev = FALSE) {
           em("Not sure what name to use? Copy + paste the file name."),
         )
       ),
-      fluidRow(
-        column(
-          width = 12,
-          br(), br(),
-          ## |-- OUTPUT [comp_display_upload] ---------
-          reactable::reactableOutput(
-            outputId = NS(
-              namespace = id,
-              id = "comp_display_upload"
-            )
-          )
+      br(), br(),
+      ## |-- OUTPUT [comp_display_upload] ---------
+      reactable::reactableOutput(
+        outputId = NS(
+          namespace = id,
+          id = "comp_display_upload"
         )
       )
     )
@@ -218,41 +178,21 @@ mod_upload_ui <- function(id, dev = FALSE) {
         title = "Reactive values (compare)",
         icon = icon("bug"),
         strong(em("For DEV purposes only")),
-        fluidRow(
-          column(
-            12,
-            code("comp_dev_a"),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "comp_dev_a")
-            )
-          )
+        code("comp_dev_a"),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "comp_dev_a")
         ),
-        fluidRow(
-          column(
-            12,
-            code("comp_dev_b"),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "comp_dev_b")
-            )
-          )
+        code("comp_dev_b"),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "comp_dev_b")
         ),
-        fluidRow(
-          column(
-            12,
-            code("comp_dev_x"),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "comp_dev_x")
-            )
-          )
+        code("comp_dev_x"),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "comp_dev_x")
         ),
-        fluidRow(
-          column(
-            12,
-            code("comp_dev_y"),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "comp_dev_y")
-            )
-          )
+        code("comp_dev_y"),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "comp_dev_y")
         )
       )
     ))
@@ -279,11 +219,15 @@ mod_upload_ui <- function(id, dev = FALSE) {
 #'
 #' @param id module id
 #' @param dev show developer reactive-value outputs (default FALSE)
+#' @param dark_mode reactive returning TRUE when the app is in dark mode
+#'   (default reactive(FALSE))
 #'
+#' @return A list of reactives: `base_data`, `base_name`, `comp_data`,
+#'   `comp_name`
 #' @export mod_upload_server
 #'
 #' @description Server module for upload
-mod_upload_server <- function(id, dev = FALSE) {
+mod_upload_server <- function(id, dev = FALSE, dark_mode = reactive(FALSE)) {
   moduleServer(id = id, module = function(input, output, session) {
 
     # |-- INPUT [base] base_xlsx_sheets -----
@@ -336,7 +280,7 @@ mod_upload_server <- function(id, dev = FALSE) {
           wrap = FALSE,
           bordered = TRUE,
           filterable = TRUE,
-          theme = base_react_theme
+          theme = base_react_theme(dark_mode())
         )
       )
     })
@@ -416,7 +360,7 @@ mod_upload_server <- function(id, dev = FALSE) {
           wrap = FALSE,
           bordered = TRUE,
           filterable = TRUE,
-          theme = comp_react_theme
+          theme = comp_react_theme(dark_mode())
         )
       )
     })

@@ -19,7 +19,7 @@ knitr::opts_chunk$set(
 
 # Motivation
 
-The Shiny modules in `dfdiffs` (upload, select, compare, and display) keep their reactive logic in server functions. These are tested with `shiny::testServer()`, which runs a module's server function without starting an app or a browser: the test sets inputs with `session$setInputs()`, and then checks the reactive values (or rendered outputs) the module returns.
+The Shiny modules in `dfdiffs` (upload, select, and compare) keep their reactive logic in server functions. These are tested with `shiny::testServer()`, which runs a module's server function without starting an app or a browser: the test sets inputs with `session$setInputs()`, and then checks the reactive values (or rendered outputs) the module returns. The base-R comparison engine (`compare_values()`, `diff_values_by_key()`, and the join helpers) is tested directly with plain `test_that()` blocks, no Shiny session needed.
 
 The tests live in `tests/testthat/`. Run them with:
 
@@ -27,80 +27,100 @@ The tests live in `tests/testthat/`. Run them with:
 devtools::test()
 ```
 
-There are currently 4 test files containing 7 tests (`test_that()` blocks) and 26 expectations.
+There are currently 8 test files containing 36 tests (`test_that()` blocks) and 82 expectations.
 
 # Test inventory
 
-Each row is one `test_that()` block. The first column gives the file and the test name (the string passed to `test_that()`), the second column is the app feature the test protects, and the third describes what the test does and expects.
+Each row is one `test_that()` block. The first column gives the file and the test name (the string passed to `test_that()`), the second column is the app feature or function the test protects, and the third describes what the test does and expects.
 
 | Test name / file | Feature | Test |
 |:-----------------|:--------|:-----|
 | `test-mod_upload.R`<br>*mod_upload_server() reads an uploaded base file into base_data()* | Upload module: base file | Uploads `InitialData.csv` as `base_file` (with `base_new_name = "InitialData"`) and expects `base_data()` to be a data frame with 5 rows and a `subject_id` column. |
 | `test-mod_upload.R`<br>*mod_upload_server() reads an uploaded compare file into comp_data()* | Upload module: compare file | Uploads `ChangedData.csv` as `comp_file` (with `comp_new_name = "ChangedData"`) and expects `comp_data()` to be a data frame with 5 rows and a `subject_id` column. |
+| `test-mod_upload.R`<br>*mod_upload_server() reads an uploaded xlsx sheet into base_data()* | Upload module: xlsx file | Writes `InitialData` to a temp `.xlsx` file with `openxlsx::write.xlsx()`, uploads it as `base_file` with a sheet name, and expects `base_data()` to match `InitialData`'s row count and columns. |
 | `test-mod_upload.R`<br>*mod_upload_server() uses base_new_name for base_name() when supplied* | Upload module: dataset naming | Uploads `InitialData.csv` with `base_new_name = "InitialData"` and expects `base_name()` to return `"InitialData"`. |
 | `test-mod_select.R`<br>*mod_select_server() builds joined base/compare data from selected columns* | Select module: join column | Passes `InitialData` and `ChangedData` in as the uploaded data, selects every column, and sets `by = c("subject_id", "record")`. Expects `base_join_col_data()` and `comp_join_col_data()` to be data frames with the same number of rows as their source data, containing `join_column`, `join_source`, and `data_source` columns (with `data_source` equal to the dataset names). |
 | `test-mod_select.R`<br>*mod_select_server() falls back to a row-by-row comparison with no 'by' columns* | Select module: row-by-row comparison | Selects every column but leaves `by` empty. Expects `base_join_col_data()` to have no `join_column`, but to keep the `data_source` column. |
 | `test-mod_compare.R`<br>*mod_compare_server() detects changed values via the 'join_column' path* | Compare module: changed data | Builds joined base/compare data with `create_join_column()` (on `subject_id` and `record`) and passes it in as the selected data. Expects `compare_cols()` to include `join_column`, `changed_data()` to contain `diffs` and `diffs_byvar` (with at least one row in `diffs_byvar`), and `new_data()` and `deleted_data()` to have 0 rows. |
-| `test-mod_display.R`<br>*mod_display_server() previews base and compare data from mod_upload_server()'s return shape* | Display module: data preview | Passes in a list shaped like the return value of `mod_upload_server()` (`base_data`, `base_name`, `comp_data`, `comp_name`). Expects the name outputs to contain `"InitialData"` and `"ChangedData"`, and both table outputs to be rendered (non-`NULL`). |
+| `test-mod_compare.R`<br>*mod_compare_server() download report works via the 'join_column' path* | Compare module: report download | With joined base/compare data as the selected data, reads the downloaded `.xlsx` file and expects it to contain the "New Data", "Deleted Data", "Changed Data", and "Review Changes" sheets, with the "Review Changes" sheet including a `join_column`. |
+| `test-mod_compare.R`<br>*mod_compare_server() download report works via the row-by-row path* | Compare module: report download (no join) | With no join column in the selected data, expects `compare_cols()` to exclude `join_column`, and the downloaded report's "Review Changes" sheet to include a `rownumber` column instead. |
+| `test-compare_data.R`<br>*compare_data() returns new, deleted, and changed comparison tables* | `compare_data()` | Runs `compare_data()` on `Roster2021`/`Roster2022` with `by = "subject_id"` and expects a named list of `new_data`, `deleted_data`, `changed_num_diffs`, `changed_var_diffs`, with `new_data`/`deleted_data` non-empty data frames. |
+| `test-create_comparison_report.R`<br>*create_comparison_report() writes all six sheets to the xlsx file* | `create_comparison_report()` | Runs `create_comparison_report()` on `Roster2021`/`Roster2022` and expects the output file to exist with all six expected sheets, and the "New Data" sheet to be non-empty. |
+| `test-launch_app.R`<br>*(four tests, one per launcher)* | App launchers | Calls `launch_app()`, `launch_app_dev()`, `launch_upload_demo()`, and `launch_select_demo()` and expects each to return a `shiny.appobj` without error. |
+| `test-join_helpers.R`<br>*(seven tests)* | `select_cols()`, `anti_join_base()`, `left_join_base()` | Covers column subsetting (including a missing-column error), multi-column-key matching, `NA`-in-key handling, and left-join column attachment/`NA` fill for unmatched rows. |
+| `test-compare_values.R`<br>*(fourteen tests)* | `compare_values()`, `diff_values_by_key()` | Covers `NA`-vs-`NA` and `NA`-vs-value handling, exact string comparison, numeric tolerance (default and custom `tolerance`/`scale`), integer/double comparison, `Date` vs. same-instant `POSIXct` (equal) and different `POSIXct` (not equal), factor/character label comparison (default and `strict_factor = TRUE`), vectorization, and `diff_values_by_key()`'s row-matching, zero-diff, and class-mismatch behavior. |
 
 ## Test data
 
 The tests use the package's own datasets, so they don't depend on files outside of `dfdiffs`:
 
-- `InitialData` and `ChangedData` (from `data/`) are the base and compare data for the select, compare, and display tests.
-- `inst/extdata/csv/InitialData.csv` and `inst/extdata/csv/ChangedData.csv` are the files uploaded in the upload tests.
+- `InitialData` and `ChangedData` (from `data/`) are the base and compare data for the select and compare tests.
+- `Roster2021`/`Roster2022` are the base and compare data for the `compare_data()`/`create_comparison_report()` tests.
+- `inst/extdata/csv/InitialData.csv` and `inst/extdata/csv/ChangedData.csv` are the files uploaded in the CSV upload tests.
 
 # Call structure
 
-Each test targets a module's server function. The call trees below show the `dfdiffs` functions those tests exercise indirectly (for example, the compare module test also runs `create_new_data()`, `create_deleted_data()`, and `create_modified_data()`). They were generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`); only functions defined in `dfdiffs` are shown.
+Each Shiny-module test targets a module's server function; the call trees below show the `dfdiffs` functions those tests exercise indirectly (for example, the compare module tests also run `create_new_data()`, `create_deleted_data()`, and `create_modified_data()`). They were generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`); only functions defined in `dfdiffs` are shown.
 
 ```{r call-tree-tests, eval=FALSE}
 library(stackcallr)
 call_tree_dir("R", root = "mod_upload_server")
 call_tree_dir("R", root = "mod_select_server")
 call_tree_dir("R", root = "mod_compare_server")
-call_tree_dir("R", root = "mod_display_server")
 ```
 
 ```
 █─mod_upload_server
-└─█─upload_data
-  └─load_flat_file
+├─█─upload_data
+│ └─load_flat_file
+├─base_react_theme
+└─comp_react_theme
 ```
 
 ```
 █─mod_select_server
-└─create_join_column
+├─select_cols
+├─base_react_theme
+├─comp_react_theme
+├─info_react_theme
+└─█─create_join_column
+  └─select_cols
 ```
 
 ```
 █─mod_compare_server
 ├─%nin%
+├─info_react_theme
 ├─█─create_new_data
+│ ├─anti_join_base
+│ ├─select_cols
 │ ├─rename_join_col
 │ └─create_new_column
+├─new_react_theme
 ├─█─create_deleted_data
+│ ├─anti_join_base
+│ ├─select_cols
 │ ├─rename_join_col
 │ └─create_new_column
+├─deleted_react_theme
 ├─█─create_modified_data
+│ ├─select_cols
+│ ├─█─diff_values_by_key
+│ │ ├─compare_values
+│ │ └─class_diffs
 │ ├─rename_join_col
 │ └─create_new_column
-└─█─create_changed_data
-  ├─extract_df_tables
-  ├─rename_join_col
-  └─create_new_column
+├─select_cols
+├─changed_react_theme
+└─left_join_base
 ```
 
-```
-mod_display_server
-```
+`test-compare_data.R`, `test-create_comparison_report.R`, `test-join_helpers.R`, and `test-compare_values.R` call their target functions directly and don't go through a Shiny module, so there's no call tree to show for them beyond what's already in the [getting-started](getting-started.html) vignette.
 
 # What isn't tested
 
-The current tests cover the reactive logic of the four modules. These areas don't have tests yet:
+The current tests cover the reactive logic of the three modules, the base-R comparison engine, `compare_data()`, `create_comparison_report()`, and a build smoke test for every `launch_*()` entry point. These areas don't have tests yet:
 
-- The UI functions (`mod_upload_ui()`, `mod_select_ui()`, `mod_compare_ui()`, `mod_display_ui()`, and `app_ui()`).
-- The app launchers (`launch_app()` and the `launch_*_demo()` functions).
-- Uploading Excel (`.xlsx`) files (the upload tests use CSVs).
-- The compare module's row-by-row path (no `join_column`), and the report download.
-- `compare_data()` and `create_comparison_report()`, which have vignettes but no tests.
+- The UI functions (`mod_upload_ui()`, `mod_select_ui()`, `mod_compare_ui()`, and `app_ui()`).
+- `cross_tabyl()` and `create_join_column()`'s multi-column `by_colums` path.
+- `class_diffs()` beyond the one genuine-class-mismatch case covered in `test-compare_values.R`.

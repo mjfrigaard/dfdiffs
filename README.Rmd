@@ -25,9 +25,9 @@ The goal of `dfdiffs` is to answer the following questions:
 2. What rows were here before that aren't here now?   
 3. What values have been changed?   
 
-The `dfdiffs` package and application wouldn't be possible without the previous work from the authors of the [`arsenal`](https://mayoverse.github.io/arsenal/reference/arsenal.html) and [`diffdf`](https://gowerc.github.io/diffdf/) packages.
+The `dfdiffs` Shiny app-package is built with [`bslib`](https://rstudio.github.io/bslib/). Its comparison engine is pure base R, but it owes a debt to the [`diffdf`](https://gowerc.github.io/diffdf/) package: the tolerance-based numeric comparison in `compare_values()` is a direct port of `diffdf`'s own formula.
 
-You can access a development version of the application [here.](https://mjfrigaard.shinyapps.io/compareDataApp/) 
+You can access a development version of the application [here](https://mjfrigaard.shinyapps.io/compareDataApp/).
 
 ## Installation
 
@@ -42,37 +42,35 @@ devtools::install_github("mjfrigaard/dfdiffs")
 library(dfdiffs)
 ```
 
-## Packages 
+## Packages
 
-Dependencies
+`dfdiffs` depends on:
 
 ```{r dep-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
-library(dplyr)
-library(stringr)
-library(forcats)
-library(lubridate)
-library(fs)
-library(vctrs)
-library(glue)
-library(purrr)
-library(vroom)
+library(bslib)
+library(data.table)
+library(ggplot2)
 library(haven)
+library(janitor)
+library(openxlsx)
+library(purrr)
+library(reactable)
 library(readxl)
-library(janitor) 
-library(arsenal) 
-library(diffdf)  
-library(gt)
-library(labelled)
-library(gtsummary)
+library(shiny)
+library(tibble)
 ```
 
-## Package functions 
+`dfdiffs`'s own comparison engine (`create_new_data()`, `create_deleted_data()`, `create_changed_data()`, `create_modified_data()`, and the helpers behind them) is built on base R alone, so it doesn't require `dplyr`, `tidyr`, `tidyselect`, or `diffdf`. Those packages (plus `arsenal`) remain in `Suggests` only because a few vignettes demonstrate them directly, side-by-side, as points of comparison.
 
-We have functions for answering each of the questions posed above. Each function has a pair of datasets to demonstrate how they work (which we'll cover below).
+The Shiny app previews and displays data with [`reactable`](https://glin.github.io/reactable/) (an interactive JS widget). GitHub renders this README as plain markdown and strips the JS that a `reactable` table needs, so the tables below use `knitr::kable()`, which GitHub can render natively.
+
+## Package functions
+
+`dfdiffs` has a function for each of the questions posed above, and each function comes with a pair of example datasets that demonstrate how it works (which we'll cover below).
 
 ## *What rows are here now that weren't here before?*
 
-To check new data, we're going to use `T1Data` and `T2Data`.
+To check for new data, we'll use `T1Data` and `T2Data`.
 
 ```{r T1Data-T2Data-NewData, echo=TRUE}
 T1Data <- dfdiffs::T1Data
@@ -82,40 +80,40 @@ NewData <- dfdiffs::NewData
 
 ### Timepoint 1 data (original)
 
-These data represent data taken at T1. 
+`T1Data` represents data collected at the first timepoint (T1).
 
 ```{r T1Data}
-T1Data |> gt::gt()
+T1Data |> knitr::kable()
 ```
 
 ### Timepoint 2 data (new)
 
-This is a 'new' dataset representing T2.
+`T2Data` is the 'new' dataset, representing data collected at the second timepoint (T2).
 
 ```{r T2Data}
-T2Data |> gt::gt()
+T2Data |> knitr::kable()
 ```
 
 ### `create_new_data()`
 
-The `create_new_data()` function shows us the 'new data' (i.e. what is here now that wasn't here before?)
+The `create_new_data()` function returns the 'new data' (i.e., the rows that are here now but weren't here before).
 
 ```{r}
 create_new_data(
   compare = T2Data, 
-  base = T1Data) |> 
-  gt::gt()
+  base = T1Data) |>
+  knitr::kable()
 ```
 
-We can check this against the `NewData` dataset (which should match the output from `create_new_data()`)
+We can check this against the `NewData` dataset, which should match the output from `create_new_data()`.
 
 ```{r NewData}
-NewData |> gt::gt()
+NewData |> knitr::kable()
 ```
 
 ## *What rows were here before that aren't here now?*
 
-To test for the deleted data, we use the `CompleteData`, `IncompleteData`, and check these with `DeletedData`. 
+To test for deleted data, we'll compare `CompleteData` and `IncompleteData`, then check the result against `DeletedData`.
 
 ```{r CompleteData-IncompleteData, echo = TRUE}
 CompleteData <- dfdiffs::CompleteData
@@ -128,7 +126,7 @@ DeletedData <- dfdiffs::DeletedData
 `CompleteData` represents a 'complete' set of data. 
 
 ```{r CompleteData}
-CompleteData |> gt::gt()
+CompleteData |> knitr::kable()
 ```
 
 
@@ -137,37 +135,33 @@ CompleteData |> gt::gt()
 This is a dataset with rows removed from `CompleteData`.
 
 ```{r IncompleteData}
-IncompleteData |> gt::gt()
+IncompleteData |> knitr::kable()
 ```
 
 ### `create_deleted_data()`
 
-When we run the `create_deleted_data()`, we check for the deleted rows between `IncompleteData` and `CompleteData`.
+Running `create_deleted_data()` checks for rows that were deleted between `CompleteData` and `IncompleteData`.
 
 ```{r create_deleted_data, echo=TRUE}
 create_deleted_data(
   compare = IncompleteData, 
-  base = CompleteData) |> 
-  gt::gt()
+  base = CompleteData) |>
+  knitr::kable()
 ```
 
 ### The deleted data 
 
-This is identical to the data stored in `DeletedData`
+The output above is identical to the data stored in `DeletedData`.
 
 ```{r DeletedData}
-DeletedData |> gt::gt()
+DeletedData |> knitr::kable()
 ```
 
 ## *What values have been changed?*
 
-To answer this question, we have two options: `create_changed_data()` and `create_modified_data()`.
+To answer this question, we have two options: `create_changed_data()` and `create_modified_data()`. Both build on the same `diff_values_by_key()`/`compare_values()` engine and differ only in the shape of their output: `create_changed_data()` returns `$num_diffs`/`$var_diffs` (used by `compare_data()`), and `create_modified_data()` returns `$diffs_byvar`/`$diffs` (used by `mod_compare` and `create_comparison_report()`).
 
-+ `create_changed_data()` relies on the `diffdf()` function from the [`diffdf` package](https://gowerc.github.io/diffdf/reference/diffdf.html) package. 
-
-+ `create_modified_data()` relies on the `comparedf()` function from the [`arsenal` package](https://mayoverse.github.io/arsenal/reference/comparedf.html) package.
-
-To check for changes between two datasets, we use the `InitialData` and `ChangedData`. 
+To check for changes between two datasets, we'll use `InitialData` and `ChangedData`.
 
 ```{r InitialData-ChangedData, echo=TRUE}
 InitialData <- dfdiffs::InitialData
@@ -177,13 +171,13 @@ ChangedData <- dfdiffs::ChangedData
 ### Initial data 
 
 ```{r InitialData}
-InitialData |> gt::gt()
+InitialData |> knitr::kable()
 ```
 
 ### Changed data
 
 ```{r ChangedData}
-ChangedData |> gt::gt()
+ChangedData |> knitr::kable()
 ```
 
 ### `create_changed_data()` 
@@ -202,7 +196,7 @@ names(changed)
 The counts of changes by variable are stored in `num_diffs`.
 
 ```{r num_diffs}
-changed$num_diffs |> gt::gt()
+changed$num_diffs |> knitr::kable()
 ```
 
 #### Changes by row (`var_diffs`)
@@ -210,7 +204,7 @@ changed$num_diffs |> gt::gt()
 The changes by row are stored in `var_diffs`.
 
 ```{r var_diffs}
-changed$var_diffs |> gt::gt()
+changed$var_diffs |> knitr::kable()
 ```
 
 ### `create_modified_data()` 
@@ -229,7 +223,7 @@ names(modified)
 The counts of changes by variable are stored in `diffs_byvar`.
 
 ```{r diffs_byvar}
-modified$diffs_byvar |> gt::gt()
+modified$diffs_byvar |> knitr::kable()
 ```
 
 #### Changes by row 
@@ -237,6 +231,6 @@ modified$diffs_byvar |> gt::gt()
 The changes by row are stored in `diffs`.
 
 ```{r diffs}
-modified$diffs |> gt::gt()
+modified$diffs |> knitr::kable()
 ```
 

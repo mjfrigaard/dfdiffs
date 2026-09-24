@@ -4,12 +4,19 @@
 \alias{mod_upload_server}
 \title{mod_upload_server()}
 \usage{
-mod_upload_server(id, dev = FALSE)
+mod_upload_server(id, dev = FALSE, dark_mode = reactive(FALSE))
 }
 \arguments{
 \item{id}{module id}
 
 \item{dev}{show developer reactive-value outputs (default FALSE)}
+
+\item{dark_mode}{reactive returning TRUE when the app is in dark mode
+(default reactive(FALSE))}
+}
+\value{
+A list of reactives: \code{base_data}, \code{base_name}, \code{comp_data},
+\code{comp_name}
 }
 \description{
 Server module for upload

@@ -1,12 +1,15 @@
 #' mod_compare_ui
 #'
 #'
-#' @importFrom bslib layout_column_wrap value_box card card_header card_body
-#'   navset_card_tab nav_panel tooltip accordion accordion_panel
+#' @importFrom bslib layout_column_wrap layout_columns value_box card
+#'   card_header card_body navset_card_tab nav_panel tooltip accordion
+#'   accordion_panel
 #'
 #' @param id module id
 #' @param dev show developer reactive-value outputs (default FALSE)
 #'
+#' @return A `tagList` of the compare module's UI (KPI tiles, match info,
+#'   and the results tabs)
 #' @export mod_compare_ui
 #'
 #' @description compare UI module
@@ -35,9 +38,9 @@ mod_compare_ui <- function(id, dev = FALSE) {
     bslib::card(
       bslib::card_header("How base and compare are matched"),
       bslib::card_body(
-        fluidRow(
-          column(
-            width = 5,
+        bslib::layout_columns(
+          col_widths = c(5, 7),
+          tagList(
             ## OUTPUT |-- (info) ------
             uiOutput(
               outputId = NS(
@@ -53,12 +56,9 @@ mod_compare_ui <- function(id, dev = FALSE) {
               )
             )
           ),
-          column(
-            width = 7,
-            downloadButton(outputId =
-                NS(namespace = id, id = "download"),
-              label = "Download Report", class = "btn-secondary")
-          )
+          downloadButton(outputId =
+              NS(namespace = id, id = "download"),
+            label = "Download Report", class = "btn-secondary")
         )
       )
     ),
@@ -66,6 +66,7 @@ mod_compare_ui <- function(id, dev = FALSE) {
     bslib::navset_card_tab(
       title = "Results",
       id = NS(namespace = id, id = "results_tabs"),
+      full_screen = TRUE,
       # New Data ------
       bslib::nav_panel(
         title = "New Data",
@@ -116,19 +117,14 @@ mod_compare_ui <- function(id, dev = FALSE) {
         ),
         br(), br(),
         p(strong("Differences by Variable:")),
-        fluidRow(
-          column(
-            width = 5,
-            ## OUTPUT |-- (num_diffs_display) ------
-            reactable::reactableOutput(
-              outputId = NS(namespace = id, id = "num_diffs_display")
-            )
+        bslib::layout_columns(
+          col_widths = c(5, 7),
+          ## OUTPUT |-- (num_diffs_display) ------
+          reactable::reactableOutput(
+            outputId = NS(namespace = id, id = "num_diffs_display")
           ),
-          column(
-            width = 7,
-            ## OUTPUT |-- (num_diffs_graph) ------
-            plotOutput(outputId = NS(namespace = id, id = "num_diffs_graph"))
-          )
+          ## OUTPUT |-- (num_diffs_graph) ------
+          plotOutput(outputId = NS(namespace = id, id = "num_diffs_graph"))
         )
       ),
       # Review Changes ------
@@ -166,32 +162,17 @@ mod_compare_ui <- function(id, dev = FALSE) {
           title = "Reactive values",
           icon = icon("bug"),
           strong(em("For DEV purposes only")),
-          fluidRow(
-            column(
-              12,
-              strong(code("dev_a"), "=", code("base_join_data()")),
-              verbatimTextOutput(
-                outputId = NS(namespace = id, id = "dev_a")
-              )
-            )
+          strong(code("dev_a"), "=", code("base_join_data()")),
+          verbatimTextOutput(
+            outputId = NS(namespace = id, id = "dev_a")
           ),
-          fluidRow(
-            column(
-              12,
-              strong(code("dev_b"), "=", code("comp_join_data()")),
-              verbatimTextOutput(
-                outputId = NS(namespace = id, id = "dev_b")
-              )
-            )
+          strong(code("dev_b"), "=", code("comp_join_data()")),
+          verbatimTextOutput(
+            outputId = NS(namespace = id, id = "dev_b")
           ),
-          fluidRow(
-            column(
-              12,
-              strong(code("dev_c"), "=", code("comp_var_diffs()")),
-              verbatimTextOutput(
-                outputId = NS(namespace = id, id = "dev_c")
-              )
-            )
+          strong(code("dev_c"), "=", code("comp_var_diffs()")),
+          verbatimTextOutput(
+            outputId = NS(namespace = id, id = "dev_c")
           )
         )
       )
@@ -202,12 +183,18 @@ mod_compare_ui <- function(id, dev = FALSE) {
 #' mod_compare_server
 #'
 #' @param id module id
+#' @param data_selected list of reactives returned by `mod_select_server()`
+#'   (`join_selected`, `base_join_col_data`, `comp_join_col_data`)
 #' @param dev show developer reactive-value outputs (default FALSE)
+#' @param dark_mode reactive returning TRUE when the app is in dark mode
+#'   (default reactive(FALSE))
 #'
+#' @return NULL invisibly; called for the side effect of rendering the
+#'   module's outputs and the report `downloadHandler()`
 #' @export mod_compare_server
 #'
 #' @description compare server module
-mod_compare_server <- function(id, data_selected, dev = FALSE) {
+mod_compare_server <- function(id, data_selected, dev = FALSE, dark_mode = reactive(FALSE)) {
   moduleServer(id = id, module = function(input, output, session) {
 
     ## SELECTED DATA ----------------------------------------------
@@ -238,10 +225,10 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
         `Compare Columns` = compare_cols()
       )
       # remove join column, data_source, join_source
-      compare_cols_tbl <- dplyr::filter(
-        compare_cols_tbl,
-        `Compare Columns` %nin% c("join_column", "data_source", "join_source")
-      )
+      compare_cols_tbl <- compare_cols_tbl[
+        compare_cols_tbl[["Compare Columns"]] %nin% c("join_column", "data_source", "join_source"),
+        , drop = FALSE
+      ]
       return(compare_cols_tbl)
     })
     #### DEV OUTPUT |--  (dev_a/dev_b) ---------
@@ -263,17 +250,17 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
       unique(base_join_data()$data_source)
     })
     output$base_dims <- renderText({
-      paste0(nrow(base_join_data()), " rows × ", ncol(base_join_data()), " cols")
+      paste0(nrow(base_join_data()), " rows \u00d7 ", ncol(base_join_data()), " cols")
     })
     output$comp_name <- renderText({
       unique(comp_join_data()$data_source)
     })
     output$comp_dims <- renderText({
-      paste0(nrow(comp_join_data()), " rows × ", ncol(comp_join_data()), " cols")
+      paste0(nrow(comp_join_data()), " rows \u00d7 ", ncol(comp_join_data()), " cols")
     })
     ### OUTPUT |--  (info) ---------
     output$info <- renderUI({
-      if (length(base_join_data()$join_source) > 0) {
+      if ("join_source" %in% names(base_join_data()) && length(base_join_data()$join_source) > 0) {
         HTML(paste0(
           "The ",
           code("base"), " and ", code("compare"),
@@ -300,13 +287,7 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
         wrap = FALSE,
         bordered = TRUE,
         defaultPageSize = 5,
-        theme = reactable::reactableTheme(
-          color = "#011627",
-          borderColor = "#e5eaee",
-          stripedColor = "#f6f8fa",
-          highlightColor = "#f0f5f9",
-          cellPadding = "8px 12px"
-        )
+        theme = info_react_theme(dark_mode())
       )
     })
 
@@ -314,7 +295,7 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
     ###  |-- REACTIVE  new data ---------
     new_data <- reactive({
       # join column
-      if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
+      if (sum(grepl("^join_column", compare_cols())) > 0) {
         new <- create_new_data(
           compare = comp_join_data(),
           base = base_join_data(),
@@ -343,7 +324,7 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
           wrap = FALSE,
           bordered = TRUE,
           filterable = TRUE,
-          theme = new_react_theme
+          theme = new_react_theme(dark_mode())
         )
       })
     })
@@ -352,7 +333,7 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
     ### |-- REACTIVE  deleted data ---------
     deleted_data <- reactive({
       # join column
-      if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
+      if (sum(grepl("^join_column", compare_cols())) > 0) {
         deleted <- create_deleted_data(
           compare = comp_join_data(),
           base = base_join_data(),
@@ -380,7 +361,7 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
           wrap = FALSE,
           bordered = TRUE,
           filterable = TRUE,
-          theme = deleted_react_theme
+          theme = deleted_react_theme(dark_mode())
         )
       })
     })
@@ -390,10 +371,10 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
     ### this creates $diffs and $diffs_byvar
     changed_data <- reactive({
       # join column
-      if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
+      if (sum(grepl("^join_column", compare_cols())) > 0) {
         # remove data source
-        comp_join_data <- select(comp_join_data(), -data_source)
-        base_join_data <- select(base_join_data(), -data_source)
+        comp_join_data <- comp_join_data()[setdiff(names(comp_join_data()), "data_source")]
+        base_join_data <- base_join_data()[setdiff(names(base_join_data()), "data_source")]
         # changes
         changed <- create_modified_data(
           compare = comp_join_data,
@@ -403,8 +384,8 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
         # no join column
       } else {
         # remove data source
-        comp_join_data <- select(comp_join_data(), -data_source)
-        base_join_data <- select(base_join_data(), -data_source)
+        comp_join_data <- comp_join_data()[setdiff(names(comp_join_data()), "data_source")]
+        base_join_data <- base_join_data()[setdiff(names(base_join_data()), "data_source")]
         changed <- create_modified_data(
           compare = comp_join_data,
           base = base_join_data
@@ -426,11 +407,7 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
       if (!is.null(changed_data()[["diffs_byvar"]])) {
         output$num_diffs_display <- reactable::renderReactable({
           reactable::reactable(
-            data = dplyr::select(
-              changed_data()$diffs_byvar,
-              `Variable name`,
-              `Modified Values`
-            ),
+            data = select_cols(changed_data()$diffs_byvar, c("Variable name", "Modified Values")),
             resizable = TRUE,
             pagination = TRUE,
             defaultPageSize = 10,
@@ -439,7 +416,7 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
             wrap = FALSE,
             bordered = TRUE,
             filterable = TRUE,
-            theme = changed_react_theme
+            theme = changed_react_theme(dark_mode())
           )
         })
       } else {
@@ -448,12 +425,10 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
             variable = 0, no_of_differences = 0
           )
           reactable::reactable(
-            data =
-              dplyr::rename(
-                empty_num_diffs,
-                `Variable name` = variable,
-                `Modified Values` = no_of_differences
-              ),
+            data = {
+              names(empty_num_diffs) <- c("Variable name", "Modified Values")
+              empty_num_diffs
+            },
             resizable = TRUE,
             pagination = TRUE,
             defaultPageSize = 10,
@@ -462,7 +437,7 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
             wrap = FALSE,
             bordered = TRUE,
             filterable = TRUE,
-            theme = changed_react_theme
+            theme = changed_react_theme(dark_mode())
           )
         })
       }
@@ -473,13 +448,12 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
       output$num_diffs_graph <- renderPlot({
         diffs_byvar <- tibble::as_tibble(changed_data()$diffs_byvar)
         # rename column names
-        rename(diffs_byvar,
-          variable = `Variable name`,
-          mod_values = `Modified Values`) |>
+        names(diffs_byvar) <- c("variable", "mod_values")
+        diffs_byvar |>
           # create graph
           ggplot2::ggplot(
             ggplot2::aes(
-              x = forcats::fct_reorder(.f = variable, .x = mod_values),
+              x = factor(variable, levels = variable[order(mod_values)]),
               y =  mod_values,
               fill = variable
             )
@@ -500,22 +474,19 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
     ### |-- REACTIVE comp_var_diffs -------------------
     ### we want to extract the $diffs tibble from the changed_data() list
     comp_var_diffs <- eventReactive(input$go_review_changed_data, {
-      if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
+      if (sum(grepl("^join_column", compare_cols())) > 0) {
         # join to var_diffs
-        dplyr::left_join(
+        left_join_base(
           x = changed_data()$diffs,
           y = comp_join_data(),
           by = "join_column"
         )
       } else {
-        compare_row_by_row <- comp_join_data() %>%
-          mutate(
-            rownumber = row_number(),
-            rownumber = as.character(rownumber)
-          ) |>
-          relocate(rownumber, .before = 1)
+        compare_row_by_row <- comp_join_data()
+        compare_row_by_row$rownumber <- as.character(seq_len(nrow(compare_row_by_row)))
+        compare_row_by_row <- compare_row_by_row[c("rownumber", setdiff(names(compare_row_by_row), "rownumber"))]
         # join to var_diffs
-        dplyr::left_join(
+        left_join_base(
           x = changed_data()$diffs,
           y = compare_row_by_row,
           by = "rownumber"
@@ -537,7 +508,7 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
             wrap = FALSE,
             bordered = TRUE,
             filterable = TRUE,
-            theme = changed_react_theme
+            theme = changed_react_theme(dark_mode())
           )
         })
       } else {
@@ -558,7 +529,7 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
             wrap = FALSE,
             bordered = TRUE,
             filterable = TRUE,
-            theme = changed_react_theme
+            theme = changed_react_theme(dark_mode())
           )
         })
       }
@@ -586,7 +557,7 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
                                sheetName = "Review Changes")
 
         #### DATA download ----
-          if (sum(str_detect(string = compare_cols(), "^join_column")) > 0) {
+          if (sum(grepl("^join_column", compare_cols())) > 0) {
              #### NEW DATA ----
              new <- create_new_data(
                 compare = comp_join_data(),
@@ -603,23 +574,22 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
               #### we have two tibbles in changed_data(),
               #### $diffs_byvar and $diffs
               #### remove data_source from base and compare
-              comp_join_data <- select(comp_join_data(), -data_source)
-              base_join_data <- select(base_join_data(), -data_source)
-              # changed_data
-              # create changed_data with by column
-              changed_data <- create_modified_data(
-                compare = comp_join_data,
-                base = base_join_data,
+              dwnld_comp_data <- comp_join_data()[setdiff(names(comp_join_data()), "data_source")]
+              dwnld_base_data <- base_join_data()[setdiff(names(base_join_data()), "data_source")]
+              # create the changed data with by column
+              dwnld_changed_data <- create_modified_data(
+                compare = dwnld_comp_data,
+                base = dwnld_base_data,
                 by = "join_column"
               )
               ##### num_diffs_dwnld ----
-              num_diffs_dwnld <- dplyr::select(
-              changed_data()$diffs_byvar,
-              `Variable name`,
-              `Modified Values`)
+              num_diffs_dwnld <- select_cols(
+                dwnld_changed_data$diffs_byvar,
+                c("Variable name", "Modified Values")
+              )
               ##### comp_var_diffs_dwnld ----
-                comp_var_diffs_dwnld <- dplyr::left_join(
-                      x = changed_data()$diffs,
+                comp_var_diffs_dwnld <- left_join_base(
+                      x = dwnld_changed_data$diffs,
                       y = comp_join_data(),
                       by = "join_column"
                     )
@@ -636,29 +606,26 @@ mod_compare_server <- function(id, data_selected, dev = FALSE) {
               base = base_join_data()
             )
             #### CHANGED DATA ----
-            comp_join_data <- select(comp_join_data(), -data_source)
-            base_join_data <- select(base_join_data(), -data_source)
-            changed_data <- create_changed_data(
-              compare = comp_join_data,
-              base = base_join_data
+            dwnld_comp_data <- comp_join_data()[setdiff(names(comp_join_data()), "data_source")]
+            dwnld_base_data <- base_join_data()[setdiff(names(base_join_data()), "data_source")]
+            dwnld_changed_data <- create_modified_data(
+              compare = dwnld_comp_data,
+              base = dwnld_base_data
             )
             ##### num_diffs_dwnld ----
-            num_diffs_dwnld <-  dplyr::select(
-              changed_data()$diffs_byvar,
-              `Variable name`,
-              `Modified Values`)
+            num_diffs_dwnld <- select_cols(
+              dwnld_changed_data$diffs_byvar,
+              c("Variable name", "Modified Values")
+            )
             ##### comp_var_diffs_dwnld ----
             ###### ROW-BY-ROW comparison ----
-            comp_var_diffs_dwnld <- comp_join_data() |>
-              mutate(
-                rownumber = row_number(),
-                rownumber = as.character(rownumber)
-              ) |>
-              relocate(rownumber, .before = 1)
+            dwnld_row_by_row <- comp_join_data()
+            dwnld_row_by_row$rownumber <- as.character(seq_len(nrow(dwnld_row_by_row)))
+            dwnld_row_by_row <- dwnld_row_by_row[c("rownumber", setdiff(names(dwnld_row_by_row), "rownumber"))]
               # join to var_diffs
-              dplyr::left_join(
-                x = changed_data()$var_diffs,
-                y = compare_row_by_row,
+              comp_var_diffs_dwnld <- left_join_base(
+                x = dwnld_changed_data$diffs,
+                y = dwnld_row_by_row,
                 by = "rownumber"
               )
           }

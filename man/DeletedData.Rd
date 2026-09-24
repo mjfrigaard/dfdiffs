@@ -5,22 +5,23 @@
 \alias{DeletedData}
 \title{Deleted Data (simulated data for checking deleted data)}
 \format{
-A data frame with 9 rows and 7 variables:
+A data frame with 4 rows and 7 variables:
 \describe{
 \item{subject}{A character ID variable ("A", "B", "C", "D")}
 \item{record}{A numeric record ID (1-3)}
 \item{start_date}{a beginning date (from 2021-12-26 to 2021-12-30)}
 \item{mid_date}{a middle date (from 2022-01-25 to 2022-01-29)}
 \item{end_date}{a last date (from 2022-02-24 to 2022-02-28)}
-\item{text_var}{a variable containing random text}
-\item{factor_var}{a categorical variable formatted as a factor}
+\item{text_var}{a visit record description (e.g. "Concomitant medication...")}
+\item{factor_var}{the record's category (e.g. "conmed", "exam", "history")}
 }
 }
 \usage{
 DeletedData
 }
 \description{
-A dataset containing four rows and seven columns. The variables are as
-follows:
+The four records present in \code{CompleteData} but not
+\code{IncompleteData} — the expected result of
+\code{create_deleted_data(compare = IncompleteData, base = CompleteData)}.
 }
 \keyword{datasets}

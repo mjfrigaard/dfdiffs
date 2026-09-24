@@ -3,12 +3,14 @@
 #' @importFrom bslib page_navbar nav_panel nav_spacer nav_item navbar_options input_dark_mode
 #'
 #' @return A Shiny UI definition
+
 #' @export app_ui
 #'
 #' @description UI for the production `dfdiffs` comparison app
 app_ui <- function() {
   compare_theme <- dfdiffs_fresh_theme()
   bslib::page_navbar(
+    id = "main_nav",
     title = "dfdiffs",
     theme = compare_theme,
     navbar_options = bslib::navbar_options(bg = "#011627", theme = "dark"),
@@ -47,11 +49,14 @@ app_ui <- function() {
         system.file("compareDataApp/assets/about.md", package = "dfdiffs")
       )
     ),
+    bslib::nav_item(uiOutput(outputId = "step_indicator", inline = TRUE)),
     bslib::nav_item(bslib::input_dark_mode(id = "dark_mode"))
   )
 }
 
 #' Application server
+#'
+#' @importFrom bslib nav_select
 #'
 #' @param input,output,session Shiny server arguments
 #'
@@ -59,17 +64,66 @@ app_ui <- function() {
 #'
 #' @description Server for the production `dfdiffs` comparison app
 app_server <- function(input, output, session) {
+  # dark mode (shared with all modules' reactable tables) -------------
+  dark_mode <- reactive({
+    identical(input$dark_mode, "dark")
+  })
   # mod_upload_server ------------------------------------------------
-  upload_data_list <- mod_upload_server(id = "upload_data")
+  upload_data_list <- mod_upload_server(id = "upload_data", dark_mode = dark_mode)
   # mod_select_server ------------------------------------------------
   select_data_list <- mod_select_server(
     id = "select_data",
-    data_upload = upload_data_list
+    data_upload = upload_data_list,
+    dark_mode = dark_mode
   )
   # mod_compare_server ------------------
   mod_compare_server(
     id = "compare_data",
-    data_selected = select_data_list
+    data_selected = select_data_list,
+    dark_mode = dark_mode
+  )
+
+  # step progress indicator --------------------------------------------
+  output$step_indicator <- renderUI({
+    nav_value <- input$main_nav
+    if (is.null(nav_value) || length(nav_value) != 1) {
+      return(NULL)
+    }
+    step <- switch(nav_value,
+      "1) Upload Data" = 1L,
+      "2) Select Data" = 2L,
+      "3) Compare Data" = 3L,
+      NA_integer_
+    )
+    if (is.na(step)) {
+      return(NULL)
+    }
+    tags$span(class = "navbar-text", paste0("Step ", step, " of 3"))
+  })
+
+  # step auto-advance ---------------------------------------------------
+  ## upload complete -> jump to "2) Select Data"
+  observeEvent(
+    {
+      req(upload_data_list$base_data())
+      req(upload_data_list$comp_data())
+      TRUE
+    },
+    once = TRUE,
+    {
+      bslib::nav_select(id = "main_nav", selected = "2) Select Data", session = session)
+    }
+  )
+  ## join column chosen -> jump to "3) Compare Data"
+  observeEvent(
+    {
+      req(length(select_data_list$join_selected()) > 0)
+      TRUE
+    },
+    once = TRUE,
+    {
+      bslib::nav_select(id = "main_nav", selected = "3) Compare Data", session = session)
+    }
   )
 }
 

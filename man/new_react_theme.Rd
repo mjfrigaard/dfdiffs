@@ -4,7 +4,10 @@
 \alias{new_react_theme}
 \title{reactable theme (new data)}
 \usage{
-new_react_theme
+new_react_theme(dark = FALSE)
+}
+\arguments{
+\item{dark}{use dark-mode colors (default FALSE)}
 }
 \description{
 theme for new data in reactable table

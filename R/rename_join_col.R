@@ -6,17 +6,9 @@
 #'
 #' @return renamed_data
 #' @export rename_join_col
-#'
-#' @importFrom dplyr rename
-#' @importFrom dplyr across
-#' @importFrom dplyr select
-#' @importFrom dplyr relocate
 rename_join_col <- function(data, by, by_col) {
-    # names(data)[names(data) == by] <- by_col
-    renamed_data <-  dplyr::rename_with(.data = data, ~ stringr::str_replace_all(.x, by, by_col))
-    return_data <- dplyr::relocate(.data = renamed_data, 
-                        tidyselect::all_of(by_col), 
-                        tidyselect::everything()
-    )
+    renamed_data <- as.data.frame(data)
+    names(renamed_data)[names(renamed_data) == by] <- by_col
+    return_data <- renamed_data[c(by_col, setdiff(names(renamed_data), by_col))]
     return(return_data)
 }

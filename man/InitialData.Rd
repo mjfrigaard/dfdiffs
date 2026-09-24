@@ -9,8 +9,8 @@ A data frame with 5 rows and 7 variables:
 \describe{
 \item{subject_id}{A character ID variable ("A", "B", "C")}
 \item{record}{A numeric record ID (1-5)}
-\item{text_value_a}{a variable containing random text}
-\item{text_value_b}{a variable containing random text}
+\item{text_value_a}{the adverse event's resolution status ("Issue resolved"/"Issue unresolved")}
+\item{text_value_b}{the adverse event term (e.g. "Fatigue", "Fever", "Joint pain")}
 \item{created_date}{a beginning date (from 2021-07-16  to 2021-08-24)}
 \item{updated_date}{a middle date (from 2021-09-02 to 2021-10-03)}
 \item{entered_date}{a last date (from 2021-08-18 to 2021-10-29)}
@@ -20,7 +20,8 @@ A data frame with 5 rows and 7 variables:
 InitialData
 }
 \description{
-A dataset containing five rows and seven columns. The variables are as
-follows:
+Simulated adverse-event records for three subjects, taken before query
+resolution, used to demonstrate \code{create_changed_data()} and
+\code{create_modified_data()}.
 }
 \keyword{datasets}

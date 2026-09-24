@@ -11,6 +11,10 @@ mod_compare_ui(id, dev = FALSE)
 
 \item{dev}{show developer reactive-value outputs (default FALSE)}
 }
+\value{
+A \code{tagList} of the compare module's UI (KPI tiles, match info,
+and the results tabs)
+}
 \description{
 compare UI module
 }

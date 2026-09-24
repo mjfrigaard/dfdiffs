@@ -16,23 +16,20 @@ T2Data <- data.frame(
           end_date = c("2022-03-30","2022-03-29",
                        "2022-03-25","2022-03-27","2022-03-26","2022-03-31",
                        "2022-04-21","2022-04-20","2022-04-22"),
-          text_var = c("The birch canoe slid on the smooth planks.",
-                       "Glue the sheet to the dark blue background.",
-                       "It's easy to tell the depth of a well.",
-                       "These days a chicken leg is a rare dish.",
-                       "Rice is often served in round bowls.",
-                       "The juice of lemons makes fine punch.",
-                       "The box was thrown beside the parked truck.",
-                       "The hogs were fed chopped corn and garbage.",
-                       "Four hours of steady work faced us."),
-        factor_var = c("food","most","park",
-                       "between","regard","law","pension",
-                       "encourage","associate")) %>%
+          text_var = c("Patient reports mild headache after morning dose.",
+                       "Patient reports occasional nausea following meals.",
+                       "Patient reports persistent fatigue throughout the day.",
+                       "Patient reports brief dizziness upon standing.",
+                       "Patient reports mild rash on the left forearm.",
+                       "Patient reports low-grade fever in the evening.",
+                       "Patient reports dry cough lasting several days.",
+                       "Patient reports difficulty sleeping through the night.",
+                       "Patient reports lower back pain after activity."),
+        factor_var = c("headache","nausea","fatigue",
+                       "dizziness","rash","fever","cough",
+                       "insomnia","back pain")) %>%
   # convert to date
   dplyr::mutate(dplyr::across(.cols = contains("date"), .fns = lubridate::ymd)) %>%
   dplyr::arrange(desc(subject))
 T2Data <- tibble::as_tibble(T2Data)
 usethis::use_data(T2Data, overwrite = TRUE)
-
-
-

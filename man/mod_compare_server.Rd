@@ -4,12 +4,22 @@
 \alias{mod_compare_server}
 \title{mod_compare_server}
 \usage{
-mod_compare_server(id, data_selected, dev = FALSE)
+mod_compare_server(id, data_selected, dev = FALSE, dark_mode = reactive(FALSE))
 }
 \arguments{
 \item{id}{module id}
 
+\item{data_selected}{list of reactives returned by \code{mod_select_server()}
+(\code{join_selected}, \code{base_join_col_data}, \code{comp_join_col_data})}
+
 \item{dev}{show developer reactive-value outputs (default FALSE)}
+
+\item{dark_mode}{reactive returning TRUE when the app is in dark mode
+(default reactive(FALSE))}
+}
+\value{
+NULL invisibly; called for the side effect of rendering the
+module's outputs and the report \code{downloadHandler()}
 }
 \description{
 compare server module

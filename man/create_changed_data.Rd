@@ -18,7 +18,9 @@ create_changed_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 \item{cols}{Columns to be compared.}
 }
 \value{
-modified data
+a list with \code{num_diffs} (count of differing values per variable)
+and \code{var_diffs} (long format: \verb{Variable name}, key column(s),
+\verb{Current Value}, \verb{Previous Value})
 }
 \description{
 Create changed data

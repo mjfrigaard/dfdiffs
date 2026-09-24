@@ -13,20 +13,17 @@
 #'                     by_colums = c('subject_id', 'record'),
 #'                     new_by_column_name = 'join_var')
 create_join_column <- function(df, by_colums, new_by_column_name) {
-    # select by_vars
-    tmp <- dplyr::select(df, tidyselect::all_of(by_colums))
-    # convert to character
-    tmp <- dplyr::mutate(tmp, dplyr::across(.cols = dplyr::everything(),
-                                            .fns = as.character))
+    # select by_vars, convert to character
+    tmp <- select_cols(df, by_colums)
+    tmp[] <- lapply(tmp, as.character)
     # rename data
-    join_col_data <- df
+    join_col_data <- as.data.frame(df)
     # assign new col
-    join_col_data$new_col <- purrr::pmap_chr(.l = tmp, .f = paste, sep = "-")
+    join_col_data$new_col <- do.call(paste, c(tmp, sep = "-"))
     # rename
     names(join_col_data)[names(join_col_data) == "new_col"] <- new_by_column_name
     # relocate
-    join_col_data <- dplyr::relocate(join_col_data,
-      tidyselect::all_of(new_by_column_name))
+    join_col_data <- join_col_data[c(new_by_column_name, setdiff(names(join_col_data), new_by_column_name))]
     # return
     return(join_col_data)
 }

@@ -4,7 +4,10 @@
 \alias{changed_react_theme}
 \title{reactable theme (changed data)}
 \usage{
-changed_react_theme
+changed_react_theme(dark = FALSE)
+}
+\arguments{
+\item{dark}{use dark-mode colors (default FALSE)}
 }
 \description{
 theme for changed data in reactable table

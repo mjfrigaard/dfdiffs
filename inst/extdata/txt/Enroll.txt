@@ -1,0 +1,11 @@
+subject_id	first_name	last_name	site_id	enroll_year	enroll_month	enroll_day	height_cm	full_name	first_visit_date	status
+SUBJ-0001	Jamie	Nguyen	SITE-07	2021	5	15	169.7	Jamie Nguyen	2021-05-15	Active
+SUBJ-0002	Riley	Jensen	SITE-01	2021	10	5	166.3	Riley Jensen	2021-10-05	Active
+SUBJ-0003	Rowan	Singh	SITE-07	2021	10	28	174.5	Rowan Singh	2021-10-28	Active
+SUBJ-0004	Reese	Diaz	SITE-04	2021	6	9	165.3	Reese Diaz	2021-06-09	Active
+SUBJ-0005	Jamie	Singh	SITE-03	2021	2	19	179.5	Jamie Singh	2021-02-19	Active
+SUBJ-0006	Quinn	Nguyen	SITE-01	2021	1	18	170.6	Quinn Nguyen	2021-01-18	Active
+SUBJ-0007	Morgan	Foster	SITE-02	2021	4	16	158.8	Morgan Foster	2021-04-16	Active
+SUBJ-0008	Riley	Kim	SITE-08	2021	11	13	169.8	Riley Kim	2021-11-13	Active
+SUBJ-0009	Hayden	Nguyen	SITE-08	2021	7	14	161.4	Hayden Nguyen	2021-07-14	Active
+SUBJ-0010	Riley	Carter	SITE-07	2021	7	15	176.5	Riley Carter	2021-07-15	Active

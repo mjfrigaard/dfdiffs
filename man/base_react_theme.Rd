@@ -4,7 +4,10 @@
 \alias{base_react_theme}
 \title{reactable theme (base data)}
 \usage{
-base_react_theme
+base_react_theme(dark = FALSE)
+}
+\arguments{
+\item{dark}{use dark-mode colors (default FALSE)}
 }
 \description{
 theme for base data in reactable table

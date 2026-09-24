@@ -12,15 +12,15 @@ A data frame with 3 rows and 7 variables:
 \item{start_date}{a beginning date (from 2022-04-02 to 2022-04-04)}
 \item{mid_date}{a middle date (from 2022-04-13 to 2022-04-15)}
 \item{end_date}{a last date (from 2022-04-20 to 2022-04-22)}
-\item{text_var}{a variable containing random text}
-\item{factor_var}{a categorical variable formatted as a factor}
+\item{text_var}{a patient-reported clinical observation}
+\item{factor_var}{the observation's category (e.g. "cough", "insomnia")}
 }
 }
 \usage{
 NewData
 }
 \description{
-A dataset containing three rows and seven columns. The variables are as
-follows:
+The three observations present in \code{T2Data} but not \code{T1Data} —
+the expected result of \code{create_new_data(compare = T2Data, base = T1Data)}.
 }
 \keyword{datasets}
