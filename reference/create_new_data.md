@@ -42,9 +42,19 @@ T2Data <- dfdiffs::T2Data
 T1Data <- dfdiffs::T1Data
 create_new_data(compare = T2Data, base = T1Data,
                 by = c('subject', 'record'))
-#> Error in tidyr::unite(data, {    {        new_name    }}, {    {        cols    }}, remove = FALSE, sep = sep): `sep` must be a single string, not absent.
+#>   join subject record start_date   mid_date   end_date
+#> 3  D-5       D      5 2022-04-04 2022-04-13 2022-04-22
+#> 6  B-4       B      4 2022-04-02 2022-04-14 2022-04-20
+#> 9  A-2       A      2 2022-04-04 2022-04-15 2022-04-21
+#>                                                 text_var factor_var
+#> 3        Patient reports lower back pain after activity.  back pain
+#> 6 Patient reports difficulty sleeping through the night.   insomnia
+#> 9        Patient reports dry cough lasting several days.      cough
 create_new_data(compare = T2Data, base = T1Data,
                 by = c('subject', 'record'),
                 cols = c("text_var", "factor_var"))
-#> Error in tidyr::unite(data, {    {        new_name    }}, {    {        cols    }}, remove = FALSE, sep = sep): `sep` must be a single string, not absent.
+#>   join                                               text_var factor_var
+#> 3  D-5        Patient reports lower back pain after activity.  back pain
+#> 6  B-4 Patient reports difficulty sleeping through the night.   insomnia
+#> 9  A-2        Patient reports dry cough lasting several days.      cough
 ```

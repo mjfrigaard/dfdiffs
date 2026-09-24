@@ -1,7 +1,7 @@
 # Complete Data (simulated data for checking 'deleted data')
 
-A dataset containing nine rows and seven columns. The variables are as
-follows:
+Simulated clinical visit records for four subjects, used to demonstrate
+[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md).
 
 ## Usage
 
@@ -35,8 +35,8 @@ A data frame with 9 rows and 7 variables:
 
 - text_var:
 
-  a variable containing random text
+  a visit record description (e.g. "Vital signs recorded...")
 
 - factor_var:
 
-  a categorical variable formatted as a factor
+  the record's category (e.g. "vitals", "labs", "exam")

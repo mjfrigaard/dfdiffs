@@ -17,3 +17,8 @@ mod_upload_ui(id, dev = FALSE)
 - dev:
 
   show developer reactive-value outputs (default FALSE)
+
+## Value
+
+A `tagList` of the upload module's UI (file inputs and preview tables
+for `base` and `compare`)

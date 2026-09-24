@@ -1,7 +1,7 @@
 # NewData (difference between 'time-point 1' & 'time-point 2' data)
 
-A dataset containing three rows and seven columns. The variables are as
-follows:
+The three observations present in `T2Data` but not `T1Data` — the
+expected result of `create_new_data(compare = T2Data, base = T1Data)`.
 
 ## Usage
 
@@ -35,8 +35,8 @@ A data frame with 3 rows and 7 variables:
 
 - text_var:
 
-  a variable containing random text
+  a patient-reported clinical observation
 
 - factor_var:
 
-  a categorical variable formatted as a factor
+  the observation's category (e.g. "cough", "insomnia")

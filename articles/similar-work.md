@@ -2,41 +2,38 @@
 
 ## Motivation
 
-This vignette covers similar functions/packages that compare two
+This vignette covers similar functions and packages that compare two
 datasets to each other.
 
 ### Packages
 
-Our package
+Load `dfdiffs`:
 
 ``` r
 
 library(dfdiffs)
 ```
 
-Packages for import/export, iteration, wrangling, etc.
+We’ll also need packages for import/export, iteration, and wrangling:
 
 ``` r
 
 library(readr)
-library(dplyr)
-library(tidyr)
 library(stringr)
 library(purrr)
 library(glue)
 ```
 
-Packages for tables.
+These packages are for building tables:
 
 ``` r
 
 library(labelled)
-library(gt)
 library(gtsummary)
 library(kableExtra)
 ```
 
-Similar packages
+These packages offer similar comparison functions:
 
 ``` r
 
@@ -44,25 +41,24 @@ library(janitor) # compare_df_cols
 library(testthat) # expect_equal
 library(vetr) # alike
 library(labelled)
-library(gt)
 library(gtsummary)
 ```
 
 ### Data
 
-We’ll be using the data in this package to cover similar
+We’ll use the data in this package to cover similar
 `packages::functions()`.
 
 #### New data
 
-To check new data, we’re going to use `T1Data` and `T2Data`. The
+To check for new data, we’ll use `T1Data` and `T2Data`. The
 [`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)
-function shows us the ‘new data’ (i.e. what is here now that wasn’t here
-before?)
+function returns the ‘new data’ (i.e., the rows that are here now but
+weren’t here before).
 
-We can check this against the `NewData` dataset (which should match the
+We can check this against the `NewData` dataset, which should match the
 output from
-[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md))
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md).
 
 ``` r
 
@@ -74,11 +70,11 @@ T1T2New |>
   kableExtra::kable_paper()
 ```
 
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|:---|:---|:---|:---|:---|:---|:---|
-| D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Four hours of steady work faced us. | associate |
-| B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | The hogs were fed chopped corn and garbage. | encourage |
-| A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | The box was thrown beside the parked truck. | pension |
+|  | subject | record | start_date | mid_date | end_date | text_var | factor_var |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| 3 | D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Patient reports lower back pain after activity. | back pain |
+| 6 | B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | Patient reports difficulty sleeping through the night. | insomnia |
+| 9 | A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | Patient reports dry cough lasting several days. | cough |
 
 New data T1 \> T2 {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
@@ -93,9 +89,9 @@ NewData |>
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |:---|:---|:---|:---|:---|:---|:---|
-| D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Four hours of steady work faced us. | associate |
-| B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | The hogs were fed chopped corn and garbage. | encourage |
-| A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | The box was thrown beside the parked truck. | pension |
+| D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Patient reports lower back pain after activity. | back pain |
+| B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | Patient reports difficulty sleeping through the night. | insomnia |
+| A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | Patient reports dry cough lasting several days. | cough |
 
 New data (Comparison) {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
@@ -106,6 +102,12 @@ the date columns:
 ``` r
 
 waldo::compare(x = T1T2New, y = NewData)
+#> `class(old)`: "data.frame"                   
+#> `class(new)`: "tbl_df"     "tbl" "data.frame"
+#> 
+#> `attr(old, 'row.names')`: 3 6 9
+#> `attr(new, 'row.names')`: 1 2 3
+#> 
 #> `old$start_date` is a character vector ('2022-04-04', '2022-04-02', '2022-04-04')
 #> `new$start_date` is an S3 object of class <Date>, a double vector
 #> 
@@ -118,10 +120,10 @@ waldo::compare(x = T1T2New, y = NewData)
 
 #### Deleted data
 
-To test for the deleted data, we use the `CompleteData`,
-`IncompleteData`, and `DeletedData`.
+To test for deleted data, we’ll use `CompleteData`, `IncompleteData`,
+and `DeletedData`.
 
-`CompleteData` represents a ‘complete’ set of data,
+`CompleteData` represents a ‘complete’ set of data.
 
 ``` r
 
@@ -133,20 +135,20 @@ CompleteData |>
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |:---|---:|:---|:---|:---|:---|:---|
-| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | The copper bowl shone in the sun’s rays. | interest |
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Take a chance and win a china doll. | sure |
-| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A cramp is no small danger on a swim. | white |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It’s easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
-| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Wake and rise, and step into the green outdoors. | situate |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Say it slow!y but make it ring clear. | document |
+| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at screening visit. | vitals |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Laboratory sample collected for hematology panel. | labs |
+| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | ECG performed during screening assessment. | ecg |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
+| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at follow-up visit. | vitals |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Laboratory sample collected for chemistry panel. | labs |
 
 CompleteData {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
 
-and `IncompleteData` is a dataset with rows removed from `CompleteData`.
+`IncompleteData` is a dataset with rows removed from `CompleteData`.
 
 ``` r
 
@@ -158,19 +160,19 @@ IncompleteData |>
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |:---|---:|:---|:---|:---|:---|:---|
-| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | The copper bowl shone in the sun’s rays. | interest |
-| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Take a chance and win a china doll. | sure |
-| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A cramp is no small danger on a swim. | white |
-| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Wake and rise, and step into the green outdoors. | situate |
-| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Say it slow!y but make it ring clear. | document |
+| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at screening visit. | vitals |
+| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Laboratory sample collected for hematology panel. | labs |
+| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | ECG performed during screening assessment. | ecg |
+| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at follow-up visit. | vitals |
+| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Laboratory sample collected for chemistry panel. | labs |
 
 IncompleteData {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
 
-When we run the
-[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md),
-we check for the deleted rows between `IncompleteData` and
-`CompleteData`.
+Running
+[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)
+checks for rows that were deleted between `CompleteData` and
+`IncompleteData`.
 
 ``` r
 
@@ -178,22 +180,16 @@ IncompCompDiff <- create_deleted_data(
   compare = IncompleteData, 
   base = CompleteData) |> 
   arrange(subject)
+#> Error in `arrange()`:
+#> ! could not find function "arrange"
 IncompCompDiff |> 
   knitr::kable(caption = "IncompCompDiff") |> 
   kableExtra::kable_paper()
+#> Error:
+#> ! object 'IncompCompDiff' not found
 ```
 
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|:---|:---|:---|:---|:---|:---|:---|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It’s easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
-
-IncompCompDiff {.table .lightable-paper
-style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
-
-This is identical to the data stored in `DeletedData`
+The output above is identical to the data stored in `DeletedData`.
 
 ``` r
 
@@ -205,33 +201,27 @@ DeletedData |>
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |:---|---:|:---|:---|:---|:---|:---|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It’s easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
 
 DeletedData {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
 
+We can confirm this with
+[`waldo::compare()`](https://waldo.r-lib.org/reference/compare.html):
+
 ``` r
 
 waldo::compare(x = IncompCompDiff, y = DeletedData)
-#> `old$record` is a character vector ('2', '3', '1', '1')
-#> `new$record` is an integer vector (2, 3, 1, 1)
-#> 
-#> `old$start_date` is a character vector ('2021-12-28', '2021-12-26', '2021-12-30', '2021-12-27')
-#> `new$start_date` is an S3 object of class <Date>, a double vector
-#> 
-#> `old$mid_date` is a character vector ('2022-01-27', '2022-01-25', '2022-01-29', '2022-01-26')
-#> `new$mid_date` is an S3 object of class <Date>, a double vector
-#> 
-#> `old$end_date` is a character vector ('2022-02-26', '2022-02-24', '2022-02-28', '2022-02-25')
-#> `new$end_date` is an S3 object of class <Date>, a double vector
+#> Error:
+#> ! object 'IncompCompDiff' not found
 ```
 
-#### InitialData/ChangedData Data
+#### Changed data
 
-To check for changes between two datasets, we uses the `InitialData` and
+To check for changes between two datasets, we’ll use `InitialData` and
 `ChangedData`.
 
 ``` r
@@ -251,15 +241,15 @@ mods$diffs_byvar |>
   kableExtra::kable_paper()
 ```
 
-| Variable name | Modified Values | Missing Values |
-|:--------------|----------------:|---------------:|
-| subject_id    |               0 |              0 |
-| record        |               0 |              0 |
-| text_value_a  |               2 |              0 |
-| text_value_b  |               1 |              0 |
-| created_date  |               0 |              0 |
-| updated_date  |               5 |              0 |
-| entered_date  |               5 |              0 |
+| Variable name | Modified Values |
+|:--------------|----------------:|
+| subject_id    |               0 |
+| record        |               0 |
+| text_value_a  |               2 |
+| text_value_b  |               1 |
+| created_date  |               0 |
+| updated_date  |               5 |
+| entered_date  |               5 |
 
 diffs_byvar {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
@@ -273,21 +263,21 @@ mods$diffs |>
   kableExtra::kable_paper()
 ```
 
-| Variable name | Current Value                      | Previous Value   |
-|:--------------|:-----------------------------------|:-----------------|
-| text_value_a  | Issue resolved                     | Issue unresolved |
-| text_value_a  | Issue resolved                     | Issue unresolved |
-| text_value_b  | Joint pain, stiffness and swelling | Joint pain       |
-| updated_date  | 2021-10-03                         | 2021-09-29       |
-| updated_date  | 2021-11-27                         | 2021-10-03       |
-| updated_date  | 2021-10-20                         | 2021-09-02       |
-| updated_date  | 2021-10-13                         | 2021-10-03       |
-| updated_date  | 2021-10-14                         | 2021-09-20       |
-| entered_date  | 2021-11-30                         | 2021-09-29       |
-| entered_date  | 2021-11-30                         | 2021-10-29       |
-| entered_date  | 2021-11-21                         | 2021-08-18       |
-| entered_date  | 2021-11-11                         | 2021-10-03       |
-| entered_date  | 2021-11-16                         | 2021-10-20       |
+| Variable name | rownumber | Current Value                      | Previous Value   |
+|:--------------|----------:|:-----------------------------------|:-----------------|
+| text_value_a  |         1 | Issue resolved                     | Issue unresolved |
+| text_value_a  |         2 | Issue resolved                     | Issue unresolved |
+| text_value_b  |         4 | Joint pain, stiffness and swelling | Joint pain       |
+| updated_date  |         1 | 2021-10-03                         | 2021-09-29       |
+| updated_date  |         2 | 2021-11-27                         | 2021-10-03       |
+| updated_date  |         3 | 2021-10-20                         | 2021-09-02       |
+| updated_date  |         4 | 2021-10-13                         | 2021-10-03       |
+| updated_date  |         5 | 2021-10-14                         | 2021-09-20       |
+| entered_date  |         1 | 2021-11-30                         | 2021-09-29       |
+| entered_date  |         2 | 2021-11-30                         | 2021-10-29       |
+| entered_date  |         3 | 2021-11-21                         | 2021-08-18       |
+| entered_date  |         4 | 2021-11-11                         | 2021-10-03       |
+| entered_date  |         5 | 2021-11-16                         | 2021-10-20       |
 
 diffs {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
@@ -309,13 +299,13 @@ compare_df_cols_same(InitialData, ChangedData, strict_description = FALSE)
 #> [1] TRUE
 ```
 
-All of our test datasets meet this condition, but this could be used as
-a step in one our `create_` functions (to see if they can be
-successfully bound together).
+All of our test datasets meet this condition, but this check could be
+used as a step in one of our `create_` functions (to confirm the
+datasets can be bound together).
 
 ### `testthat::expect_equal()`
 
-This works, but returns the result as an error.
+This works, but it returns the result as an error.
 
 ``` r
 
@@ -375,21 +365,21 @@ testthat::expect_equal(object = T1Data, expected = T2Data)
 #> `attr(expected, 'row.names')[4:9]`: 4 5 6 7 8 9
 #> 
 #> actual vs expected
-#>                 subject record start_date   mid_date   end_date                                    text_var factor_var
-#> - actual[1, ]         A      1 2022-01-28 2022-03-20 2022-03-30 The birch canoe slid on the smooth planks.   food     
-#> + expected[1, ]       D      5 2022-01-30 2022-03-16 2022-03-26 Rice is often served in round bowls.         regard   
-#> - actual[2, ]         A      2 2022-01-25 2022-03-15 2022-03-29 Glue the sheet to the dark blue background.  most     
-#> + expected[2, ]       D      6 2022-01-27 2022-03-17 2022-03-31 The juice of lemons makes fine punch.        law      
-#> - actual[3, ]         B      3 2022-01-26 2022-03-19 2022-03-25 It's easy to tell the depth of a well.       park     
-#> + expected[3, ]       D      5 2022-04-04 2022-04-13 2022-04-22 Four hours of steady work faced us.          associate
-#>   actual[4, ]         C      4 2022-01-29 2022-03-18 2022-03-27 These days a chicken leg is a rare dish.     between  
-#> - actual[5, ]         D      5 2022-01-30 2022-03-16 2022-03-26 Rice is often served in round bowls.         regard   
-#> - actual[6, ]         D      6 2022-01-27 2022-03-17 2022-03-31 The juice of lemons makes fine punch.        law      
-#> + expected[5, ]       B      3 2022-01-26 2022-03-19 2022-03-25 It's easy to tell the depth of a well.       park     
-#> + expected[6, ]       B      4 2022-04-02 2022-04-14 2022-04-20 The hogs were fed chopped corn and garbage.  encourage
-#> + expected[7, ]       A      1 2022-01-28 2022-03-20 2022-03-30 The birch canoe slid on the smooth planks.   food     
-#> + expected[8, ]       A      2 2022-01-25 2022-03-15 2022-03-29 Glue the sheet to the dark blue background.  most     
-#> + expected[9, ]       A      2 2022-04-04 2022-04-15 2022-04-21 The box was thrown beside the parked truck.  pension  
+#>                 subject record start_date   mid_date   end_date                                               text_var factor_var
+#> - actual[1, ]         A      1 2022-01-28 2022-03-20 2022-03-30 Patient reports mild headache after morning dose.       headache 
+#> + expected[1, ]       D      5 2022-01-30 2022-03-16 2022-03-26 Patient reports mild rash on the left forearm.          rash     
+#> - actual[2, ]         A      2 2022-01-25 2022-03-15 2022-03-29 Patient reports occasional nausea following meals.      nausea   
+#> + expected[2, ]       D      6 2022-01-27 2022-03-17 2022-03-31 Patient reports low-grade fever in the evening.         fever    
+#> - actual[3, ]         B      3 2022-01-26 2022-03-19 2022-03-25 Patient reports persistent fatigue throughout the day.  fatigue  
+#> + expected[3, ]       D      5 2022-04-04 2022-04-13 2022-04-22 Patient reports lower back pain after activity.         back pain
+#>   actual[4, ]         C      4 2022-01-29 2022-03-18 2022-03-27 Patient reports brief dizziness upon standing.          dizziness
+#> - actual[5, ]         D      5 2022-01-30 2022-03-16 2022-03-26 Patient reports mild rash on the left forearm.          rash     
+#> - actual[6, ]         D      6 2022-01-27 2022-03-17 2022-03-31 Patient reports low-grade fever in the evening.         fever    
+#> + expected[5, ]       B      3 2022-01-26 2022-03-19 2022-03-25 Patient reports persistent fatigue throughout the day.  fatigue  
+#> + expected[6, ]       B      4 2022-04-02 2022-04-14 2022-04-20 Patient reports difficulty sleeping through the night.  insomnia 
+#> + expected[7, ]       A      1 2022-01-28 2022-03-20 2022-03-30 Patient reports mild headache after morning dose.       headache 
+#> + expected[8, ]       A      2 2022-01-25 2022-03-15 2022-03-29 Patient reports occasional nausea following meals.      nausea   
+#> + expected[9, ]       A      2 2022-04-04 2022-04-15 2022-04-21 Patient reports dry cough lasting several days.         cough    
 #> 
 #> `actual$subject`:   "A" "A" "B" "C" "D" "D"            
 #> `expected$subject`: "D" "D" "D" "C" "B" "B" "A" "A" "A"
@@ -431,31 +421,31 @@ testthat::expect_equal(object = T1Data, expected = T2Data)
 #>                     - "2022-04-21"      [9]
 #> 
 #> actual$text_var vs expected$text_var
-#> - "The birch canoe slid on the smooth planks."
-#> + "Rice is often served in round bowls."
-#> - "Glue the sheet to the dark blue background."
-#> + "The juice of lemons makes fine punch."
-#> - "It's easy to tell the depth of a well."
-#> + "Four hours of steady work faced us."
-#>   "These days a chicken leg is a rare dish."
-#> - "Rice is often served in round bowls."
-#> - "The juice of lemons makes fine punch."
-#> + "It's easy to tell the depth of a well."
-#> + "The hogs were fed chopped corn and garbage."
-#> + "The birch canoe slid on the smooth planks."
-#> + "Glue the sheet to the dark blue background."
-#> + "The box was thrown beside the parked truck."
+#> - "Patient reports mild headache after morning dose."
+#> + "Patient reports mild rash on the left forearm."
+#> - "Patient reports occasional nausea following meals."
+#> + "Patient reports low-grade fever in the evening."
+#> - "Patient reports persistent fatigue throughout the day."
+#> + "Patient reports lower back pain after activity."
+#>   "Patient reports brief dizziness upon standing."
+#> - "Patient reports mild rash on the left forearm."
+#> - "Patient reports low-grade fever in the evening."
+#> + "Patient reports persistent fatigue throughout the day."
+#> + "Patient reports difficulty sleeping through the night."
+#> + "Patient reports mild headache after morning dose."
+#> + "Patient reports occasional nausea following meals."
+#> + "Patient reports dry cough lasting several days."
 #> 
 #>     actual$factor_var | expected$factor_var    
-#> [1] "food"            - "regard"            [1]
-#> [2] "most"            - "law"               [2]
-#> [3] "park"            - "associate"         [3]
-#> [4] "between"         | "between"           [4]
-#> [5] "regard"          - "park"              [5]
-#> [6] "law"             - "encourage"         [6]
-#>                       - "food"              [7]
-#>                       - "most"              [8]
-#>                       - "pension"           [9]
+#> [1] "headache"        - "rash"              [1]
+#> [2] "nausea"          - "fever"             [2]
+#> [3] "fatigue"         - "back pain"         [3]
+#> [4] "dizziness"       | "dizziness"         [4]
+#> [5] "rash"            - "fatigue"           [5]
+#> [6] "fever"           - "insomnia"          [6]
+#>                       - "headache"          [7]
+#>                       - "nausea"            [8]
+#>                       - "cough"             [9]
 ```
 
 ### `vetr::alike()`

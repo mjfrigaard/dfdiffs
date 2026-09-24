@@ -1,7 +1,8 @@
 # T2Data (simulated 'time-point 2' data for checking new data)
 
-A dataset containing nine rows and seven columns. The variables are as
-follows:
+The same patient-reported observations as `T1Data`, plus three
+additional rows recorded at a later time point, used to demonstrate
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md).
 
 ## Usage
 
@@ -35,8 +36,8 @@ A data frame with 9 rows and 7 variables:
 
 - text_var:
 
-  a variable containing random text
+  a patient-reported clinical observation
 
 - factor_var:
 
-  a categorical variable formatted as a factor
+  the observation's category (e.g. "headache", "fatigue")

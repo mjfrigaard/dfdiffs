@@ -1,18 +1,21 @@
 # dfdiffs
 
-The goal of `dfdiffs` is to is to answer the following questions:
+The goal of `dfdiffs` is to answer the following questions:
 
 1.  What rows are here now that weren’t here before?  
 2.  What rows were here before that aren’t here now?  
 3.  What values have been changed?
 
-The `dfdiffs` package and application wouldn’t be possible without the
-previous work from the authors of the
-[`arsenal`](https://mayoverse.github.io/arsenal/reference/arsenal.html)
-and [`diffdf`](https://gowerc.github.io/diffdf/) packages.
+The `dfdiffs` Shiny app-package is built with
+[`bslib`](https://rstudio.github.io/bslib/). Its comparison engine is
+pure base R, but it owes a debt to the
+[`diffdf`](https://gowerc.github.io/diffdf/) package: the
+tolerance-based numeric comparison in
+[`compare_values()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_values.md)
+is a direct port of `diffdf`’s own formula.
 
 You can access a development version of the application
-[here.](https://mjfrigaard.shinyapps.io/compareDataApp/)
+[here](https://mjfrigaard.shinyapps.io/compareDataApp/).
 
 ## Installation
 
@@ -32,38 +35,49 @@ library(dfdiffs)
 
 ## Packages
 
-Dependencies
+`dfdiffs` depends on:
 
 ``` r
 
-library(dplyr)
-library(stringr)
-library(forcats)
-library(lubridate)
-library(fs)
-library(vctrs)
-library(glue)
-library(purrr)
-library(vroom)
+library(bslib)
+library(data.table)
+library(ggplot2)
 library(haven)
+library(janitor)
+library(openxlsx)
+library(purrr)
+library(reactable)
 library(readxl)
-library(janitor) 
-library(arsenal) 
-library(diffdf)  
-library(gt)
-library(labelled)
-library(gtsummary)
+library(shiny)
+library(tibble)
 ```
+
+`dfdiffs`’s own comparison engine
+([`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md),
+[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md),
+[`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md),
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md),
+and the helpers behind them) is built on base R alone, so it doesn’t
+require `dplyr`, `tidyr`, `tidyselect`, or `diffdf`. Those packages
+(plus `arsenal`) remain in `Suggests` only because a few vignettes
+demonstrate them directly, side-by-side, as points of comparison.
+
+The Shiny app previews and displays data with
+[`reactable`](https://glin.github.io/reactable/) (an interactive JS
+widget). GitHub renders this README as plain markdown and strips the JS
+that a `reactable` table needs, so the tables below use
+[`knitr::kable()`](https://rdrr.io/pkg/knitr/man/kable.html), which
+GitHub can render natively.
 
 ## Package functions
 
-We have functions for answering each of the questions posed above. Each
-function has a pair of datasets to demonstrate how they work (which
-we’ll cover below).
+`dfdiffs` has a function for each of the questions posed above, and each
+function comes with a pair of example datasets that demonstrate how it
+works (which we’ll cover below).
 
 ## *What rows are here now that weren’t here before?*
 
-To check new data, we’re going to use `T1Data` and `T2Data`.
+To check for new data, we’ll use `T1Data` and `T2Data`.
 
 ``` r
 
@@ -74,83 +88,84 @@ NewData <- dfdiffs::NewData
 
 ### Timepoint 1 data (original)
 
-These data represent data taken at T1.
+`T1Data` represents data collected at the first timepoint (T1).
 
 ``` r
 
-T1Data |> gt::gt()
+T1Data |> knitr::kable()
 ```
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|----|----|----|----|----|----|----|
-| A | 1 | 2022-01-28 | 2022-03-20 | 2022-03-30 | The birch canoe slid on the smooth planks. | food |
-| A | 2 | 2022-01-25 | 2022-03-15 | 2022-03-29 | Glue the sheet to the dark blue background. | most |
-| B | 3 | 2022-01-26 | 2022-03-19 | 2022-03-25 | It’s easy to tell the depth of a well. | park |
-| C | 4 | 2022-01-29 | 2022-03-18 | 2022-03-27 | These days a chicken leg is a rare dish. | between |
-| D | 5 | 2022-01-30 | 2022-03-16 | 2022-03-26 | Rice is often served in round bowls. | regard |
-| D | 6 | 2022-01-27 | 2022-03-17 | 2022-03-31 | The juice of lemons makes fine punch. | law |
+|:---|---:|:---|:---|:---|:---|:---|
+| A | 1 | 2022-01-28 | 2022-03-20 | 2022-03-30 | Patient reports mild headache after morning dose. | headache |
+| A | 2 | 2022-01-25 | 2022-03-15 | 2022-03-29 | Patient reports occasional nausea following meals. | nausea |
+| B | 3 | 2022-01-26 | 2022-03-19 | 2022-03-25 | Patient reports persistent fatigue throughout the day. | fatigue |
+| C | 4 | 2022-01-29 | 2022-03-18 | 2022-03-27 | Patient reports brief dizziness upon standing. | dizziness |
+| D | 5 | 2022-01-30 | 2022-03-16 | 2022-03-26 | Patient reports mild rash on the left forearm. | rash |
+| D | 6 | 2022-01-27 | 2022-03-17 | 2022-03-31 | Patient reports low-grade fever in the evening. | fever |
 
 ### Timepoint 2 data (new)
 
-This is a ‘new’ dataset representing T2.
+`T2Data` is the ‘new’ dataset, representing data collected at the second
+timepoint (T2).
 
 ``` r
 
-T2Data |> gt::gt()
+T2Data |> knitr::kable()
 ```
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|----|----|----|----|----|----|----|
-| D | 5 | 2022-01-30 | 2022-03-16 | 2022-03-26 | Rice is often served in round bowls. | regard |
-| D | 6 | 2022-01-27 | 2022-03-17 | 2022-03-31 | The juice of lemons makes fine punch. | law |
-| D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Four hours of steady work faced us. | associate |
-| C | 4 | 2022-01-29 | 2022-03-18 | 2022-03-27 | These days a chicken leg is a rare dish. | between |
-| B | 3 | 2022-01-26 | 2022-03-19 | 2022-03-25 | It’s easy to tell the depth of a well. | park |
-| B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | The hogs were fed chopped corn and garbage. | encourage |
-| A | 1 | 2022-01-28 | 2022-03-20 | 2022-03-30 | The birch canoe slid on the smooth planks. | food |
-| A | 2 | 2022-01-25 | 2022-03-15 | 2022-03-29 | Glue the sheet to the dark blue background. | most |
-| A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | The box was thrown beside the parked truck. | pension |
+|:---|---:|:---|:---|:---|:---|:---|
+| D | 5 | 2022-01-30 | 2022-03-16 | 2022-03-26 | Patient reports mild rash on the left forearm. | rash |
+| D | 6 | 2022-01-27 | 2022-03-17 | 2022-03-31 | Patient reports low-grade fever in the evening. | fever |
+| D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Patient reports lower back pain after activity. | back pain |
+| C | 4 | 2022-01-29 | 2022-03-18 | 2022-03-27 | Patient reports brief dizziness upon standing. | dizziness |
+| B | 3 | 2022-01-26 | 2022-03-19 | 2022-03-25 | Patient reports persistent fatigue throughout the day. | fatigue |
+| B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | Patient reports difficulty sleeping through the night. | insomnia |
+| A | 1 | 2022-01-28 | 2022-03-20 | 2022-03-30 | Patient reports mild headache after morning dose. | headache |
+| A | 2 | 2022-01-25 | 2022-03-15 | 2022-03-29 | Patient reports occasional nausea following meals. | nausea |
+| A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | Patient reports dry cough lasting several days. | cough |
 
 ### `create_new_data()`
 
 The
 [`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)
-function shows us the ‘new data’ (i.e. what is here now that wasn’t here
-before?)
+function returns the ‘new data’ (i.e., the rows that are here now but
+weren’t here before).
 
 ``` r
 
 create_new_data(
   compare = T2Data, 
-  base = T1Data) |> 
-  gt::gt()
+  base = T1Data) |>
+  knitr::kable()
 ```
 
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|----|----|----|----|----|----|----|
-| D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Four hours of steady work faced us. | associate |
-| B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | The hogs were fed chopped corn and garbage. | encourage |
-| A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | The box was thrown beside the parked truck. | pension |
+|  | subject | record | start_date | mid_date | end_date | text_var | factor_var |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| 3 | D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Patient reports lower back pain after activity. | back pain |
+| 6 | B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | Patient reports difficulty sleeping through the night. | insomnia |
+| 9 | A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | Patient reports dry cough lasting several days. | cough |
 
-We can check this against the `NewData` dataset (which should match the
+We can check this against the `NewData` dataset, which should match the
 output from
-[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md))
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md).
 
 ``` r
 
-NewData |> gt::gt()
+NewData |> knitr::kable()
 ```
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|----|----|----|----|----|----|----|
-| D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Four hours of steady work faced us. | associate |
-| B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | The hogs were fed chopped corn and garbage. | encourage |
-| A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | The box was thrown beside the parked truck. | pension |
+|:---|:---|:---|:---|:---|:---|:---|
+| D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Patient reports lower back pain after activity. | back pain |
+| B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | Patient reports difficulty sleeping through the night. | insomnia |
+| A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | Patient reports dry cough lasting several days. | cough |
 
 ## *What rows were here before that aren’t here now?*
 
-To test for the deleted data, we use the `CompleteData`,
-`IncompleteData`, and check these with `DeletedData`.
+To test for deleted data, we’ll compare `CompleteData` and
+`IncompleteData`, then check the result against `DeletedData`.
 
 ``` r
 
@@ -165,20 +180,20 @@ DeletedData <- dfdiffs::DeletedData
 
 ``` r
 
-CompleteData |> gt::gt()
+CompleteData |> knitr::kable()
 ```
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|----|----|----|----|----|----|----|
-| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | The copper bowl shone in the sun’s rays. | interest |
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Take a chance and win a china doll. | sure |
-| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A cramp is no small danger on a swim. | white |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It’s easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
-| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Wake and rise, and step into the green outdoors. | situate |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Say it slow!y but make it ring clear. | document |
+|:---|---:|:---|:---|:---|:---|:---|
+| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at screening visit. | vitals |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Laboratory sample collected for hematology panel. | labs |
+| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | ECG performed during screening assessment. | ecg |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
+| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at follow-up visit. | vitals |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Laboratory sample collected for chemistry panel. | labs |
 
 ### An incomplete dataset
 
@@ -186,54 +201,54 @@ This is a dataset with rows removed from `CompleteData`.
 
 ``` r
 
-IncompleteData |> gt::gt()
+IncompleteData |> knitr::kable()
 ```
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|----|----|----|----|----|----|----|
-| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | The copper bowl shone in the sun’s rays. | interest |
-| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Take a chance and win a china doll. | sure |
-| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A cramp is no small danger on a swim. | white |
-| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Wake and rise, and step into the green outdoors. | situate |
-| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Say it slow!y but make it ring clear. | document |
+|:---|---:|:---|:---|:---|:---|:---|
+| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at screening visit. | vitals |
+| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Laboratory sample collected for hematology panel. | labs |
+| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | ECG performed during screening assessment. | ecg |
+| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at follow-up visit. | vitals |
+| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Laboratory sample collected for chemistry panel. | labs |
 
 ### `create_deleted_data()`
 
-When we run the
-[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md),
-we check for the deleted rows between `IncompleteData` and
-`CompleteData`.
+Running
+[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)
+checks for rows that were deleted between `CompleteData` and
+`IncompleteData`.
 
 ``` r
 
 create_deleted_data(
   compare = IncompleteData, 
-  base = CompleteData) |> 
-  gt::gt()
+  base = CompleteData) |>
+  knitr::kable()
 ```
 
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It’s easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
+|  | subject | record | start_date | mid_date | end_date | text_var | factor_var |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| 2 | A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| 5 | C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| 6 | D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
+| 8 | B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
 
 ### The deleted data
 
-This is identical to the data stored in `DeletedData`
+The output above is identical to the data stored in `DeletedData`.
 
 ``` r
 
-DeletedData |> gt::gt()
+DeletedData |> knitr::kable()
 ```
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It’s easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+|:---|---:|:---|:---|:---|:---|:---|
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
 
 ## *What values have been changed?*
 
@@ -241,22 +256,18 @@ To answer this question, we have two options:
 [`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md)
 and
 [`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md).
+Both build on the same
+[`diff_values_by_key()`](https://mjfrigaard.github.io/dfdiffs/reference/diff_values_by_key.md)/[`compare_values()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_values.md)
+engine and differ only in the shape of their output:
+[`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md)
+returns `$num_diffs`/`$var_diffs` (used by
+[`compare_data()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_data.md)),
+and
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
+returns `$diffs_byvar`/`$diffs` (used by `mod_compare` and
+[`create_comparison_report()`](https://mjfrigaard.github.io/dfdiffs/reference/create_comparison_report.md)).
 
-- [`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md)
-  relies on the
-  [`diffdf()`](https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html)
-  function from the [`diffdf`
-  package](https://gowerc.github.io/diffdf/reference/diffdf.html)
-  package.
-
-- [`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
-  relies on the
-  [`comparedf()`](https://mayoverse.github.io/arsenal/reference/comparedf.html)
-  function from the [`arsenal`
-  package](https://mayoverse.github.io/arsenal/reference/comparedf.html)
-  package.
-
-To check for changes between two datasets, we use the `InitialData` and
+To check for changes between two datasets, we’ll use `InitialData` and
 `ChangedData`.
 
 ``` r
@@ -269,11 +280,11 @@ ChangedData <- dfdiffs::ChangedData
 
 ``` r
 
-InitialData |> gt::gt()
+InitialData |> knitr::kable()
 ```
 
 | subject_id | record | text_value_a | text_value_b | created_date | updated_date | entered_date |
-|----|----|----|----|----|----|----|
+|:---|---:|:---|:---|:---|:---|:---|
 | A | 1 | Issue unresolved | Fatigue | 2021-07-29 | 2021-09-29 | 2021-09-29 |
 | A | 2 | Issue unresolved | Fatigue | 2021-07-29 | 2021-10-03 | 2021-10-29 |
 | B | 3 | Issue resolved | Fever | 2021-07-16 | 2021-09-02 | 2021-08-18 |
@@ -284,11 +295,11 @@ InitialData |> gt::gt()
 
 ``` r
 
-ChangedData |> gt::gt()
+ChangedData |> knitr::kable()
 ```
 
 | subject_id | record | text_value_a | text_value_b | created_date | updated_date | entered_date |
-|----|----|----|----|----|----|----|
+|:---|---:|:---|:---|:---|:---|:---|
 | A | 1 | Issue resolved | Fatigue | 2021-07-29 | 2021-10-03 | 2021-11-30 |
 | A | 2 | Issue resolved | Fatigue | 2021-07-29 | 2021-11-27 | 2021-11-30 |
 | B | 3 | Issue resolved | Fever | 2021-07-16 | 2021-10-20 | 2021-11-21 |
@@ -315,15 +326,18 @@ The counts of changes by variable are stored in `num_diffs`.
 
 ``` r
 
-changed$num_diffs |> gt::gt()
+changed$num_diffs |> knitr::kable()
 ```
 
-| variable     | no_of_differences |
-|--------------|-------------------|
-| text_value_a | 2                 |
-| text_value_b | 1                 |
-| updated_date | 5                 |
-| entered_date | 5                 |
+| Variable name | Modified Values |
+|:--------------|----------------:|
+| subject_id    |               0 |
+| record        |               0 |
+| text_value_a  |               2 |
+| text_value_b  |               1 |
+| created_date  |               0 |
+| updated_date  |               5 |
+| entered_date  |               5 |
 
 #### Changes by row (`var_diffs`)
 
@@ -331,24 +345,24 @@ The changes by row are stored in `var_diffs`.
 
 ``` r
 
-changed$var_diffs |> gt::gt()
+changed$var_diffs |> knitr::kable()
 ```
 
-| variable     | rownumber | base             | compare                            |
-|--------------|-----------|------------------|------------------------------------|
-| text_value_a | 1         | Issue unresolved | Issue resolved                     |
-| text_value_a | 2         | Issue unresolved | Issue resolved                     |
-| text_value_b | 4         | Joint pain       | Joint pain, stiffness and swelling |
-| updated_date | 1         | 2021-09-29       | 2021-10-03                         |
-| updated_date | 2         | 2021-10-03       | 2021-11-27                         |
-| updated_date | 3         | 2021-09-02       | 2021-10-20                         |
-| updated_date | 4         | 2021-10-03       | 2021-10-13                         |
-| updated_date | 5         | 2021-09-20       | 2021-10-14                         |
-| entered_date | 1         | 2021-09-29       | 2021-11-30                         |
-| entered_date | 2         | 2021-10-29       | 2021-11-30                         |
-| entered_date | 3         | 2021-08-18       | 2021-11-21                         |
-| entered_date | 4         | 2021-10-03       | 2021-11-11                         |
-| entered_date | 5         | 2021-10-20       | 2021-11-16                         |
+| Variable name | rownumber | Current Value                      | Previous Value   |
+|:--------------|----------:|:-----------------------------------|:-----------------|
+| text_value_a  |         1 | Issue resolved                     | Issue unresolved |
+| text_value_a  |         2 | Issue resolved                     | Issue unresolved |
+| text_value_b  |         4 | Joint pain, stiffness and swelling | Joint pain       |
+| updated_date  |         1 | 2021-10-03                         | 2021-09-29       |
+| updated_date  |         2 | 2021-11-27                         | 2021-10-03       |
+| updated_date  |         3 | 2021-10-20                         | 2021-09-02       |
+| updated_date  |         4 | 2021-10-13                         | 2021-10-03       |
+| updated_date  |         5 | 2021-10-14                         | 2021-09-20       |
+| entered_date  |         1 | 2021-11-30                         | 2021-09-29       |
+| entered_date  |         2 | 2021-11-30                         | 2021-10-29       |
+| entered_date  |         3 | 2021-11-21                         | 2021-08-18       |
+| entered_date  |         4 | 2021-11-11                         | 2021-10-03       |
+| entered_date  |         5 | 2021-11-16                         | 2021-10-20       |
 
 ### `create_modified_data()`
 
@@ -371,18 +385,18 @@ The counts of changes by variable are stored in `diffs_byvar`.
 
 ``` r
 
-modified$diffs_byvar |> gt::gt()
+modified$diffs_byvar |> knitr::kable()
 ```
 
-| Variable name | Modified Values | Missing Values |
-|---------------|-----------------|----------------|
-| subject_id    | 0               | 0              |
-| record        | 0               | 0              |
-| text_value_a  | 2               | 0              |
-| text_value_b  | 1               | 0              |
-| created_date  | 0               | 0              |
-| updated_date  | 5               | 0              |
-| entered_date  | 5               | 0              |
+| Variable name | Modified Values |
+|:--------------|----------------:|
+| subject_id    |               0 |
+| record        |               0 |
+| text_value_a  |               2 |
+| text_value_b  |               1 |
+| created_date  |               0 |
+| updated_date  |               5 |
+| entered_date  |               5 |
 
 #### Changes by row
 
@@ -390,21 +404,21 @@ The changes by row are stored in `diffs`.
 
 ``` r
 
-modified$diffs |> gt::gt()
+modified$diffs |> knitr::kable()
 ```
 
-| Variable name | Current Value                      | Previous Value   |
-|---------------|------------------------------------|------------------|
-| text_value_a  | Issue resolved                     | Issue unresolved |
-| text_value_a  | Issue resolved                     | Issue unresolved |
-| text_value_b  | Joint pain, stiffness and swelling | Joint pain       |
-| updated_date  | 2021-10-03                         | 2021-09-29       |
-| updated_date  | 2021-11-27                         | 2021-10-03       |
-| updated_date  | 2021-10-20                         | 2021-09-02       |
-| updated_date  | 2021-10-13                         | 2021-10-03       |
-| updated_date  | 2021-10-14                         | 2021-09-20       |
-| entered_date  | 2021-11-30                         | 2021-09-29       |
-| entered_date  | 2021-11-30                         | 2021-10-29       |
-| entered_date  | 2021-11-21                         | 2021-08-18       |
-| entered_date  | 2021-11-11                         | 2021-10-03       |
-| entered_date  | 2021-11-16                         | 2021-10-20       |
+| Variable name | rownumber | Current Value                      | Previous Value   |
+|:--------------|----------:|:-----------------------------------|:-----------------|
+| text_value_a  |         1 | Issue resolved                     | Issue unresolved |
+| text_value_a  |         2 | Issue resolved                     | Issue unresolved |
+| text_value_b  |         4 | Joint pain, stiffness and swelling | Joint pain       |
+| updated_date  |         1 | 2021-10-03                         | 2021-09-29       |
+| updated_date  |         2 | 2021-11-27                         | 2021-10-03       |
+| updated_date  |         3 | 2021-10-20                         | 2021-09-02       |
+| updated_date  |         4 | 2021-10-13                         | 2021-10-03       |
+| updated_date  |         5 | 2021-10-14                         | 2021-09-20       |
+| entered_date  |         1 | 2021-11-30                         | 2021-09-29       |
+| entered_date  |         2 | 2021-11-30                         | 2021-10-29       |
+| entered_date  |         3 | 2021-11-21                         | 2021-08-18       |
+| entered_date  |         4 | 2021-11-11                         | 2021-10-03       |
+| entered_date  |         5 | 2021-11-16                         | 2021-10-20       |

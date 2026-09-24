@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -91,13 +91,73 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># not run</span></span></span>
-<span class="r-in"><span><span class="va">m15</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master15</span></span></span>
-<span class="r-in"><span><span class="va">m22</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master22</span></span></span>
-<span class="r-in"><span><span class="fu">compare_data</span><span class="op">(</span>compare <span class="op">=</span> <span class="va">m22</span>, base <span class="op">=</span> <span class="va">m15</span>,</span></span>
-<span class="r-in"><span>    by <span class="op">=</span> <span class="st">"playerID"</span>,</span></span>
-<span class="r-in"><span>    by_col <span class="op">=</span> <span class="st">"join"</span>,</span></span>
-<span class="r-in"><span>    cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nameFirst"</span>, <span class="st">"nameLast"</span>, <span class="st">"nameGiven"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in tidyr::unite(data, {    {        new_name    }}, {    {        cols    }}, remove = FALSE, sep = sep):</span> `sep` must be a single string, not absent.</span>
+<span class="r-in"><span><span class="va">r21</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="Roster2021.html">Roster2021</a></span></span></span>
+<span class="r-in"><span><span class="va">r22</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="Roster2022.html">Roster2022</a></span></span></span>
+<span class="r-in"><span><span class="fu">compare_data</span><span class="op">(</span>compare <span class="op">=</span> <span class="va">r22</span>, base <span class="op">=</span> <span class="va">r21</span>,</span></span>
+<span class="r-in"><span>    by <span class="op">=</span> <span class="st">"subject_id"</span>,</span></span>
+<span class="r-in"><span>    cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first_name"</span>, <span class="st">"last_name"</span>, <span class="st">"full_name"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $new_data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     subject_id first_name last_name      full_name</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 198  SUBJ-0201      Riley    Jensen   Riley Jensen</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 199  SUBJ-0202      Casey     Hayes    Casey Hayes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 200  SUBJ-0203     Skyler     Grant   Skyler Grant</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 201  SUBJ-0204     Skyler       Kim     Skyler Kim</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 202  SUBJ-0205      Riley     Irwin    Riley Irwin</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 203  SUBJ-0206      Casey       Kim      Casey Kim</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 204  SUBJ-0207     Hayden    Foster  Hayden Foster</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 205  SUBJ-0208       Drew     Moore     Drew Moore</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 206  SUBJ-0209      Quinn    Nguyen   Quinn Nguyen</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 207  SUBJ-0210     Skyler     Lopez   Skyler Lopez</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 208  SUBJ-0211      Avery       Kim      Avery Kim</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 209  SUBJ-0212       Drew       Kim       Drew Kim</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 210  SUBJ-0213     Skyler     Moore   Skyler Moore</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 211  SUBJ-0214      Casey     Hayes    Casey Hayes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 212  SUBJ-0215     Taylor    Foster  Taylor Foster</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 213  SUBJ-0216     Taylor    Carter  Taylor Carter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 214  SUBJ-0217    Cameron     Grant  Cameron Grant</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 215  SUBJ-0218      Casey   Bennett  Casey Bennett</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 216  SUBJ-0219     Taylor     Hayes   Taylor Hayes</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 217  SUBJ-0220    Cameron       Kim    Cameron Kim</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 218  SUBJ-0221      Jamie     Lopez    Jamie Lopez</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 219  SUBJ-0222      Rowan     Lopez    Rowan Lopez</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 220  SUBJ-0223      Riley     Singh    Riley Singh</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 221  SUBJ-0224      Rowan      Diaz     Rowan Diaz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 222  SUBJ-0225    Emerson    Carter Emerson Carter</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 223  SUBJ-0226      Riley       Kim      Riley Kim</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 224  SUBJ-0227      Quinn      Diaz     Quinn Diaz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 225  SUBJ-0228      Riley     Patel    Riley Patel</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 226  SUBJ-0229     Taylor    Foster  Taylor Foster</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 227  SUBJ-0230     Skyler    Foster  Skyler Foster</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 228  SUBJ-0231      Quinn     Ortiz    Quinn Ortiz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 229  SUBJ-0232     Skyler     Patel   Skyler Patel</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 230  SUBJ-0233     Skyler    Jensen  Skyler Jensen</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 231  SUBJ-0234    Cameron     Irwin  Cameron Irwin</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 232  SUBJ-0235     Skyler     Moore   Skyler Moore</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 233  SUBJ-0236      Riley      Diaz     Riley Diaz</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 234  SUBJ-0237      Reese    Jensen   Reese Jensen</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 235  SUBJ-0238     Taylor   Bennett Taylor Bennett</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 236  SUBJ-0239      Jamie     Patel    Jamie Patel</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 237  SUBJ-0240     Skyler     Singh   Skyler Singh</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $deleted_data</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     subject_id first_name last_name   full_name</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    SUBJ-0005      Jamie     Singh Jamie Singh</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 50   SUBJ-0050      Riley     Patel Riley Patel</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 150  SUBJ-0150     Skyler       Kim  Skyler Kim</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $changed_num_diffs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3 × 2</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   `Variable name` `Modified Values`</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                       <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> first_name                      0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> last_name                       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> full_name                       0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $changed_var_diffs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 0 × 4</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4 variables: Variable name &lt;chr&gt;, Current Value &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Previous Value &lt;chr&gt;, subject_id &lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

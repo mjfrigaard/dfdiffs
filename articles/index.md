@@ -2,6 +2,7 @@
 
 ### All vignettes
 
+- [change-frequency-from-proc-compare](https://mjfrigaard.github.io/dfdiffs/articles/change-frequency-from-proc-compare.md):
 - [changed-modified-data](https://mjfrigaard.github.io/dfdiffs/articles/changed-modified-data.md):
 - [compare-data](https://mjfrigaard.github.io/dfdiffs/articles/compare-data.md):
 - [create-comparison-report](https://mjfrigaard.github.io/dfdiffs/articles/create-comparison-report.md):

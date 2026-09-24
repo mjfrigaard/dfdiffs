@@ -2,7 +2,7 @@
 
 ## Motivation
 
-The goal of the `dfdiffs` is to answer the following questions:
+The goal of `dfdiffs` is to answer the following questions:
 
 1.  What rows are here now that weren’t here before?  
 2.  *What rows were here before that aren’t here now?*
@@ -11,7 +11,7 @@ The goal of the `dfdiffs` is to answer the following questions:
 This vignette takes us through the
 [`create_comparison_report()`](https://mjfrigaard.github.io/dfdiffs/reference/create_comparison_report.md)
 function, which runs all three comparison functions and exports the
-results to an excel file.
+results to an Excel file.
 
 ### Packages
 
@@ -31,11 +31,8 @@ library(janitor) # compare_df_cols
 library(arsenal) # comparedf
 library(diffdf) # diffdf
 library(testthat) # expect_equal
-library(dplyr)
-library(tidyr)
 library(tibble)
 library(stringr)
-library(forcats)
 library(lubridate)
 library(fs)
 library(vctrs)
@@ -44,24 +41,26 @@ library(purrr)
 library(flextable)
 ```
 
-### Lahman data
+### Site roster data
 
-We have four `Lahman` master (People) datasets to use for comparisons
+We have four yearly pulls of a synthetic (not real) clinical site roster
+to use for comparisons (see
+[`?Roster2021`](https://mjfrigaard.github.io/dfdiffs/reference/Roster2021.md)):
 
 ``` r
 
-master15 <- dfdiffs::master15
-max(master15$debut, na.rm = TRUE)
-#> [1] "2015-10-03"
-master20 <- dfdiffs::master20
-max(master20$debut, na.rm = TRUE)
-#> [1] "2019-09-27"
-master21 <- dfdiffs::master21
-max(master21$debut, na.rm = TRUE)
-#> [1] "2020-09-27"
-master22 <- dfdiffs::master22
-max(master22$debut, na.rm = TRUE)
-#> [1] "2022-04-26"
+roster2021 <- dfdiffs::Roster2021
+nrow(roster2021)
+#> [1] 200
+roster2022 <- dfdiffs::Roster2022
+nrow(roster2022)
+#> [1] 237
+roster2023 <- dfdiffs::Roster2023
+nrow(roster2023)
+#> [1] 255
+roster2024 <- dfdiffs::Roster2024
+nrow(roster2024)
+#> [1] 275
 ```
 
 ## `create_comparison_report()`
@@ -260,14 +259,14 @@ stackcallr::call_tree_dir("R", root = "create_comparison_report")
 
 ### Test `create_comparison_report()`
 
-We test this below with `master20` and `master15`:
+We test this below with `roster2022` and `roster2021`:
 
 ``` r
 
 create_comparison_report(
-  compare = master20,
-  base = master15,
-  by = "playerID",
-  file = "../inst/out/compare-report-lahman-15-20.xlsx"
+  compare = roster2022,
+  base = roster2021,
+  by = "subject_id",
+  file = "../inst/out/compare-report-roster-2021-2022.xlsx"
 )
 ```

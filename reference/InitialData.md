@@ -1,7 +1,10 @@
 # Changed/Modified Initial Data (simulated data for checking modified data)
 
-A dataset containing five rows and seven columns. The variables are as
-follows:
+Simulated adverse-event records for three subjects, taken before query
+resolution, used to demonstrate
+[`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md)
+and
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md).
 
 ## Usage
 
@@ -23,11 +26,12 @@ A data frame with 5 rows and 7 variables:
 
 - text_value_a:
 
-  a variable containing random text
+  the adverse event's resolution status ("Issue resolved"/"Issue
+  unresolved")
 
 - text_value_b:
 
-  a variable containing random text
+  the adverse event term (e.g. "Fatigue", "Fever", "Joint pain")
 
 - created_date:
 

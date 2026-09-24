@@ -1,7 +1,8 @@
 # Deleted Data (simulated data for checking deleted data)
 
-A dataset containing four rows and seven columns. The variables are as
-follows:
+The four records present in `CompleteData` but not `IncompleteData` —
+the expected result of
+`create_deleted_data(compare = IncompleteData, base = CompleteData)`.
 
 ## Usage
 
@@ -11,7 +12,7 @@ DeletedData
 
 ## Format
 
-A data frame with 9 rows and 7 variables:
+A data frame with 4 rows and 7 variables:
 
 - subject:
 
@@ -35,8 +36,8 @@ A data frame with 9 rows and 7 variables:
 
 - text_var:
 
-  a variable containing random text
+  a visit record description (e.g. "Concomitant medication...")
 
 - factor_var:
 
-  a categorical variable formatted as a factor
+  the record's category (e.g. "conmed", "exam", "history")

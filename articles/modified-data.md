@@ -2,7 +2,7 @@
 
 ## Motivation
 
-The goal of the `dfdiffs` is to answer the following questions:
+The goal of `dfdiffs` is to answer the following questions:
 
 1.  What rows are here now that weren’t here before?
 2.  What rows were here before that aren’t here now?
@@ -10,23 +10,20 @@ The goal of the `dfdiffs` is to answer the following questions:
 
 This vignette takes us through the
 [`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
-function, which answers the “*What values have been changed?*”. We also
-have another function that detects modified data,
+function, which answers the question, “*What values have been changed?*”
+The package has a second function that detects modified data,
 [`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md).
 
 ### Packages
 
 ``` r
 
-library(dplyr)
 library(stringr)
-library(forcats)
 library(lubridate)
 library(fs)
 library(vctrs)
 library(glue)
 library(purrr)
-library(vroom)
 library(haven)
 library(readxl)
 library(dfdiffs)
@@ -104,7 +101,7 @@ style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left:
 
 #### ChangedDataID
 
-We create an identical join column in the `ChangedData`
+We create an identical join column in `ChangedData`.
 
 ``` r
 
@@ -129,11 +126,14 @@ column.
 
 ## `create_modified_data()`
 
-The
 [`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
-function is a wrapper around
-[`arsenal::comparedf()`](https://mayoverse.github.io/arsenal/reference/comparedf.html),
-but only returns a small fraction of the output.
+itself is built on a base-R engine (see the call tree below), not
+`arsenal`. As a point of comparison, here’s what
+[`arsenal::comparedf()`](https://mayoverse.github.io/arsenal/reference/comparedf.html)
+produces directly when run on the same data;
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
+returns only a small fraction of this output, reshaped into
+`$diffs`/`$diffs_byvar`.
 
 ``` r
 
@@ -164,13 +164,15 @@ We’re only interested in the `diffs.byvar.table` and the `diffs.table`.
 
 Within `dfdiffs`,
 [`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
-calls
+is built on
+[`diff_values_by_key()`](https://mjfrigaard.github.io/dfdiffs/reference/diff_values_by_key.md)
+(a base-R engine that compares matched rows column-by-column with
+[`compare_values()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_values.md)),
+plus the same
 [`rename_join_col()`](https://mjfrigaard.github.io/dfdiffs/reference/rename_join_col.md)
 and
 [`create_new_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_column.md)
-to build (and name) the join column; the comparison itself comes from
-[`arsenal::comparedf()`](https://mayoverse.github.io/arsenal/reference/comparedf.html)
-(from another package, so it isn’t shown below). The call tree below was
+helpers used by the other comparison functions. The call tree below was
 generated from the package source with
 [stackcallr](https://github.com/mjfrigaard/stackcallr)
 (`pak::pak("mjfrigaard/stackcallr")`); only functions defined in
@@ -182,6 +184,10 @@ stackcallr::call_tree_dir("R", root = "create_modified_data")
 ```
 
     █─create_modified_data
+    ├─select_cols
+    ├─█─diff_values_by_key
+    │ ├─compare_values
+    │ └─class_diffs
     ├─rename_join_col
     └─create_new_column
 
@@ -205,7 +211,7 @@ modified_cdf_sum$diffs.byvar.table
 modified_cdf_sum\$diffs.byvar.table {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
 
-### `comparedf()` -\> `diffs.byvar.table`
+### `comparedf()` -\> `diffs.table`
 
 ``` r
 
@@ -251,15 +257,15 @@ We’ve removed the extra `var.y` (and renamed `var.x` to
 modified$diffs_byvar
 ```
 
-| Variable name | Modified Values | Missing Values |
-|:--------------|----------------:|---------------:|
-| subject_id    |               0 |              0 |
-| record        |               0 |              0 |
-| text_value_a  |               2 |              0 |
-| text_value_b  |               1 |              0 |
-| created_date  |               0 |              0 |
-| updated_date  |               5 |              0 |
-| entered_date  |               5 |              0 |
+| Variable name | Modified Values |
+|:--------------|----------------:|
+| subject_id    |               0 |
+| record        |               0 |
+| text_value_a  |               2 |
+| text_value_b  |               1 |
+| created_date  |               0 |
+| updated_date  |               5 |
+| entered_date  |               5 |
 
 modified\$diffs_byvar {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
@@ -270,7 +276,7 @@ We’ve removed the `var.y` (and renamed `var.x` to `Variable name`).
 `values.x` was renamed to `Current Value`, and `values.y` was renamed to
 `Previous Value`.
 
-We’ve also removed the row position variables (`row.x` and `row.y`)
+We’ve also removed the row position variables (`row.x` and `row.y`).
 
 ``` r
 

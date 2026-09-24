@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,7 @@
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
-<p>The goal of the <code>dfdiffs</code> is to answer the following
+<p>The goal of <code>dfdiffs</code> is to answer the following
 questions:</p>
 <ol style="list-style-type: decimal">
 <li>What rows are here now that weren’t here before?</li>
@@ -92,14 +92,15 @@ questions:</p>
 <li><strong>What values have been changed?</strong></li>
 </ol>
 <p>This vignette covers how to apply the functions in
-<code>dfdiffs</code> to multiple datasets (separated by folder)</p>
+<code>dfdiffs</code> to multiple datasets (separated by folder).</p>
 <div class="section level3">
 <h3 id="packages">Packages<a class="anchor" aria-label="anchor" href="#packages"></a>
 </h3>
-<p>Our package</p>
+<p>Load <code>dfdiffs</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mjfrigaard.github.io/dfdiffs/">dfdiffs</a></span><span class="op">)</span></span></code></pre></div>
-<p>Packages for import/export, iteration, wrangling, etc.</p>
+<p>We’ll also need packages for import/export, iteration, and
+wrangling:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org" class="external-link">readr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
@@ -107,13 +108,12 @@ questions:</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glue.tidyverse.org/" class="external-link">glue</a></span><span class="op">)</span></span></code></pre></div>
-<p>Packages for tables.</p>
+<p>These packages are for building tables:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://larmarange.github.io/labelled/" class="external-link">labelled</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gt.rstudio.com" class="external-link">gt</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary" class="external-link">gtsummary</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span></code></pre></div>
-<p>Similar packages for comparisons.</p>
+<p>These packages offer similar comparison functions:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor" class="external-link">janitor</a></span><span class="op">)</span> <span class="co"># compare_df_cols</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayoverse/arsenal" class="external-link">arsenal</a></span><span class="op">)</span> <span class="co"># comparedf</span></span>
@@ -124,111 +124,127 @@ questions:</p>
 <div class="section level3">
 <h3 id="folder-structure">Folder structure<a class="anchor" aria-label="anchor" href="#folder-structure"></a>
 </h3>
-<p>Below is a folder structure of datasets separated by year.</p>
+<p>Below is a folder structure of datasets separated by year. It holds
+two yearly pulls of the synthetic (not real) <code>dfdiffs</code> site
+roster (see <code><a href="../reference/Roster2021.html">?Roster2021</a></code>), which
+<code>data-raw/Roster.R</code> has already split into
+<code>Enroll</code>/<code>Visit</code>/<code>Name</code> files.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/dir_tree.html" class="external-link">dir_tree</a></span><span class="op">(</span><span class="st">"../inst/extdata/csv/by-year"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #0000BB; font-weight: bold;">../inst/extdata/csv/by-year</span></span></span>
-<span><span class="co">#&gt; ├── <span style="color: #0000BB; font-weight: bold;">20</span></span></span>
-<span><span class="co">#&gt; │   ├── PlayerBirth.csv</span></span>
-<span><span class="co">#&gt; │   ├── PlayerDebut.csv</span></span>
-<span><span class="co">#&gt; │   └── PlayerName.csv</span></span>
-<span><span class="co">#&gt; └── <span style="color: #0000BB; font-weight: bold;">21</span></span></span>
-<span><span class="co">#&gt;     ├── PlayerBirth.csv</span></span>
-<span><span class="co">#&gt;     ├── PlayerDebut.csv</span></span>
-<span><span class="co">#&gt;     └── PlayerName.csv</span></span></code></pre></div>
-<p>We start by storing these files in a vector with
-<code><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files()</a></code>, then we clean up the names a bit, and pass
-the list of paths to <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv</a></code> with
-<code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">purrr::map()</a></code>:</p>
+<code class="sourceCode R"><span><span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/dir_tree.html" class="external-link">dir_tree</a></span><span class="op">(</span><span class="st">"../inst/extdata/csv/site-roster"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #0000BB; font-weight: bold;">../inst/extdata/csv/site-roster</span></span></span>
+<span><span class="co">#&gt; ├── <span style="color: #0000BB; font-weight: bold;">2021</span></span></span>
+<span><span class="co">#&gt; │   ├── Enroll.csv</span></span>
+<span><span class="co">#&gt; │   ├── Name.csv</span></span>
+<span><span class="co">#&gt; │   ├── Roster.csv</span></span>
+<span><span class="co">#&gt; │   └── Visit.csv</span></span>
+<span><span class="co">#&gt; ├── <span style="color: #0000BB; font-weight: bold;">2022</span></span></span>
+<span><span class="co">#&gt; │   ├── Enroll.csv</span></span>
+<span><span class="co">#&gt; │   ├── Name.csv</span></span>
+<span><span class="co">#&gt; │   ├── Roster.csv</span></span>
+<span><span class="co">#&gt; │   └── Visit.csv</span></span>
+<span><span class="co">#&gt; ├── <span style="color: #0000BB; font-weight: bold;">2023</span></span></span>
+<span><span class="co">#&gt; │   ├── Enroll.csv</span></span>
+<span><span class="co">#&gt; │   ├── Name.csv</span></span>
+<span><span class="co">#&gt; │   ├── Roster.csv</span></span>
+<span><span class="co">#&gt; │   └── Visit.csv</span></span>
+<span><span class="co">#&gt; └── <span style="color: #0000BB; font-weight: bold;">2024</span></span></span>
+<span><span class="co">#&gt;     ├── Enroll.csv</span></span>
+<span><span class="co">#&gt;     ├── Name.csv</span></span>
+<span><span class="co">#&gt;     ├── Roster.csv</span></span>
+<span><span class="co">#&gt;     └── Visit.csv</span></span></code></pre></div>
+<p>We start by storing these file paths in a vector with
+<code><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files()</a></code>. Then we clean up the names a bit and pass the
+paths to <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv</a></code> with
+<code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">purrr::map()</a></code>.</p>
 <div class="section level4">
 <h4 id="import-base-dfs">Import base dfs<a class="anchor" aria-label="anchor" href="#import-base-dfs"></a>
 </h4>
-<p>Below we import the compare data tables (from 2020)</p>
+<p>Below we import the base data tables (from the 2021 pull).</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">base_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"../inst/extdata/csv/by-year/20"</span>, </span>
-<span>  pattern <span class="op">=</span> <span class="st">".csv"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">base_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"../inst/extdata/csv/site-roster/2021"</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="st">"Enroll|Visit|Name"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">base_files_nms</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_chr</a></span><span class="op">(</span><span class="va">base_files</span>, <span class="fu">base</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">)</span></span>
-<span><span class="va">base_dfs</span> <span class="op">&lt;-</span> <span class="va">base_files</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/set_names.html" class="external-link">set_names</a></span><span class="op">(</span><span class="va">base_files_nms</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="va">base_dfs</span> <span class="op">&lt;-</span> <span class="va">base_files</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/set_names.html" class="external-link">set_names</a></span><span class="op">(</span><span class="va">base_files_nms</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="fu">readr</span><span class="fu">::</span><span class="va"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">)</span></span>
 <span><span class="va">base_dfs</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 3</span></span>
-<span><span class="co">#&gt;  $ PlayerBirth.csv: spc_tbl_ [20,673 × 4] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
-<span><span class="co">#&gt;   ..$ playerID  : chr [1:20673] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...</span></span>
-<span><span class="co">#&gt;   ..$ birthYear : num [1:20673] 1981 1934 1939 1954 1972 ...</span></span>
-<span><span class="co">#&gt;   ..$ birthMonth: num [1:20673] 12 2 8 9 8 12 11 4 11 10 ...</span></span>
-<span><span class="co">#&gt;   ..$ birthDay  : num [1:20673] 27 5 5 8 25 17 4 15 11 14 ...</span></span>
+<span><span class="co">#&gt;  $ Enroll.csv: spc_tbl_ [200 × 4] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
+<span><span class="co">#&gt;   ..$ subject_id  : chr [1:200] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
+<span><span class="co">#&gt;   ..$ enroll_year : num [1:200] 2021 2021 2021 2021 2021 ...</span></span>
+<span><span class="co">#&gt;   ..$ enroll_month: num [1:200] 5 10 10 6 2 1 4 11 7 7 ...</span></span>
+<span><span class="co">#&gt;   ..$ enroll_day  : num [1:200] 15 5 28 9 19 18 16 13 14 15 ...</span></span>
 <span><span class="co">#&gt;   ..- attr(*, "spec")=</span></span>
 <span><span class="co">#&gt;   .. .. cols(</span></span>
-<span><span class="co">#&gt;   .. ..   playerID = <span style="color: #BB0000;">col_character()</span>,</span></span>
-<span><span class="co">#&gt;   .. ..   birthYear = <span style="color: #00BB00;">col_double()</span>,</span></span>
-<span><span class="co">#&gt;   .. ..   birthMonth = <span style="color: #00BB00;">col_double()</span>,</span></span>
-<span><span class="co">#&gt;   .. ..   birthDay = <span style="color: #00BB00;">col_double()</span></span></span>
+<span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
+<span><span class="co">#&gt;   .. ..   enroll_year = <span style="color: #00BB00;">col_double()</span>,</span></span>
+<span><span class="co">#&gt;   .. ..   enroll_month = <span style="color: #00BB00;">col_double()</span>,</span></span>
+<span><span class="co">#&gt;   .. ..   enroll_day = <span style="color: #00BB00;">col_double()</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x556c759cc640&gt; </span></span>
-<span><span class="co">#&gt;  $ PlayerDebut.csv: spc_tbl_ [20,673 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
-<span><span class="co">#&gt;   ..$ playerID: chr [1:20673] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...</span></span>
-<span><span class="co">#&gt;   ..$ debut   : Date[1:20673], format: "2004-04-06" "1954-04-13" ...</span></span>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x5582ed075ae0&gt; </span></span>
+<span><span class="co">#&gt;  $ Name.csv  : spc_tbl_ [200 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
+<span><span class="co">#&gt;   ..$ subject_id: chr [1:200] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
+<span><span class="co">#&gt;   ..$ full_name : chr [1:200] "Jamie Nguyen" "Riley Jensen" "Rowan Singh" "Reese Diaz" ...</span></span>
 <span><span class="co">#&gt;   ..- attr(*, "spec")=</span></span>
 <span><span class="co">#&gt;   .. .. cols(</span></span>
-<span><span class="co">#&gt;   .. ..   playerID = <span style="color: #BB0000;">col_character()</span>,</span></span>
-<span><span class="co">#&gt;   .. ..   debut = <span style="color: #0000BB;">col_date(format = "")</span></span></span>
+<span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
+<span><span class="co">#&gt;   .. ..   full_name = <span style="color: #BB0000;">col_character()</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x556c78cc51b0&gt; </span></span>
-<span><span class="co">#&gt;  $ PlayerName.csv : spc_tbl_ [20,673 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
-<span><span class="co">#&gt;   ..$ playerID : chr [1:20673] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...</span></span>
-<span><span class="co">#&gt;   ..$ nameGiven: chr [1:20673] "David Allan" "Henry Louis" "Tommie Lee" "Donald William" ...</span></span>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x5582ebf8bbc0&gt; </span></span>
+<span><span class="co">#&gt;  $ Visit.csv : spc_tbl_ [200 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
+<span><span class="co">#&gt;   ..$ subject_id      : chr [1:200] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
+<span><span class="co">#&gt;   ..$ first_visit_date: Date[1:200], format: "2021-05-15" "2021-10-05" ...</span></span>
 <span><span class="co">#&gt;   ..- attr(*, "spec")=</span></span>
 <span><span class="co">#&gt;   .. .. cols(</span></span>
-<span><span class="co">#&gt;   .. ..   playerID = <span style="color: #BB0000;">col_character()</span>,</span></span>
-<span><span class="co">#&gt;   .. ..   nameGiven = <span style="color: #BB0000;">col_character()</span></span></span>
+<span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
+<span><span class="co">#&gt;   .. ..   first_visit_date = <span style="color: #0000BB;">col_date(format = "")</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x556c77550930&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x5582e94bf220&gt;</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="import-compare-dfs">Import compare dfs<a class="anchor" aria-label="anchor" href="#import-compare-dfs"></a>
 </h4>
-<p>Below we import the compare data tables (from 2021)</p>
+<p>Below we import the compare data tables (from the 2022 pull).</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">compare_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"../inst/extdata/csv/by-year/21"</span>, </span>
-<span>  pattern <span class="op">=</span> <span class="st">".csv"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">compare_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"../inst/extdata/csv/site-roster/2022"</span>,</span>
+<span>  pattern <span class="op">=</span> <span class="st">"Enroll|Visit|Name"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">compare_files_nms</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_chr</a></span><span class="op">(</span><span class="va">compare_files</span>, <span class="fu">base</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">)</span></span>
-<span><span class="va">compare_dfs</span> <span class="op">&lt;-</span> <span class="va">compare_files</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/set_names.html" class="external-link">set_names</a></span><span class="op">(</span><span class="va">compare_files_nms</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="va">compare_dfs</span> <span class="op">&lt;-</span> <span class="va">compare_files</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/set_names.html" class="external-link">set_names</a></span><span class="op">(</span><span class="va">compare_files_nms</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="fu">readr</span><span class="fu">::</span><span class="va"><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">read_csv</a></span><span class="op">)</span></span>
 <span><span class="va">compare_dfs</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; List of 3</span></span>
-<span><span class="co">#&gt;  $ PlayerBirth.csv: spc_tbl_ [20,370 × 4] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
-<span><span class="co">#&gt;   ..$ playerID  : chr [1:20370] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...</span></span>
-<span><span class="co">#&gt;   ..$ birthYear : num [1:20370] 1981 1934 1939 1954 1972 ...</span></span>
-<span><span class="co">#&gt;   ..$ birthMonth: num [1:20370] 12 2 8 9 8 12 11 4 11 10 ...</span></span>
-<span><span class="co">#&gt;   ..$ birthDay  : num [1:20370] 27 5 5 8 25 17 4 15 11 14 ...</span></span>
+<span><span class="co">#&gt;  $ Enroll.csv: spc_tbl_ [237 × 4] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
+<span><span class="co">#&gt;   ..$ subject_id  : chr [1:237] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
+<span><span class="co">#&gt;   ..$ enroll_year : num [1:237] 2021 2021 2021 2021 2021 ...</span></span>
+<span><span class="co">#&gt;   ..$ enroll_month: num [1:237] 5 10 10 6 1 4 11 7 7 10 ...</span></span>
+<span><span class="co">#&gt;   ..$ enroll_day  : num [1:237] 15 5 28 9 18 16 13 14 15 23 ...</span></span>
 <span><span class="co">#&gt;   ..- attr(*, "spec")=</span></span>
 <span><span class="co">#&gt;   .. .. cols(</span></span>
-<span><span class="co">#&gt;   .. ..   playerID = <span style="color: #BB0000;">col_character()</span>,</span></span>
-<span><span class="co">#&gt;   .. ..   birthYear = <span style="color: #00BB00;">col_double()</span>,</span></span>
-<span><span class="co">#&gt;   .. ..   birthMonth = <span style="color: #00BB00;">col_double()</span>,</span></span>
-<span><span class="co">#&gt;   .. ..   birthDay = <span style="color: #00BB00;">col_double()</span></span></span>
+<span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
+<span><span class="co">#&gt;   .. ..   enroll_year = <span style="color: #00BB00;">col_double()</span>,</span></span>
+<span><span class="co">#&gt;   .. ..   enroll_month = <span style="color: #00BB00;">col_double()</span>,</span></span>
+<span><span class="co">#&gt;   .. ..   enroll_day = <span style="color: #00BB00;">col_double()</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x556c7db2f4c0&gt; </span></span>
-<span><span class="co">#&gt;  $ PlayerDebut.csv: spc_tbl_ [20,370 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
-<span><span class="co">#&gt;   ..$ playerID: chr [1:20370] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...</span></span>
-<span><span class="co">#&gt;   ..$ debut   : Date[1:20370], format: "2004-04-06" "1954-04-13" ...</span></span>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x5582e98beb10&gt; </span></span>
+<span><span class="co">#&gt;  $ Name.csv  : spc_tbl_ [237 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
+<span><span class="co">#&gt;   ..$ subject_id: chr [1:237] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
+<span><span class="co">#&gt;   ..$ full_name : chr [1:237] "Jamie Nguyen" "Riley Jensen" "Rowan Singh" "Reese Diaz" ...</span></span>
 <span><span class="co">#&gt;   ..- attr(*, "spec")=</span></span>
 <span><span class="co">#&gt;   .. .. cols(</span></span>
-<span><span class="co">#&gt;   .. ..   playerID = <span style="color: #BB0000;">col_character()</span>,</span></span>
-<span><span class="co">#&gt;   .. ..   debut = <span style="color: #0000BB;">col_date(format = "")</span></span></span>
+<span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
+<span><span class="co">#&gt;   .. ..   full_name = <span style="color: #BB0000;">col_character()</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x556c79bc5840&gt; </span></span>
-<span><span class="co">#&gt;  $ PlayerName.csv : spc_tbl_ [20,370 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
-<span><span class="co">#&gt;   ..$ playerID : chr [1:20370] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...</span></span>
-<span><span class="co">#&gt;   ..$ nameGiven: chr [1:20370] "David Allan" "Henry Louis" "Tommie Lee" "Donald William" ...</span></span>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x5582e66c08a0&gt; </span></span>
+<span><span class="co">#&gt;  $ Visit.csv : spc_tbl_ [237 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
+<span><span class="co">#&gt;   ..$ subject_id      : chr [1:237] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
+<span><span class="co">#&gt;   ..$ first_visit_date: Date[1:237], format: "2021-05-15" "2021-10-05" ...</span></span>
 <span><span class="co">#&gt;   ..- attr(*, "spec")=</span></span>
 <span><span class="co">#&gt;   .. .. cols(</span></span>
-<span><span class="co">#&gt;   .. ..   playerID = <span style="color: #BB0000;">col_character()</span>,</span></span>
-<span><span class="co">#&gt;   .. ..   nameGiven = <span style="color: #BB0000;">col_character()</span></span></span>
+<span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
+<span><span class="co">#&gt;   .. ..   first_visit_date = <span style="color: #0000BB;">col_date(format = "")</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x556c78c99e90&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x5582e940d520&gt;</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -236,7 +252,7 @@ the list of paths to <code><a href="https://readr.tidyverse.org/reference/read_d
 <h2 id="iteration">Iteration<a class="anchor" aria-label="anchor" href="#iteration"></a>
 </h2>
 <p>We’re going to follow the iteration steps from <a href="https://www.rstudio.com/resources/rstudioconf-2017/happy-r-users-purrr-tutorial-/" class="external-link">Charlotte
-Wickham’s Happy R Users Purrr Tutorial</a></p>
+Wickham’s Happy R Users Purrr Tutorial</a>:</p>
 <ol style="list-style-type: decimal">
 <li>DO IT FOR ONE<br>
 </li>
@@ -247,18 +263,18 @@ Wickham’s Happy R Users Purrr Tutorial</a></p>
 <div class="section level3">
 <h3 id="do-it-for-one-or-two">1) Do it for one (or two)<a class="anchor" aria-label="anchor" href="#do-it-for-one-or-two"></a>
 </h3>
-<p>We’re going to use the <code><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">arsenal::comparedf()</a></code> function
-first. Remember that this function requires an additional
-<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> call!</p>
+<p>We’ll start with the <code><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">arsenal::comparedf()</a></code> function.
+Remember that this function requires an additional
+<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> call.</p>
 <div class="section level4">
 <h4 id="arsenalcomparedf">
 <code>arsenal::comparedf</code><a class="anchor" aria-label="anchor" href="#arsenalcomparedf"></a>
 </h4>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">by_var</span> <span class="op">&lt;-</span> <span class="st">"playerID"</span></span>
+<code class="sourceCode R"><span><span class="va">by_var</span> <span class="op">&lt;-</span> <span class="st">"subject_id"</span></span>
 <span><span class="va">cdf_people</span> <span class="op">&lt;-</span> <span class="fu">arsenal</span><span class="fu">::</span><span class="fu"><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">comparedf</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="va">base_dfs</span><span class="op">$</span><span class="va">PlayerBirth.csv</span>, </span>
-<span>  y <span class="op">=</span> <span class="va">compare_dfs</span><span class="op">$</span><span class="va">PlayerBirth.csv</span>, </span>
+<span>  x <span class="op">=</span> <span class="va">base_dfs</span><span class="op">$</span><span class="va">Enroll.csv</span>, </span>
+<span>  y <span class="op">=</span> <span class="va">compare_dfs</span><span class="op">$</span><span class="va">Enroll.csv</span>, </span>
 <span>  by <span class="op">=</span> <span class="va">by_var</span><span class="op">)</span></span>
 <span><span class="va">sumcdf_people</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cdf_people</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sumcdf_people</span><span class="op">)</span></span>
@@ -275,16 +291,15 @@ first. Remember that this function requires an additional
 <p>Next we’ll use the <code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf()</a></code> function.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">diffdf_people</span> <span class="op">&lt;-</span> <span class="fu">diffdf</span><span class="fu">::</span><span class="fu"><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf</a></span><span class="op">(</span></span>
-<span>  compare <span class="op">=</span> <span class="va">compare_dfs</span><span class="op">$</span><span class="va">PlayerBirth.csv</span>, </span>
-<span>  base <span class="op">=</span> <span class="va">base_dfs</span><span class="op">$</span><span class="va">PlayerBirth.csv</span>, </span>
-<span>  keys <span class="op">=</span> <span class="st">"playerID"</span><span class="op">)</span></span>
+<span>  compare <span class="op">=</span> <span class="va">compare_dfs</span><span class="op">$</span><span class="va">Enroll.csv</span>, </span>
+<span>  base <span class="op">=</span> <span class="va">base_dfs</span><span class="op">$</span><span class="va">Enroll.csv</span>, </span>
+<span>  keys <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span>
 <span><span class="va">diffdf_people</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "DataSummary"        "ExtRowsBase"        "NumDiff"           </span></span>
-<span><span class="co">#&gt; [4] "VarDiff_birthYear"  "VarDiff_birthMonth" "VarDiff_birthDay"</span></span></code></pre></div>
-<p>Just to ensure we’re getting the same display in the output from both
-functions, we’re going to use the
-<code>diffs.byvar.table</code>/<code>NumDiff</code> tables, and the
-<code>diffs.table</code>/ <code>VarDiff_</code> tables.</p>
+<span><span class="co">#&gt; [1] "DataSummary" "ExtRowsBase" "ExtRowsComp"</span></span></code></pre></div>
+<p>To make sure the output from both functions is displayed the same
+way, we’ll use the <code>diffs.byvar.table</code>/<code>NumDiff</code>
+tables and the <code>diffs.table</code>/<code>VarDiff_</code>
+tables.</p>
 <div class="section level5">
 <h5 id="diffs-byvar-table">
 <code>diffs.byvar.table</code><a class="anchor" aria-label="anchor" href="#diffs-byvar-table"></a>
@@ -310,26 +325,26 @@ No of Differences
 <tbody>
 <tr>
 <td style="text-align:left;">
-birthYear
+enroll_year
 </td>
 <td style="text-align:right;">
-19
+0
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-birthMonth
+enroll_month
 </td>
 <td style="text-align:right;">
-3
+0
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-birthDay
+enroll_day
 </td>
 <td style="text-align:right;">
-6
+0
 </td>
 </tr>
 </tbody>
@@ -342,46 +357,9 @@ birthDay
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">diffdf_people</span><span class="op">[[</span><span class="st">"NumDiff"</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"NumDiff"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
-<caption>
-NumDiff
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-Variable
-</th>
-<th style="text-align:right;">
-No of Differences
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:right;">
-19
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthMonth
-</td>
-<td style="text-align:right;">
-3
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:right;">
-6
-</td>
-</tr>
-</tbody>
-</table>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `matrix()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> data is too long</span></span></code></pre></div>
 </div>
 <div class="section level5">
 <h5 id="diffs-table">
@@ -408,409 +386,29 @@ diffs.table
 VARIABLE
 </th>
 <th style="text-align:left;">
-playerID
+subject_id
 </th>
-<th style="text-align:right;">
+<th style="text-align:left;">
 BASE
 </th>
-<th style="text-align:right;">
+<th style="text-align:left;">
 COMPARE
 </th>
 </tr></thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-bearnla01
-</td>
-<td style="text-align:right;">
-1940
-</td>
-<td style="text-align:right;">
-1941
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
+character(0)
 </td>
 <td style="text-align:left;">
-candito01
-</td>
-<td style="text-align:right;">
-1956
-</td>
-<td style="text-align:right;">
-1957
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
+c(“:——–”, “:———-”, “:—-”, “:——-”)
 </td>
 <td style="text-align:left;">
-childbi01
-</td>
-<td style="text-align:right;">
-1867
-</td>
-<td style="text-align:right;">
-NA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
+character(0)
 </td>
 <td style="text-align:left;">
-coopean99
+c(“:——–”, “:———-”, “:—-”, “:——-”)
 </td>
-<td style="text-align:right;">
-1897
-</td>
-<td style="text-align:right;">
-1898
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-herremi01
-</td>
-<td style="text-align:right;">
-1892
-</td>
-<td style="text-align:right;">
-1897
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-jimenma01
-</td>
-<td style="text-align:right;">
-1936
-</td>
-<td style="text-align:right;">
-1938
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-jonesco02
-</td>
-<td style="text-align:right;">
-1905
-</td>
-<td style="text-align:right;">
-1907
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-kelletr01
-</td>
-<td style="text-align:right;">
-1992
-</td>
-<td style="text-align:right;">
-1993
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-mcfaror01
-</td>
-<td style="text-align:right;">
-1935
-</td>
-<td style="text-align:right;">
-1938
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-mendomi01
-</td>
-<td style="text-align:right;">
-1934
-</td>
-<td style="text-align:right;">
-1933
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-minosmi01
-</td>
-<td style="text-align:right;">
-1923
-</td>
-<td style="text-align:right;">
-1925
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-naranch01
-</td>
-<td style="text-align:right;">
-1933
-</td>
-<td style="text-align:right;">
-1934
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-olivaed01
-</td>
-<td style="text-align:right;">
-1937
-</td>
-<td style="text-align:right;">
-1938
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-olivoch01
-</td>
-<td style="text-align:right;">
-1926
-</td>
-<td style="text-align:right;">
-1928
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-posadle01
-</td>
-<td style="text-align:right;">
-1934
-</td>
-<td style="text-align:right;">
-1936
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-quirkar01
-</td>
-<td style="text-align:right;">
-1937
-</td>
-<td style="text-align:right;">
-1938
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-senerso01
-</td>
-<td style="text-align:right;">
-1929
-</td>
-<td style="text-align:right;">
-1931
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-willida02
-</td>
-<td style="text-align:right;">
-1879
-</td>
-<td style="text-align:right;">
-1880
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-zamoros01
-</td>
-<td style="text-align:right;">
-1943
-</td>
-<td style="text-align:right;">
-1944
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthMonth
-</td>
-<td style="text-align:left;">
-hickmch01
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-5
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthMonth
-</td>
-<td style="text-align:left;">
-mendomi01
-</td>
-<td style="text-align:right;">
-12
-</td>
-<td style="text-align:right;">
-11
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthMonth
-</td>
-<td style="text-align:left;">
-willida02
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-2
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:left;">
-barnesk01
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-3
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:left;">
-jamesbo01
-</td>
-<td style="text-align:right;">
-15
-</td>
-<td style="text-align:right;">
-18
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:left;">
-mendomi01
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-16
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:left;">
-posadle01
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-15
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:left;">
-walshed01
-</td>
-<td style="text-align:right;">
-19
-</td>
-<td style="text-align:right;">
-14
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:left;">
-willida02
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-7
-</td>
-</tr>
-</tbody>
+</tr></tbody>
 </table>
 </div>
 <div class="section level5">
@@ -822,420 +420,9 @@ NA
 <span><span class="va">vardiff_tbls</span> <span class="op">&lt;-</span> <span class="va">tbl_names</span><span class="op">[</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">tbl_names</span>, <span class="st">"VarDiff_"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">diffdf_people</span><span class="op">[</span><span class="va">vardiff_tbls</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"'VarDiff_' tables"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
-<caption>
-‘VarDiff_’ tables
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-VARIABLE
-</th>
-<th style="text-align:left;">
-playerID
-</th>
-<th style="text-align:right;">
-BASE
-</th>
-<th style="text-align:right;">
-COMPARE
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-bearnla01
-</td>
-<td style="text-align:right;">
-1940
-</td>
-<td style="text-align:right;">
-1941
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-candito01
-</td>
-<td style="text-align:right;">
-1956
-</td>
-<td style="text-align:right;">
-1957
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-childbi01
-</td>
-<td style="text-align:right;">
-1867
-</td>
-<td style="text-align:right;">
-NA
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-coopean99
-</td>
-<td style="text-align:right;">
-1897
-</td>
-<td style="text-align:right;">
-1898
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-herremi01
-</td>
-<td style="text-align:right;">
-1892
-</td>
-<td style="text-align:right;">
-1897
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-jimenma01
-</td>
-<td style="text-align:right;">
-1936
-</td>
-<td style="text-align:right;">
-1938
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-jonesco02
-</td>
-<td style="text-align:right;">
-1905
-</td>
-<td style="text-align:right;">
-1907
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-kelletr01
-</td>
-<td style="text-align:right;">
-1992
-</td>
-<td style="text-align:right;">
-1993
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-mcfaror01
-</td>
-<td style="text-align:right;">
-1935
-</td>
-<td style="text-align:right;">
-1938
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-mendomi01
-</td>
-<td style="text-align:right;">
-1934
-</td>
-<td style="text-align:right;">
-1933
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-minosmi01
-</td>
-<td style="text-align:right;">
-1923
-</td>
-<td style="text-align:right;">
-1925
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-naranch01
-</td>
-<td style="text-align:right;">
-1933
-</td>
-<td style="text-align:right;">
-1934
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-olivaed01
-</td>
-<td style="text-align:right;">
-1937
-</td>
-<td style="text-align:right;">
-1938
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-olivoch01
-</td>
-<td style="text-align:right;">
-1926
-</td>
-<td style="text-align:right;">
-1928
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-posadle01
-</td>
-<td style="text-align:right;">
-1934
-</td>
-<td style="text-align:right;">
-1936
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-quirkar01
-</td>
-<td style="text-align:right;">
-1937
-</td>
-<td style="text-align:right;">
-1938
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-senerso01
-</td>
-<td style="text-align:right;">
-1929
-</td>
-<td style="text-align:right;">
-1931
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-willida02
-</td>
-<td style="text-align:right;">
-1879
-</td>
-<td style="text-align:right;">
-1880
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthYear
-</td>
-<td style="text-align:left;">
-zamoros01
-</td>
-<td style="text-align:right;">
-1943
-</td>
-<td style="text-align:right;">
-1944
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthMonth
-</td>
-<td style="text-align:left;">
-hickmch01
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-5
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthMonth
-</td>
-<td style="text-align:left;">
-mendomi01
-</td>
-<td style="text-align:right;">
-12
-</td>
-<td style="text-align:right;">
-11
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthMonth
-</td>
-<td style="text-align:left;">
-willida02
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-2
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:left;">
-barnesk01
-</td>
-<td style="text-align:right;">
-7
-</td>
-<td style="text-align:right;">
-3
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:left;">
-jamesbo01
-</td>
-<td style="text-align:right;">
-15
-</td>
-<td style="text-align:right;">
-18
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:left;">
-mendomi01
-</td>
-<td style="text-align:right;">
-3
-</td>
-<td style="text-align:right;">
-16
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:left;">
-posadle01
-</td>
-<td style="text-align:right;">
-1
-</td>
-<td style="text-align:right;">
-15
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:left;">
-walshed01
-</td>
-<td style="text-align:right;">
-19
-</td>
-<td style="text-align:right;">
-14
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-birthDay
-</td>
-<td style="text-align:left;">
-willida02
-</td>
-<td style="text-align:right;">
-NA
-</td>
-<td style="text-align:right;">
-7
-</td>
-</tr>
-</tbody>
-</table>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `matrix()`:</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> data is too long</span></span></code></pre></div>
 </div>
 </div>
 </div>
@@ -1243,22 +430,23 @@ NA
 <h3 id="turn-it-into-a-recipe">2) Turn it into a recipe<a class="anchor" aria-label="anchor" href="#turn-it-into-a-recipe"></a>
 </h3>
 <p>We have two vectors with file paths (<code>.x</code> and
-<code>.y</code>)</p>
+<code>.y</code>).</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span>.x <span class="op">=</span> <span class="va">base_dfs</span>, .y <span class="op">=</span> <span class="va">compare_files</span>, <span class="op">)</span></span></code></pre></div>
-<p>And the <code>.f</code> is our <code><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">arsenal::comparedf</a></code> or
-<code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf</a></code> functions.</p>
+<p>The <code>.f</code> argument is either the
+<code><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">arsenal::comparedf</a></code> or the <code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf</a></code>
+function.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span>.x <span class="op">=</span> <span class="va">base_dfs</span>, .y <span class="op">=</span> <span class="va">compare_files</span>, .f <span class="op">=</span> <span class="fu">arsenal</span><span class="fu">::</span><span class="va"><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">comparedf</a></span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span>.x <span class="op">=</span> <span class="va">compare_files</span>, .y <span class="op">=</span> <span class="va">base_dfs</span>, .f <span class="op">=</span> <span class="fu">diffdf</span><span class="fu">::</span><span class="va"><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf</a></span><span class="op">)</span></span></code></pre></div>
-<p>We can pass the <code>by</code> and <code>keys</code> arguments to
-<code>...</code>.</p>
+<p>We can pass the <code>by</code> and <code>keys</code> arguments
+through <code>...</code>.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span>.x <span class="op">=</span>  <span class="va">base_dfs</span>, .y <span class="op">=</span> <span class="va">compare_dfs</span>, </span>
-<span>            .f <span class="op">=</span> <span class="fu">arsenal</span><span class="fu">::</span><span class="va"><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">comparedf</a></span>, by <span class="op">=</span> <span class="st">"playerID"</span><span class="op">)</span></span></code></pre></div>
+<span>            .f <span class="op">=</span> <span class="fu">arsenal</span><span class="fu">::</span><span class="va"><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">comparedf</a></span>, by <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span>.x <span class="op">=</span>  <span class="va">compare_dfs</span>,  .y <span class="op">=</span> <span class="va">base_dfs</span>, </span>
-<span>            .f <span class="op">=</span> <span class="fu">diffdf</span><span class="fu">::</span><span class="va"><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf</a></span>, keys <span class="op">=</span> <span class="st">"playerID"</span><span class="op">)</span></span></code></pre></div>
+<span>            .f <span class="op">=</span> <span class="fu">diffdf</span><span class="fu">::</span><span class="va"><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf</a></span>, keys <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="do-it-for-all">3) Do it for all<a class="anchor" aria-label="anchor" href="#do-it-for-all"></a>
@@ -1274,9 +462,9 @@ the items in <code>base_dfs</code> to <code>compare_dfs</code>.</p>
 <span>  .x <span class="op">=</span>  <span class="va">base_dfs</span>, </span>
 <span>  .y <span class="op">=</span> <span class="va">compare_dfs</span>, </span>
 <span>  .f <span class="op">=</span> <span class="fu">arsenal</span><span class="fu">::</span><span class="va"><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">comparedf</a></span>, </span>
-<span>  by <span class="op">=</span> <span class="st">"playerID"</span><span class="op">)</span></span>
+<span>  by <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span>
 <span><span class="va">all_scdfs</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">all_cdfs</span>, .f <span class="op">=</span> <span class="va">summary</span><span class="op">)</span></span>
-<span><span class="va">all_scdfs</span><span class="op">[[</span><span class="st">"PlayerName.csv"</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">all_scdfs</span><span class="op">[[</span><span class="st">"Name.csv"</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "frame.summary.table"      "comparison.summary.table"</span></span>
 <span><span class="co">#&gt; [3] "vars.ns.table"            "vars.nc.table"           </span></span>
 <span><span class="co">#&gt; [5] "obs.table"                "diffs.byvar.table"       </span></span>
@@ -1287,15 +475,15 @@ the items in <code>base_dfs</code> to <code>compare_dfs</code>.</p>
 <h4 id="map2-diffdfdiffdf">
 <code>map2()</code> + <code>diffdf::diffdf</code><a class="anchor" aria-label="anchor" href="#map2-diffdfdiffdf"></a>
 </h4>
+<p>We can do the same with <code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf()</a></code>.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">all_diffdfs</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span></span>
 <span>  .x <span class="op">=</span> <span class="va">base_dfs</span>, </span>
 <span>  .y <span class="op">=</span> <span class="va">compare_dfs</span>, </span>
 <span>  .f <span class="op">=</span> <span class="fu">diffdf</span><span class="fu">::</span><span class="va"><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf</a></span>, </span>
-<span>  keys <span class="op">=</span> <span class="st">"playerID"</span><span class="op">)</span></span>
-<span><span class="va">all_diffdfs</span><span class="op">[[</span><span class="st">"PlayerName.csv"</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "DataSummary"       "ExtRowsBase"       "NumDiff"          </span></span>
-<span><span class="co">#&gt; [4] "VarDiff_nameGiven"</span></span></code></pre></div>
+<span>  keys <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span>
+<span><span class="va">all_diffdfs</span><span class="op">[[</span><span class="st">"Name.csv"</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "DataSummary" "ExtRowsBase" "ExtRowsComp"</span></span></code></pre></div>
 </div>
 </div>
 </div>

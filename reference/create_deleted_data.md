@@ -42,11 +42,14 @@ CompleteData <- dfdiffs::CompleteData
 IncompleteData <- dfdiffs::IncompleteData
 create_deleted_data(compare = IncompleteData,
                     base = CompleteData)
-#> # A tibble: 4 × 7
-#>   subject record start_date mid_date   end_date   text_var            factor_var
-#>   <chr>   <chr>  <chr>      <chr>      <chr>      <chr>               <chr>     
-#> 1 A       2      2021-12-28 2022-01-27 2022-02-26 Mark the spot with… state     
-#> 2 C       1      2021-12-30 2022-01-29 2022-02-28 It's easy to tell … grant     
-#> 3 D       1      2021-12-27 2022-01-26 2022-02-25 The sky that morni… tape      
-#> 4 B       3      2021-12-26 2022-01-25 2022-02-24 A blue crane is a … shut      
+#>   subject record start_date   mid_date   end_date
+#> 2       A      2 2021-12-28 2022-01-27 2022-02-26
+#> 5       C      1 2021-12-30 2022-01-29 2022-02-28
+#> 6       D      1 2021-12-27 2022-01-26 2022-02-25
+#> 8       B      3 2021-12-26 2022-01-25 2022-02-24
+#>                                               text_var factor_var
+#> 2         Concomitant medication reported at baseline.     conmed
+#> 5 Physical exam completed with no abnormalities noted.       exam
+#> 6     Medical history reviewed and confirmed complete.    history
+#> 8         Concomitant medication updated at visit two.     conmed
 ```

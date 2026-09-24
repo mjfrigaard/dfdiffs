@@ -17,3 +17,8 @@ mod_compare_ui(id, dev = FALSE)
 - dev:
 
   show developer reactive-value outputs (default FALSE)
+
+## Value
+
+A `tagList` of the compare module's UI (KPI tiles, match info, and the
+results tabs)
