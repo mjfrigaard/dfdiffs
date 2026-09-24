@@ -25,10 +25,9 @@ Compare data (create new, deleted, and changed data)
 }
 \examples{
 # not run
-m15 <- dfdiffs::master15
-m22 <- dfdiffs::master22
-compare_data(compare = m22, base = m15,
-    by = "playerID",
-    by_col = "join",
-    cols = c("nameFirst", "nameLast", "nameGiven"))
+r21 <- dfdiffs::Roster2021
+r22 <- dfdiffs::Roster2022
+compare_data(compare = r22, base = r21,
+    by = "subject_id",
+    cols = c("first_name", "last_name", "full_name"))
 }

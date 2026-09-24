@@ -4,7 +4,10 @@
 \alias{deleted_react_theme}
 \title{reactable theme (deleted data)}
 \usage{
-deleted_react_theme
+deleted_react_theme(dark = FALSE)
+}
+\arguments{
+\item{dark}{use dark-mode colors (default FALSE)}
 }
 \description{
 theme for deleted data in reactable table

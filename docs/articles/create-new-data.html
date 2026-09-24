@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,7 @@
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
-<p>The goal of the <code>dfdiffs</code> is to answer the following
+<p>The goal of <code>dfdiffs</code> is to answer the following
 questions:</p>
 <ol style="list-style-type: decimal">
 <li><em>What rows are here now that weren’t here before?</em></li>
@@ -93,8 +93,8 @@ questions:</p>
 <li>What values have been changed?</li>
 </ol>
 <p>This vignette takes us through the <code><a href="../reference/create_new_data.html">create_new_data()</a></code>
-function, which answers the “<em>What rows are here now that weren’t
-here before?</em>”</p>
+function, which answers the question, “<em>What rows are here now that
+weren’t here before?</em>”</p>
 <div class="section level3">
 <h3 id="packages">Packages<a class="anchor" aria-label="anchor" href="#packages"></a>
 </h3>
@@ -102,7 +102,6 @@ here before?</em>”</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mjfrigaard.github.io/dfdiffs/">dfdiffs</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/" class="external-link">forcats</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org" class="external-link">lubridate</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fs.r-lib.org" class="external-link">fs</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://vctrs.r-lib.org/" class="external-link">vctrs</a></span><span class="op">)</span></span>
@@ -129,8 +128,8 @@ variables.</p>
 <span><span class="co">#&gt; $ start_date <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2022-01-28<span style="color: #949494;">, </span>2022-01-25<span style="color: #949494;">, </span>2022-01-26<span style="color: #949494;">, </span>2022-01-29<span style="color: #949494;">, </span>2022-01-30<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ mid_date   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2022-03-20<span style="color: #949494;">, </span>2022-03-15<span style="color: #949494;">, </span>2022-03-19<span style="color: #949494;">, </span>2022-03-18<span style="color: #949494;">, </span>2022-03-16<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ end_date   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2022-03-30<span style="color: #949494;">, </span>2022-03-29<span style="color: #949494;">, </span>2022-03-25<span style="color: #949494;">, </span>2022-03-27<span style="color: #949494;">, </span>2022-03-26…</span></span>
-<span><span class="co">#&gt; $ text_var   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "The birch canoe slid on the smooth planks."<span style="color: #949494;">, </span>"Glue the sh…</span></span>
-<span><span class="co">#&gt; $ factor_var <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "food"<span style="color: #949494;">, </span>"most"<span style="color: #949494;">, </span>"park"<span style="color: #949494;">, </span>"between"<span style="color: #949494;">, </span>"regard"<span style="color: #949494;">, </span>"law"</span></span></code></pre></div>
+<span><span class="co">#&gt; $ text_var   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Patient reports mild headache after morning dose."<span style="color: #949494;">, </span>"Pati…</span></span>
+<span><span class="co">#&gt; $ factor_var <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "headache"<span style="color: #949494;">, </span>"nausea"<span style="color: #949494;">, </span>"fatigue"<span style="color: #949494;">, </span>"dizziness"<span style="color: #949494;">, </span>"rash"<span style="color: #949494;">, </span>"fev…</span></span></code></pre></div>
 <p>The unique identifier in this dataset is the combination of subject
 and record (which we can see below):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -156,9 +155,9 @@ and record (which we can see below):</p>
 <div class="section level4">
 <h4 id="compare-data">Compare Data<a class="anchor" aria-label="anchor" href="#compare-data"></a>
 </h4>
-<p>We will be comparing the <code>T2Data</code> to the original data,
-and we can see this dataset has the same six rows as
-<code>T1Data</code>, but includes three additional rows.</p>
+<p>We’ll compare <code>T2Data</code> to the original data.
+<code>T2Data</code> has the same six rows as <code>T1Data</code>, plus
+three additional rows.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">T2Data</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/T2Data.html">T2Data</a></span></span>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">T2Data</span><span class="op">)</span></span>
@@ -169,8 +168,8 @@ and we can see this dataset has the same six rows as
 <span><span class="co">#&gt; $ start_date <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2022-01-30<span style="color: #949494;">, </span>2022-01-27<span style="color: #949494;">, </span>2022-04-04<span style="color: #949494;">, </span>2022-01-29<span style="color: #949494;">, </span>2022-01-26<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ mid_date   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2022-03-16<span style="color: #949494;">, </span>2022-03-17<span style="color: #949494;">, </span>2022-04-13<span style="color: #949494;">, </span>2022-03-18<span style="color: #949494;">, </span>2022-03-19<span style="color: #949494;">,</span>…</span></span>
 <span><span class="co">#&gt; $ end_date   <span style="color: #949494; font-style: italic;">&lt;date&gt;</span> 2022-03-26<span style="color: #949494;">, </span>2022-03-31<span style="color: #949494;">, </span>2022-04-22<span style="color: #949494;">, </span>2022-03-27<span style="color: #949494;">, </span>2022-03-25…</span></span>
-<span><span class="co">#&gt; $ text_var   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Rice is often served in round bowls."<span style="color: #949494;">, </span>"The juice of lemo…</span></span>
-<span><span class="co">#&gt; $ factor_var <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "regard"<span style="color: #949494;">, </span>"law"<span style="color: #949494;">, </span>"associate"<span style="color: #949494;">, </span>"between"<span style="color: #949494;">, </span>"park"<span style="color: #949494;">, </span>"encourag…</span></span></code></pre></div>
+<span><span class="co">#&gt; $ text_var   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Patient reports mild rash on the left forearm."<span style="color: #949494;">, </span>"Patient…</span></span>
+<span><span class="co">#&gt; $ factor_var <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "rash"<span style="color: #949494;">, </span>"fever"<span style="color: #949494;">, </span>"back pain"<span style="color: #949494;">, </span>"dizziness"<span style="color: #949494;">, </span>"fatigue"<span style="color: #949494;">, </span>"ins…</span></span></code></pre></div>
 <p>The unique identifier in this dataset is the combination of subject
 and record (which we can see below):</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
@@ -197,11 +196,12 @@ and record (which we can see below):</p>
 <div class="section level4">
 <h4 id="creating-a-unique-identifier">Creating a unique identifier<a class="anchor" aria-label="anchor" href="#creating-a-unique-identifier"></a>
 </h4>
-<p>We also need a function that allows users to specify joining
-variables, which creates a new <code>join_var</code> given the supplied
-columns that constitute a unique identifier in each dataset.</p>
-<p>For example, in <code>T1Data</code> and <code>T2Data</code>, we can
-create a unique identifier named <code>join_var</code></p>
+<p>We also need a function that lets users specify the joining
+variables. It creates a new <code>join_var</code> from the supplied
+columns that together form a unique identifier in each dataset.</p>
+<p>For example, we can create a unique identifier named
+<code>join_var</code> in <code>T1Data</code> and
+<code>T2Data</code>:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">T1DataJoin</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">T1Data</span>, </span>
 <span>  join_var <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
@@ -211,16 +211,16 @@ create a unique identifier named <code>join_var</code></p>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/relocate.html" class="external-link">relocate</a></span><span class="op">(</span><span class="va">join_var</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">T1DataJoin</span></span></code></pre></div>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="8%">
 <col width="7%">
 <col width="6%">
-<col width="9%">
-<col width="9%">
-<col width="9%">
-<col width="39%">
-<col width="9%">
+<col width="5%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="44%">
+<col width="8%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">join_var</th>
@@ -240,8 +240,8 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-01-28</td>
 <td align="left">2022-03-20</td>
 <td align="left">2022-03-30</td>
-<td align="left">The birch canoe slid on the smooth planks.</td>
-<td align="left">food</td>
+<td align="left">Patient reports mild headache after morning dose.</td>
+<td align="left">headache</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
@@ -250,8 +250,8 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-01-25</td>
 <td align="left">2022-03-15</td>
 <td align="left">2022-03-29</td>
-<td align="left">Glue the sheet to the dark blue background.</td>
-<td align="left">most</td>
+<td align="left">Patient reports occasional nausea following meals.</td>
+<td align="left">nausea</td>
 </tr>
 <tr class="odd">
 <td align="left">3</td>
@@ -260,8 +260,9 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-01-26</td>
 <td align="left">2022-03-19</td>
 <td align="left">2022-03-25</td>
-<td align="left">It’s easy to tell the depth of a well.</td>
-<td align="left">park</td>
+<td align="left">Patient reports persistent fatigue throughout the
+day.</td>
+<td align="left">fatigue</td>
 </tr>
 <tr class="even">
 <td align="left">4</td>
@@ -270,8 +271,8 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-01-29</td>
 <td align="left">2022-03-18</td>
 <td align="left">2022-03-27</td>
-<td align="left">These days a chicken leg is a rare dish.</td>
-<td align="left">between</td>
+<td align="left">Patient reports brief dizziness upon standing.</td>
+<td align="left">dizziness</td>
 </tr>
 <tr class="odd">
 <td align="left">5</td>
@@ -280,8 +281,8 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-01-30</td>
 <td align="left">2022-03-16</td>
 <td align="left">2022-03-26</td>
-<td align="left">Rice is often served in round bowls.</td>
-<td align="left">regard</td>
+<td align="left">Patient reports mild rash on the left forearm.</td>
+<td align="left">rash</td>
 </tr>
 <tr class="even">
 <td align="left">6</td>
@@ -290,23 +291,23 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-01-27</td>
 <td align="left">2022-03-17</td>
 <td align="left">2022-03-31</td>
-<td align="left">The juice of lemons makes fine punch.</td>
-<td align="left">law</td>
+<td align="left">Patient reports low-grade fever in the evening.</td>
+<td align="left">fever</td>
 </tr>
 </tbody>
 </table>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">T2DataJoin</span></span></code></pre></div>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="8%">
 <col width="7%">
 <col width="6%">
-<col width="9%">
-<col width="9%">
-<col width="9%">
-<col width="39%">
-<col width="9%">
+<col width="5%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="44%">
+<col width="8%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">join_var</th>
@@ -326,8 +327,8 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-01-30</td>
 <td align="left">2022-03-16</td>
 <td align="left">2022-03-26</td>
-<td align="left">Rice is often served in round bowls.</td>
-<td align="left">regard</td>
+<td align="left">Patient reports mild rash on the left forearm.</td>
+<td align="left">rash</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
@@ -336,8 +337,8 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-01-27</td>
 <td align="left">2022-03-17</td>
 <td align="left">2022-03-31</td>
-<td align="left">The juice of lemons makes fine punch.</td>
-<td align="left">law</td>
+<td align="left">Patient reports low-grade fever in the evening.</td>
+<td align="left">fever</td>
 </tr>
 <tr class="odd">
 <td align="left">3</td>
@@ -346,8 +347,8 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-04-04</td>
 <td align="left">2022-04-13</td>
 <td align="left">2022-04-22</td>
-<td align="left">Four hours of steady work faced us.</td>
-<td align="left">associate</td>
+<td align="left">Patient reports lower back pain after activity.</td>
+<td align="left">back pain</td>
 </tr>
 <tr class="even">
 <td align="left">4</td>
@@ -356,8 +357,8 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-01-29</td>
 <td align="left">2022-03-18</td>
 <td align="left">2022-03-27</td>
-<td align="left">These days a chicken leg is a rare dish.</td>
-<td align="left">between</td>
+<td align="left">Patient reports brief dizziness upon standing.</td>
+<td align="left">dizziness</td>
 </tr>
 <tr class="odd">
 <td align="left">5</td>
@@ -366,8 +367,9 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-01-26</td>
 <td align="left">2022-03-19</td>
 <td align="left">2022-03-25</td>
-<td align="left">It’s easy to tell the depth of a well.</td>
-<td align="left">park</td>
+<td align="left">Patient reports persistent fatigue throughout the
+day.</td>
+<td align="left">fatigue</td>
 </tr>
 <tr class="even">
 <td align="left">6</td>
@@ -376,8 +378,9 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-04-02</td>
 <td align="left">2022-04-14</td>
 <td align="left">2022-04-20</td>
-<td align="left">The hogs were fed chopped corn and garbage.</td>
-<td align="left">encourage</td>
+<td align="left">Patient reports difficulty sleeping through the
+night.</td>
+<td align="left">insomnia</td>
 </tr>
 <tr class="odd">
 <td align="left">7</td>
@@ -386,8 +389,8 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-01-28</td>
 <td align="left">2022-03-20</td>
 <td align="left">2022-03-30</td>
-<td align="left">The birch canoe slid on the smooth planks.</td>
-<td align="left">food</td>
+<td align="left">Patient reports mild headache after morning dose.</td>
+<td align="left">headache</td>
 </tr>
 <tr class="even">
 <td align="left">8</td>
@@ -396,8 +399,8 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-01-25</td>
 <td align="left">2022-03-15</td>
 <td align="left">2022-03-29</td>
-<td align="left">Glue the sheet to the dark blue background.</td>
-<td align="left">most</td>
+<td align="left">Patient reports occasional nausea following meals.</td>
+<td align="left">nausea</td>
 </tr>
 <tr class="odd">
 <td align="left">9</td>
@@ -406,8 +409,8 @@ create a unique identifier named <code>join_var</code></p>
 <td align="left">2022-04-04</td>
 <td align="left">2022-04-15</td>
 <td align="left">2022-04-21</td>
-<td align="left">The box was thrown beside the parked truck.</td>
-<td align="left">pension</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+<td align="left">cough</td>
 </tr>
 </tbody>
 </table>
@@ -421,12 +424,12 @@ following conditions:</p>
 <ol style="list-style-type: decimal">
 <li><p>Two datasets</p></li>
 <li><p>Multiple columns to compare (<code>cols</code>)</p></li>
-<li><p>Single by column</p></li>
+<li><p>Single <code>by</code> column</p></li>
 <li><p>Single <code>by</code> column, new column name
 (<code>by_col</code>)</p></li>
 <li><p>Single <code>by</code> column, multiple compare columns
 (<code>cols</code>)</p></li>
-<li><p><code>Single</code> by column, new column name
+<li><p>Single <code>by</code> column, new column name
 (<code>by_col</code>), multiple compare columns
 (<code>cols</code>)</p></li>
 <li><p>Multiple <code>by</code> columns</p></li>
@@ -465,7 +468,8 @@ following conditions:</p>
 <span>  by <span class="op">=</span> <span class="st">"join_var"</span><span class="op">)</span></span></code></pre></div>
 </li>
 <li>
-<p>Single by column, new column name (<code>by_col</code>)</p>
+<p>Single <code>by</code> column, new column name
+(<code>by_col</code>)</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2DataJoin</span>, </span>
@@ -475,7 +479,7 @@ following conditions:</p>
 </li>
 <li>
 <p>Single <code>by</code> column, multiple compare columns
-<code>cols</code></p>
+(<code>cols</code>)</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2DataJoin</span>, </span>
@@ -552,6 +556,92 @@ following conditions:</p>
 <p>Below is the <code><a href="../reference/create_new_data.html">create_new_data()</a></code> function:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span><span class="va">compare</span>, <span class="va">base</span>, by <span class="op">=</span> <span class="cn">NULL</span>, by_col <span class="op">=</span> <span class="cn">NULL</span>, cols <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">create_new_data</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">compare</span>, <span class="va">base</span>, <span class="va">by</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">by_col</span> <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">cols</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="co"># convert all columns to character</span></span>
+<span>  <span class="va">compare</span><span class="op">[</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">compare</span>, <span class="va">as.character</span><span class="op">)</span></span>
+<span>  <span class="va">base</span><span class="op">[</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">lapply</a></span><span class="op">(</span><span class="va">base</span>, <span class="va">as.character</span><span class="op">)</span></span>
+<span></span>
+<span>  <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">by</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">by_col</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># 1) no 'by', no 'by_col', no 'cols' -----</span></span>
+<span>    <span class="va">new_data_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anti_join_base.html">anti_join_base</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">compare</span>, y <span class="op">=</span> <span class="va">base</span>,</span>
+<span>                                     by <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">compare</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">base</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">new_data_join</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">by</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">by_col</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># 2) no 'by', no 'by_col', multiple compare 'cols' -----</span></span>
+<span>    <span class="va">compare_join_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_cols.html">select_cols</a></span><span class="op">(</span><span class="va">compare</span>, <span class="va">cols</span><span class="op">)</span></span>
+<span>    <span class="va">base_join_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_cols.html">select_cols</a></span><span class="op">(</span><span class="va">base</span>, <span class="va">cols</span><span class="op">)</span></span>
+<span>    <span class="va">new_data_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anti_join_base.html">anti_join_base</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">compare_join_cols</span>, y <span class="op">=</span> <span class="va">base_join_cols</span>,</span>
+<span>                            by <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">compare_join_cols</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">base_join_cols</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">new_data_join</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">by</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">by_col</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># 3) single 'by' column ----</span></span>
+<span>    <span class="va">new_data_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anti_join_base.html">anti_join_base</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">compare</span>, y <span class="op">=</span> <span class="va">base</span>, by <span class="op">=</span> <span class="va">by</span><span class="op">)</span></span>
+<span>    <span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">new_data_join</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">by</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">by_col</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># 4) single 'by' column, new 'by_col' ----</span></span>
+<span>    <span class="va">compare</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rename_join_col.html">rename_join_col</a></span><span class="op">(</span><span class="va">compare</span>, by <span class="op">=</span> <span class="va">by</span>, by_col <span class="op">=</span> <span class="va">by_col</span><span class="op">)</span></span>
+<span>    <span class="va">base</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rename_join_col.html">rename_join_col</a></span><span class="op">(</span><span class="va">base</span>, by <span class="op">=</span> <span class="va">by</span>, by_col <span class="op">=</span> <span class="va">by_col</span><span class="op">)</span></span>
+<span>    <span class="va">new_data_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anti_join_base.html">anti_join_base</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">compare</span>, y <span class="op">=</span> <span class="va">base</span>, by <span class="op">=</span> <span class="va">by_col</span><span class="op">)</span></span>
+<span>    <span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">new_data_join</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">by</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">by_col</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># 5) single 'by' column, multiple compare 'cols' ----</span></span>
+<span>    <span class="va">compare_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_cols.html">select_cols</a></span><span class="op">(</span><span class="va">compare</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">by</span>, <span class="va">cols</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">base_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_cols.html">select_cols</a></span><span class="op">(</span><span class="va">base</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">by</span>, <span class="va">cols</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">new_data_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anti_join_base.html">anti_join_base</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">compare_cols</span>, y <span class="op">=</span> <span class="va">base_cols</span>, by <span class="op">=</span> <span class="va">by</span><span class="op">)</span></span>
+<span>    <span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">new_data_join</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">by</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">by_col</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># 6) single 'by' column, new 'by_col', multiple compare 'cols' ----</span></span>
+<span>    <span class="va">compare_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rename_join_col.html">rename_join_col</a></span><span class="op">(</span><span class="va">compare</span>, by <span class="op">=</span> <span class="va">by</span>, by_col <span class="op">=</span> <span class="va">by_col</span><span class="op">)</span></span>
+<span>    <span class="va">base_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/rename_join_col.html">rename_join_col</a></span><span class="op">(</span><span class="va">base</span>, by <span class="op">=</span> <span class="va">by</span>, by_col <span class="op">=</span> <span class="va">by_col</span><span class="op">)</span></span>
+<span>    <span class="va">compare_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_cols.html">select_cols</a></span><span class="op">(</span><span class="va">compare_cols</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">by_col</span>, <span class="va">cols</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">base_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_cols.html">select_cols</a></span><span class="op">(</span><span class="va">base_cols</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">by_col</span>, <span class="va">cols</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">new_data_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anti_join_base.html">anti_join_base</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">compare_join</span>, y <span class="op">=</span> <span class="va">base_join</span>, by <span class="op">=</span> <span class="va">by_col</span><span class="op">)</span></span>
+<span>    <span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">new_data_join</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">by</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">by_col</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># 7) multiple 'by' ----</span></span>
+<span>    <span class="co"># no 'by_col', no multiple compare 'cols'</span></span>
+<span>    <span class="va">compare_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_new_column.html">create_new_column</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">compare</span>, cols <span class="op">=</span> <span class="va">by</span>, new_name <span class="op">=</span> <span class="st">"join"</span><span class="op">)</span></span>
+<span>    <span class="va">base_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_new_column.html">create_new_column</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">base</span>, cols <span class="op">=</span> <span class="va">by</span>, new_name <span class="op">=</span> <span class="st">"join"</span><span class="op">)</span></span>
+<span>    <span class="va">new_data_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anti_join_base.html">anti_join_base</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">compare_join</span>, y <span class="op">=</span> <span class="va">base_join</span>,</span>
+<span>                            by <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">compare_join</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">base_join</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">new_data_join</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">by</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">by_col</span><span class="op">)</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># 8) multiple 'by' and 'by_col' ----</span></span>
+<span>    <span class="co"># no multiple compare 'cols'</span></span>
+<span>    <span class="va">compare_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_new_column.html">create_new_column</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">compare</span>, cols <span class="op">=</span> <span class="va">by</span>, new_name <span class="op">=</span> <span class="va">by_col</span><span class="op">)</span></span>
+<span>    <span class="va">base_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_new_column.html">create_new_column</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">base</span>, cols <span class="op">=</span> <span class="va">by</span>, new_name <span class="op">=</span> <span class="va">by_col</span><span class="op">)</span></span>
+<span>    <span class="va">new_data_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anti_join_base.html">anti_join_base</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">compare_join</span>, y <span class="op">=</span> <span class="va">base_join</span>,</span>
+<span>                            by <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">compare_join</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">base_join</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">new_data_join</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">by</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">by_col</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># 9) multiple 'by' &amp; multiple compare 'cols' ----</span></span>
+<span>    <span class="co"># no 'by_col'</span></span>
+<span>    <span class="va">compare_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_new_column.html">create_new_column</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">compare</span>, cols <span class="op">=</span> <span class="va">by</span>, new_name <span class="op">=</span> <span class="st">"join"</span><span class="op">)</span></span>
+<span>    <span class="va">base_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_new_column.html">create_new_column</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">base</span>, cols <span class="op">=</span> <span class="va">by</span>, new_name <span class="op">=</span> <span class="st">"join"</span><span class="op">)</span></span>
+<span>    <span class="va">compare_join_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_cols.html">select_cols</a></span><span class="op">(</span><span class="va">compare_join</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"join"</span>, <span class="va">cols</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">base_join_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_cols.html">select_cols</a></span><span class="op">(</span><span class="va">base_join</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"join"</span>, <span class="va">cols</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">new_data_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anti_join_base.html">anti_join_base</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">compare_join_cols</span>, y <span class="op">=</span> <span class="va">base_join_cols</span>,</span>
+<span>                            by <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">compare_join_cols</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">base_join_cols</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">new_data_join</span><span class="op">)</span></span>
+<span>  <span class="op">}</span> <span class="kw">else</span> <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">by</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">by_col</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">cols</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="co"># 10) multiple 'by', new 'by_col' &amp; compare multiple 'cols' ----</span></span>
+<span>    <span class="va">compare_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_new_column.html">create_new_column</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">compare</span>, cols <span class="op">=</span> <span class="va">by</span>, new_name <span class="op">=</span> <span class="va">by_col</span><span class="op">)</span></span>
+<span>    <span class="va">base_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_new_column.html">create_new_column</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">base</span>, cols <span class="op">=</span> <span class="va">by</span>, new_name <span class="op">=</span> <span class="va">by_col</span><span class="op">)</span></span>
+<span>    <span class="va">compare_join_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_cols.html">select_cols</a></span><span class="op">(</span><span class="va">compare_join</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">by_col</span>, <span class="va">cols</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">base_join_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/select_cols.html">select_cols</a></span><span class="op">(</span><span class="va">base_join</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">by_col</span>, <span class="va">cols</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">new_data_join</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/anti_join_base.html">anti_join_base</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">compare_join_cols</span>, y <span class="op">=</span> <span class="va">base_join_cols</span>,</span>
+<span>                            by <span class="op">=</span> <span class="fu"><a href="https://generics.r-lib.org/reference/setops.html" class="external-link">intersect</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">compare_join_cols</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">base_join_cols</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">new_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">new_data_join</span><span class="op">)</span></span>
+<span>  <span class="op">}</span></span>
+<span></span>
+<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">new_data</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>The <code>cond-1</code> through <code>cond-10</code> examples above
+call the real, exported <code><a href="../reference/create_new_data.html">dfdiffs::create_new_data()</a></code>. The
+source shown here is display-only (<code>eval=FALSE</code>) and no
+longer redefines the function, so it can’t shadow the package’s own
+implementation.</p>
 <p><code>compare</code> = The current or new dataset in the
 comparison</p>
 <p><code>base</code> = The previous or old dataset in the comparison</p>
@@ -563,49 +653,56 @@ columns are compared)</p>
 <div class="section level3">
 <h3 id="call-structure">Call structure<a class="anchor" aria-label="anchor" href="#call-structure"></a>
 </h3>
-<p><code><a href="../reference/create_new_data.html">create_new_data()</a></code> relies on two helpers from the
-package: <code><a href="../reference/rename_join_col.html">rename_join_col()</a></code> (renames the join column) and
+<p><code><a href="../reference/create_new_data.html">create_new_data()</a></code> relies on four helpers from the
+package: <code><a href="../reference/anti_join_base.html">anti_join_base()</a></code> and <code><a href="../reference/select_cols.html">select_cols()</a></code>
+(base-R replacements for
+<code><a href="https://dplyr.tidyverse.org/reference/filter-joins.html" class="external-link">dplyr::anti_join()</a></code>/<code><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">dplyr::select()</a></code>),
+<code><a href="../reference/rename_join_col.html">rename_join_col()</a></code> (renames the join column), and
 <code><a href="../reference/create_new_column.html">create_new_column()</a></code> (builds the join column from the
 <code>by</code> columns). The call tree below was generated from the
 package source with <a href="https://github.com/mjfrigaard/stackcallr" class="external-link">stackcallr</a>
 (<code>pak::pak("mjfrigaard/stackcallr")</code>). Only functions defined
 in <code>dfdiffs</code> are shown.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stackcallr</span><span class="fu">::</span><span class="fu"><a href="https://mjfrigaard.github.io/stackcallr/reference/call_tree_dir.html" class="external-link">call_tree_dir</a></span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"create_new_data"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>█─create_new_data
+├─anti_join_base
+├─select_cols
 ├─rename_join_col
 └─create_new_column</code></pre>
 </div>
 <div class="section level3">
 <h3 id="single-by-column-conditions-1">Single <code>by</code> column conditions<a class="anchor" aria-label="anchor" href="#single-by-column-conditions-1"></a>
 </h3>
-<p>The function should also be able to handle multiple conditions. Below
-we cover the conditions for a single <code>by</code> columns (assuming
-there is an existing unique identifier in each dataset). But first,
-we’ll cover a few uncommon conditions, like a missing <code>by</code>
-column, or a missing <code>by</code> column and specific columns
-selected for comparison.</p>
+<p>The function also needs to handle multiple conditions. Below we cover
+the conditions for a single <code>by</code> column (assuming each
+dataset already has a unique identifier). First, we’ll cover a few
+uncommon conditions, like a missing <code>by</code> column, or a missing
+<code>by</code> column with specific columns selected for
+comparison.</p>
 <div class="section level4">
 <h4 id="two-datasets">1) Two datasets<a class="anchor" aria-label="anchor" href="#two-datasets"></a>
 </h4>
 <ul>
 <li>No <code>by</code> columns (only two datasets)</li>
 </ul>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2Data</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1Data</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="7%">
+<col width="2%">
 <col width="6%">
-<col width="10%">
-<col width="10%">
-<col width="10%">
-<col width="42%">
-<col width="10%">
+<col width="5%">
+<col width="9%">
+<col width="9%">
+<col width="9%">
+<col width="47%">
+<col width="9%">
 </colgroup>
 <thead><tr class="header">
+<th align="left"></th>
 <th align="left">subject</th>
 <th align="left">record</th>
 <th align="left">start_date</th>
@@ -616,50 +713,56 @@ selected for comparison.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="left">3</td>
 <td align="left">D</td>
 <td align="left">5</td>
 <td align="left">2022-04-04</td>
 <td align="left">2022-04-13</td>
 <td align="left">2022-04-22</td>
-<td align="left">Four hours of steady work faced us.</td>
-<td align="left">associate</td>
+<td align="left">Patient reports lower back pain after activity.</td>
+<td align="left">back pain</td>
 </tr>
 <tr class="even">
+<td align="left">6</td>
 <td align="left">B</td>
 <td align="left">4</td>
 <td align="left">2022-04-02</td>
 <td align="left">2022-04-14</td>
 <td align="left">2022-04-20</td>
-<td align="left">The hogs were fed chopped corn and garbage.</td>
-<td align="left">encourage</td>
+<td align="left">Patient reports difficulty sleeping through the
+night.</td>
+<td align="left">insomnia</td>
 </tr>
 <tr class="odd">
+<td align="left">9</td>
 <td align="left">A</td>
 <td align="left">2</td>
 <td align="left">2022-04-04</td>
 <td align="left">2022-04-15</td>
 <td align="left">2022-04-21</td>
-<td align="left">The box was thrown beside the parked truck.</td>
-<td align="left">pension</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+<td align="left">cough</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2DataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1DataJoin</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="8%">
+<col width="2%">
 <col width="7%">
 <col width="6%">
-<col width="9%">
-<col width="9%">
-<col width="9%">
-<col width="39%">
-<col width="9%">
+<col width="5%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="43%">
+<col width="8%">
 </colgroup>
 <thead><tr class="header">
+<th align="left"></th>
 <th align="left">join_var</th>
 <th align="left">subject</th>
 <th align="left">record</th>
@@ -672,83 +775,93 @@ selected for comparison.</p>
 <tbody>
 <tr class="odd">
 <td align="left">1</td>
+<td align="left">1</td>
 <td align="left">D</td>
 <td align="left">5</td>
 <td align="left">2022-01-30</td>
 <td align="left">2022-03-16</td>
 <td align="left">2022-03-26</td>
-<td align="left">Rice is often served in round bowls.</td>
-<td align="left">regard</td>
+<td align="left">Patient reports mild rash on the left forearm.</td>
+<td align="left">rash</td>
 </tr>
 <tr class="even">
+<td align="left">2</td>
 <td align="left">2</td>
 <td align="left">D</td>
 <td align="left">6</td>
 <td align="left">2022-01-27</td>
 <td align="left">2022-03-17</td>
 <td align="left">2022-03-31</td>
-<td align="left">The juice of lemons makes fine punch.</td>
-<td align="left">law</td>
+<td align="left">Patient reports low-grade fever in the evening.</td>
+<td align="left">fever</td>
 </tr>
 <tr class="odd">
+<td align="left">3</td>
 <td align="left">3</td>
 <td align="left">D</td>
 <td align="left">5</td>
 <td align="left">2022-04-04</td>
 <td align="left">2022-04-13</td>
 <td align="left">2022-04-22</td>
-<td align="left">Four hours of steady work faced us.</td>
-<td align="left">associate</td>
+<td align="left">Patient reports lower back pain after activity.</td>
+<td align="left">back pain</td>
 </tr>
 <tr class="even">
+<td align="left">5</td>
 <td align="left">5</td>
 <td align="left">B</td>
 <td align="left">3</td>
 <td align="left">2022-01-26</td>
 <td align="left">2022-03-19</td>
 <td align="left">2022-03-25</td>
-<td align="left">It’s easy to tell the depth of a well.</td>
-<td align="left">park</td>
+<td align="left">Patient reports persistent fatigue throughout the
+day.</td>
+<td align="left">fatigue</td>
 </tr>
 <tr class="odd">
+<td align="left">6</td>
 <td align="left">6</td>
 <td align="left">B</td>
 <td align="left">4</td>
 <td align="left">2022-04-02</td>
 <td align="left">2022-04-14</td>
 <td align="left">2022-04-20</td>
-<td align="left">The hogs were fed chopped corn and garbage.</td>
-<td align="left">encourage</td>
+<td align="left">Patient reports difficulty sleeping through the
+night.</td>
+<td align="left">insomnia</td>
 </tr>
 <tr class="even">
+<td align="left">7</td>
 <td align="left">7</td>
 <td align="left">A</td>
 <td align="left">1</td>
 <td align="left">2022-01-28</td>
 <td align="left">2022-03-20</td>
 <td align="left">2022-03-30</td>
-<td align="left">The birch canoe slid on the smooth planks.</td>
-<td align="left">food</td>
+<td align="left">Patient reports mild headache after morning dose.</td>
+<td align="left">headache</td>
 </tr>
 <tr class="odd">
+<td align="left">8</td>
 <td align="left">8</td>
 <td align="left">A</td>
 <td align="left">2</td>
 <td align="left">2022-01-25</td>
 <td align="left">2022-03-15</td>
 <td align="left">2022-03-29</td>
-<td align="left">Glue the sheet to the dark blue background.</td>
-<td align="left">most</td>
+<td align="left">Patient reports occasional nausea following meals.</td>
+<td align="left">nausea</td>
 </tr>
 <tr class="even">
+<td align="left">9</td>
 <td align="left">9</td>
 <td align="left">A</td>
 <td align="left">2</td>
 <td align="left">2022-04-04</td>
 <td align="left">2022-04-15</td>
 <td align="left">2022-04-21</td>
-<td align="left">The box was thrown beside the parked truck.</td>
-<td align="left">pension</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+<td align="left">cough</td>
 </tr>
 </tbody>
 </table>
@@ -759,55 +872,75 @@ selected for comparison.</p>
 </h4>
 <ul>
 <li>No <code>by</code> columns (only two datasets) and multiple compare
-(<code>cols</code>)</li>
+columns (<code>cols</code>)</li>
 </ul>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2Data</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1Data</span>,</span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text_var"</span>, <span class="st">"factor_var"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
+<colgroup>
+<col width="4%">
+<col width="79%">
+<col width="15%">
+</colgroup>
 <thead><tr class="header">
+<th align="left"></th>
 <th align="left">text_var</th>
 <th align="left">factor_var</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">Four hours of steady work faced us.</td>
-<td align="left">associate</td>
+<td align="left">3</td>
+<td align="left">Patient reports lower back pain after activity.</td>
+<td align="left">back pain</td>
 </tr>
 <tr class="even">
-<td align="left">The hogs were fed chopped corn and garbage.</td>
-<td align="left">encourage</td>
+<td align="left">6</td>
+<td align="left">Patient reports difficulty sleeping through the
+night.</td>
+<td align="left">insomnia</td>
 </tr>
 <tr class="odd">
-<td align="left">The box was thrown beside the parked truck.</td>
-<td align="left">pension</td>
+<td align="left">9</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+<td align="left">cough</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2DataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1DataJoin</span>,</span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text_var"</span>, <span class="st">"factor_var"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
+<colgroup>
+<col width="4%">
+<col width="79%">
+<col width="15%">
+</colgroup>
 <thead><tr class="header">
+<th align="left"></th>
 <th align="left">text_var</th>
 <th align="left">factor_var</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">Four hours of steady work faced us.</td>
-<td align="left">associate</td>
+<td align="left">3</td>
+<td align="left">Patient reports lower back pain after activity.</td>
+<td align="left">back pain</td>
 </tr>
 <tr class="even">
-<td align="left">The hogs were fed chopped corn and garbage.</td>
-<td align="left">encourage</td>
+<td align="left">6</td>
+<td align="left">Patient reports difficulty sleeping through the
+night.</td>
+<td align="left">insomnia</td>
 </tr>
 <tr class="odd">
-<td align="left">The box was thrown beside the parked truck.</td>
-<td align="left">pension</td>
+<td align="left">9</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+<td align="left">cough</td>
 </tr>
 </tbody>
 </table>
@@ -816,27 +949,29 @@ selected for comparison.</p>
 <h4 id="single-by-column">3) Single <code>by</code> column<a class="anchor" aria-label="anchor" href="#single-by-column"></a>
 </h4>
 <ul>
-<li>We can provide a single <code>by</code> column (using our
-<code>T1DataJoin</code> and <code>T2DataJoin</code>) datasets we created
+<li>We can provide a single <code>by</code> column using the
+<code>T1DataJoin</code> and <code>T2DataJoin</code> datasets we created
 above.</li>
 </ul>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2DataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1DataJoin</span>, </span>
 <span>  by <span class="op">=</span> <span class="st">"join_var"</span><span class="op">)</span></span></code></pre></div>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="8%">
+<col width="2%">
 <col width="7%">
 <col width="6%">
+<col width="5%">
 <col width="9%">
 <col width="9%">
 <col width="9%">
-<col width="39%">
+<col width="41%">
 <col width="9%">
 </colgroup>
 <thead><tr class="header">
+<th align="left"></th>
 <th align="left">join_var</th>
 <th align="left">subject</th>
 <th align="left">record</th>
@@ -849,33 +984,36 @@ above.</li>
 <tbody>
 <tr class="odd">
 <td align="left">7</td>
+<td align="left">7</td>
 <td align="left">A</td>
 <td align="left">1</td>
 <td align="left">2022-01-28</td>
 <td align="left">2022-03-20</td>
 <td align="left">2022-03-30</td>
-<td align="left">The birch canoe slid on the smooth planks.</td>
-<td align="left">food</td>
+<td align="left">Patient reports mild headache after morning dose.</td>
+<td align="left">headache</td>
 </tr>
 <tr class="even">
+<td align="left">8</td>
 <td align="left">8</td>
 <td align="left">A</td>
 <td align="left">2</td>
 <td align="left">2022-01-25</td>
 <td align="left">2022-03-15</td>
 <td align="left">2022-03-29</td>
-<td align="left">Glue the sheet to the dark blue background.</td>
-<td align="left">most</td>
+<td align="left">Patient reports occasional nausea following meals.</td>
+<td align="left">nausea</td>
 </tr>
 <tr class="odd">
+<td align="left">9</td>
 <td align="left">9</td>
 <td align="left">A</td>
 <td align="left">2</td>
 <td align="left">2022-04-04</td>
 <td align="left">2022-04-15</td>
 <td align="left">2022-04-21</td>
-<td align="left">The box was thrown beside the parked truck.</td>
-<td align="left">pension</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+<td align="left">cough</td>
 </tr>
 </tbody>
 </table>
@@ -885,11 +1023,10 @@ above.</li>
 (<code>by_col</code>)<a class="anchor" aria-label="anchor" href="#single-by-column-new-column-name-by_col"></a>
 </h4>
 <ul>
-<li>We can also provide a single <code>by</code> column (for unique
-identifiers) and a new name for the <code>by_col</code>
-</li>
+<li>We can also provide a single <code>by</code> column (the unique
+identifier) and a new name for it with <code>by_col</code>.</li>
 </ul>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2DataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1DataJoin</span>, </span>
@@ -897,16 +1034,18 @@ identifiers) and a new name for the <code>by_col</code>
 <span>  by_col <span class="op">=</span> <span class="st">'new_join_var'</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <colgroup>
-<col width="11%">
+<col width="2%">
+<col width="10%">
 <col width="6%">
-<col width="6%">
-<col width="9%">
-<col width="9%">
-<col width="9%">
-<col width="37%">
-<col width="9%">
+<col width="5%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="40%">
+<col width="8%">
 </colgroup>
 <thead><tr class="header">
+<th align="left"></th>
 <th align="left">new_join_var</th>
 <th align="left">subject</th>
 <th align="left">record</th>
@@ -919,60 +1058,65 @@ identifiers) and a new name for the <code>by_col</code>
 <tbody>
 <tr class="odd">
 <td align="left">7</td>
+<td align="left">7</td>
 <td align="left">A</td>
 <td align="left">1</td>
 <td align="left">2022-01-28</td>
 <td align="left">2022-03-20</td>
 <td align="left">2022-03-30</td>
-<td align="left">The birch canoe slid on the smooth planks.</td>
-<td align="left">food</td>
+<td align="left">Patient reports mild headache after morning dose.</td>
+<td align="left">headache</td>
 </tr>
 <tr class="even">
+<td align="left">8</td>
 <td align="left">8</td>
 <td align="left">A</td>
 <td align="left">2</td>
 <td align="left">2022-01-25</td>
 <td align="left">2022-03-15</td>
 <td align="left">2022-03-29</td>
-<td align="left">Glue the sheet to the dark blue background.</td>
-<td align="left">most</td>
+<td align="left">Patient reports occasional nausea following meals.</td>
+<td align="left">nausea</td>
 </tr>
 <tr class="odd">
+<td align="left">9</td>
 <td align="left">9</td>
 <td align="left">A</td>
 <td align="left">2</td>
 <td align="left">2022-04-04</td>
 <td align="left">2022-04-15</td>
 <td align="left">2022-04-21</td>
-<td align="left">The box was thrown beside the parked truck.</td>
-<td align="left">pension</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+<td align="left">cough</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level4">
 <h4 id="single-by-column-multiple-compare-columns-cols">5) Single <code>by</code> column, multiple compare columns
-<code>cols</code><a class="anchor" aria-label="anchor" href="#single-by-column-multiple-compare-columns-cols"></a>
+(<code>cols</code>)<a class="anchor" aria-label="anchor" href="#single-by-column-multiple-compare-columns-cols"></a>
 </h4>
 <ul>
 <li>Single <code>by</code> column and multiple compare columns
 (<code>cols</code>)</li>
 </ul>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2DataJoin</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1DataJoin</span>, </span>
 <span>  by <span class="op">=</span> <span class="st">"join_var"</span>, </span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"text_var"</span>, <span class="st">"factor_var"</span>, <span class="st">"subject"</span>, <span class="st">"record"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="11%">
-<col width="55%">
-<col width="13%">
+<col width="3%">
 <col width="10%">
+<col width="57%">
+<col width="12%">
 <col width="8%">
+<col width="7%">
 </colgroup>
 <thead><tr class="header">
+<th align="left"></th>
 <th align="left">join_var</th>
 <th align="left">text_var</th>
 <th align="left">factor_var</th>
@@ -982,22 +1126,25 @@ identifiers) and a new name for the <code>by_col</code>
 <tbody>
 <tr class="odd">
 <td align="left">7</td>
-<td align="left">The birch canoe slid on the smooth planks.</td>
-<td align="left">food</td>
+<td align="left">7</td>
+<td align="left">Patient reports mild headache after morning dose.</td>
+<td align="left">headache</td>
 <td align="left">A</td>
 <td align="left">1</td>
 </tr>
 <tr class="even">
 <td align="left">8</td>
-<td align="left">Glue the sheet to the dark blue background.</td>
-<td align="left">most</td>
+<td align="left">8</td>
+<td align="left">Patient reports occasional nausea following meals.</td>
+<td align="left">nausea</td>
 <td align="left">A</td>
 <td align="left">2</td>
 </tr>
 <tr class="odd">
 <td align="left">9</td>
-<td align="left">The box was thrown beside the parked truck.</td>
-<td align="left">pension</td>
+<td align="left">9</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+<td align="left">cough</td>
 <td align="left">A</td>
 <td align="left">2</td>
 </tr>
@@ -1013,7 +1160,7 @@ identifiers) and a new name for the <code>by_col</code>
 (<code>by_col</code>), and multiple compare columns
 (<code>cols</code>)</li>
 </ul>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  <span class="co"># data </span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2DataJoin</span>, </span>
@@ -1026,13 +1173,15 @@ identifiers) and a new name for the <code>by_col</code>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject"</span>, <span class="st">"record"</span>, <span class="st">"text_var"</span>, <span class="st">"factor_var"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="15%">
-<col width="9%">
-<col width="8%">
-<col width="53%">
+<col width="3%">
 <col width="13%">
+<col width="8%">
+<col width="7%">
+<col width="54%">
+<col width="11%">
 </colgroup>
 <thead><tr class="header">
+<th align="left"></th>
 <th align="left">new_join_var</th>
 <th align="left">subject</th>
 <th align="left">record</th>
@@ -1042,24 +1191,27 @@ identifiers) and a new name for the <code>by_col</code>
 <tbody>
 <tr class="odd">
 <td align="left">7</td>
+<td align="left">7</td>
 <td align="left">A</td>
 <td align="left">1</td>
-<td align="left">The birch canoe slid on the smooth planks.</td>
-<td align="left">food</td>
+<td align="left">Patient reports mild headache after morning dose.</td>
+<td align="left">headache</td>
 </tr>
 <tr class="even">
 <td align="left">8</td>
+<td align="left">8</td>
 <td align="left">A</td>
 <td align="left">2</td>
-<td align="left">Glue the sheet to the dark blue background.</td>
-<td align="left">most</td>
+<td align="left">Patient reports occasional nausea following meals.</td>
+<td align="left">nausea</td>
 </tr>
 <tr class="odd">
 <td align="left">9</td>
+<td align="left">9</td>
 <td align="left">A</td>
 <td align="left">2</td>
-<td align="left">The box was thrown beside the parked truck.</td>
-<td align="left">pension</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+<td align="left">cough</td>
 </tr>
 </tbody>
 </table>
@@ -1068,8 +1220,8 @@ identifiers) and a new name for the <code>by_col</code>
 <div class="section level3">
 <h3 id="multiple-by-column-conditions-1">Multiple <code>by</code> column conditions<a class="anchor" aria-label="anchor" href="#multiple-by-column-conditions-1"></a>
 </h3>
-<p>Now we’re going to test conditions in which there are multiple
-columns used to create a unique identifier.</p>
+<p>Next, we’ll test conditions in which multiple columns are used to
+create a unique identifier.</p>
 <div class="section level4">
 <h4 id="multiple-by-columns">7) Multiple <code>by</code> columns<a class="anchor" aria-label="anchor" href="#multiple-by-columns"></a>
 </h4>
@@ -1077,14 +1229,72 @@ columns used to create a unique identifier.</p>
 <li>Multiple <code>by</code> columns (assuming the columns create a
 unique identifier)</li>
 </ul>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2Data</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1Data</span>, </span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'subject'</span>, <span class="st">'record'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()` at dfdiffs/R/create_new_column.R:25:5:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span></code></pre>
-<p>This creates a new <code>join</code> column and it’s a combination of
+<table class="table">
+<colgroup>
+<col width="2%">
+<col width="4%">
+<col width="6%">
+<col width="5%">
+<col width="9%">
+<col width="9%">
+<col width="9%">
+<col width="45%">
+<col width="9%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="left">join</th>
+<th align="left">subject</th>
+<th align="left">record</th>
+<th align="left">start_date</th>
+<th align="left">mid_date</th>
+<th align="left">end_date</th>
+<th align="left">text_var</th>
+<th align="left">factor_var</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">D-5</td>
+<td align="left">D</td>
+<td align="left">5</td>
+<td align="left">2022-04-04</td>
+<td align="left">2022-04-13</td>
+<td align="left">2022-04-22</td>
+<td align="left">Patient reports lower back pain after activity.</td>
+<td align="left">back pain</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">B-4</td>
+<td align="left">B</td>
+<td align="left">4</td>
+<td align="left">2022-04-02</td>
+<td align="left">2022-04-14</td>
+<td align="left">2022-04-20</td>
+<td align="left">Patient reports difficulty sleeping through the
+night.</td>
+<td align="left">insomnia</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">A-2</td>
+<td align="left">A</td>
+<td align="left">2</td>
+<td align="left">2022-04-04</td>
+<td align="left">2022-04-15</td>
+<td align="left">2022-04-21</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+<td align="left">cough</td>
+</tr>
+</tbody>
+</table>
+<p>This creates a new <code>join</code> column that combines
 <code>subject</code> and <code>record</code>.</p>
 </div>
 <div class="section level4">
@@ -1092,15 +1302,73 @@ unique identifier)</li>
 (<code>by_col</code>)<a class="anchor" aria-label="anchor" href="#multiple-by-columns-new-column-name-by_col"></a>
 </h4>
 <p>We can provide multiple <code>by</code> columns, a new
-<code>by_col</code>, and <strong>no <code>cols</code></strong></p>
+<code>by_col</code>, and <strong>no <code>cols</code></strong>.</p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2Data</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1Data</span>, </span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'subject'</span>, <span class="st">'record'</span><span class="op">)</span>,</span>
 <span>  by_col <span class="op">=</span> <span class="st">"new_join_col"</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()` at dfdiffs/R/create_new_column.R:25:5:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span></code></pre>
+<table class="table">
+<colgroup>
+<col width="2%">
+<col width="10%">
+<col width="6%">
+<col width="5%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="42%">
+<col width="8%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="left">new_join_col</th>
+<th align="left">subject</th>
+<th align="left">record</th>
+<th align="left">start_date</th>
+<th align="left">mid_date</th>
+<th align="left">end_date</th>
+<th align="left">text_var</th>
+<th align="left">factor_var</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">D-5</td>
+<td align="left">D</td>
+<td align="left">5</td>
+<td align="left">2022-04-04</td>
+<td align="left">2022-04-13</td>
+<td align="left">2022-04-22</td>
+<td align="left">Patient reports lower back pain after activity.</td>
+<td align="left">back pain</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">B-4</td>
+<td align="left">B</td>
+<td align="left">4</td>
+<td align="left">2022-04-02</td>
+<td align="left">2022-04-14</td>
+<td align="left">2022-04-20</td>
+<td align="left">Patient reports difficulty sleeping through the
+night.</td>
+<td align="left">insomnia</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">A-2</td>
+<td align="left">A</td>
+<td align="left">2</td>
+<td align="left">2022-04-04</td>
+<td align="left">2022-04-15</td>
+<td align="left">2022-04-21</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+<td align="left">cough</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level4">
 <h4 id="multiple-by-columns-multiple-compare-columns-cols">9) Multiple <code>by</code> columns, multiple compare columns
@@ -1111,30 +1379,116 @@ unique identifier)</li>
 (<code>cols</code>), and <strong>no new
 <code>by_col</code></strong>.</li>
 </ul>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2Data</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1Data</span>, </span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'subject'</span>, <span class="st">'record'</span><span class="op">)</span>,</span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject"</span>,  <span class="st">"record"</span>, <span class="st">"factor_var"</span>, <span class="st">"text_var"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()` at dfdiffs/R/create_new_column.R:25:5:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span></code></pre>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="3%">
+<col width="5%">
+<col width="8%">
+<col width="7%">
+<col width="12%">
+<col width="61%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="left">join</th>
+<th align="left">subject</th>
+<th align="left">record</th>
+<th align="left">factor_var</th>
+<th align="left">text_var</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">D-5</td>
+<td align="left">D</td>
+<td align="left">5</td>
+<td align="left">back pain</td>
+<td align="left">Patient reports lower back pain after activity.</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">B-4</td>
+<td align="left">B</td>
+<td align="left">4</td>
+<td align="left">insomnia</td>
+<td align="left">Patient reports difficulty sleeping through the
+night.</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">A-2</td>
+<td align="left">A</td>
+<td align="left">2</td>
+<td align="left">cough</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level4">
 <h4 id="multiple-by-columns-a-new-by_col-and-cols">10) Multiple <code>by</code> columns, a new <code>by_col</code>, and
 <code>cols</code><a class="anchor" aria-label="anchor" href="#multiple-by-columns-a-new-by_col-and-cols"></a>
 </h4>
-<p>We can provide multiple <code>by</code> columns, new
-<code>by_col</code>, and multiple <code>cols</code></p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<p>We can provide multiple <code>by</code> columns, a new
+<code>by_col</code>, and multiple <code>cols</code>.</p>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2Data</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1Data</span>, </span>
 <span>  by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'subject'</span>, <span class="st">'record'</span><span class="op">)</span>,</span>
 <span>  by_col <span class="op">=</span> <span class="st">"new_join_col"</span>,</span>
 <span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"subject"</span>, <span class="st">"record"</span>, <span class="st">"text_var"</span>, <span class="st">"factor_var"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()` at dfdiffs/R/create_new_column.R:25:5:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span></code></pre>
+<table class="table">
+<colgroup>
+<col width="3%">
+<col width="13%">
+<col width="8%">
+<col width="7%">
+<col width="56%">
+<col width="11%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="left">new_join_col</th>
+<th align="left">subject</th>
+<th align="left">record</th>
+<th align="left">text_var</th>
+<th align="left">factor_var</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">D-5</td>
+<td align="left">D</td>
+<td align="left">5</td>
+<td align="left">Patient reports lower back pain after activity.</td>
+<td align="left">back pain</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">B-4</td>
+<td align="left">B</td>
+<td align="left">4</td>
+<td align="left">Patient reports difficulty sleeping through the
+night.</td>
+<td align="left">insomnia</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">A-2</td>
+<td align="left">A</td>
+<td align="left">2</td>
+<td align="left">Patient reports dry cough lasting several days.</td>
+<td align="left">cough</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>

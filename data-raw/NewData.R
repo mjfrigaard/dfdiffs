@@ -9,10 +9,10 @@ NewData <- data.frame(
         start_date = c("2022-04-04", "2022-04-02", "2022-04-04"),
           mid_date = c("2022-04-13", "2022-04-14", "2022-04-15"),
           end_date = c("2022-04-22", "2022-04-20", "2022-04-21"),
-             text_var = c("Four hours of steady work faced us.",
-                          "The hogs were fed chopped corn and garbage.",
-               "The box was thrown beside the parked truck."),
-        factor_var = c("associate", "encourage", "pension")
+             text_var = c("Patient reports lower back pain after activity.",
+                          "Patient reports difficulty sleeping through the night.",
+               "Patient reports dry cough lasting several days."),
+        factor_var = c("back pain", "insomnia", "cough")
    ) %>%
   mutate(across(.cols = contains("date"), .fns = lubridate::ymd))
 

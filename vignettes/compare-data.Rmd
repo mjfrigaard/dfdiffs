@@ -28,14 +28,10 @@ library(openxlsx)
 library(janitor) 
 library(arsenal) # comparedf
 library(diffdf)  # diffdf
-library(dplyr)
-library(tidyr)
 library(stringr)
 library(lubridate)
-library(forcats)
 library(glue)
 library(purrr)
-library(vroom)
 library(reactable)
 library(haven)
 library(readxl)
@@ -44,26 +40,26 @@ library(readxl)
 
 # Motivation
 
-The goal of the `dfdiffs` is to answer the following questions: 
+The goal of `dfdiffs` is to answer the following questions:
 
 1. What rows are here now that weren't here before?  
 2. What rows were here before that aren't here now?   
 3. What values have been changed?
 
-## Test data 
+## Test data
 
-These are two Masters tables from the [Lahman baseball database.](https://www.seanlahman.com/baseball-archive/statistics/) 
+`Roster2021` and `Roster2022` are two yearly pulls of a synthetic (not real) clinical site roster, used here to demonstrate `dfdiffs` at a larger scale than the small toy datasets in the other vignettes. See `?Roster2021` for details.
 
 ```{r masters}
-m15 <- dfdiffs::master15 |> 
-  dplyr::slice_sample(n = 3000, replace = FALSE)
-max(m15$debut, na.rm = TRUE)
-m20 <- dfdiffs::master20 |> 
-  dplyr::slice_sample(n = 3000, replace = FALSE)
-max(m20$debut, na.rm = TRUE)
+r21 <- dfdiffs::Roster2021
+nrow(r21)
+r22 <- dfdiffs::Roster2022
+nrow(r22)
 ```
 
-## The `compare_data()` function 
+## The `compare_data()` function
+
+Below are the arguments for `compare_data()`:
 
 ```{r compare_data-args, eval=FALSE}
 compare_data(compare = , base = , by = , by_col = , cols = )
@@ -95,9 +91,9 @@ compare_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
 
 ```{r test-compare_data}
 comparisons <- compare_data(
-  compare = m20, base = m15, 
-  by = "playerID", by_col = "join", 
-  cols = c("nameFirst", "nameLast", "nameGiven", "height"))
+  compare = r22, base = r21,
+  by = "subject_id",
+  cols = c("first_name", "last_name", "full_name", "height_cm"))
 names(comparisons)
 ```
 
@@ -112,18 +108,25 @@ stackcallr::call_tree_dir("R", root = "compare_data")
 ```
 █─compare_data
 ├─█─create_new_data
+│ ├─anti_join_base
+│ ├─select_cols
 │ ├─rename_join_col
 │ └─create_new_column
 ├─█─create_deleted_data
+│ ├─anti_join_base
+│ ├─select_cols
 │ ├─rename_join_col
 │ └─create_new_column
 └─█─create_changed_data
-  ├─extract_df_tables
+  ├─select_cols
+  ├─█─diff_values_by_key
+  │ ├─compare_values
+  │ └─class_diffs
   ├─rename_join_col
   └─create_new_column
 ```
 
-The Shiny app's compare module (`mod_compare_server()`) orchestrates the four comparison functions (`create_new_data()`, `create_deleted_data()`, `create_modified_data()`, and `create_changed_data()`), and uses the `%nin%` helper to drop `join_column`, `data_source`, and `join_source` from the list of compared columns:
+The Shiny app's compare module (`mod_compare_server()`) orchestrates three comparison functions (`create_new_data()`, `create_deleted_data()`, and `create_modified_data()`; `create_changed_data()` is used by `compare_data()` instead), and uses the `%nin%` helper to drop `join_column`, `data_source`, and `join_source` from the list of compared columns:
 
 ```{r call-tree-mod_compare_server, eval=FALSE}
 stackcallr::call_tree_dir("R", root = "mod_compare_server")
@@ -132,19 +135,29 @@ stackcallr::call_tree_dir("R", root = "mod_compare_server")
 ```
 █─mod_compare_server
 ├─%nin%
+├─info_react_theme
 ├─█─create_new_data
+│ ├─anti_join_base
+│ ├─select_cols
 │ ├─rename_join_col
 │ └─create_new_column
+├─new_react_theme
 ├─█─create_deleted_data
+│ ├─anti_join_base
+│ ├─select_cols
 │ ├─rename_join_col
 │ └─create_new_column
+├─deleted_react_theme
 ├─█─create_modified_data
+│ ├─select_cols
+│ ├─█─diff_values_by_key
+│ │ ├─compare_values
+│ │ └─class_diffs
 │ ├─rename_join_col
 │ └─create_new_column
-└─█─create_changed_data
-  ├─extract_df_tables
-  ├─rename_join_col
-  └─create_new_column
+├─select_cols
+├─changed_react_theme
+└─left_join_base
 ```
 
 ## `$new_data`

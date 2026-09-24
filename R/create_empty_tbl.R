@@ -2,8 +2,6 @@
 #'
 #' @param tbl input table
 #'
-#' @importFrom rlang !!!
-#'
 #' @return tibble with columns from tbl, all logical
 #' @export create_empty_tbl
 #'
@@ -15,9 +13,8 @@
 #' create_empty_tbl(DF)
 create_empty_tbl <- function(tbl) {
   nms <- names(tbl)
-  empty_tbl <- tibble::tibble(!!!nms, .rows = 1)
-  nmd_tbl <- purrr::set_names(empty_tbl, nms)
-  log_tbl <- dplyr::mutate(.data = nmd_tbl,
-    dplyr::across(.cols = tidyselect::everything(), .fns = as.logical))
-  return(log_tbl)
+  empty_tbl <- as.data.frame(matrix(NA, nrow = 1, ncol = length(nms)))
+  names(empty_tbl) <- nms
+  empty_tbl[] <- lapply(empty_tbl, as.logical)
+  tibble::as_tibble(empty_tbl)
 }

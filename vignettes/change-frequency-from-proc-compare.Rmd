@@ -1,0 +1,272 @@
+---
+title: "change-frequency-from-proc-compare"
+output: 
+  rmarkdown::html_vignette:
+    toc: yes
+    toc_depth: 3
+    df_print: kable
+vignette: >
+  %\VignetteIndexEntry{change-frequency-from-proc-compare}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>", 
+  error = TRUE,
+  fig.height=5, 
+  fig.width=7
+)
+options(
+  rmarkdown.html_vignette.check_title = FALSE,
+  tibble.print_max = Inf)
+```
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(dfdiffs)
+library(openxlsx)
+library(readxl)
+library(tidyverse)
+library(janitor) 
+library(arsenal) # comparedf
+library(diffdf)  # diffdf
+```
+
+# Motivation 
+
+This vignette covers how to calculate the frequency of changes per column in the datasets used in the PROC COMPARE file, `snapshot_compare_270301_20221116_year3_preview_noDAP.xlsx`. 
+
+Below we import the Excel file and build a regular expression for separating the changes in the `value_changes` and `newvalues` columns. 
+
+# Import data
+
+Below we check the names of the sheets in the `snapshot_compare_270301_20221116_year3_preview_noDAP.xlsx` file. 
+
+```{r snapshot_pth}
+snapshot_pth <- "../inst/extdata/app-testing/xlsx/snapshot_compare_270301_20221116_year3_preview_noDAP.xlsx"
+snapshoty3_sheets <- readxl::excel_sheets(snapshot_pth)
+snapshoty3_sheets
+```
+
+
+## AE 
+
+Import the `"AE"` sheet and check the column names. 
+
+```{r snap_ae_raw}
+snap_ae_raw <- readxl::read_excel(snapshot_pth, sheet = "AE") 
+names(snap_ae_raw) |> head(10)
+names(snap_ae_raw) |> tail(10)
+```
+
+
+We'll reformat the column names and filter the `"AE"` dataset to only the rows with an `"Updated"` value in the `status` column.
+
+```{r snap_updated}
+snap_updated <- snap_ae_raw |>  
+  select(
+    subject_id = `Subject name or identifier`, 
+    record_num = `Record number`,
+    DATASET, 
+    STATUS, 
+    `Value changes`, 
+    NEW_VALUES = NEWVALUES) %>% 
+  janitor::clean_names() |> 
+  filter(status == "Updated")
+glimpse(snap_updated)
+```
+
+
+### Testing `SAEDESC1`
+
+The `SAEDESC1` columns contain a lot of unstructured text with multiple commas, so we'll use them to test separating the column names from the `value_changes` and `newvalues` columns.
+
+```{r test_SAEDESC1}
+test_SAEDESC1 <- snap_updated |> 
+  filter(str_detect(snap_updated$value_changes, "SAEDESC1")) |> 
+  head(3)
+glimpse(test_SAEDESC1)
+```
+
+### Test with regular expression 
+
+Below is the regular expression pattern we'll test these rows against.
+
+```{r sas_cols_regex}
+sas_cols_regex <- "\\w*[A-Z]\\w*[A-Z]\\w*="
+sas_cols_regex
+```
+
+
+We'll start by using the `str_view_all()` function to check if our regular expression is working. 
+
+```{r test-SAEDESC1-02}
+str_view_all(string = test_SAEDESC1$value_changes, 
+  pattern = sas_cols_regex) 
+```
+
+## `count_change_columns()`
+
+Now that we have a regular expression for matching the column names in `value_changes`, we'll count the occurrences of each match.
+
+```{r count_change_columns}
+count_change_columns <- function(df) {
+  sas_cols_regex <- "\\w*[A-Z]\\w*[A-Z]\\w*="
+  # clean names
+  df_clean_nms <- df |> janitor::clean_names()
+  # value_changes
+  value_change_match <- dplyr::mutate(df_clean_nms, 
+         raw_col_match = stringr::str_match_all(value_changes, 
+                                                sas_cols_regex)) |> 
+    dplyr::relocate(raw_col_match, .after = 1)
+  # unnest 
+  raw_matches_long <- tidyr::unnest_longer(data = value_change_match, 
+                                  col = raw_col_match)
+  col_matches_long <- dplyr::mutate(.data = raw_matches_long,
+      col_matches = stringr::str_remove_all(raw_col_match, "=")) |> 
+    dplyr::relocate(col_matches, .after = 2)
+  col_count_raw <- dplyr::count(col_matches_long, col_matches, 
+                            name = "occurrence")
+  col_count <- dplyr::filter(col_count_raw, !is.na(col_matches))
+  count_tbl <- dplyr::rename(.data = col_count,
+    Field = col_matches,
+    ChangeCount = occurrence
+  )
+  return(count_tbl)
+}
+```
+
+## Field and Change Count
+
+We can derive `Field` and `ChangeCount` from `snap_ae_raw` (the data imported from the spreadsheet).
+
+```{r ae_change_freq}
+ae_change_freq <- count_change_columns(df = snap_ae_raw)
+ae_change_freq
+```
+
+## Graph Changes 
+
+We can build a graph of these changes, but we have to manually set the font size because of the long `y` axis.
+
+```{r graph-ae-changes}
+ggplot(data = ae_change_freq, 
+       mapping = aes(x = ChangeCount, 
+                     y = forcats::fct_reorder(.f = Field, 
+                                              .x = ChangeCount))) + 
+  geom_col(aes(fill = Field), show.legend = FALSE) + 
+  labs(title = "AE Changes", 
+       y = "Field", 
+       x = "Number of Changes") + 
+  theme_minimal(base_size = 6)
+```
+
+# Map to other sheets
+
+Now we can apply `count_change_columns()` to all sheets in `snapshot_compare_270301_20221116_year3_preview_noDAP.xlsx`.
+
+First, we remove the first two sheets from `snapshoty3_sheets`:
+
+```{r form_sheets}
+form_sheets <- snapshoty3_sheets[! snapshoty3_sheets %in% c('Summary', 'Key variables')]
+form_sheets
+```
+
+Then we name each sheet in the vector and store the result in `form_sheets_nmd`:
+
+```{r form_sheets_nmd}
+form_sheets_nmd <- purrr::set_names(form_sheets)
+form_sheets_nmd
+```
+
+## Import all sheets
+
+We can now import all the sheets from the file at `snapshot_pth` and store them in `all_sheets`.
+
+```{r all_sheets}
+all_sheets <- form_sheets_nmd |> 
+  map(~ readxl::read_excel(path = snapshot_pth, sheet = .x))
+```
+
+
+Checking the names of this list confirms it contains all the imported sheets.
+
+```{r sheet-names-all_sheets}
+names(all_sheets)
+```
+
+## Map `count_change_columns()` to `all_sheets`
+
+We `map()` the `count_change_columns()` function over every item in `all_sheets` and store the results in the `all_field_counts` list.
+
+```{r all_field_counts}
+all_field_counts <- purrr::map(.x = all_sheets, .f = count_change_columns)
+names(all_field_counts)
+```
+
+We can check the results by graphing the changes in a few of the forms.
+
+### CM Changes
+
+```{r graph-cm-changes}
+all_field_counts$CM |> 
+  ggplot(mapping = aes(x = ChangeCount, 
+                     y = forcats::fct_reorder(.f = Field, 
+                                              .x = ChangeCount))) + 
+  geom_col(aes(fill = Field), show.legend = FALSE) + 
+  labs(title = "CM Changes", 
+       y = "Field", 
+       x = "Number of Changes") + 
+  theme_minimal(base_size = 6)
+```
+
+### QSQOL Changes 
+
+```{r graph-qsqol-changes}
+all_field_counts$QSQOL |> 
+  ggplot(mapping = aes(x = ChangeCount, 
+                     y = forcats::fct_reorder(.f = Field, 
+                                              .x = ChangeCount))) + 
+  geom_col(aes(fill = Field), show.legend = FALSE) + 
+  labs(title = "QSQOL Changes", 
+       y = "Field", 
+       x = "Number of Changes") + 
+  theme_minimal(base_size = 6)
+```
+
+
+### VS Changes 
+
+```{r graph-vs-changes}
+all_field_counts$VS |> 
+  ggplot(mapping = aes(x = ChangeCount, 
+                     y = forcats::fct_reorder(.f = Field, 
+                                              .x = ChangeCount))) + 
+  geom_col(aes(fill = Field), show.legend = FALSE) + 
+  labs(title = "VS Changes", 
+       y = "Field", 
+       x = "Number of Changes") + 
+  theme_minimal(base_size = 6)
+```
+
+## Export field count tables
+
+We can export these into the `inst/out/` folder as `all-field-counts.xlsx`.
+
+```{r export}
+library(openxlsx)
+# create wb
+openxlsx::write.xlsx(x = all_field_counts,
+                file = "../inst/out/all-field-counts.xlsx")
+```
+
+## Collapse into a single table
+
+```{r}
+
+```
+
+
+

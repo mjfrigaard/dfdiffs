@@ -11,6 +11,10 @@ mod_upload_ui(id, dev = FALSE)
 
 \item{dev}{show developer reactive-value outputs (default FALSE)}
 }
+\value{
+A \code{tagList} of the upload module's UI (file inputs and preview
+tables for \code{base} and \code{compare})
+}
 \description{
 UI module for upload
 }

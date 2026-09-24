@@ -4,7 +4,7 @@
 \alias{create_new_column}
 \title{Create new (joining) column}
 \usage{
-create_new_column(data, cols, new_name, sep)
+create_new_column(data, cols, new_name, sep = "-")
 }
 \arguments{
 \item{data}{a tibble or data.frame}
@@ -12,6 +12,8 @@ create_new_column(data, cols, new_name, sep)
 \item{cols}{cols to create new column from (they will be pasted together with "-")}
 
 \item{new_name}{new column name}
+
+\item{sep}{separator pasted between \code{cols} values (default \code{"-"})}
 }
 \value{
 new_col_data data with new column
@@ -20,8 +22,6 @@ new_col_data data with new column
 Create new (joining) column
 }
 \examples{
-library(dplyr)
-library(tidyr)
 CompleteData <- dfdiffs::CompleteData
 IncompleteData <- dfdiffs::IncompleteData
 CompleteDataJoin <- create_new_column(data = CompleteData,

@@ -9,18 +9,15 @@
 #' @export cross_tabyl
 #'
 #' @examples # not run
-#' library(dplyr)
-#' cross_tabyl(starwars, "hair_color")
-#' cross_tabyl(starwars, "name")
+#' df <- data.frame(hair_color = c("blond", "brown", "brown", "black", NA))
+#' cross_tabyl(df, "hair_color")
 cross_tabyl <- function(df, col) {
    col <- as.character(col)
-   cross_tbl <- dplyr::select(df,
-        tidyselect::all_of(as.character(col))) %>%
-    purrr::as_vector(.x = .) %>%
-    janitor::tabyl() %>%
-    janitor::adorn_pct_formatting() %>%
+   cross_tbl <- df[[col]] |>
+    janitor::tabyl() |>
+    janitor::adorn_pct_formatting() |>
     janitor::adorn_totals(where = "row",
-        name = "Total Queries") %>%
+        name = "Total Queries") |>
     tibble::as_tibble()
    if (ncol(cross_tbl) > 3) {
        cross_tabyl <- purrr::set_names(x = cross_tbl,

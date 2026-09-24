@@ -27,20 +27,16 @@ extdata_folder <- "../inst/extdata/"
 
 # Motivation
 
-This vignette walks through the `create_join_column()` function, which is used for creating new columns in the `dfdiffs` shiny application. 
+This vignette walks through the `create_join_column()` function, which creates new columns in the `dfdiffs` Shiny application.
 
 ```{r pkgs, message=FALSE, warning=FALSE}
 library(dfdiffs)
 library(shiny)
 library(data.table)
-library(dplyr)
-library(tidyr)
 library(stringr)
 library(lubridate)
-library(forcats)
 library(glue)
 library(purrr)
-library(vroom)
 library(reactable)
 library(haven)
 library(readxl)
@@ -53,25 +49,10 @@ library(vetr) # alike
 
 ## create_join_column()
 
-This function allows us to create a new 'join' column from any number of column inputs. 
+This function allows us to create a new 'join' column from any number of column inputs.
 
-```{r create_join_column}
-create_join_column <- function(df, join_cols, new_col_name){
-  # select by_vars
-  tmp <- select(df, all_of(join_cols))
-  # convert to character
-  tmp <- mutate(tmp, across(.fns = as.character))
-  # rename data 
-  join_col_data <- df
-  # assign new col
-  join_col_data$new_col <- pmap_chr(.l = tmp, .f = paste, sep = "-")
-  # rename 
-  names(join_col_data)[names(join_col_data) == "new_col"] <- new_col_name
-  # relocate
-  join_col_data <- relocate(join_col_data, all_of(new_col_name))
-  # return
-  return(join_col_data)
-}
+```{r create_join_column, eval=FALSE}
+create_join_column(df, by_colums, new_by_column_name)
 ```
 
 ## Call structure
@@ -89,63 +70,63 @@ stackcallr::call_tree_dir("R", root = "mod_select_server")
 
 ## Test data
 
-We will load some test data from the `Lahman` package to demonstrate how this function works: 
+We'll load some test data from the synthetic (not real) `dfdiffs` site roster (see `?Roster2021`) to demonstrate how this function works.
 
-### Hall of Fame (2010)
+### Roster pull (2021)
 
-Below is the Hall of Fame data from 2010.
+Below is the 2021 roster pull.
 
 ```{r lahman2010_files}
-lahman2010_files <- "../inst/extdata/csv/2010-lahman/"
-fs::dir_tree(lahman2010_files)
+roster2021_files <- "../inst/extdata/csv/site-roster/2021/"
+fs::dir_tree(roster2021_files)
 ```
 
 
 ```{r master_2010}
-lahman_2010_csv_paths <- list.files(
-  path = lahman2010_files, 
-  full.names = TRUE, 
+roster2021_csv_paths <- list.files(
+  path = roster2021_files,
+  full.names = TRUE,
   pattern = ".csv$")
-master_2010_path <- lahman_2010_csv_paths[grepl(pattern = "Master", lahman_2010_csv_paths)]
-master_2010 <- data.table::fread(input = master_2010_path)
-glimpse(master_2010)
+roster2021_path <- roster2021_csv_paths[grepl(pattern = "Roster", roster2021_csv_paths)]
+roster_2021 <- data.table::fread(input = roster2021_path)
+str(roster_2021)
 ```
 
-### Master data (2015)
+### Roster pull (2022)
 
-And the 'Master' data from 2015.
+Below is the 2022 roster pull.
 
 ```{r lahman2015_files}
-lahman2015_files <- "../inst/extdata/csv/2015-baseballdatabank/"
-fs::dir_tree(lahman2015_files)
+roster2022_files <- "../inst/extdata/csv/site-roster/2022/"
+fs::dir_tree(roster2022_files)
 ```
 
 
 ```{r master_2015}
-lahman_2015_csv_paths <- list.files(path = lahman2015_files, 
-                                    full.names = TRUE, 
+roster2022_csv_paths <- list.files(path = roster2022_files,
+                                    full.names = TRUE,
                                     pattern = ".csv$")
-master_2015_path <- lahman_2015_csv_paths[grepl(pattern = "Master", lahman_2015_csv_paths)]
-master_2015 <- data.table::fread(input = master_2015_path)
-glimpse(master_2015)
+roster2022_path <- roster2022_csv_paths[grepl(pattern = "Roster", roster2022_csv_paths)]
+roster_2022 <- data.table::fread(input = roster2022_path)
+str(roster_2022)
 ```
 
-Assume we want to create a new join column for unique rows of `nameFirst`, `nameLast`, and `birthYear`.
+Assume we want to create a new join column that identifies unique rows by `first_name`, `last_name`, and `enroll_year`.
 
 ```{r name_year_id}
-join_master_2010 <- create_join_column(df = master_2010, 
-  join_cols = c("nameFirst", "nameLast", "birthYear"), 
-  new_col_name = "name_birth_year_id")
+join_roster_2021 <- create_join_column(df = roster_2021,
+  by_colums = c("first_name", "last_name", "enroll_year"),
+  new_by_column_name = "name_year_id")
 
-join_master_2015 <- create_join_column(df = master_2015, 
-  join_cols = c("nameFirst", "nameLast", "birthYear"), 
-  new_col_name = "name_birth_year_id")
+join_roster_2022 <- create_join_column(df = roster_2022,
+  by_colums = c("first_name", "last_name", "enroll_year"),
+  new_by_column_name = "name_year_id")
 
-anti_join(
-  # return all rows from join_master_2010 WITHOUT a match in join_master_2015
-  x = join_master_2010, 
-  y = join_master_2015, 
-  by = "name_birth_year_id") %>% glimpse()
+anti_join_base(
+  # return all rows from join_roster_2021 WITHOUT a match in join_roster_2022
+  x = join_roster_2021,
+  y = join_roster_2022,
+  by = "name_year_id") |> str()
 ```
 
-These are the rows in `join_master_2010` that aren't in `join_master_2015`. 
+These are the rows in `join_roster_2021` that aren't in `join_roster_2022`.

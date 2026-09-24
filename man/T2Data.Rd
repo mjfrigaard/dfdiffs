@@ -12,15 +12,16 @@ A data frame with 9 rows and 7 variables:
 \item{start_date}{a beginning date (from 2022-01-25 to 2022-04-22)}
 \item{mid_date}{a middle date (from 2022-03-15 to 2022-04-15)}
 \item{end_date}{a last date (from 2022-03-25 to 2022-04-22)}
-\item{text_var}{a variable containing random text}
-\item{factor_var}{a categorical variable formatted as a factor}
+\item{text_var}{a patient-reported clinical observation}
+\item{factor_var}{the observation's category (e.g. "headache", "fatigue")}
 }
 }
 \usage{
 T2Data
 }
 \description{
-A dataset containing nine rows and seven columns. The variables are as
-follows:
+The same patient-reported observations as \code{T1Data}, plus three
+additional rows recorded at a later time point, used to demonstrate
+\code{create_new_data()}.
 }
 \keyword{datasets}

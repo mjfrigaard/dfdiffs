@@ -6,17 +6,9 @@
 #' @param by_col A new name for the joining column.
 #' @param cols Columns to be compared.
 #'
-#' @import arsenal
-#' @import diffdf
-#' @importFrom dplyr mutate
-#' @importFrom dplyr across
-#' @importFrom dplyr select
-#' @importFrom dplyr contains
-#' @importFrom dplyr relocate
-#' @importFrom dplyr row_number
-#' @importFrom tibble as_tibble
-#'
-#' @return modified data
+#' @return a list with `diffs` (long format: `Variable name`, key column(s),
+#'   `Current Value`, `Previous Value`) and `diffs_byvar` (count of
+#'   differing values per variable)
 #' @export create_modified_data
 #'
 #' @examples # with local data
@@ -32,322 +24,66 @@
 #'            base = PreviousData,
 #'            by = c("subject_id", "record"))
 create_modified_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
-    # convert all columns to character
-    compare <- dplyr::mutate(compare,
-                        across(.cols = tidyselect::everything(), .fns = as.character))
-    base <- dplyr::mutate(base,
-                        across(.cols = tidyselect::everything(), .fns = as.character))
-
-    if (is.null(by) & is.null(by_col) & is.null(cols)) {
-      # 1) NOTHING (two datasets) ----
-      compare_join_cols <- compare
-      base_join_cols <- base
-      # check
-      # mod_data <- list(compare_join_cols, base_join_cols)
-      comparedf_list <- summary(arsenal::comparedf(
-                                  x = compare_join_cols,
-                                  y = base_join_cols))
-      # diffs
-      diffs_table <- dplyr::mutate(
-                .data = comparedf_list$diffs.table,
-                    dplyr::across(.cols = dplyr::contains("values"),
-                          .fns = base::as.character))
-      diffs_names <- dplyr::select(
-                      .data = diffs_table,
-                      `Variable name` = var.x,
-                      `Current Value` = values.x,
-                      `Previous Value` = values.y)
-      diffs_tbl <- tibble::as_tibble(diffs_names)
-      # diffs_byvar
-      diffs_byvar_names <- dplyr::select(.data = comparedf_list$diffs.byvar.table,
-                      `Variable name` = var.x,
-                      `Modified Values` = n,
-                      `Missing Values` = NAs)
-      diffs_byvar_tbl <- tibble::as_tibble(diffs_byvar_names)
-      mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
-
-    } else if (is.null(by) & is.null(by_col) & !is.null(cols)) {
-      # 2) multiple 'cols' ----
-      # no 'by' & no 'by_col'
-      compare_join_cols <- dplyr::select(compare, tidyselect::all_of(cols))
-      base_join_cols <- dplyr::select(base, tidyselect::all_of(cols))
-      comparedf_list <- summary(arsenal::comparedf(
-                                  x = compare_join_cols,
-                                  y = base_join_cols))
-      # diffs
-      diffs_table <- dplyr::mutate(
-                .data = comparedf_list$diffs.table,
-                    dplyr::across(.cols = dplyr::contains("values"),
-                          .fns = base::as.character))
-      diffs_names <- dplyr::select(
-                      .data = diffs_table,
-                      `Variable name` = var.x,
-                      `Current Value` = values.x,
-                      `Previous Value` = values.y)
-      diffs_tbl <- tibble::as_tibble(diffs_names)
-      # diffs_byvar
-      diffs_byvar_names <- dplyr::select(
-                      .data = comparedf_list$diffs.byvar.table,
-                      `Variable name` = var.x,
-                      `Modified Values` = n,
-                      `Missing Values` = NAs)
-      diffs_byvar_tbl <- tibble::as_tibble(diffs_byvar_names)
-      mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
+    if (is.null(by)) {
+      # 1)/2) NOTHING or multiple 'cols' (row-position match) ----
+      if (!is.null(cols)) {
+        compare <- select_cols(compare, cols)
+        base <- select_cols(base, cols)
+      }
+      mod_data <- diff_values_by_key(base = base, compare = compare, by = NULL)
 
     } else if (length(by) == 1 & is.null(by_col) & is.null(cols)) {
       # 3) Single 'by' column ----
-      compare_join_cols <- dplyr::relocate(compare, {{by}}, tidyselect::everything())
-      base_join_cols <- dplyr::relocate(base, {{by}}, tidyselect::everything())
-      # check
-      # mod_data <- list(compare_join_cols, base_join_cols)
-      comparedf_list <- summary(arsenal::comparedf(
-                                  x = compare_join_cols,
-                                  y = base_join_cols,
-                                    by = {{by}}))
-      # diffs
-      diffs_table <- dplyr::mutate(
-                .data = comparedf_list$diffs.table,
-                    dplyr::across(.cols = dplyr::contains("values"),
-                          .fns = base::as.character))
-      diffs_names <- dplyr::select(
-                      .data = diffs_table,
-                      `Variable name` = var.x,
-                       tidyselect::all_of(by),
-                      `Current Value` = values.x,
-                      `Previous Value` = values.y)
-      diffs_tbl <- tibble::as_tibble(diffs_names)
-      # diffs_byvar
-      diffs_byvar_names <- dplyr::select(
-                      .data = comparedf_list$diffs.byvar.table,
-                      `Variable name` = var.x,
-                      `Modified Values` = n,
-                      `Missing Values` = NAs)
-      diffs_byvar_tbl <- tibble::as_tibble(diffs_byvar_names)
-      mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
+      mod_data <- diff_values_by_key(base = base, compare = compare, by = by)
 
     } else if (length(by) == 1 & !is.null(by_col) & is.null(cols)) {
-      # 3) Single 'by' column, new column ('by_col') ----
+      # 4) Single by column, new column ('by_col') ----
       compare_join_cols <- rename_join_col(compare, by = by, by_col = by_col)
       base_join_cols <- rename_join_col(base, by = by, by_col = by_col)
-
-      comparedf_list <- summary(arsenal::comparedf(
-                                  x = compare_join_cols,
-                                  y = base_join_cols,
-                                    by = {{by_col}}))
-      # diffs
-     diffs_table <- dplyr::mutate(
-                .data = comparedf_list$diffs.table,
-                    dplyr::across(.cols = dplyr::contains("values"),
-                          .fns = base::as.character))
-      diffs_names <- dplyr::select(
-                      .data = diffs_table,
-                      `Variable name` = var.x,
-                       tidyselect::all_of(by_col),
-                      `Current Value` = values.x,
-                      `Previous Value` = values.y)
-      diffs_tbl <- tibble::as_tibble(diffs_names)
-      # diffs_byvar
-      diffs_byvar_names <- dplyr::select(
-                      .data = comparedf_list$diffs.byvar.table,
-                      `Variable name` = var.x,
-                      `Modified Values` = n,
-                      `Missing Values` = NAs)
-      diffs_byvar_tbl <- tibble::as_tibble(diffs_byvar_names)
-      mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
+      mod_data <- diff_values_by_key(base = base_join_cols, compare = compare_join_cols, by = by_col)
 
     } else if (length(by) == 1 & is.null(by_col) & !is.null(cols)) {
       # 5) Single 'by' column, multiple compare cols ('cols') ----
-      compare_join_cols <- dplyr::select(compare, {{by}}, tidyselect::all_of(cols))
-      base_join_cols <- dplyr::select(base, {{by}}, tidyselect::all_of(cols))
-
-      comparedf_list <- summary(arsenal::comparedf(
-                                  x = compare_join_cols,
-                                  y = base_join_cols,
-                                    by = {{by}}))
-      # diffs
-     diffs_table <- dplyr::mutate(
-                .data = comparedf_list$diffs.table,
-                    dplyr::across(.cols = dplyr::contains("values"),
-                          .fns = base::as.character))
-      diffs_names <- dplyr::select(
-                      .data = diffs_table,
-                      `Variable name` = var.x,
-                       tidyselect::all_of(by),
-                      `Current Value` = values.x,
-                      `Previous Value` = values.y)
-      diffs_tbl <- tibble::as_tibble(diffs_names)
-      # diffs_byvar
-      diffs_byvar_names <- dplyr::select(
-                      .data = comparedf_list$diffs.byvar.table,
-                      `Variable name` = var.x,
-                      `Modified Values` = n,
-                      `Missing Values` = NAs)
-      diffs_byvar_tbl <- tibble::as_tibble(diffs_byvar_names)
-      mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
+      compare_join_cols <- select_cols(compare, c(by, cols))
+      base_join_cols <- select_cols(base, c(by, cols))
+      mod_data <- diff_values_by_key(base = base_join_cols, compare = compare_join_cols, by = by)
 
     } else if (length(by) == 1 & !is.null(by_col) & !is.null(cols)) {
       # 6) Single 'by' column, new 'by_col', multiple compare 'cols' ----
       compare_cols <- rename_join_col(compare, by = by, by_col = by_col)
       base_cols <- rename_join_col(base, by = by, by_col = by_col)
-      compare_join_cols <- dplyr::select(compare_cols, {{by_col}}, tidyselect::all_of(cols))
-      base_join_cols <- dplyr::select(base_cols, {{by_col}}, tidyselect::all_of(cols))
-
-      comparedf_list <- summary(arsenal::comparedf(
-                                  x = compare_join_cols,
-                                  y = base_join_cols,
-                                    by = {{by_col}}))
-      # diffs
-     diffs_table <- dplyr::mutate(
-                .data = comparedf_list$diffs.table,
-                    dplyr::across(.cols = dplyr::contains("values"),
-                          .fns = base::as.character))
-      diffs_names <- dplyr::select(
-                      .data = diffs_table,
-                      `Variable name` = var.x,
-                       tidyselect::all_of(by_col),
-                      `Current Value` = values.x,
-                      `Previous Value` = values.y)
-      diffs_tbl <- tibble::as_tibble(diffs_names)
-      # diffs_byvar
-      diffs_byvar_names <- dplyr::select(
-                      .data = comparedf_list$diffs.byvar.table,
-                      `Variable name` = var.x,
-                      `Modified Values` = n,
-                      `Missing Values` = NAs)
-      diffs_byvar_tbl <- tibble::as_tibble(diffs_byvar_names)
-      mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
+      compare_join_cols <- select_cols(compare_cols, c(by_col, cols))
+      base_join_cols <- select_cols(base_cols, c(by_col, cols))
+      mod_data <- diff_values_by_key(base = base_join_cols, compare = compare_join_cols, by = by_col)
 
     } else if (length(by) > 1 & is.null(by_col) & is.null(cols)) {
       # 7) multiple `by` columns ----
-      compare_join_cols <- create_new_column(data = compare,
-                          cols = tidyselect::all_of(by), new_name = "join")
-      base_join_cols <- create_new_column(data = base,
-                          cols = tidyselect::all_of(by), new_name = "join")
+      compare_join_cols <- create_new_column(data = compare, cols = by, new_name = "join")
+      base_join_cols <- create_new_column(data = base, cols = by, new_name = "join")
+      mod_data <- diff_values_by_key(base = base_join_cols, compare = compare_join_cols, by = "join")
 
-      comparedf_list <- summary(arsenal::comparedf(
-                                  x = compare_join_cols,
-                                  y = base_join_cols,
-                                    by = "join"))
-      # diffs
-     diffs_table <- dplyr::mutate(
-                .data = comparedf_list$diffs.table,
-                    dplyr::across(.cols = dplyr::contains("values"),
-                          .fns = base::as.character))
-      diffs_names <- dplyr::select(
-                      .data = diffs_table,
-                      `Variable name` = var.x,
-                       tidyselect::matches("join"),
-                      `Current Value` = values.x,
-                      `Previous Value` = values.y)
-      diffs_tbl <- tibble::as_tibble(diffs_names)
-      # diffs_byvar
-      diffs_byvar_names <- dplyr::select(
-                      .data = comparedf_list$diffs.byvar.table,
-                      `Variable name` = var.x,
-                      `Modified Values` = n,
-                      `Missing Values` = NAs)
-      diffs_byvar_tbl <- tibble::as_tibble(diffs_byvar_names)
-      mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
     } else if (length(by) > 1 & !is.null(by_col) & is.null(cols)) {
       # 8) multiple `by` columns, new 'by_col' ----
-      compare_join_cols <- create_new_column(data = compare,
-                          cols = tidyselect::all_of(by), new_name = {{by_col}})
-      base_join_cols <- create_new_column(data = base,
-                          cols = tidyselect::all_of(by), new_name = {{by_col}})
-      comparedf_list <- summary(arsenal::comparedf(
-                                  x = compare_join_cols,
-                                  y = base_join_cols,
-                                    by = {{by_col}}))
-      # diffs
-     diffs_table <- dplyr::mutate(
-                .data = comparedf_list$diffs.table,
-                    dplyr::across(.cols = dplyr::contains("values"),
-                          .fns = base::as.character))
-      diffs_names <- dplyr::select(
-                      .data = diffs_table,
-                      `Variable name` = var.x,
-                       tidyselect::all_of(by_col),
-                      `Current Value` = values.x,
-                      `Previous Value` = values.y)
-      diffs_tbl <- tibble::as_tibble(diffs_names)
-      # diffs_byvar
-      diffs_byvar_names <- dplyr::select(
-                      .data = comparedf_list$diffs.byvar.table,
-                      `Variable name` = var.x,
-                      `Modified Values` = n,
-                      `Missing Values` = NAs)
-      diffs_byvar_tbl <- tibble::as_tibble(diffs_byvar_names)
-      mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
+      compare_join_cols <- create_new_column(data = compare, cols = by, new_name = by_col)
+      base_join_cols <- create_new_column(data = base, cols = by, new_name = by_col)
+      mod_data <- diff_values_by_key(base = base_join_cols, compare = compare_join_cols, by = by_col)
 
     } else if (length(by) > 1 & is.null(by_col) & !is.null(cols)) {
       # 9) multiple `by` columns, multiple compare 'cols' ----
-      compare_cols <- create_new_column(data = compare,
-                          cols = tidyselect::all_of(by), new_name = "join")
-      base_cols <- create_new_column(data = base,
-                          cols = tidyselect::all_of(by), new_name = "join")
-      compare_join_cols <- dplyr::select(compare_cols,
-                                      tidyselect::matches("join"), tidyselect::all_of(cols))
-      base_join_cols <- dplyr::select(base_cols,
-                                      tidyselect::matches("join"), tidyselect::all_of(cols))
-      comparedf_list <- summary(arsenal::comparedf(
-                                  x = compare_join_cols,
-                                  y = base_join_cols,
-                                    by = "join"))
-      # diffs
-     diffs_table <- dplyr::mutate(
-                .data = comparedf_list$diffs.table,
-                    dplyr::across(.cols = dplyr::contains("values"),
-                          .fns = base::as.character))
-      diffs_names <- dplyr::select(
-                      .data = diffs_table,
-                      `Variable name` = var.x,
-                       tidyselect::matches("join"),
-                      `Current Value` = values.x,
-                      `Previous Value` = values.y)
-      diffs_tbl <- tibble::as_tibble(diffs_names)
-      # diffs_byvar
-      diffs_byvar_names <- dplyr::select(
-                      .data = comparedf_list$diffs.byvar.table,
-                      `Variable name` = var.x,
-                      `Modified Values` = n,
-                      `Missing Values` = NAs)
-      diffs_byvar_tbl <- tibble::as_tibble(diffs_byvar_names)
-      mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
+      compare_cols <- create_new_column(data = compare, cols = by, new_name = "join")
+      base_cols <- create_new_column(data = base, cols = by, new_name = "join")
+      compare_join_cols <- select_cols(compare_cols, c("join", cols))
+      base_join_cols <- select_cols(base_cols, c("join", cols))
+      mod_data <- diff_values_by_key(base = base_join_cols, compare = compare_join_cols, by = "join")
 
     } else if (length(by) > 1 & !is.null(by_col) & !is.null(cols)) {
       # 10) multiple `by` columns, new 'by_col', multiple compare 'cols' ----
-      compare_cols <- create_new_column(data = compare,
-                          cols = tidyselect::all_of(by), new_name = {{by_col}})
-      base_cols <- create_new_column(data = base,
-                          cols = tidyselect::all_of(by), new_name = {{by_col}})
-      compare_join_cols <- dplyr::select(compare_cols,
-                                      tidyselect::all_of(by_col), tidyselect::all_of(cols))
-      base_join_cols <- dplyr::select(base_cols,
-                                      tidyselect::all_of(by_col), tidyselect::all_of(cols))
-      comparedf_list <- summary(arsenal::comparedf(
-                                  x = compare_join_cols,
-                                  y = base_join_cols,
-                                    by = {{by_col}}))
-      # diffs
-     diffs_table <- dplyr::mutate(
-                .data = comparedf_list$diffs.table,
-                    dplyr::across(.cols = dplyr::contains("values"),
-                          .fns = base::as.character))
-      diffs_names <- dplyr::select(
-                      .data = diffs_table,
-                      `Variable name` = var.x,
-                       tidyselect::all_of(by_col),
-                      `Current Value` = values.x,
-                      `Previous Value` = values.y)
-      diffs_tbl <- tibble::as_tibble(diffs_names)
-      # diffs_byvar
-      diffs_byvar_names <- dplyr::select(
-                      .data = comparedf_list$diffs.byvar.table,
-                      `Variable name` = var.x,
-                      `Modified Values` = n,
-                      `Missing Values` = NAs)
-      diffs_byvar_tbl <- tibble::as_tibble(diffs_byvar_names)
-      mod_data <- list('diffs' = diffs_tbl, 'diffs_byvar' = diffs_byvar_tbl)
+      compare_cols <- create_new_column(data = compare, cols = by, new_name = by_col)
+      base_cols <- create_new_column(data = base, cols = by, new_name = by_col)
+      compare_join_cols <- select_cols(compare_cols, c(by_col, cols))
+      base_join_cols <- select_cols(base_cols, c(by_col, cols))
+      mod_data <- diff_values_by_key(base = base_join_cols, compare = compare_join_cols, by = by_col)
     }
-    return(mod_data)
+
+    list("diffs" = mod_data$diffs, "diffs_byvar" = mod_data$diffs_byvar)
 }

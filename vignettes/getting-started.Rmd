@@ -24,7 +24,7 @@ extdata_folder <- "../inst/extdata/"
 
 # Motivation
 
-This vignette is an intro to the `dfdiffs` package. The goal  of `dfdiffs` is to answer the following questions: 
+This vignette introduces the `dfdiffs` package. The goal of `dfdiffs` is to answer the following questions:
 
 1. What rows are here now that weren't here before?  
 2. What rows were here before that aren't here now?   
@@ -32,42 +32,38 @@ This vignette is an intro to the `dfdiffs` package. The goal  of `dfdiffs` is to
 
 ## Packages 
 
-Our package
+Load `dfdiffs`:
 
 ```{r dfdiffs, echo = TRUE}
 library(dfdiffs)
 ```
 
-Dependencies
+Load the other packages used in this vignette:
 
 ```{r similar-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
 library(shiny)
 library(data.table)
-library(dplyr)
 library(stringr)
-library(forcats)
 library(lubridate)
 library(fs)
 library(vctrs)
 library(glue)
 library(purrr)
-library(vroom)
 library(haven)
 library(readxl)
-library(janitor) 
-library(arsenal) 
-library(gt)
+library(janitor)
+library(reactable)
 library(labelled)
 library(gtsummary)
 ```
 
 ## Package functions 
 
-We have functions for answering each of the questions posed above. Each function has a pair of datasets to demonstrate how they work (which we'll cover below).
+`dfdiffs` has a function for each of the questions posed above, and each function comes with a pair of example datasets that demonstrate how it works (which we'll cover below).
 
 ### Call structure
 
-The four comparison functions below are built from a few small helpers, and the same functions power the package's Shiny app. The call trees in this section were generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in `dfdiffs` are shown: calls to other packages (like `diffdf::diffdf()` or `arsenal::comparedf()`) aren't followed.
+The four comparison functions below are built from a few small helpers, and the same functions power the package's Shiny app. The call trees in this section were generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in `dfdiffs` are shown.
 
 ```{r call-tree-getting-started, eval=FALSE}
 library(stackcallr)
@@ -77,31 +73,32 @@ call_tree_dir("R", root = "create_changed_data")
 call_tree_dir("R", root = "create_modified_data")
 ```
 
-`create_new_data()`, `create_deleted_data()` and `create_modified_data()` each call `rename_join_col()` and `create_new_column()` to build (and name) the join column:
+`create_new_data()` and `create_deleted_data()` (the "new rows"/"deleted rows" answers) share `anti_join_base()`, `select_cols()`, `rename_join_col()`, and `create_new_column()`. These are all base-R helpers, so no external comparison package is involved:
 
 ```
 █─create_new_data
+├─anti_join_base
+├─select_cols
 ├─rename_join_col
 └─create_new_column
 ```
 
 ```
 █─create_deleted_data
+├─anti_join_base
+├─select_cols
 ├─rename_join_col
 └─create_new_column
 ```
 
-```
-█─create_modified_data
-├─rename_join_col
-└─create_new_column
-```
-
-`create_changed_data()` uses the same helpers, plus `extract_df_tables()` to turn the output of `diffdf::diffdf()` into tables:
+`create_changed_data()` and `create_modified_data()` (the "changed values" answer) both build on `diff_values_by_key()`, which compares matched rows column-by-column with `compare_values()` (tolerance-aware for numeric/date-time values, label-aware for factors) and records any class mismatches via `class_diffs()`:
 
 ```
 █─create_changed_data
-├─extract_df_tables
+├─select_cols
+├─█─diff_values_by_key
+│ ├─compare_values
+│ └─class_diffs
 ├─rename_join_col
 └─create_new_column
 ```
@@ -121,30 +118,47 @@ call_tree_dir("R", root = "launch_app")
 │ └─mod_compare_ui
 └─█─app_server
   ├─█─mod_upload_server
-  │ └─█─upload_data
-  │   └─load_flat_file
+  │ ├─█─upload_data
+  │ │ └─load_flat_file
+  │ ├─base_react_theme
+  │ └─comp_react_theme
   ├─█─mod_select_server
-  │ └─create_join_column
+  │ ├─select_cols
+  │ ├─base_react_theme
+  │ ├─comp_react_theme
+  │ ├─info_react_theme
+  │ └─█─create_join_column
+  │   └─select_cols
   └─█─mod_compare_server
     ├─%nin%
+    ├─info_react_theme
     ├─█─create_new_data
+    │ ├─anti_join_base
+    │ ├─select_cols
     │ ├─rename_join_col
     │ └─create_new_column
+    ├─new_react_theme
     ├─█─create_deleted_data
+    │ ├─anti_join_base
+    │ ├─select_cols
     │ ├─rename_join_col
     │ └─create_new_column
+    ├─deleted_react_theme
     ├─█─create_modified_data
+    │ ├─select_cols
+    │ ├─█─diff_values_by_key
+    │ │ ├─compare_values
+    │ │ └─class_diffs
     │ ├─rename_join_col
     │ └─create_new_column
-    └─█─create_changed_data
-      ├─extract_df_tables
-      ├─rename_join_col
-      └─create_new_column
+    ├─select_cols
+    ├─changed_react_theme
+    └─left_join_base
 ```
 
 ## *What rows are here now that weren't here before?*
 
-To check new data, we're going to use `T1Data` and `T2Data`.
+To check for new data, we'll use `T1Data` and `T2Data`.
 
 ```{r T1Data-T2Data-NewData, echo=TRUE}
 T1Data <- dfdiffs::T1Data
@@ -154,27 +168,27 @@ NewData <- dfdiffs::NewData
 
 ### Timepoint 1 data (original)
 
-These data represent data taken at T1. 
+`T1Data` represents data collected at the first timepoint (T1).
+
+**`T1Data`**: Simulated 'time-point 1' data
 
 ```{r T1Data, echo=FALSE}
-gt::gt(T1Data) %>% 
-  gt::tab_header(data = ., 
-    title = md("**`T1Data`**: Simulated 'time-point 1' data"))
+reactable::reactable(T1Data, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
 ### Timepoint 2 data (new)
 
-This is a 'new' dataset representing T2.
+`T2Data` is the 'new' dataset, representing data collected at the second timepoint (T2).
+
+**`T2Data`**: Simulated 'time-point 2' data
 
 ```{r T2Data, echo=FALSE}
-gt::gt(T2Data) %>% 
-  gt::tab_header(data = ., 
-    title = md("**`T2Data`**: Simulated 'time-point 2' data"))
+reactable::reactable(T2Data, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
 ### `create_new_data()`
 
-The `create_new_data()` function shows us the 'new data' (i.e. what is here now that wasn't here before?)
+The `create_new_data()` function returns the 'new data' (i.e., the rows that are here now but weren't here before).
 
 ```{r , eval=FALSE}
 create_new_data(
@@ -183,28 +197,26 @@ create_new_data(
 ```
 
 
+Output from **`create_new_data()`**: Difference between 'time-point 1' & 'time-point 2'
+
 ```{r create_new_data, echo=FALSE}
 create_new_data(
-  compare = T2Data, 
-  base = T1Data) %>% 
-  gt::gt(data = .) %>% 
-  gt::tab_header(data = ., 
-  title = md("Output from **`create_new_data()`**"), 
-    subtitle = md("Difference between 'time-point 1' & 'time-point 2'"))
+  compare = T2Data,
+  base = T1Data) %>%
+  reactable::reactable(resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
-We can check this against the `NewData` dataset (which should match the output from `create_new_data()`)
+We can check this against the `NewData` dataset, which should match the output from `create_new_data()`.
+
+**`NewData`**: stored differences from `create_new_data()`
 
 ```{r NewData, echo=FALSE}
-gt::gt(NewData) %>% 
-    gt::tab_header(data = ., 
-      title = md("**`NewData`**"), 
-      subtitle = md("stored differences from `create_new_data()`"))
+reactable::reactable(NewData, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
 ## *What rows were here before that aren't here now?*
 
-To test for the deleted data, we use the `CompleteData`, `IncompleteData`, and check these with `DeletedData`. 
+To test for deleted data, we'll compare `CompleteData` and `IncompleteData`, then check the result against `DeletedData`.
 
 ```{r CompleteData-IncompleteData, echo = TRUE}
 CompleteData <- dfdiffs::CompleteData
@@ -216,11 +228,10 @@ DeletedData <- dfdiffs::DeletedData
 
 `CompleteData` represents a 'complete' set of data. 
 
+**`CompleteData`**: simulated data for checking 'deleted data'
+
 ```{r CompleteData, echo=FALSE}
-gt::gt(CompleteData) %>% 
-  gt::tab_header(data = ., 
-  title = md("**`CompleteData`**"), 
-    subtitle = md("simulated data for checking 'deleted data'"))
+reactable::reactable(CompleteData, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
 
@@ -228,16 +239,15 @@ gt::gt(CompleteData) %>%
 
 This is a dataset with rows removed from `CompleteData`.
 
+**`IncompleteData`**: simulated data for checking 'deleted data'
+
 ```{r IncompleteData, echo=FALSE}
-gt::gt(IncompleteData) %>% 
-  gt::tab_header(data = ., 
-  title = md("**`IncompleteData`**"), 
-    subtitle = md("simulated data for checking 'deleted data'"))
+reactable::reactable(IncompleteData, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
 ### `create_deleted_data()`
 
-When we run the `create_deleted_data()`, we check for the deleted rows between `IncompleteData` and `CompleteData`.
+Running `create_deleted_data()` checks for rows that were deleted between `CompleteData` and `IncompleteData`.
 
 ```{r create_deleted_data, echo=TRUE, eval=FALSE}
 create_deleted_data(
@@ -245,38 +255,32 @@ create_deleted_data(
   base = CompleteData) 
 ```
 
+Output from **`create_deleted_data()`**: Differences between `CompleteData` and `IncompleteData`
+
 ```{r , echo=FALSE}
-create_deleted_data(
-  compare = IncompleteData, 
-  base = CompleteData) %>% 
-  dplyr::arrange(subject) %>% 
-  gt::gt(data = .) %>% 
-  gt::tab_header(data = ., 
-  title = md("Output from **`create_deleted_data()`**"), 
-    subtitle = md("Differences between `CompleteData` and `IncompleteData`"))
+deleted <- create_deleted_data(
+  compare = IncompleteData,
+  base = CompleteData)
+deleted <- deleted[order(deleted$subject), ]
+reactable::reactable(deleted, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
-### The deleted data 
+### The deleted data
 
-This is identical to the data stored in `DeletedData`
+The output above is identical to the data stored in `DeletedData`.
+
+**`DeletedData`**: Output from **`create_deleted_data()`**
 
 ```{r DeletedData, echo=FALSE}
-gt::gt(DeletedData) %>% 
-  gt::tab_header(data = ., 
-  title = md("**`DeletedData`**"), 
-    subtitle = md("Output from **`create_deleted_data()`**"))
+reactable::reactable(DeletedData, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
 
 ## *What values have been changed?*
 
-To answer this question, we have two options: `create_changed_data()` and `create_modified_data()`.
+To answer this question, we have two options: `create_changed_data()` and `create_modified_data()`. Both build on the same base-R `diff_values_by_key()`/`compare_values()` engine and differ only in the shape of their output: `create_changed_data()` returns `$num_diffs`/`$var_diffs` (used by `compare_data()`), and `create_modified_data()` returns `$diffs_byvar`/`$diffs` (used by `mod_compare` and `create_comparison_report()`).
 
-+ `create_changed_data()` relies on the `diffdf()` function from the [`diffdf` package](https://gowerc.github.io/diffdf/reference/diffdf.html) package. 
-
-+ `create_modified_data()` relies on the `comparedf()` function from the [`arsenal` package](https://mayoverse.github.io/arsenal/reference/comparedf.html) package.
-
-To check for changes between two datasets, we use the `InitialData` and `ChangedData`. 
+To check for changes between two datasets, we'll use `InitialData` and `ChangedData`.
 
 ```{r InitialData-ChangedData, echo=TRUE}
 InitialData <- dfdiffs::InitialData
@@ -285,20 +289,18 @@ ChangedData <- dfdiffs::ChangedData
 
 ### Initial data 
 
+**`InitialData`**: simulated data for checking 'changed/modified data'
+
 ```{r InitialData, echo=FALSE}
-gt::gt(InitialData) %>% 
-  gt::tab_header(data = ., 
-  title = md("**`InitialData`**"), 
-    subtitle = md("simulated data for checking 'changed/modified data'"))
+reactable::reactable(InitialData, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
 ### Changed data
 
+**`ChangedData`**: simulated data for checking 'modified data'
+
 ```{r ChangedData, echo=FALSE}
-gt::gt(ChangedData) %>% 
-  gt::tab_header(data = ., 
-  title = md("**`ChangedData`**"), 
-    subtitle = md("simulated data for checking 'modified data'"))
+reactable::reactable(ChangedData, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
 ### `create_changed_data()` 
@@ -316,22 +318,20 @@ names(changed)
 
 The counts of changes by variable are stored in `num_diffs`.
 
+**`num_diffs`**: counts of changes for 'changed data'
+
 ```{r num_diffs, echo=FALSE}
-gt::gt(data = changed$num_diffs) %>% 
-    gt::tab_header(data = ., 
-  title = md("**`num_diffs`**"), 
-    subtitle = md("counts of changes for 'changed data'"))
+reactable::reactable(changed$num_diffs, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
 #### Changes by row (`var_diffs`)
 
 The changes by row are stored in `var_diffs`.
 
+**`var_diffs`**: Row-by-row of changes for 'changed data'
+
 ```{r var_diffs, echo=FALSE}
-gt::gt(data = changed$var_diffs) %>% 
-    gt::tab_header(data = ., 
-  title = md("**`var_diffs`**"), 
-    subtitle = md("Row-by-row of changes for 'changed data'"))
+reactable::reactable(changed$var_diffs, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
 
@@ -350,21 +350,19 @@ names(modified)
 
 The counts of changes by variable are stored in `diffs_byvar`.
 
+**`diffs_byvar`**: counts of changes for 'modified data'
+
 ```{r diffs_byvar, echo=FALSE}
-gt::gt(data = modified$diffs_byvar) %>% 
-    gt::tab_header(data = ., 
-  title = md("**`diffs_byvar`**"), 
-    subtitle = md("counts of changes for 'modified data'"))
+reactable::reactable(modified$diffs_byvar, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
 #### Changes by row 
 
 The changes by row are stored in `diffs`.
 
+**`diffs`**: Row-by-row changes of 'modified data'
+
 ```{r diffs, echo=FALSE}
-gt::gt(data = modified$diffs) %>% 
-    gt::tab_header(data = ., 
-  title = md("**`diffs`**"), 
-    subtitle = md("Row-by-row changes of 'modified data'"))
+reactable::reactable(modified$diffs, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 

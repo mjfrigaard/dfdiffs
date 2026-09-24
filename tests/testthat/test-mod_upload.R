@@ -44,6 +44,30 @@ test_that("mod_upload_server() reads an uploaded compare file into comp_data()",
   })
 })
 
+test_that("mod_upload_server() reads an uploaded xlsx sheet into base_data()", {
+  xlsx_path <- withr::local_tempfile(fileext = ".xlsx")
+  openxlsx::write.xlsx(InitialData, xlsx_path, sheetName = "InitialData")
+
+  shiny::testServer(mod_upload_server, {
+    session$setInputs(
+      base_file = data.frame(
+        name = "InitialData.xlsx",
+        size = file.info(xlsx_path)$size,
+        type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        datapath = xlsx_path,
+        stringsAsFactors = FALSE
+      ),
+      base_xlsx_sheets = "InitialData",
+      base_new_name = "InitialData"
+    )
+
+    out <- session$returned$base_data()
+    expect_s3_class(out, "data.frame")
+    expect_equal(nrow(out), nrow(InitialData))
+    expect_true("subject_id" %in% names(out))
+  })
+})
+
 test_that("mod_upload_server() uses base_new_name for base_name() when supplied", {
   base_path <- system.file("extdata/csv/InitialData.csv", package = "dfdiffs")
 

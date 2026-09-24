@@ -19,25 +19,21 @@ options(
 
 # Motivation
 
-This vignette walks through the `upload_data()` function, which is used for loading a variety of file types into the `dfdiffs` shiny application. 
+This vignette walks through the `upload_data()` function, which loads a variety of file types into the `dfdiffs` Shiny application.
 
 ```{r pkgs, message=FALSE, warning=FALSE}
 library(dfdiffs)
 library(shiny)
 library(data.table)
 library(dplyr)
-library(tidyr)
 library(stringr)
 library(lubridate)
-library(forcats)
 library(glue)
 library(purrr)
-library(vroom)
 library(reactable)
 library(haven)
 library(readxl)
 library(labelled)
-library(gt)
 library(gtsummary)
 ```
 
@@ -71,7 +67,7 @@ load_flat_file <- function(path) {
 }
 ```
 
-If the file is an excel file, the name of the sheet should be passed to `sheet`. 
+The `upload_data()` function below also handles Excel files. If the file is an Excel file, pass the name of the sheet to `sheet`.
 
 ```{r upload_data}
 upload_data <- function(path, sheet = NULL) {
@@ -119,54 +115,54 @@ stackcallr::call_tree_dir("R", root = "launch_upload_demo")
     └─load_flat_file
 ```
 
-## 2010 Lahamn CSVs
+## 2021 site roster CSVs
 
 ```{r lahman_2010_csv_paths}
-lahman_2010_csv_paths <- list.files(path = "../inst/extdata/csv/2010-lahman", full.names = TRUE, pattern = ".csv$")
-head(lahman_2010_csv_paths)
+roster2021_csv_paths <- list.files(path = "../inst/extdata/csv/site-roster/2021", full.names = TRUE, pattern = ".csv$")
+head(roster2021_csv_paths)
 ```
 
-Test this on `lahman_2010_csv_paths[3]`
+We'll test this on `roster2021_csv_paths[4]` (the full `Roster.csv`).
 
 ```{r test-load_flat_file-1}
-master_2010 <- load_flat_file(path = lahman_2010_csv_paths[3])
-glimpse(master_2010)
+roster_2021 <- load_flat_file(path = roster2021_csv_paths[4])
+glimpse(roster_2021)
 ```
 
-## 2015 Lahamn CSVs
+## 2022 site roster CSVs
 
 ```{r lahman_2015_csv_paths}
-lahman_2015_csv_paths <- list.files(path = "../inst/extdata/csv/2015-baseballdatabank", full.names = TRUE, pattern = ".csv$")
-head(lahman_2015_csv_paths)
+roster2022_csv_paths <- list.files(path = "../inst/extdata/csv/site-roster/2022", full.names = TRUE, pattern = ".csv$")
+head(roster2022_csv_paths)
 ```
 
-Test this on `lahman_2015_csv_paths[3]`
+We'll test this on `roster2022_csv_paths[4]`.
 
 ```{r test-master_2015}
-master_csv_2015 <- load_flat_file(path = lahman_2015_csv_paths[3])
-glimpse(master_csv_2015)
+roster_csv_2022 <- load_flat_file(path = roster2022_csv_paths[4])
+glimpse(roster_csv_2022)
 ```
 
-## List of 2010 csvs 
+## List of 2021 CSVs
 
-Now we create `lahman_2010_csv_files`
+Now we import every 2021 CSV into a named list, `roster2021_csv_files`:
 
 ```{r lahman_2010_csv_files}
-lahman_2010_csv_files <- map(.x = lahman_2010_csv_paths, 
-  .f = load_flat_file) %>% 
-  set_names(x = ., nm = basename(lahman_2010_csv_paths))
-map(lahman_2010_csv_files, names)
+roster2021_csv_files <- map(.x = roster2021_csv_paths,
+  .f = load_flat_file) %>%
+  set_names(x = ., nm = basename(roster2021_csv_paths))
+map(roster2021_csv_files, names)
 ```
 
-We'll test this on the `map_df()` function. 
+We'll also test this with the `map_df()` function.
 
 ```{r tbl_2010_csv_files}
-tbl_2010_csv_files <- lahman_2010_csv_paths %>% 
-  set_names() %>% 
-  map_df(.x = ., 
-  .f = load_flat_file, .id = "source") %>% 
+tbl_2021_csv_files <- roster2021_csv_paths %>%
+  set_names() %>%
+  map_df(.x = .,
+  .f = load_flat_file, .id = "source") %>%
   mutate(source = basename(source))
-tbl_2010_csv_files %>% count(source)
+tbl_2021_csv_files %>% count(source)
 ```
 
 

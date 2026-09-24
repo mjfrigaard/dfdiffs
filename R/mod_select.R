@@ -1,10 +1,12 @@
 #' mod_select_ui
 #'
-#' @importFrom bslib accordion accordion_panel
+#' @importFrom bslib accordion accordion_panel layout_columns
 #'
 #' @param id module id
 #' @param dev show developer reactive-value outputs (default FALSE)
 #'
+#' @return A `tagList` of the select module's UI (column selection and
+#'   join-column accordions)
 #' @export mod_select_ui
 #'
 #' @description select UI module
@@ -44,32 +46,17 @@ mod_select_ui <- function(id, dev = FALSE) {
         title = "Reactive values (base)",
         icon = icon("bug"),
         strong(em("For DEV purposes only")),
-        fluidRow(
-          column(
-            12,
-            strong(code("base_dev_a"), "=", code("base_select()")),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "base_dev_a")
-            )
-          )
+        strong(code("base_dev_a"), "=", code("base_select()")),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "base_dev_a")
         ),
-        fluidRow(
-          column(
-            12,
-            strong(code("base_dev_b"), "=", code("input$by")),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "base_dev_b")
-            )
-          )
+        strong(code("base_dev_b"), "=", code("input$by")),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "base_dev_b")
         ),
-        fluidRow(
-          column(
-            12,
-            strong(code("base_dev_c"), "=", code("input$base_col_select")),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "base_dev_c")
-            )
-          )
+        strong(code("base_dev_c"), "=", code("input$base_col_select")),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "base_dev_c")
         )
       )
     ))
@@ -110,32 +97,17 @@ mod_select_ui <- function(id, dev = FALSE) {
         title = "Reactive values (compare)",
         icon = icon("bug"),
         strong(em("For DEV purposes only")),
-        fluidRow(
-          column(
-            12,
-            strong(code("comp_dev_a"), "=", code("comp_select()")),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "comp_dev_a")
-            )
-          )
+        strong(code("comp_dev_a"), "=", code("comp_select()")),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "comp_dev_a")
         ),
-        fluidRow(
-          column(
-            12,
-            strong(code("comp_dev_b"), "=", code("input$by")),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "comp_dev_b")
-            )
-          )
+        strong(code("comp_dev_b"), "=", code("input$by")),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "comp_dev_b")
         ),
-        fluidRow(
-          column(
-            12,
-            strong(code("comp_dev_c"), "=", code("input$comp_col_select")),
-            verbatimTextOutput(
-              outputId = NS(namespace = id, id = "comp_dev_c")
-            )
-          )
+        strong(code("comp_dev_c"), "=", code("input$comp_col_select")),
+        verbatimTextOutput(
+          outputId = NS(namespace = id, id = "comp_dev_c")
         )
       )
     ))
@@ -164,9 +136,9 @@ mod_select_ui <- function(id, dev = FALSE) {
       bslib::accordion_panel(
         title = "Select Join Columns",
         icon = icon("link"),
-        fluidRow(
-          column(
-            width = 5,
+        bslib::layout_columns(
+          col_widths = c(5, 6),
+          tagList(
             h5(
               strong(
                 em("Intersecting columns:")
@@ -181,8 +153,7 @@ mod_select_ui <- function(id, dev = FALSE) {
               )
             )
           ),
-          column(
-            width = 6,
+          tagList(
             h5(
               strong(
                 em("Select Joining Column(s)")
@@ -218,32 +189,22 @@ mod_select_ui <- function(id, dev = FALSE) {
       bslib::accordion_panel(
         title = "Base data (for comparison)",
         icon = icon("table"),
-        fluidRow(
-          column(
-            width = 12,
-            ## OUTPUT |-- (base_join_col_display) ------
-            reactable::reactableOutput(
-              outputId = NS(
-                namespace = id,
-                id = "base_join_col_display"
-              )
-            )
+        ## OUTPUT |-- (base_join_col_display) ------
+        reactable::reactableOutput(
+          outputId = NS(
+            namespace = id,
+            id = "base_join_col_display"
           )
         )
       ),
       bslib::accordion_panel(
         title = "Compare data (for comparison)",
         icon = icon("table"),
-        fluidRow(
-          column(
-            width = 12,
-            ## OUTPUT |-- (comp_join_col_display) ------
-            reactable::reactableOutput(
-              outputId = NS(
-                namespace = id,
-                id = "comp_join_col_display"
-              )
-            )
+        ## OUTPUT |-- (comp_join_col_display) ------
+        reactable::reactableOutput(
+          outputId = NS(
+            namespace = id,
+            id = "comp_join_col_display"
           )
         )
       )
@@ -254,12 +215,19 @@ mod_select_ui <- function(id, dev = FALSE) {
 #' mod_select_server
 #'
 #' @param id module id
+#' @param data_upload list of reactives returned by `mod_upload_server()`
+#'   (`base_data`, `base_name`, `comp_data`, `comp_name`)
 #' @param dev show developer reactive-value outputs (default FALSE)
 #'
+#' @param dark_mode reactive returning TRUE when the app is in dark mode
+#'   (default reactive(FALSE))
+#'
+#' @return A list of reactives: `join_selected`, `base_join_col_data`,
+#'   `comp_join_col_data`
 #' @export mod_select_server
 #'
 #' @description select server module
-mod_select_server <- function(id, data_upload, dev = FALSE) {
+mod_select_server <- function(id, data_upload, dev = FALSE, dark_mode = reactive(FALSE)) {
   moduleServer(id = id, module = function(input, output, session) {
     # BASE DATA |-- ----
     ## BASE REACTIVE |-- base_data (reactive) ---------
@@ -306,11 +274,8 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
         need(base_data(), "please upload data")
       )
       reactable::reactable(
-        data = select(
-          base_data(),
-          tidyselect::all_of(input$base_col_select)
-        ),
-        theme = base_react_theme,
+        data = select_cols(base_data(), input$base_col_select),
+        theme = base_react_theme(dark_mode()),
         defaultPageSize = 10,
         resizable = TRUE,
         highlight = TRUE,
@@ -323,7 +288,7 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
     ## BASE REACTIVE |-- base_select   ---------
     base_select <- eventReactive(input$base_col_select, {
       # create selection
-      base_select <- select(base_data(), tidyselect::all_of(input$base_col_select))
+      base_select <- select_cols(base_data(), input$base_col_select)
       return(base_select)
     })
 
@@ -373,11 +338,8 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
         need(comp_data(), "please upload data")
       )
       reactable::reactable(
-        data = select(
-          comp_data(),
-          tidyselect::all_of(input$comp_col_select)
-        ),
-        theme = comp_react_theme,
+        data = select_cols(comp_data(), input$comp_col_select),
+        theme = comp_react_theme(dark_mode()),
         defaultPageSize = 10,
         resizable = TRUE,
         highlight = TRUE,
@@ -390,7 +352,7 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
     ## COMPARE REACTIVE |-- comp_select (reactive) ---------
     comp_select <- eventReactive(input$comp_col_select, {
       # create selection
-      comp_select <- select(comp_data(), tidyselect::all_of(input$comp_col_select))
+      comp_select <- select_cols(comp_data(), input$comp_col_select)
       return(comp_select)
     })
 
@@ -413,13 +375,7 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
         wrap = FALSE,
         bordered = TRUE,
         defaultPageSize = 5,
-        theme = reactable::reactableTheme(
-          color = "#011627",
-          borderColor = "#e5eaee",
-          stripedColor = "#f6f8fa",
-          highlightColor = "#f0f5f9",
-          cellPadding = "8px 12px"
-        )
+        theme = info_react_theme(dark_mode())
       )
     })
     ##  UPDATE |-- input$by   ---------
@@ -441,17 +397,14 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
           by_colums = input$by,
           new_by_column_name = "join_column"
         )
-        base_join_col <- select(
+        base_join_col <- select_cols(
           base_join_col,
-          join_column, tidyselect::all_of(col_intersect()$Columns)
+          c("join_column", col_intersect()$Columns)
         )
       } else {
         base_join_col <- base_select()
         # no by col, new name
-        base_join_col <- select(
-          base_join_col,
-          tidyselect::all_of(col_intersect()$Columns)
-        )
+        base_join_col <- select_cols(base_join_col, col_intersect()$Columns)
       }
     })
 
@@ -466,7 +419,7 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
         wrap = FALSE,
         bordered = TRUE,
         filterable = TRUE,
-        theme = base_react_theme
+        theme = base_react_theme(dark_mode())
       )
     })
 
@@ -479,17 +432,14 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
           by_colums = input$by,
           new_by_column_name = "join_column"
         )
-        comp_join_col <- select(
+        comp_join_col <- select_cols(
           comp_join_col,
-          join_column, tidyselect::all_of(col_intersect()$Columns)
+          c("join_column", col_intersect()$Columns)
         )
       } else {
         comp_join_col <- comp_select()
         # no by col
-        comp_join_col <- select(
-          comp_join_col,
-          tidyselect::all_of(col_intersect()$Columns)
-        )
+        comp_join_col <- select_cols(comp_join_col, col_intersect()$Columns)
       }
     })
 
@@ -503,13 +453,17 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
         wrap = FALSE,
         bordered = TRUE,
         filterable = TRUE,
-        theme = comp_react_theme
+        theme = comp_react_theme(dark_mode())
       )
     })
 
     # |---- return list ---------
     return(
       list(
+        ## join_selected -----
+        join_selected = reactive({
+          input$by
+        }),
         ## base_join_col_data -----
         base_join_col_data = reactive({
           # no by col, no new name
@@ -523,9 +477,9 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
               new_by_column_name = "join_column"
             )
             # only intersecting columns
-            base_join_col <- dplyr::select(
+            base_join_col <- select_cols(
               base_join_col,
-              join_column, tidyselect::all_of(col_intersect()$Columns)
+              c("join_column", col_intersect()$Columns)
             )
             # join column
             base_join_col <- tibble::add_column(
@@ -540,10 +494,7 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
           } else {
             # no by col, new name
             base_join_col <- base_select()
-            base_join_col <- select(
-              base_join_col,
-              tidyselect::all_of(col_intersect()$Columns)
-            )
+            base_join_col <- select_cols(base_join_col, col_intersect()$Columns)
             # data source column
             base_join_col <- tibble::add_column(
               .data = base_join_col,
@@ -565,9 +516,9 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
               new_by_column_name = "join_column"
             )
             # only intersecting columns
-            comp_join_col <- select(
+            comp_join_col <- select_cols(
               comp_join_col,
-              join_column, tidyselect::all_of(col_intersect()$Columns)
+              c("join_column", col_intersect()$Columns)
             )
             # data source column
             comp_join_col <- tibble::add_column(
@@ -583,10 +534,7 @@ mod_select_server <- function(id, data_upload, dev = FALSE) {
             # no by col, new name
             comp_join_col <- comp_select()
             # only intersecting columns
-            comp_join_col <- select(
-              comp_join_col,
-              tidyselect::all_of(col_intersect()$Columns)
-            )
+            comp_join_col <- select_cols(comp_join_col, col_intersect()$Columns)
             # data source column
             comp_join_col <- tibble::add_column(
               .data = comp_join_col,

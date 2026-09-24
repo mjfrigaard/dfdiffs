@@ -12,13 +12,16 @@
       "head *": "allow",
       "echo *": "allow",
       "ls *": "allow",
-      "/opt/quarto/bin/quarto *": "allow"
+      "/opt/quarto/bin/quarto *": "allow",
+      "git rm *": "allow",
+      "git status *": "allow"
     },
     "executeCode": {
       "*": "allow"
     },
     "edit": {
-      "*.R": "allow"
+      "*.R": "allow",
+      "*/.gitignore": "allow"
     }
   }
 }
