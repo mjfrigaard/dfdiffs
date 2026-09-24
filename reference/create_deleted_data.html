@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -95,13 +95,16 @@
 <span class="r-in"><span><span class="va">IncompleteData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="IncompleteData.html">IncompleteData</a></span></span></span>
 <span class="r-in"><span><span class="fu">create_deleted_data</span><span class="op">(</span>compare <span class="op">=</span> <span class="va">IncompleteData</span>,</span></span>
 <span class="r-in"><span>                    base <span class="op">=</span> <span class="va">CompleteData</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4 × 7</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   subject record start_date mid_date   end_date   text_var            factor_var</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>               <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> A       2      2021-12-28 2022-01-27 2022-02-26 Mark the spot with… state     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> C       1      2021-12-30 2022-01-29 2022-02-28 It's easy to tell … grant     </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> D       1      2021-12-27 2022-01-26 2022-02-25 The sky that morni… tape      </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> B       3      2021-12-26 2022-01-25 2022-02-24 A blue crane is a … shut      </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   subject record start_date   mid_date   end_date</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       A      2 2021-12-28 2022-01-27 2022-02-26</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       C      1 2021-12-30 2022-01-29 2022-02-28</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6       D      1 2021-12-27 2022-01-26 2022-02-25</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8       B      3 2021-12-26 2022-01-25 2022-02-24</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                               text_var factor_var</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2         Concomitant medication reported at baseline.     conmed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 Physical exam completed with no abnormalities noted.       exam</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     Medical history reviewed and confirmed complete.    history</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8         Concomitant medication updated at visit two.     conmed</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

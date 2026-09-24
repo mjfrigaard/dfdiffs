@@ -2,7 +2,7 @@
 
 ## Motivation
 
-The goal of the `dfdiffs` is to answer the following questions:
+The goal of `dfdiffs` is to answer the following questions:
 
 1.  What rows are here now that weren’t here before?  
 2.  *What rows were here before that aren’t here now?*
@@ -10,17 +10,15 @@ The goal of the `dfdiffs` is to answer the following questions:
 
 This vignette takes us through the
 [`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)
-function, which answers the “*What rows were here before that aren’t
-here now?*”
+function, which answers the question, “*What rows were here before that
+aren’t here now?*”
 
 ### Packages
 
 ``` r
 
 library(dfdiffs)
-library(dplyr)
 library(stringr)
-library(forcats)
 library(lubridate)
 library(fs)
 library(vctrs)
@@ -31,13 +29,13 @@ library(flextable)
 
 ### What rows were here before that aren’t here now?
 
-We will need three datasets to test for deleted data: `CompleteData`,
-`IncompleteData`, and `DeletedData`
+We’ll need three datasets to test for deleted data: `CompleteData`,
+`IncompleteData`, and `DeletedData`.
 
 #### CompleteData
 
-The `CompleteData` has 9 rows and 7 column. Unique rows are identified
-by a combination of `subject` and `record`:
+`CompleteData` has 9 rows and 7 columns. Unique rows are identified by a
+combination of `subject` and `record`:
 
 ``` r
 
@@ -47,19 +45,19 @@ flextable::qflextable(CompleteData)
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | The copper bowl shone in the sun's rays. | interest |
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Take a chance and win a china doll. | sure |
-| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A cramp is no small danger on a swim. | white |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
-| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Wake and rise, and step into the green outdoors. | situate |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Say it slow!y but make it ring clear. | document |
+| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at screening visit. | vitals |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Laboratory sample collected for hematology panel. | labs |
+| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | ECG performed during screening assessment. | ecg |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
+| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at follow-up visit. | vitals |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Laboratory sample collected for chemistry panel. | labs |
 
 #### IncompleteData
 
-`IncompeleteData` has 5 rows (4 have been removed)
+`IncompleteData` has 5 rows (4 have been removed).
 
 ``` r
 
@@ -70,16 +68,16 @@ flextable::qflextable(IncompleteData) |>
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | The copper bowl shone in the sun's rays. | interest |
-| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Take a chance and win a china doll. | sure |
-| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A cramp is no small danger on a swim. | white |
-| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Wake and rise, and step into the green outdoors. | situate |
-| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Say it slow!y but make it ring clear. | document |
+| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at screening visit. | vitals |
+| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Laboratory sample collected for hematology panel. | labs |
+| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | ECG performed during screening assessment. | ecg |
+| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at follow-up visit. | vitals |
+| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Laboratory sample collected for chemistry panel. | labs |
 
 #### DeletedData
 
 `DeletedData` contains the 4 rows of data removed from `CompleteData` to
-create `IncompleteData`
+create `IncompleteData`.
 
 ``` r
 
@@ -90,23 +88,20 @@ flextable::qflextable(DeletedData) |>
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
 
-If we check, the combination of `IncompleteData` and `DeletedData`
-create `CompleteData`.
+We can confirm that combining `IncompleteData` and `DeletedData`
+recreates `CompleteData`:
 
 ``` r
 
-dplyr::all_equal(target = bind_rows(IncompleteData, DeletedData), 
-                 current = CompleteData)
-#> Warning: `all_equal()` was deprecated in dplyr 1.1.0.
-#> ℹ Please use `all.equal()` instead.
-#> ℹ And manually order the rows/cols as needed
-#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-#> generated.
+combined <- rbind(IncompleteData, DeletedData)
+combined <- combined[do.call(order, combined), ]
+complete <- CompleteData[do.call(order, CompleteData), ]
+all.equal(combined, complete, check.attributes = FALSE)
 #> [1] TRUE
 ```
 
@@ -118,13 +113,13 @@ Each function in the `dfdiffs` package assumes the following conditions:
 
 2.  Multiple columns to compare (`cols`)
 
-3.  Single by column
+3.  Single `by` column
 
 4.  Single `by` column, new column name (`by_col`)
 
 5.  Single `by` column, multiple compare columns (`cols`)
 
-6.  `Single` by column, new column name (`by_col`), multiple compare
+6.  Single `by` column, new column name (`by_col`), multiple compare
     columns (`cols`)
 
 7.  Multiple `by` columns
@@ -166,7 +161,7 @@ Each function in the `dfdiffs` package assumes the following conditions:
       by = "join_var")
     ```
 
-4.  Single by column, new column name (`by_col`)
+4.  Single `by` column, new column name (`by_col`)
 
     ``` r
 
@@ -177,7 +172,7 @@ Each function in the `dfdiffs` package assumes the following conditions:
       by_col = 'new_join_var')
     ```
 
-5.  Single `by` column, multiple compare columns `cols`
+5.  Single `by` column, multiple compare columns (`cols`)
 
     ``` r
 
@@ -274,10 +269,17 @@ CompleteDataJoin <- create_new_column(data = CompleteData,
 CompleteDataJoin
 ```
 
-    #> Error in `tidyr::unite()`:
-    #> ! `sep` must be a single string, not absent.
-    #> Error:
-    #> ! object 'CompleteDataJoin' not found
+| join_var | subject | record | start_date | mid_date | end_date | text_var | factor_var |
+|----|----|----|----|----|----|----|----|
+| A-1 | A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at screening visit. | vitals |
+| A-2 | A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B-1 | B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Laboratory sample collected for hematology panel. | labs |
+| B-2 | B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | ECG performed during screening assessment. | ecg |
+| C-1 | C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D-1 | D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
+| A-3 | A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at follow-up visit. | vitals |
+| B-3 | B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| D-2 | D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Laboratory sample collected for chemistry panel. | labs |
 
 ``` r
 
@@ -287,10 +289,13 @@ IncompleteDataJoin <- create_new_column(data = IncompleteData,
 IncompleteDataJoin
 ```
 
-    #> Error in `tidyr::unite()`:
-    #> ! `sep` must be a single string, not absent.
-    #> Error:
-    #> ! object 'IncompleteDataJoin' not found
+| join_var | subject | record | start_date | mid_date | end_date | text_var | factor_var |
+|----|----|----|----|----|----|----|----|
+| A-1 | A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at screening visit. | vitals |
+| B-1 | B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Laboratory sample collected for hematology panel. | labs |
+| B-2 | B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | ECG performed during screening assessment. | ecg |
+| A-3 | A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Vital signs recorded at follow-up visit. | vitals |
+| D-2 | D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Laboratory sample collected for chemistry panel. | labs |
 
   
   
@@ -308,10 +313,12 @@ create_deleted_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
 ### Call structure
 
 [`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)
-relies on the same two helpers as
+relies on the same four helpers as
 [`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md):
+[`anti_join_base()`](https://mjfrigaard.github.io/dfdiffs/reference/anti_join_base.md),
+[`select_cols()`](https://mjfrigaard.github.io/dfdiffs/reference/select_cols.md),
 [`rename_join_col()`](https://mjfrigaard.github.io/dfdiffs/reference/rename_join_col.md)
-(renames the join column) and
+(renames the join column), and
 [`create_new_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_column.md)
 (builds the join column from the `by` columns, covered above). The call
 tree below was generated from the package source with
@@ -325,16 +332,18 @@ stackcallr::call_tree_dir("R", root = "create_deleted_data")
 ```
 
     █─create_deleted_data
+    ├─anti_join_base
+    ├─select_cols
     ├─rename_join_col
     └─create_new_column
 
 ### Single `by` column conditions
 
-The function should also be able to handle multiple conditions. Below we
-cover the conditions for a single `by` columns (assuming there is an
-existing unique identifier in each dataset). But first, we’ll cover a
-few uncommon conditions, like a missing `by` column, or a missing `by`
-column and specific columns selected for comparison.
+The function also needs to handle multiple conditions. Below we cover
+the conditions for a single `by` column (assuming each dataset already
+has a unique identifier). First, we’ll cover a few uncommon conditions,
+like a missing `by` column, or a missing `by` column with specific
+columns selected for comparison.
 
 #### 1) Two datasets
 
@@ -349,24 +358,21 @@ create_deleted_data(
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
 
-When we compare this `DeletedData`, we can see this performs a
+When we compare this to `DeletedData`, we can see it performs a
 row-by-row comparison.
 
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+    #> Error in `arrange()`:
+    #> ! could not find function "arrange"
 
 #### 2) Multiple columns to compare (`cols`)
 
-- No `by` columns (only two datasets) and multiple compare (`cols`)
+- No `by` columns (only two datasets) and multiple compare columns
+  (`cols`)
 
 ``` r
 
@@ -376,23 +382,27 @@ create_deleted_data(
   cols = c("text_var", "factor_var"))
 ```
 
-    #> Error:
-    #> ! object 'IncompleteDataJoin' not found
+| text_var                                             | factor_var |
+|------------------------------------------------------|------------|
+| Concomitant medication reported at baseline.         | conmed     |
+| Physical exam completed with no abnormalities noted. | exam       |
+| Medical history reviewed and confirmed complete.     | history    |
+| Concomitant medication updated at visit two.         | conmed     |
 
-When we compare this `DeletedData`, we can see the `text_var` and
-`factor_var` are identical.
+When we compare this to `DeletedData`, we can see the `text_var` and
+`factor_var` columns are identical.
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
 
 #### 3) Single `by` column
 
 - If the tables have a joining column, like `CompleteDataJoin` and
-  `IncompleteDataJoin`, we can supply the (`by`) joining column
+  `IncompleteDataJoin`, we can supply that joining column with `by`.
 
 ``` r
 
@@ -402,23 +412,27 @@ create_deleted_data(
   by = "join_var")
 ```
 
-    #> Error:
-    #> ! object 'IncompleteDataJoin' not found
+| join_var | subject | record | start_date | mid_date | end_date | text_var | factor_var |
+|----|----|----|----|----|----|----|----|
+| A-2 | A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| C-1 | C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D-1 | D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
+| B-3 | B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
 
 When we compare this to `DeletedData`, we can see the rows are
 identical.
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
 
 #### 4) Single `by` column, new column name (`by_col`)
 
-- We can also provide a single `by` column (for unique identifiers) and
-  a new name for the `by_col`
+- We can also provide a single `by` column (the unique identifier) and a
+  new name for it with `by_col`.
 
 ``` r
 
@@ -429,20 +443,24 @@ create_deleted_data(
   by_col = 'new_join_var')
 ```
 
-    #> Error:
-    #> ! object 'IncompleteDataJoin' not found
+| new_join_var | subject | record | start_date | mid_date | end_date | text_var | factor_var |
+|----|----|----|----|----|----|----|----|
+| A-2 | A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| C-1 | C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D-1 | D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
+| B-3 | B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
 
 When we compare this to `DeletedData`, we can see the rows are
 identical.
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
 
-#### 5) Single `by` column, multiple compare columns `cols`
+#### 5) Single `by` column, multiple compare columns (`cols`)
 
 - Single `by` column and multiple compare columns (`cols`)
 
@@ -455,18 +473,22 @@ create_deleted_data(
   cols = c("subject", "record", "factor_var", "text_var"))
 ```
 
-    #> Error:
-    #> ! object 'IncompleteDataJoin' not found
+| join_var | subject | record | factor_var | text_var |
+|----|----|----|----|----|
+| A-2 | A | 2 | conmed | Concomitant medication reported at baseline. |
+| C-1 | C | 1 | exam | Physical exam completed with no abnormalities noted. |
+| D-1 | D | 1 | history | Medical history reviewed and confirmed complete. |
+| B-3 | B | 3 | conmed | Concomitant medication updated at visit two. |
 
 When we compare this to `DeletedData`, we can see the rows are
 identical.
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
 
 #### 6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
 
@@ -483,23 +505,27 @@ create_deleted_data(
   cols = c("subject", "record", "text_var", "factor_var"))
 ```
 
-    #> Error:
-    #> ! object 'IncompleteDataJoin' not found
+| new_join_var | subject | record | text_var | factor_var |
+|----|----|----|----|----|
+| A-2 | A | 2 | Concomitant medication reported at baseline. | conmed |
+| C-1 | C | 1 | Physical exam completed with no abnormalities noted. | exam |
+| D-1 | D | 1 | Medical history reviewed and confirmed complete. | history |
+| B-3 | B | 3 | Concomitant medication updated at visit two. | conmed |
 
 When we compare this to `DeletedData`, we can see the rows are
 identical.
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
 
 ### Multiple `by` column conditions
 
-Now we’re going to test conditions in which there are multiple columns
-used to create a unique identifier.
+Next, we’ll test conditions in which multiple columns are used to create
+a unique identifier.
 
 #### 7) Multiple `by` columns
 
@@ -514,23 +540,27 @@ create_deleted_data(
   by = c('subject', 'record'))
 ```
 
-    #> Error in `tidyr::unite()`:
-    #> ! `sep` must be a single string, not absent.
+| join | subject | record | start_date | mid_date | end_date | text_var | factor_var |
+|----|----|----|----|----|----|----|----|
+| A-2 | A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| C-1 | C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D-1 | D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
+| B-3 | B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
 
-This creates a new `join` column and it’s a combination of `subject` and
-`record`, and when we compare this to `DeletedData`, we can see the rows
-are identical.
+This creates a new `join` column that combines `subject` and `record`.
+When we compare this to `DeletedData`, we can see the rows are
+identical.
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
 
 #### 8) Multiple `by` columns, new column name (`by_col`)
 
-We can provide multiple `by` columns, a new `by_col`, and **no `cols`**
+We can provide multiple `by` columns, a new `by_col`, and **no `cols`**.
 
 ``` r
 
@@ -541,19 +571,23 @@ create_deleted_data(
   by_col = "new_join_col")
 ```
 
-    #> Error in `tidyr::unite()`:
-    #> ! `sep` must be a single string, not absent.
+| new_join_col | subject | record | start_date | mid_date | end_date | text_var | factor_var |
+|----|----|----|----|----|----|----|----|
+| A-2 | A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| C-1 | C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D-1 | D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
+| B-3 | B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
 
-This creates a new `new_join_col` column and it’s a combination of
-`subject` and `record`, and when we compare this to `DeletedData`, we
-can see the rows are identical.
+This creates a new `new_join_col` column that combines `subject` and
+`record`. When we compare this to `DeletedData`, we can see the rows are
+identical.
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
 
 #### 9) Multiple `by` columns, multiple compare columns (`cols`)
 
@@ -569,23 +603,28 @@ create_deleted_data(
   cols = c("subject",  "record", "factor_var", "text_var"))
 ```
 
-    #> Error in `tidyr::unite()`:
-    #> ! `sep` must be a single string, not absent.
+| join | subject | record | factor_var | text_var |
+|----|----|----|----|----|
+| A-2 | A | 2 | conmed | Concomitant medication reported at baseline. |
+| C-1 | C | 1 | exam | Physical exam completed with no abnormalities noted. |
+| D-1 | D | 1 | history | Medical history reviewed and confirmed complete. |
+| B-3 | B | 3 | conmed | Concomitant medication updated at visit two. |
 
-This creates a new `join` column, and it’s a combination of `subject`
-and `record`, and when we compare this to `DeletedData`, we can see the
-rows are identical.
+This creates a new `join` column that combines `subject` and `record`.
+When we compare this to `DeletedData`, we can see the rows are
+identical.
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
 
 #### 10) Multiple `by` columns, a new `by_col`, and `cols`
 
-We can provide multiple `by` columns, new `by_col`, and multiple `cols`
+We can provide multiple `by` columns, a new `by_col`, and multiple
+`cols`.
 
 ``` r
 
@@ -597,16 +636,20 @@ create_deleted_data(
   cols = c("subject", "record", "text_var", "factor_var"))
 ```
 
-    #> Error in `tidyr::unite()`:
-    #> ! `sep` must be a single string, not absent.
+| new_join_col | subject | record | text_var | factor_var |
+|----|----|----|----|----|
+| A-2 | A | 2 | Concomitant medication reported at baseline. | conmed |
+| C-1 | C | 1 | Physical exam completed with no abnormalities noted. | exam |
+| D-1 | D | 1 | Medical history reviewed and confirmed complete. | history |
+| B-3 | B | 3 | Concomitant medication updated at visit two. | conmed |
 
-This creates a new `join` column, and it’s a combination of `subject`
-and `record`, and when we compare this to `DeletedData`, we can see the
-rows are identical.
+This creates a new `join` column that combines `subject` and `record`.
+When we compare this to `DeletedData`, we can see the rows are
+identical.
 
 | subject | record | start_date | mid_date | end_date | text_var | factor_var |
 |----|----|----|----|----|----|----|
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |

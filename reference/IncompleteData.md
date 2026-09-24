@@ -1,7 +1,7 @@
 # Incomplete Data (simulated data for checking deleted data)
 
-A dataset containing five rows and seven columns. The variables are as
-follows:
+`CompleteData` with four records removed, used to demonstrate
+[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md).
 
 ## Usage
 
@@ -11,7 +11,7 @@ IncompleteData
 
 ## Format
 
-A data frame with 9 rows and 7 variables:
+A data frame with 5 rows and 7 variables:
 
 - subject:
 
@@ -35,8 +35,8 @@ A data frame with 9 rows and 7 variables:
 
 - text_var:
 
-  a variable containing random text
+  a visit record description (e.g. "Vital signs recorded...")
 
 - factor_var:
 
-  a categorical variable formatted as a factor
+  the record's category (e.g. "vitals", "labs")

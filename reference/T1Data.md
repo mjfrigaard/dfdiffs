@@ -1,7 +1,8 @@
 # T1Data (simulated 'time-point 1' data for checking 'new data')
 
-A dataset containing six rows and seven columns. The variables are as
-follows:
+Simulated patient-reported clinical observations recorded at the first
+time point, used to demonstrate
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md).
 
 ## Usage
 
@@ -35,8 +36,8 @@ A data frame with 6 rows and 7 variables:
 
 - text_var:
 
-  a variable containing random text
+  a patient-reported clinical observation
 
 - factor_var:
 
-  a categorical variable formatted as a factor
+  the observation's category (e.g. "headache", "fatigue")

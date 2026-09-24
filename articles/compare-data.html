@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -68,7 +68,7 @@
 
 
 
-
+<script src="compare-data_files/kePrint-0.0.1/kePrint.js"></script><link href="compare-data_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
@@ -87,21 +87,17 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor" class="external-link">janitor</a></span><span class="op">)</span> </span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayoverse/arsenal" class="external-link">arsenal</a></span><span class="op">)</span> <span class="co"># comparedf</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gowerc.github.io/diffdf/" class="external-link">diffdf</a></span><span class="op">)</span>  <span class="co"># diffdf</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org" class="external-link">lubridate</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/" class="external-link">forcats</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glue.tidyverse.org/" class="external-link">glue</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://vroom.tidyverse.org" class="external-link">vroom</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glin.github.io/reactable/" class="external-link">reactable</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://haven.tidyverse.org" class="external-link">haven</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://readxl.tidyverse.org" class="external-link">readxl</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
-<p>The goal of the <code>dfdiffs</code> is to answer the following
+<p>The goal of <code>dfdiffs</code> is to answer the following
 questions:</p>
 <ol style="list-style-type: decimal">
 <li>What rows are here now that weren’t here before?<br>
@@ -113,33 +109,33 @@ questions:</p>
 <div class="section level3">
 <h3 id="test-data">Test data<a class="anchor" aria-label="anchor" href="#test-data"></a>
 </h3>
-<p>These are two Masters tables from the <a href="https://www.seanlahman.com/baseball-archive/statistics/" class="external-link">Lahman
-baseball database.</a></p>
+<p><code>Roster2021</code> and <code>Roster2022</code> are two yearly
+pulls of a synthetic (not real) clinical site roster, used here to
+demonstrate <code>dfdiffs</code> at a larger scale than the small toy
+datasets in the other vignettes. See <code><a href="../reference/Roster2021.html">?Roster2021</a></code> for
+details.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m15</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master15</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3000</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">m15</span><span class="op">$</span><span class="va">debut</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2015-09-13"</span></span>
-<span><span class="va">m20</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master20</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice_sample</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">3000</span>, replace <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">m20</span><span class="op">$</span><span class="va">debut</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2019-09-14"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">r21</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/Roster2021.html">Roster2021</a></span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">r21</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 200</span></span>
+<span><span class="va">r22</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/Roster2022.html">Roster2022</a></span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">r22</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 237</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="the-compare_data-function">The <code>compare_data()</code> function<a class="anchor" aria-label="anchor" href="#the-compare_data-function"></a>
 </h3>
+<p>Below are the arguments for <code><a href="../reference/compare_data.html">compare_data()</a></code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/compare_data.html">compare_data</a></span><span class="op">(</span>compare <span class="op">=</span> , base <span class="op">=</span> , by <span class="op">=</span> , by_col <span class="op">=</span> , cols <span class="op">=</span> <span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comparisons</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_data.html">compare_data</a></span><span class="op">(</span></span>
-<span>  compare <span class="op">=</span> <span class="va">m20</span>, base <span class="op">=</span> <span class="va">m15</span>, </span>
-<span>  by <span class="op">=</span> <span class="st">"playerID"</span>, by_col <span class="op">=</span> <span class="st">"join"</span>, </span>
-<span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"nameFirst"</span>, <span class="st">"nameLast"</span>, <span class="st">"nameGiven"</span>, <span class="st">"height"</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `tidyr::unite()`:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `sep` must be a single string, not absent.</span></span>
+<span>  compare <span class="op">=</span> <span class="va">r22</span>, base <span class="op">=</span> <span class="va">r21</span>,</span>
+<span>  by <span class="op">=</span> <span class="st">"subject_id"</span>,</span>
+<span>  cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first_name"</span>, <span class="st">"last_name"</span>, <span class="st">"full_name"</span>, <span class="st">"height_cm"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">comparisons</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'comparisons' not found</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "new_data"          "deleted_data"      "changed_num_diffs"</span></span>
+<span><span class="co">#&gt; [4] "changed_var_diffs"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="call-structure">Call structure<a class="anchor" aria-label="anchor" href="#call-structure"></a>
@@ -155,39 +151,57 @@ in <code>dfdiffs</code> are shown.</p>
 <code class="sourceCode R"><span><span class="fu">stackcallr</span><span class="fu">::</span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"compare_data"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>█─compare_data
 ├─█─create_new_data
+│ ├─anti_join_base
+│ ├─select_cols
 │ ├─rename_join_col
 │ └─create_new_column
 ├─█─create_deleted_data
+│ ├─anti_join_base
+│ ├─select_cols
 │ ├─rename_join_col
 │ └─create_new_column
 └─█─create_changed_data
-  ├─extract_df_tables
+  ├─select_cols
+  ├─█─diff_values_by_key
+  │ ├─compare_values
+  │ └─class_diffs
   ├─rename_join_col
   └─create_new_column</code></pre>
 <p>The Shiny app’s compare module (<code><a href="../reference/mod_compare_server.html">mod_compare_server()</a></code>)
-orchestrates the four comparison functions
-(<code><a href="../reference/create_new_data.html">create_new_data()</a></code>, <code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code>,
-<code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>, and
-<code><a href="../reference/create_changed_data.html">create_changed_data()</a></code>), and uses the <code>%nin%</code>
-helper to drop <code>join_column</code>, <code>data_source</code>, and
-<code>join_source</code> from the list of compared columns:</p>
+orchestrates three comparison functions (<code><a href="../reference/create_new_data.html">create_new_data()</a></code>,
+<code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code>, and
+<code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>; <code><a href="../reference/create_changed_data.html">create_changed_data()</a></code>
+is used by <code><a href="../reference/compare_data.html">compare_data()</a></code> instead), and uses the
+<code>%nin%</code> helper to drop <code>join_column</code>,
+<code>data_source</code>, and <code>join_source</code> from the list of
+compared columns:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stackcallr</span><span class="fu">::</span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"mod_compare_server"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>█─mod_compare_server
 ├─%nin%
+├─info_react_theme
 ├─█─create_new_data
+│ ├─anti_join_base
+│ ├─select_cols
 │ ├─rename_join_col
 │ └─create_new_column
+├─new_react_theme
 ├─█─create_deleted_data
+│ ├─anti_join_base
+│ ├─select_cols
 │ ├─rename_join_col
 │ └─create_new_column
+├─deleted_react_theme
 ├─█─create_modified_data
+│ ├─select_cols
+│ ├─█─diff_values_by_key
+│ │ ├─compare_values
+│ │ └─class_diffs
 │ ├─rename_join_col
 │ └─create_new_column
-└─█─create_changed_data
-  ├─extract_df_tables
-  ├─rename_join_col
-  └─create_new_column</code></pre>
+├─select_cols
+├─changed_react_theme
+└─left_join_base</code></pre>
 </div>
 <div class="section level3">
 <h3 id="new_data">
@@ -195,35 +209,339 @@ helper to drop <code>join_column</code>, <code>data_source</code>, and
 </h3>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comparisons</span><span class="op">$</span><span class="va">new_data</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'comparisons' not found</span></span></code></pre>
+<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
+<caption>
+head(comparisons$new_data)
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+subject_id
+</th>
+<th style="text-align:left;">
+first_name
+</th>
+<th style="text-align:left;">
+last_name
+</th>
+<th style="text-align:left;">
+full_name
+</th>
+<th style="text-align:left;">
+height_cm
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+198
+</td>
+<td style="text-align:left;">
+SUBJ-0201
+</td>
+<td style="text-align:left;">
+Riley
+</td>
+<td style="text-align:left;">
+Jensen
+</td>
+<td style="text-align:left;">
+Riley Jensen
+</td>
+<td style="text-align:left;">
+178.7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+199
+</td>
+<td style="text-align:left;">
+SUBJ-0202
+</td>
+<td style="text-align:left;">
+Casey
+</td>
+<td style="text-align:left;">
+Hayes
+</td>
+<td style="text-align:left;">
+Casey Hayes
+</td>
+<td style="text-align:left;">
+181.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+200
+</td>
+<td style="text-align:left;">
+SUBJ-0203
+</td>
+<td style="text-align:left;">
+Skyler
+</td>
+<td style="text-align:left;">
+Grant
+</td>
+<td style="text-align:left;">
+Skyler Grant
+</td>
+<td style="text-align:left;">
+165.3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+201
+</td>
+<td style="text-align:left;">
+SUBJ-0204
+</td>
+<td style="text-align:left;">
+Skyler
+</td>
+<td style="text-align:left;">
+Kim
+</td>
+<td style="text-align:left;">
+Skyler Kim
+</td>
+<td style="text-align:left;">
+165.1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+202
+</td>
+<td style="text-align:left;">
+SUBJ-0205
+</td>
+<td style="text-align:left;">
+Riley
+</td>
+<td style="text-align:left;">
+Irwin
+</td>
+<td style="text-align:left;">
+Riley Irwin
+</td>
+<td style="text-align:left;">
+181.4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+203
+</td>
+<td style="text-align:left;">
+SUBJ-0206
+</td>
+<td style="text-align:left;">
+Casey
+</td>
+<td style="text-align:left;">
+Kim
+</td>
+<td style="text-align:left;">
+Casey Kim
+</td>
+<td style="text-align:left;">
+155.4
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level3">
 <h3 id="deleted_data">
 <code>$deleted_data</code><a class="anchor" aria-label="anchor" href="#deleted_data"></a>
 </h3>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comparisons</span><span class="op">$</span><span class="va">deleted_data</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'comparisons' not found</span></span></code></pre>
+<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
+<caption>
+head(comparisons$deleted_data)
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+subject_id
+</th>
+<th style="text-align:left;">
+first_name
+</th>
+<th style="text-align:left;">
+last_name
+</th>
+<th style="text-align:left;">
+full_name
+</th>
+<th style="text-align:left;">
+height_cm
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+SUBJ-0005
+</td>
+<td style="text-align:left;">
+Jamie
+</td>
+<td style="text-align:left;">
+Singh
+</td>
+<td style="text-align:left;">
+Jamie Singh
+</td>
+<td style="text-align:left;">
+179.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+50
+</td>
+<td style="text-align:left;">
+SUBJ-0050
+</td>
+<td style="text-align:left;">
+Riley
+</td>
+<td style="text-align:left;">
+Patel
+</td>
+<td style="text-align:left;">
+Riley Patel
+</td>
+<td style="text-align:left;">
+184.5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+150
+</td>
+<td style="text-align:left;">
+SUBJ-0150
+</td>
+<td style="text-align:left;">
+Skyler
+</td>
+<td style="text-align:left;">
+Kim
+</td>
+<td style="text-align:left;">
+Skyler Kim
+</td>
+<td style="text-align:left;">
+157.4
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level3">
 <h3 id="changed_num_diffs">
 <code>$changed_num_diffs</code><a class="anchor" aria-label="anchor" href="#changed_num_diffs"></a>
 </h3>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comparisons</span><span class="op">$</span><span class="va">changed_num_diffs</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'comparisons' not found</span></span></code></pre>
+<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
+<caption>
+comparisons$changed_num_diffs
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+Variable name
+</th>
+<th style="text-align:right;">
+Modified Values
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+first_name
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+last_name
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+full_name
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+height_cm
+</td>
+<td style="text-align:right;">
+0
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level3">
 <h3 id="changed_var_diffs">
 <code>$changed_var_diffs</code><a class="anchor" aria-label="anchor" href="#changed_var_diffs"></a>
 </h3>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">comparisons</span><span class="op">$</span><span class="va">changed_var_diffs</span></span></code></pre></div>
-<pre><code><span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'comparisons' not found</span></span></code></pre>
+<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
+<caption>
+comparisons$changed_var_diffs
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+Variable name
+</th>
+<th style="text-align:left;">
+Current Value
+</th>
+<th style="text-align:left;">
+Previous Value
+</th>
+<th style="text-align:left;">
+subject_id
+</th>
+</tr></thead>
+<tbody><tr>
+<td style="text-align:left;">
+character(0)
+</td>
+<td style="text-align:left;">
+c(“:————-”, “:————-”, “:————–”, “:———-”)
+</td>
+<td style="text-align:left;">
+character(0)
+</td>
+<td style="text-align:left;">
+c(“:————-”, “:————-”, “:————–”, “:———-”)
+</td>
+</tr></tbody>
+</table>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

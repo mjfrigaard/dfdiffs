@@ -2,8 +2,8 @@
 
 ## Motivation
 
-This vignette is an intro to the `dfdiffs` package. The goal of
-`dfdiffs` is to answer the following questions:
+This vignette introduces the `dfdiffs` package. The goal of `dfdiffs` is
+to answer the following questions:
 
 1.  What rows are here now that weren’t here before?  
 2.  What rows were here before that aren’t here now?  
@@ -11,42 +11,38 @@ This vignette is an intro to the `dfdiffs` package. The goal of
 
 ### Packages
 
-Our package
+Load `dfdiffs`:
 
 ``` r
 
 library(dfdiffs)
 ```
 
-Dependencies
+Load the other packages used in this vignette:
 
 ``` r
 
 library(shiny)
 library(data.table)
-library(dplyr)
 library(stringr)
-library(forcats)
 library(lubridate)
 library(fs)
 library(vctrs)
 library(glue)
 library(purrr)
-library(vroom)
 library(haven)
 library(readxl)
-library(janitor) 
-library(arsenal) 
-library(gt)
+library(janitor)
+library(reactable)
 library(labelled)
 library(gtsummary)
 ```
 
 ### Package functions
 
-We have functions for answering each of the questions posed above. Each
-function has a pair of datasets to demonstrate how they work (which
-we’ll cover below).
+`dfdiffs` has a function for each of the questions posed above, and each
+function comes with a pair of example datasets that demonstrate how it
+works (which we’ll cover below).
 
 #### Call structure
 
@@ -55,11 +51,7 @@ and the same functions power the package’s Shiny app. The call trees in
 this section were generated from the package source with
 [stackcallr](https://github.com/mjfrigaard/stackcallr)
 (`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in
-`dfdiffs` are shown: calls to other packages (like
-[`diffdf::diffdf()`](https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html)
-or
-[`arsenal::comparedf()`](https://mayoverse.github.io/arsenal/reference/comparedf.html))
-aren’t followed.
+`dfdiffs` are shown.
 
 ``` r
 
@@ -70,37 +62,45 @@ call_tree_dir("R", root = "create_changed_data")
 call_tree_dir("R", root = "create_modified_data")
 ```
 
-[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md),
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)
+and
 [`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)
+(the “new rows”/“deleted rows” answers) share
+[`anti_join_base()`](https://mjfrigaard.github.io/dfdiffs/reference/anti_join_base.md),
+[`select_cols()`](https://mjfrigaard.github.io/dfdiffs/reference/select_cols.md),
+[`rename_join_col()`](https://mjfrigaard.github.io/dfdiffs/reference/rename_join_col.md),
 and
-[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
-each call
-[`rename_join_col()`](https://mjfrigaard.github.io/dfdiffs/reference/rename_join_col.md)
-and
-[`create_new_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_column.md)
-to build (and name) the join column:
+[`create_new_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_column.md).
+These are all base-R helpers, so no external comparison package is
+involved:
 
     █─create_new_data
+    ├─anti_join_base
+    ├─select_cols
     ├─rename_join_col
     └─create_new_column
 
     █─create_deleted_data
-    ├─rename_join_col
-    └─create_new_column
-
-    █─create_modified_data
+    ├─anti_join_base
+    ├─select_cols
     ├─rename_join_col
     └─create_new_column
 
 [`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md)
-uses the same helpers, plus
-[`extract_df_tables()`](https://mjfrigaard.github.io/dfdiffs/reference/extract_df_tables.md)
-to turn the output of
-[`diffdf::diffdf()`](https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html)
-into tables:
+and
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
+(the “changed values” answer) both build on
+[`diff_values_by_key()`](https://mjfrigaard.github.io/dfdiffs/reference/diff_values_by_key.md),
+which compares matched rows column-by-column with
+[`compare_values()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_values.md)
+(tolerance-aware for numeric/date-time values, label-aware for factors)
+and records any class mismatches via `class_diffs()`:
 
     █─create_changed_data
-    ├─extract_df_tables
+    ├─select_cols
+    ├─█─diff_values_by_key
+    │ ├─compare_values
+    │ └─class_diffs
     ├─rename_join_col
     └─create_new_column
 
@@ -128,29 +128,46 @@ call_tree_dir("R", root = "launch_app")
     │ └─mod_compare_ui
     └─█─app_server
       ├─█─mod_upload_server
-      │ └─█─upload_data
-      │   └─load_flat_file
+      │ ├─█─upload_data
+      │ │ └─load_flat_file
+      │ ├─base_react_theme
+      │ └─comp_react_theme
       ├─█─mod_select_server
-      │ └─create_join_column
+      │ ├─select_cols
+      │ ├─base_react_theme
+      │ ├─comp_react_theme
+      │ ├─info_react_theme
+      │ └─█─create_join_column
+      │   └─select_cols
       └─█─mod_compare_server
         ├─%nin%
+        ├─info_react_theme
         ├─█─create_new_data
+        │ ├─anti_join_base
+        │ ├─select_cols
         │ ├─rename_join_col
         │ └─create_new_column
+        ├─new_react_theme
         ├─█─create_deleted_data
+        │ ├─anti_join_base
+        │ ├─select_cols
         │ ├─rename_join_col
         │ └─create_new_column
+        ├─deleted_react_theme
         ├─█─create_modified_data
+        │ ├─select_cols
+        │ ├─█─diff_values_by_key
+        │ │ ├─compare_values
+        │ │ └─class_diffs
         │ ├─rename_join_col
         │ └─create_new_column
-        └─█─create_changed_data
-          ├─extract_df_tables
-          ├─rename_join_col
-          └─create_new_column
+        ├─select_cols
+        ├─changed_react_theme
+        └─left_join_base
 
 ### *What rows are here now that weren’t here before?*
 
-To check new data, we’re going to use `T1Data` and `T2Data`.
+To check for new data, we’ll use `T1Data` and `T2Data`.
 
 ``` r
 
@@ -161,41 +178,23 @@ NewData <- dfdiffs::NewData
 
 #### Timepoint 1 data (original)
 
-These data represent data taken at T1.
+`T1Data` represents data collected at the first timepoint (T1).
 
-| **`T1Data`**: Simulated ‘time-point 1’ data |  |  |  |  |  |  |
-|----|----|----|----|----|----|----|
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-| A | 1 | 2022-01-28 | 2022-03-20 | 2022-03-30 | The birch canoe slid on the smooth planks. | food |
-| A | 2 | 2022-01-25 | 2022-03-15 | 2022-03-29 | Glue the sheet to the dark blue background. | most |
-| B | 3 | 2022-01-26 | 2022-03-19 | 2022-03-25 | It's easy to tell the depth of a well. | park |
-| C | 4 | 2022-01-29 | 2022-03-18 | 2022-03-27 | These days a chicken leg is a rare dish. | between |
-| D | 5 | 2022-01-30 | 2022-03-16 | 2022-03-26 | Rice is often served in round bowls. | regard |
-| D | 6 | 2022-01-27 | 2022-03-17 | 2022-03-31 | The juice of lemons makes fine punch. | law |
+**`T1Data`**: Simulated ‘time-point 1’ data
 
 #### Timepoint 2 data (new)
 
-This is a ‘new’ dataset representing T2.
+`T2Data` is the ‘new’ dataset, representing data collected at the second
+timepoint (T2).
 
-| **`T2Data`**: Simulated ‘time-point 2’ data |  |  |  |  |  |  |
-|----|----|----|----|----|----|----|
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-| D | 5 | 2022-01-30 | 2022-03-16 | 2022-03-26 | Rice is often served in round bowls. | regard |
-| D | 6 | 2022-01-27 | 2022-03-17 | 2022-03-31 | The juice of lemons makes fine punch. | law |
-| D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Four hours of steady work faced us. | associate |
-| C | 4 | 2022-01-29 | 2022-03-18 | 2022-03-27 | These days a chicken leg is a rare dish. | between |
-| B | 3 | 2022-01-26 | 2022-03-19 | 2022-03-25 | It's easy to tell the depth of a well. | park |
-| B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | The hogs were fed chopped corn and garbage. | encourage |
-| A | 1 | 2022-01-28 | 2022-03-20 | 2022-03-30 | The birch canoe slid on the smooth planks. | food |
-| A | 2 | 2022-01-25 | 2022-03-15 | 2022-03-29 | Glue the sheet to the dark blue background. | most |
-| A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | The box was thrown beside the parked truck. | pension |
+**`T2Data`**: Simulated ‘time-point 2’ data
 
 #### `create_new_data()`
 
 The
 [`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)
-function shows us the ‘new data’ (i.e. what is here now that wasn’t here
-before?)
+function returns the ‘new data’ (i.e., the rows that are here now but
+weren’t here before).
 
 ``` r
 
@@ -204,30 +203,21 @@ create_new_data(
   base = T1Data)
 ```
 
-| Output from **[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)** |  |  |  |  |  |  |
-|----|----|----|----|----|----|----|
-| Difference between ‘time-point 1’ & ‘time-point 2’ |  |  |  |  |  |  |
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-| D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Four hours of steady work faced us. | associate |
-| B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | The hogs were fed chopped corn and garbage. | encourage |
-| A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | The box was thrown beside the parked truck. | pension |
+Output from
+**[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)**:
+Difference between ‘time-point 1’ & ‘time-point 2’
 
-We can check this against the `NewData` dataset (which should match the
+We can check this against the `NewData` dataset, which should match the
 output from
-[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md))
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md).
 
-| **`NewData`** |  |  |  |  |  |  |
-|----|----|----|----|----|----|----|
-| stored differences from [`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md) |  |  |  |  |  |  |
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-| D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Four hours of steady work faced us. | associate |
-| B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | The hogs were fed chopped corn and garbage. | encourage |
-| A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | The box was thrown beside the parked truck. | pension |
+**`NewData`**: stored differences from
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)
 
 ### *What rows were here before that aren’t here now?*
 
-To test for the deleted data, we use the `CompleteData`,
-`IncompleteData`, and check these with `DeletedData`.
+To test for deleted data, we’ll compare `CompleteData` and
+`IncompleteData`, then check the result against `DeletedData`.
 
 ``` r
 
@@ -240,40 +230,20 @@ DeletedData <- dfdiffs::DeletedData
 
 `CompleteData` represents a ‘complete’ set of data.
 
-| **`CompleteData`** |  |  |  |  |  |  |
-|----|----|----|----|----|----|----|
-| simulated data for checking ‘deleted data’ |  |  |  |  |  |  |
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | The copper bowl shone in the sun's rays. | interest |
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Take a chance and win a china doll. | sure |
-| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A cramp is no small danger on a swim. | white |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
-| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Wake and rise, and step into the green outdoors. | situate |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Say it slow!y but make it ring clear. | document |
+**`CompleteData`**: simulated data for checking ‘deleted data’
 
 #### An incomplete dataset
 
 This is a dataset with rows removed from `CompleteData`.
 
-| **`IncompleteData`** |  |  |  |  |  |  |
-|----|----|----|----|----|----|----|
-| simulated data for checking ‘deleted data’ |  |  |  |  |  |  |
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-| A | 1 | 2021-12-28 | 2022-01-27 | 2022-02-26 | The copper bowl shone in the sun's rays. | interest |
-| B | 1 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Take a chance and win a china doll. | sure |
-| B | 2 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A cramp is no small danger on a swim. | white |
-| A | 3 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Wake and rise, and step into the green outdoors. | situate |
-| D | 2 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Say it slow!y but make it ring clear. | document |
+**`IncompleteData`**: simulated data for checking ‘deleted data’
 
 #### `create_deleted_data()`
 
-When we run the
-[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md),
-we check for the deleted rows between `IncompleteData` and
-`CompleteData`.
+Running
+[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)
+checks for rows that were deleted between `CompleteData` and
+`IncompleteData`.
 
 ``` r
 
@@ -282,27 +252,16 @@ create_deleted_data(
   base = CompleteData) 
 ```
 
-| Output from **[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)** |  |  |  |  |  |  |
-|----|----|----|----|----|----|----|
-| Differences between `CompleteData` and `IncompleteData` |  |  |  |  |  |  |
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+Output from
+**[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)**:
+Differences between `CompleteData` and `IncompleteData`
 
 #### The deleted data
 
-This is identical to the data stored in `DeletedData`
+The output above is identical to the data stored in `DeletedData`.
 
-| **`DeletedData`** |  |  |  |  |  |  |
-|----|----|----|----|----|----|----|
-| Output from **[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)** |  |  |  |  |  |  |
-| subject | record | start_date | mid_date | end_date | text_var | factor_var |
-| A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Mark the spot with a sign painted red. | state |
-| B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | A blue crane is a tall wading bird. | shut |
-| C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | It's easy to tell the depth of a well. | grant |
-| D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | The sky that morning was clear and bright blue. | tape |
+**`DeletedData`**: Output from
+**[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)**
 
 ### *What values have been changed?*
 
@@ -310,22 +269,18 @@ To answer this question, we have two options:
 [`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md)
 and
 [`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md).
+Both build on the same base-R
+[`diff_values_by_key()`](https://mjfrigaard.github.io/dfdiffs/reference/diff_values_by_key.md)/[`compare_values()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_values.md)
+engine and differ only in the shape of their output:
+[`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md)
+returns `$num_diffs`/`$var_diffs` (used by
+[`compare_data()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_data.md)),
+and
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
+returns `$diffs_byvar`/`$diffs` (used by `mod_compare` and
+[`create_comparison_report()`](https://mjfrigaard.github.io/dfdiffs/reference/create_comparison_report.md)).
 
-- [`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md)
-  relies on the
-  [`diffdf()`](https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html)
-  function from the [`diffdf`
-  package](https://gowerc.github.io/diffdf/reference/diffdf.html)
-  package.
-
-- [`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
-  relies on the
-  [`comparedf()`](https://mayoverse.github.io/arsenal/reference/comparedf.html)
-  function from the [`arsenal`
-  package](https://mayoverse.github.io/arsenal/reference/comparedf.html)
-  package.
-
-To check for changes between two datasets, we use the `InitialData` and
+To check for changes between two datasets, we’ll use `InitialData` and
 `ChangedData`.
 
 ``` r
@@ -336,27 +291,11 @@ ChangedData <- dfdiffs::ChangedData
 
 #### Initial data
 
-| **`InitialData`** |  |  |  |  |  |  |
-|----|----|----|----|----|----|----|
-| simulated data for checking ‘changed/modified data’ |  |  |  |  |  |  |
-| subject_id | record | text_value_a | text_value_b | created_date | updated_date | entered_date |
-| A | 1 | Issue unresolved | Fatigue | 2021-07-29 | 2021-09-29 | 2021-09-29 |
-| A | 2 | Issue unresolved | Fatigue | 2021-07-29 | 2021-10-03 | 2021-10-29 |
-| B | 3 | Issue resolved | Fever | 2021-07-16 | 2021-09-02 | 2021-08-18 |
-| C | 4 | Issue resolved | Joint pain | 2021-08-24 | 2021-10-03 | 2021-10-03 |
-| C | 5 | Issue resolved | Joint pain | 2021-08-24 | 2021-09-20 | 2021-10-20 |
+**`InitialData`**: simulated data for checking ‘changed/modified data’
 
 #### Changed data
 
-| **`ChangedData`** |  |  |  |  |  |  |
-|----|----|----|----|----|----|----|
-| simulated data for checking ‘modified data’ |  |  |  |  |  |  |
-| subject_id | record | text_value_a | text_value_b | created_date | updated_date | entered_date |
-| A | 1 | Issue resolved | Fatigue | 2021-07-29 | 2021-10-03 | 2021-11-30 |
-| A | 2 | Issue resolved | Fatigue | 2021-07-29 | 2021-11-27 | 2021-11-30 |
-| B | 3 | Issue resolved | Fever | 2021-07-16 | 2021-10-20 | 2021-11-21 |
-| C | 4 | Issue resolved | Joint pain, stiffness and swelling | 2021-08-24 | 2021-10-13 | 2021-11-11 |
-| C | 5 | Issue resolved | Joint pain | 2021-08-24 | 2021-10-14 | 2021-11-16 |
+**`ChangedData`**: simulated data for checking ‘modified data’
 
 #### `create_changed_data()`
 
@@ -376,36 +315,13 @@ names(changed)
 
 The counts of changes by variable are stored in `num_diffs`.
 
-| **`num_diffs`**                      |                   |
-|--------------------------------------|-------------------|
-| counts of changes for ‘changed data’ |                   |
-| variable                             | no_of_differences |
-| text_value_a                         | 2                 |
-| text_value_b                         | 1                 |
-| updated_date                         | 5                 |
-| entered_date                         | 5                 |
+**`num_diffs`**: counts of changes for ‘changed data’
 
 ##### Changes by row (`var_diffs`)
 
 The changes by row are stored in `var_diffs`.
 
-| **`var_diffs`** |  |  |  |
-|----|----|----|----|
-| Row-by-row of changes for ‘changed data’ |  |  |  |
-| variable | rownumber | base | compare |
-| text_value_a | 1 | Issue unresolved | Issue resolved |
-| text_value_a | 2 | Issue unresolved | Issue resolved |
-| text_value_b | 4 | Joint pain | Joint pain, stiffness and swelling |
-| updated_date | 1 | 2021-09-29 | 2021-10-03 |
-| updated_date | 2 | 2021-10-03 | 2021-11-27 |
-| updated_date | 3 | 2021-09-02 | 2021-10-20 |
-| updated_date | 4 | 2021-10-03 | 2021-10-13 |
-| updated_date | 5 | 2021-09-20 | 2021-10-14 |
-| entered_date | 1 | 2021-09-29 | 2021-11-30 |
-| entered_date | 2 | 2021-10-29 | 2021-11-30 |
-| entered_date | 3 | 2021-08-18 | 2021-11-21 |
-| entered_date | 4 | 2021-10-03 | 2021-11-11 |
-| entered_date | 5 | 2021-10-20 | 2021-11-16 |
+**`var_diffs`**: Row-by-row of changes for ‘changed data’
 
 #### `create_modified_data()`
 
@@ -426,36 +342,10 @@ names(modified)
 
 The counts of changes by variable are stored in `diffs_byvar`.
 
-| **`diffs_byvar`**                     |                 |                |
-|---------------------------------------|-----------------|----------------|
-| counts of changes for ‘modified data’ |                 |                |
-| Variable name                         | Modified Values | Missing Values |
-| subject_id                            | 0               | 0              |
-| record                                | 0               | 0              |
-| text_value_a                          | 2               | 0              |
-| text_value_b                          | 1               | 0              |
-| created_date                          | 0               | 0              |
-| updated_date                          | 5               | 0              |
-| entered_date                          | 5               | 0              |
+**`diffs_byvar`**: counts of changes for ‘modified data’
 
 ##### Changes by row
 
 The changes by row are stored in `diffs`.
 
-| **`diffs`** |  |  |
-|----|----|----|
-| Row-by-row changes of ‘modified data’ |  |  |
-| Variable name | Current Value | Previous Value |
-| text_value_a | Issue resolved | Issue unresolved |
-| text_value_a | Issue resolved | Issue unresolved |
-| text_value_b | Joint pain, stiffness and swelling | Joint pain |
-| updated_date | 2021-10-03 | 2021-09-29 |
-| updated_date | 2021-11-27 | 2021-10-03 |
-| updated_date | 2021-10-20 | 2021-09-02 |
-| updated_date | 2021-10-13 | 2021-10-03 |
-| updated_date | 2021-10-14 | 2021-09-20 |
-| entered_date | 2021-11-30 | 2021-09-29 |
-| entered_date | 2021-11-30 | 2021-10-29 |
-| entered_date | 2021-11-21 | 2021-08-18 |
-| entered_date | 2021-11-11 | 2021-10-03 |
-| entered_date | 2021-11-16 | 2021-10-20 |
+**`diffs`**: Row-by-row changes of ‘modified data’

@@ -2,25 +2,25 @@
 
 ## Motivation
 
-The goal of the `dfdiffs` is to answer the following questions:
+The goal of `dfdiffs` is to answer the following questions:
 
 1.  What rows are here now that weren’t here before?
 2.  What rows were here before that aren’t here now?
 3.  **What values have been changed?**
 
 This vignette covers how to apply the functions in `dfdiffs` to multiple
-datasets (separated by folder)
+datasets (separated by folder).
 
 ### Packages
 
-Our package
+Load `dfdiffs`:
 
 ``` r
 
 library(dfdiffs)
 ```
 
-Packages for import/export, iteration, wrangling, etc.
+We’ll also need packages for import/export, iteration, and wrangling:
 
 ``` r
 
@@ -32,17 +32,16 @@ library(purrr)
 library(glue)
 ```
 
-Packages for tables.
+These packages are for building tables:
 
 ``` r
 
 library(labelled)
-library(gt)
 library(gtsummary)
 library(kableExtra)
 ```
 
-Similar packages for comparisons.
+These packages offer similar comparison functions:
 
 ``` r
 
@@ -55,127 +54,143 @@ library(vetr) # alike
 
 ### Folder structure
 
-Below is a folder structure of datasets separated by year.
+Below is a folder structure of datasets separated by year. It holds two
+yearly pulls of the synthetic (not real) `dfdiffs` site roster (see
+[`?Roster2021`](https://mjfrigaard.github.io/dfdiffs/reference/Roster2021.md)),
+which `data-raw/Roster.R` has already split into `Enroll`/`Visit`/`Name`
+files.
 
 ``` r
 
-fs::dir_tree("../inst/extdata/csv/by-year")
-#> ../inst/extdata/csv/by-year
-#> ├── 20
-#> │   ├── PlayerBirth.csv
-#> │   ├── PlayerDebut.csv
-#> │   └── PlayerName.csv
-#> └── 21
-#>     ├── PlayerBirth.csv
-#>     ├── PlayerDebut.csv
-#>     └── PlayerName.csv
+fs::dir_tree("../inst/extdata/csv/site-roster")
+#> ../inst/extdata/csv/site-roster
+#> ├── 2021
+#> │   ├── Enroll.csv
+#> │   ├── Name.csv
+#> │   ├── Roster.csv
+#> │   └── Visit.csv
+#> ├── 2022
+#> │   ├── Enroll.csv
+#> │   ├── Name.csv
+#> │   ├── Roster.csv
+#> │   └── Visit.csv
+#> ├── 2023
+#> │   ├── Enroll.csv
+#> │   ├── Name.csv
+#> │   ├── Roster.csv
+#> │   └── Visit.csv
+#> └── 2024
+#>     ├── Enroll.csv
+#>     ├── Name.csv
+#>     ├── Roster.csv
+#>     └── Visit.csv
 ```
 
-We start by storing these files in a vector with
-[`list.files()`](https://rdrr.io/r/base/list.files.html), then we clean
-up the names a bit, and pass the list of paths to
+We start by storing these file paths in a vector with
+[`list.files()`](https://rdrr.io/r/base/list.files.html). Then we clean
+up the names a bit and pass the paths to
 [`readr::read_csv`](https://readr.tidyverse.org/reference/read_delim.html)
-with [`purrr::map()`](https://purrr.tidyverse.org/reference/map.html):
+with [`purrr::map()`](https://purrr.tidyverse.org/reference/map.html).
 
 #### Import base dfs
 
-Below we import the compare data tables (from 2020)
+Below we import the base data tables (from the 2021 pull).
 
 ``` r
 
-base_files <- list.files(path = "../inst/extdata/csv/by-year/20", 
-  pattern = ".csv", recursive = TRUE, full.names = TRUE)
+base_files <- list.files(path = "../inst/extdata/csv/site-roster/2021",
+  pattern = "Enroll|Visit|Name", recursive = TRUE, full.names = TRUE)
 base_files_nms <- purrr::map_chr(base_files, base::basename)
-base_dfs <- base_files |> 
-  purrr::set_names(base_files_nms) |> 
+base_dfs <- base_files |>
+  purrr::set_names(base_files_nms) |>
   purrr::map(readr::read_csv)
 base_dfs |> str()
 #> List of 3
-#>  $ PlayerBirth.csv: spc_tbl_ [20,673 × 4] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
-#>   ..$ playerID  : chr [1:20673] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...
-#>   ..$ birthYear : num [1:20673] 1981 1934 1939 1954 1972 ...
-#>   ..$ birthMonth: num [1:20673] 12 2 8 9 8 12 11 4 11 10 ...
-#>   ..$ birthDay  : num [1:20673] 27 5 5 8 25 17 4 15 11 14 ...
+#>  $ Enroll.csv: spc_tbl_ [200 × 4] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+#>   ..$ subject_id  : chr [1:200] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...
+#>   ..$ enroll_year : num [1:200] 2021 2021 2021 2021 2021 ...
+#>   ..$ enroll_month: num [1:200] 5 10 10 6 2 1 4 11 7 7 ...
+#>   ..$ enroll_day  : num [1:200] 15 5 28 9 19 18 16 13 14 15 ...
 #>   ..- attr(*, "spec")=
 #>   .. .. cols(
-#>   .. ..   playerID = col_character(),
-#>   .. ..   birthYear = col_double(),
-#>   .. ..   birthMonth = col_double(),
-#>   .. ..   birthDay = col_double()
+#>   .. ..   subject_id = col_character(),
+#>   .. ..   enroll_year = col_double(),
+#>   .. ..   enroll_month = col_double(),
+#>   .. ..   enroll_day = col_double()
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x556c759cc640> 
-#>  $ PlayerDebut.csv: spc_tbl_ [20,673 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
-#>   ..$ playerID: chr [1:20673] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...
-#>   ..$ debut   : Date[1:20673], format: "2004-04-06" "1954-04-13" ...
+#>   ..- attr(*, "problems")=<pointer: 0x5582ed075ae0> 
+#>  $ Name.csv  : spc_tbl_ [200 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+#>   ..$ subject_id: chr [1:200] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...
+#>   ..$ full_name : chr [1:200] "Jamie Nguyen" "Riley Jensen" "Rowan Singh" "Reese Diaz" ...
 #>   ..- attr(*, "spec")=
 #>   .. .. cols(
-#>   .. ..   playerID = col_character(),
-#>   .. ..   debut = col_date(format = "")
+#>   .. ..   subject_id = col_character(),
+#>   .. ..   full_name = col_character()
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x556c78cc51b0> 
-#>  $ PlayerName.csv : spc_tbl_ [20,673 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
-#>   ..$ playerID : chr [1:20673] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...
-#>   ..$ nameGiven: chr [1:20673] "David Allan" "Henry Louis" "Tommie Lee" "Donald William" ...
+#>   ..- attr(*, "problems")=<pointer: 0x5582ebf8bbc0> 
+#>  $ Visit.csv : spc_tbl_ [200 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+#>   ..$ subject_id      : chr [1:200] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...
+#>   ..$ first_visit_date: Date[1:200], format: "2021-05-15" "2021-10-05" ...
 #>   ..- attr(*, "spec")=
 #>   .. .. cols(
-#>   .. ..   playerID = col_character(),
-#>   .. ..   nameGiven = col_character()
+#>   .. ..   subject_id = col_character(),
+#>   .. ..   first_visit_date = col_date(format = "")
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x556c77550930>
+#>   ..- attr(*, "problems")=<pointer: 0x5582e94bf220>
 ```
 
 #### Import compare dfs
 
-Below we import the compare data tables (from 2021)
+Below we import the compare data tables (from the 2022 pull).
 
 ``` r
 
-compare_files <- list.files(path = "../inst/extdata/csv/by-year/21", 
-  pattern = ".csv", recursive = TRUE, full.names = TRUE)
+compare_files <- list.files(path = "../inst/extdata/csv/site-roster/2022",
+  pattern = "Enroll|Visit|Name", recursive = TRUE, full.names = TRUE)
 compare_files_nms <- purrr::map_chr(compare_files, base::basename)
-compare_dfs <- compare_files |> 
-  purrr::set_names(compare_files_nms) |> 
+compare_dfs <- compare_files |>
+  purrr::set_names(compare_files_nms) |>
   purrr::map(readr::read_csv)
 compare_dfs |> str()
 #> List of 3
-#>  $ PlayerBirth.csv: spc_tbl_ [20,370 × 4] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
-#>   ..$ playerID  : chr [1:20370] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...
-#>   ..$ birthYear : num [1:20370] 1981 1934 1939 1954 1972 ...
-#>   ..$ birthMonth: num [1:20370] 12 2 8 9 8 12 11 4 11 10 ...
-#>   ..$ birthDay  : num [1:20370] 27 5 5 8 25 17 4 15 11 14 ...
+#>  $ Enroll.csv: spc_tbl_ [237 × 4] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+#>   ..$ subject_id  : chr [1:237] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...
+#>   ..$ enroll_year : num [1:237] 2021 2021 2021 2021 2021 ...
+#>   ..$ enroll_month: num [1:237] 5 10 10 6 1 4 11 7 7 10 ...
+#>   ..$ enroll_day  : num [1:237] 15 5 28 9 18 16 13 14 15 23 ...
 #>   ..- attr(*, "spec")=
 #>   .. .. cols(
-#>   .. ..   playerID = col_character(),
-#>   .. ..   birthYear = col_double(),
-#>   .. ..   birthMonth = col_double(),
-#>   .. ..   birthDay = col_double()
+#>   .. ..   subject_id = col_character(),
+#>   .. ..   enroll_year = col_double(),
+#>   .. ..   enroll_month = col_double(),
+#>   .. ..   enroll_day = col_double()
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x556c7db2f4c0> 
-#>  $ PlayerDebut.csv: spc_tbl_ [20,370 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
-#>   ..$ playerID: chr [1:20370] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...
-#>   ..$ debut   : Date[1:20370], format: "2004-04-06" "1954-04-13" ...
+#>   ..- attr(*, "problems")=<pointer: 0x5582e98beb10> 
+#>  $ Name.csv  : spc_tbl_ [237 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+#>   ..$ subject_id: chr [1:237] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...
+#>   ..$ full_name : chr [1:237] "Jamie Nguyen" "Riley Jensen" "Rowan Singh" "Reese Diaz" ...
 #>   ..- attr(*, "spec")=
 #>   .. .. cols(
-#>   .. ..   playerID = col_character(),
-#>   .. ..   debut = col_date(format = "")
+#>   .. ..   subject_id = col_character(),
+#>   .. ..   full_name = col_character()
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x556c79bc5840> 
-#>  $ PlayerName.csv : spc_tbl_ [20,370 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
-#>   ..$ playerID : chr [1:20370] "aardsda01" "aaronha01" "aaronto01" "aasedo01" ...
-#>   ..$ nameGiven: chr [1:20370] "David Allan" "Henry Louis" "Tommie Lee" "Donald William" ...
+#>   ..- attr(*, "problems")=<pointer: 0x5582e66c08a0> 
+#>  $ Visit.csv : spc_tbl_ [237 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
+#>   ..$ subject_id      : chr [1:237] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...
+#>   ..$ first_visit_date: Date[1:237], format: "2021-05-15" "2021-10-05" ...
 #>   ..- attr(*, "spec")=
 #>   .. .. cols(
-#>   .. ..   playerID = col_character(),
-#>   .. ..   nameGiven = col_character()
+#>   .. ..   subject_id = col_character(),
+#>   .. ..   first_visit_date = col_date(format = "")
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x556c78c99e90>
+#>   ..- attr(*, "problems")=<pointer: 0x5582e940d520>
 ```
 
 ## Iteration
 
 We’re going to follow the iteration steps from [Charlotte Wickham’s
 Happy R Users Purrr
-Tutorial](https://www.rstudio.com/resources/rstudioconf-2017/happy-r-users-purrr-tutorial-/)
+Tutorial](https://www.rstudio.com/resources/rstudioconf-2017/happy-r-users-purrr-tutorial-/):
 
 1.  DO IT FOR ONE  
 2.  TURN IT INTO A RECIPE  
@@ -183,19 +198,19 @@ Tutorial](https://www.rstudio.com/resources/rstudioconf-2017/happy-r-users-purrr
 
 ### 1) Do it for one (or two)
 
-We’re going to use the
+We’ll start with the
 [`arsenal::comparedf()`](https://mayoverse.github.io/arsenal/reference/comparedf.html)
-function first. Remember that this function requires an additional
-[`summary()`](https://rdrr.io/r/base/summary.html) call!
+function. Remember that this function requires an additional
+[`summary()`](https://rdrr.io/r/base/summary.html) call.
 
 #### `arsenal::comparedf`
 
 ``` r
 
-by_var <- "playerID"
+by_var <- "subject_id"
 cdf_people <- arsenal::comparedf(
-  x = base_dfs$PlayerBirth.csv, 
-  y = compare_dfs$PlayerBirth.csv, 
+  x = base_dfs$Enroll.csv, 
+  y = compare_dfs$Enroll.csv, 
   by = by_var)
 sumcdf_people <- summary(cdf_people)
 names(sumcdf_people)
@@ -215,17 +230,16 @@ function.
 ``` r
 
 diffdf_people <- diffdf::diffdf(
-  compare = compare_dfs$PlayerBirth.csv, 
-  base = base_dfs$PlayerBirth.csv, 
-  keys = "playerID")
+  compare = compare_dfs$Enroll.csv, 
+  base = base_dfs$Enroll.csv, 
+  keys = "subject_id")
 diffdf_people |> names()
-#> [1] "DataSummary"        "ExtRowsBase"        "NumDiff"           
-#> [4] "VarDiff_birthYear"  "VarDiff_birthMonth" "VarDiff_birthDay"
+#> [1] "DataSummary" "ExtRowsBase" "ExtRowsComp"
 ```
 
-Just to ensure we’re getting the same display in the output from both
-functions, we’re going to use the `diffs.byvar.table`/`NumDiff` tables,
-and the `diffs.table`/ `VarDiff_` tables.
+To make sure the output from both functions is displayed the same way,
+we’ll use the `diffs.byvar.table`/`NumDiff` tables and the
+`diffs.table`/`VarDiff_` tables.
 
 ##### `diffs.byvar.table`
 
@@ -238,11 +252,11 @@ sumcdf_people[["diffs.byvar.table"]] |>
   kableExtra::kable_paper()
 ```
 
-| Variable   | No of Differences |
-|:-----------|------------------:|
-| birthYear  |                19 |
-| birthMonth |                 3 |
-| birthDay   |                 6 |
+| Variable     | No of Differences |
+|:-------------|------------------:|
+| enroll_year  |                 0 |
+| enroll_month |                 0 |
+| enroll_day   |                 0 |
 
 diffs.byvar.table {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
@@ -254,16 +268,9 @@ style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left:
 diffdf_people[["NumDiff"]] |> 
   knitr::kable(caption = "NumDiff") |> 
   kableExtra::kable_paper()
+#> Error in `matrix()`:
+#> ! data is too long
 ```
-
-| Variable   | No of Differences |
-|:-----------|------------------:|
-| birthYear  |                19 |
-| birthMonth |                 3 |
-| birthDay   |                 6 |
-
-NumDiff {.table .lightable-paper
-style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
 
 ##### `diffs.table`
 
@@ -282,36 +289,9 @@ sumcdf_people[["diffs.table"]] |>
   kableExtra::kable_paper()
 ```
 
-| VARIABLE   | playerID  | BASE | COMPARE |
-|:-----------|:----------|-----:|--------:|
-| birthYear  | bearnla01 | 1940 |    1941 |
-| birthYear  | candito01 | 1956 |    1957 |
-| birthYear  | childbi01 | 1867 |      NA |
-| birthYear  | coopean99 | 1897 |    1898 |
-| birthYear  | herremi01 | 1892 |    1897 |
-| birthYear  | jimenma01 | 1936 |    1938 |
-| birthYear  | jonesco02 | 1905 |    1907 |
-| birthYear  | kelletr01 | 1992 |    1993 |
-| birthYear  | mcfaror01 | 1935 |    1938 |
-| birthYear  | mendomi01 | 1934 |    1933 |
-| birthYear  | minosmi01 | 1923 |    1925 |
-| birthYear  | naranch01 | 1933 |    1934 |
-| birthYear  | olivaed01 | 1937 |    1938 |
-| birthYear  | olivoch01 | 1926 |    1928 |
-| birthYear  | posadle01 | 1934 |    1936 |
-| birthYear  | quirkar01 | 1937 |    1938 |
-| birthYear  | senerso01 | 1929 |    1931 |
-| birthYear  | willida02 | 1879 |    1880 |
-| birthYear  | zamoros01 | 1943 |    1944 |
-| birthMonth | hickmch01 |    3 |       5 |
-| birthMonth | mendomi01 |   12 |      11 |
-| birthMonth | willida02 |    7 |       2 |
-| birthDay   | barnesk01 |    7 |       3 |
-| birthDay   | jamesbo01 |   15 |      18 |
-| birthDay   | mendomi01 |    3 |      16 |
-| birthDay   | posadle01 |    1 |      15 |
-| birthDay   | walshed01 |   19 |      14 |
-| birthDay   | willida02 |   NA |       7 |
+| VARIABLE | subject_id | BASE | COMPARE |
+|:---|:---|:---|:---|
+| character(0) | c(“:——–”, “:———-”, “:—-”, “:——-”) | character(0) | c(“:——–”, “:———-”, “:—-”, “:——-”) |
 
 diffs.table {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
@@ -325,56 +305,24 @@ vardiff_tbls <- tbl_names[stringr::str_detect(tbl_names, "VarDiff_")]
 bind_rows(diffdf_people[vardiff_tbls]) |> 
   knitr::kable(caption = "'VarDiff_' tables") |> 
   kableExtra::kable_paper()
+#> Error in `matrix()`:
+#> ! data is too long
 ```
-
-| VARIABLE   | playerID  | BASE | COMPARE |
-|:-----------|:----------|-----:|--------:|
-| birthYear  | bearnla01 | 1940 |    1941 |
-| birthYear  | candito01 | 1956 |    1957 |
-| birthYear  | childbi01 | 1867 |      NA |
-| birthYear  | coopean99 | 1897 |    1898 |
-| birthYear  | herremi01 | 1892 |    1897 |
-| birthYear  | jimenma01 | 1936 |    1938 |
-| birthYear  | jonesco02 | 1905 |    1907 |
-| birthYear  | kelletr01 | 1992 |    1993 |
-| birthYear  | mcfaror01 | 1935 |    1938 |
-| birthYear  | mendomi01 | 1934 |    1933 |
-| birthYear  | minosmi01 | 1923 |    1925 |
-| birthYear  | naranch01 | 1933 |    1934 |
-| birthYear  | olivaed01 | 1937 |    1938 |
-| birthYear  | olivoch01 | 1926 |    1928 |
-| birthYear  | posadle01 | 1934 |    1936 |
-| birthYear  | quirkar01 | 1937 |    1938 |
-| birthYear  | senerso01 | 1929 |    1931 |
-| birthYear  | willida02 | 1879 |    1880 |
-| birthYear  | zamoros01 | 1943 |    1944 |
-| birthMonth | hickmch01 |    3 |       5 |
-| birthMonth | mendomi01 |   12 |      11 |
-| birthMonth | willida02 |    7 |       2 |
-| birthDay   | barnesk01 |    7 |       3 |
-| birthDay   | jamesbo01 |   15 |      18 |
-| birthDay   | mendomi01 |    3 |      16 |
-| birthDay   | posadle01 |    1 |      15 |
-| birthDay   | walshed01 |   19 |      14 |
-| birthDay   | willida02 |   NA |       7 |
-
-‘VarDiff\_’ tables {.table .lightable-paper
-style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
 
 ### 2) Turn it into a recipe
 
-We have two vectors with file paths (`.x` and `.y`)
+We have two vectors with file paths (`.x` and `.y`).
 
 ``` r
 
 map2(.x = base_dfs, .y = compare_files, )
 ```
 
-And the `.f` is our
+The `.f` argument is either the
 [`arsenal::comparedf`](https://mayoverse.github.io/arsenal/reference/comparedf.html)
-or
+or the
 [`diffdf::diffdf`](https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html)
-functions.
+function.
 
 ``` r
 
@@ -382,18 +330,18 @@ map2(.x = base_dfs, .y = compare_files, .f = arsenal::comparedf)
 map2(.x = compare_files, .y = base_dfs, .f = diffdf::diffdf)
 ```
 
-We can pass the `by` and `keys` arguments to `...`.
+We can pass the `by` and `keys` arguments through `...`.
 
 ``` r
 
 purrr::map2(.x =  base_dfs, .y = compare_dfs, 
-            .f = arsenal::comparedf, by = "playerID")
+            .f = arsenal::comparedf, by = "subject_id")
 ```
 
 ``` r
 
 purrr::map2(.x =  compare_dfs,  .y = base_dfs, 
-            .f = diffdf::diffdf, keys = "playerID")
+            .f = diffdf::diffdf, keys = "subject_id")
 ```
 
 ### 3) Do it for all
@@ -410,9 +358,9 @@ all_cdfs <- purrr::map2(
   .x =  base_dfs, 
   .y = compare_dfs, 
   .f = arsenal::comparedf, 
-  by = "playerID")
+  by = "subject_id")
 all_scdfs <- purrr::map(all_cdfs, .f = summary)
-all_scdfs[["PlayerName.csv"]] |> names()
+all_scdfs[["Name.csv"]] |> names()
 #> [1] "frame.summary.table"      "comparison.summary.table"
 #> [3] "vars.ns.table"            "vars.nc.table"           
 #> [5] "obs.table"                "diffs.byvar.table"       
@@ -422,14 +370,16 @@ all_scdfs[["PlayerName.csv"]] |> names()
 
 #### `map2()` + `diffdf::diffdf`
 
+We can do the same with
+[`diffdf::diffdf()`](https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html).
+
 ``` r
 
 all_diffdfs <- purrr::map2(
   .x = base_dfs, 
   .y = compare_dfs, 
   .f = diffdf::diffdf, 
-  keys = "playerID")
-all_diffdfs[["PlayerName.csv"]] |> names()
-#> [1] "DataSummary"       "ExtRowsBase"       "NumDiff"          
-#> [4] "VarDiff_nameGiven"
+  keys = "subject_id")
+all_diffdfs[["Name.csv"]] |> names()
+#> [1] "DataSummary" "ExtRowsBase" "ExtRowsComp"
 ```

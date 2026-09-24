@@ -4,8 +4,8 @@
 
 This vignette walks through the
 [`upload_data()`](https://mjfrigaard.github.io/dfdiffs/reference/upload_data.md)
-function, which is used for loading a variety of file types into the
-`dfdiffs` shiny application.
+function, which loads a variety of file types into the `dfdiffs` Shiny
+application.
 
 ``` r
 
@@ -13,18 +13,14 @@ library(dfdiffs)
 library(shiny)
 library(data.table)
 library(dplyr)
-library(tidyr)
 library(stringr)
 library(lubridate)
-library(forcats)
 library(glue)
 library(purrr)
-library(vroom)
 library(reactable)
 library(haven)
 library(readxl)
 library(labelled)
-library(gt)
 library(gtsummary)
 ```
 
@@ -34,36 +30,33 @@ Test data can be found in the `../inst/extdata/` folder:
 
     #> ../inst/extdata/
     #> ├── csv
-    #> │   ├── 2010-lahman
-    #> │   │   ├── Batting.csv
-    #> │   │   ├── Fielding.csv
-    #> │   │   └── Master.csv
-    #> │   ├── 2015-baseballdatabank
-    #> │   │   ├── Batting.csv
-    #> │   │   ├── Fielding.csv
-    #> │   │   └── Master.csv
-    #> │   ├── 2020-baseballdatabank
-    #> │   │   ├── Batting.csv
-    #> │   │   ├── Fielding.csv
-    #> │   │   └── People.csv
     #> │   ├── ChangedData.csv
     #> │   ├── InitialData.csv
-    #> │   ├── by-year
-    #> │   │   ├── 20
-    #> │   │   │   ├── PlayerBirth.csv
-    #> │   │   │   ├── PlayerDebut.csv
-    #> │   │   │   └── PlayerName.csv
-    #> │   │   └── 21
-    #> │   │       ├── PlayerBirth.csv
-    #> │   │       ├── PlayerDebut.csv
-    #> │   │       └── PlayerName.csv
     #> │   ├── diffs
     #> │   │   ├── diff_current.csv
     #> │   │   ├── diff_modified_all_raw.csv
     #> │   │   └── diff_previous.csv
-    #> │   └── lahman-people
-    #> │       ├── People2020.csv
-    #> │       └── People2021.csv
+    #> │   └── site-roster
+    #> │       ├── 2021
+    #> │       │   ├── Enroll.csv
+    #> │       │   ├── Name.csv
+    #> │       │   ├── Roster.csv
+    #> │       │   └── Visit.csv
+    #> │       ├── 2022
+    #> │       │   ├── Enroll.csv
+    #> │       │   ├── Name.csv
+    #> │       │   ├── Roster.csv
+    #> │       │   └── Visit.csv
+    #> │       ├── 2023
+    #> │       │   ├── Enroll.csv
+    #> │       │   ├── Name.csv
+    #> │       │   ├── Roster.csv
+    #> │       │   └── Visit.csv
+    #> │       └── 2024
+    #> │           ├── Enroll.csv
+    #> │           ├── Name.csv
+    #> │           ├── Roster.csv
+    #> │           └── Visit.csv
     #> ├── dta
     #> │   ├── datetime-d.dta
     #> │   ├── iris.dta
@@ -89,16 +82,11 @@ Test data can be found in the `../inst/extdata/` folder:
     #> │   ├── umlauts.sav
     #> │   └── variable-label.sav
     #> ├── tsv
-    #> │   ├── Batting.tsv
-    #> │   ├── Fielding.tsv
-    #> │   └── People.tsv
+    #> │   └── Enroll.tsv
     #> ├── txt
-    #> │   ├── Batting.txt
-    #> │   ├── Fielding.txt
-    #> │   └── People.txt
+    #> │   └── Enroll.txt
     #> └── xlsx
     #>     ├── compare-report-text.xlsx
-    #>     ├── lahman500.xlsx
     #>     └── snapshot_compare_270301_20221116_year3_preview_noDAP.xlsx
 
 ### load_flat_file()
@@ -125,8 +113,10 @@ load_flat_file <- function(path) {
 }
 ```
 
-If the file is an excel file, the name of the sheet should be passed to
-`sheet`.
+The
+[`upload_data()`](https://mjfrigaard.github.io/dfdiffs/reference/upload_data.md)
+function below also handles Excel files. If the file is an Excel file,
+pass the name of the sheet to `sheet`.
 
 ``` r
 
@@ -187,154 +177,98 @@ stackcallr::call_tree_dir("R", root = "launch_upload_demo")
       └─█─upload_data
         └─load_flat_file
 
-### 2010 Lahamn CSVs
+### 2021 site roster CSVs
 
 ``` r
 
-lahman_2010_csv_paths <- list.files(path = "../inst/extdata/csv/2010-lahman", full.names = TRUE, pattern = ".csv$")
-head(lahman_2010_csv_paths)
-#> [1] "../inst/extdata/csv/2010-lahman/Batting.csv" 
-#> [2] "../inst/extdata/csv/2010-lahman/Fielding.csv"
-#> [3] "../inst/extdata/csv/2010-lahman/Master.csv"
+roster2021_csv_paths <- list.files(path = "../inst/extdata/csv/site-roster/2021", full.names = TRUE, pattern = ".csv$")
+head(roster2021_csv_paths)
+#> [1] "../inst/extdata/csv/site-roster/2021/Enroll.csv"
+#> [2] "../inst/extdata/csv/site-roster/2021/Name.csv"  
+#> [3] "../inst/extdata/csv/site-roster/2021/Roster.csv"
+#> [4] "../inst/extdata/csv/site-roster/2021/Visit.csv"
 ```
 
-Test this on `lahman_2010_csv_paths[3]`
+We’ll test this on `roster2021_csv_paths[4]` (the full `Roster.csv`).
 
 ``` r
 
-master_2010 <- load_flat_file(path = lahman_2010_csv_paths[3])
-glimpse(master_2010)
-#> Rows: 17,674
-#> Columns: 33
-#> $ lahmanID     <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17…
-#> $ playerID     <chr> "aaronha01", "aaronto01", "aasedo01", "abadan01", "abadij…
-#> $ managerID    <chr> "", "", "", "", "", "", "", "", "", "", "", "", "", "", "…
-#> $ hofID        <chr> "aaronha01h", "", "", "", "", "", "", "", "", "", "", "",…
-#> $ birthYear    <int> 1934, 1939, 1954, 1972, 1854, 1877, 1869, 1866, 1862, 187…
-#> $ birthMonth   <int> 2, 8, 9, 8, 11, 4, 11, 10, 3, 10, 2, 8, 9, 6, 2, 9, 9, 7,…
-#> $ birthDay     <int> 5, 5, 8, 25, 4, 15, 29, 14, 16, 22, 16, 17, 19, 2, 18, 5,…
-#> $ birthCountry <chr> "USA", "USA", "USA", "USA", "USA", "USA", "USA", "USA", "…
-#> $ birthState   <chr> "AL", "AL", "CA", "FL", "PA", "PA", "VT", "NE", "OH", "OH…
-#> $ birthCity    <chr> "Mobile", "Mobile", "Orange", "West Palm Beach", "Philade…
-#> $ deathYear    <int> NA, 1984, NA, NA, 1905, 1957, 1962, 1926, 1930, 1935, NA,…
-#> $ deathMonth   <int> NA, 8, NA, NA, 5, 1, 6, 4, 2, 6, NA, NA, NA, NA, NA, 4, N…
-#> $ deathDay     <int> NA, 16, NA, NA, 17, 6, 11, 27, 13, 11, NA, NA, NA, NA, NA…
-#> $ deathCountry <chr> "", "USA", "", "", "USA", "USA", "USA", "USA", "USA", "US…
-#> $ deathState   <chr> "", "GA", "", "", "NJ", "FL", "VT", "CA", "MI", "CA", "",…
-#> $ deathCity    <chr> "", "Atlanta", "", "", "Pemberton", "Ft.Lauderdale", "Ess…
-#> $ nameFirst    <chr> "Hank", "Tommie", "Don", "Andy", "John", "Ed", "Bert", "C…
-#> $ nameLast     <chr> "Aaron", "Aaron", "Aase", "Abad", "Abadie", "Abbaticchio"…
-#> $ nameNote     <chr> "", "", "", "", "", "", "", "", "", "born Harry Frederick…
-#> $ nameGiven    <chr> "Henry Louis", "Tommie Lee", "Donald William", "", "John"…
-#> $ nameNick     <chr> "Hammer,Hammerin' Hank,Bad Henry", "", "", "", "", "Batty…
-#> $ weight       <int> 180, 190, 190, 184, 192, 170, 175, 169, 190, 180, 200, 19…
-#> $ height       <dbl> 72, 75, 75, 73, 72, 71, 71, 68, 71, 70, 78, 74, 75, 71, 7…
-#> $ bats         <chr> "R", "R", "R", "L", "R", "R", "R", "L", "R", "R", "R", "R…
-#> $ throws       <chr> "R", "R", "R", "L", "R", "R", "R", "", "R", "R", "R", "L"…
-#> $ debut        <chr> "4/13/1954 0:00:00", "4/10/1962 0:00:00", "7/26/1977 0:00…
-#> $ finalGame    <chr> "10/3/1976 0:00:00", "9/26/1971 0:00:00", "10/3/1990 0:00…
-#> $ college      <chr> "", "", "Cal St. Fullerton", "Middle Georgia JC", "", "",…
-#> $ lahman40ID   <chr> "aaronha01", "aaronto01", "aasedo01", "abadan01", "abadij…
-#> $ lahman45ID   <chr> "aaronha01", "aaronto01", "aasedo01", "abadan01", "abadij…
-#> $ retroID      <chr> "aaroh101", "aarot101", "aased001", "abada001", "abadj101…
-#> $ holtzID      <chr> "aaronha01", "aaronto01", "aasedo01", "abadan01", "abadij…
-#> $ bbrefID      <chr> "aaronha01", "aaronto01", "aasedo01", "abadan01", "abadij…
+roster_2021 <- load_flat_file(path = roster2021_csv_paths[4])
+glimpse(roster_2021)
+#> Rows: 200
+#> Columns: 2
+#> $ subject_id       <chr> "SUBJ-0001", "SUBJ-0002", "SUBJ-0003", "SUBJ-0004", "…
+#> $ first_visit_date <IDate> 2021-05-15, 2021-10-05, 2021-10-28, 2021-06-09, 202…
 ```
 
-### 2015 Lahamn CSVs
+### 2022 site roster CSVs
 
 ``` r
 
-lahman_2015_csv_paths <- list.files(path = "../inst/extdata/csv/2015-baseballdatabank", full.names = TRUE, pattern = ".csv$")
-head(lahman_2015_csv_paths)
-#> [1] "../inst/extdata/csv/2015-baseballdatabank/Batting.csv" 
-#> [2] "../inst/extdata/csv/2015-baseballdatabank/Fielding.csv"
-#> [3] "../inst/extdata/csv/2015-baseballdatabank/Master.csv"
+roster2022_csv_paths <- list.files(path = "../inst/extdata/csv/site-roster/2022", full.names = TRUE, pattern = ".csv$")
+head(roster2022_csv_paths)
+#> [1] "../inst/extdata/csv/site-roster/2022/Enroll.csv"
+#> [2] "../inst/extdata/csv/site-roster/2022/Name.csv"  
+#> [3] "../inst/extdata/csv/site-roster/2022/Roster.csv"
+#> [4] "../inst/extdata/csv/site-roster/2022/Visit.csv"
 ```
 
-Test this on `lahman_2015_csv_paths[3]`
+We’ll test this on `roster2022_csv_paths[4]`.
 
 ``` r
 
-master_csv_2015 <- load_flat_file(path = lahman_2015_csv_paths[3])
-glimpse(master_csv_2015)
-#> Rows: 18,846
-#> Columns: 24
-#> $ playerID     <chr> "aardsda01", "aaronha01", "aaronto01", "aasedo01", "abada…
-#> $ birthYear    <int> 1981, 1934, 1939, 1954, 1972, 1985, 1854, 1877, 1869, 186…
-#> $ birthMonth   <int> 12, 2, 8, 9, 8, 12, 11, 4, 11, 10, 3, 10, 2, 8, 9, 6, 2, …
-#> $ birthDay     <int> 27, 5, 5, 8, 25, 17, 4, 15, 11, 14, 16, 22, 16, 17, 19, 2…
-#> $ birthCountry <chr> "USA", "USA", "USA", "USA", "USA", "D.R.", "USA", "USA", …
-#> $ birthState   <chr> "CO", "AL", "AL", "CA", "FL", "La Romana", "PA", "PA", "V…
-#> $ birthCity    <chr> "Denver", "Mobile", "Mobile", "Orange", "Palm Beach", "La…
-#> $ deathYear    <int> NA, NA, 1984, NA, NA, NA, 1905, 1957, 1962, 1926, 1930, 1…
-#> $ deathMonth   <int> NA, NA, 8, NA, NA, NA, 5, 1, 6, 4, 2, 6, NA, NA, NA, NA, …
-#> $ deathDay     <int> NA, NA, 16, NA, NA, NA, 17, 6, 11, 27, 13, 11, NA, NA, NA…
-#> $ deathCountry <chr> "", "", "USA", "", "", "", "USA", "USA", "USA", "USA", "U…
-#> $ deathState   <chr> "", "", "GA", "", "", "", "NJ", "FL", "VT", "CA", "MI", "…
-#> $ deathCity    <chr> "", "", "Atlanta", "", "", "", "Pemberton", "Fort Lauderd…
-#> $ nameFirst    <chr> "David", "Hank", "Tommie", "Don", "Andy", "Fernando", "Jo…
-#> $ nameLast     <chr> "Aardsma", "Aaron", "Aaron", "Aase", "Abad", "Abad", "Aba…
-#> $ nameGiven    <chr> "David Allan", "Henry Louis", "Tommie Lee", "Donald Willi…
-#> $ weight       <int> 220, 180, 190, 190, 184, 220, 192, 170, 175, 169, 190, 18…
-#> $ height       <int> 75, 72, 75, 75, 73, 73, 72, 71, 71, 68, 71, 70, 78, 74, 7…
-#> $ bats         <chr> "R", "R", "R", "R", "L", "L", "R", "R", "R", "L", "R", "R…
-#> $ throws       <chr> "R", "R", "R", "R", "L", "L", "R", "R", "R", "L", "R", "R…
-#> $ debut        <IDate> 2004-04-06, 1954-04-13, 1962-04-10, 1977-07-26, 2001-09…
-#> $ finalGame    <IDate> 2015-08-23, 1976-10-03, 1971-09-26, 1990-10-03, 2006-04…
-#> $ retroID      <chr> "aardd001", "aaroh101", "aarot101", "aased001", "abada001…
-#> $ bbrefID      <chr> "aardsda01", "aaronha01", "aaronto01", "aasedo01", "abada…
+roster_csv_2022 <- load_flat_file(path = roster2022_csv_paths[4])
+glimpse(roster_csv_2022)
+#> Rows: 237
+#> Columns: 2
+#> $ subject_id       <chr> "SUBJ-0001", "SUBJ-0002", "SUBJ-0003", "SUBJ-0004", "…
+#> $ first_visit_date <IDate> 2021-05-15, 2021-10-05, 2021-10-28, 2021-06-09, 202…
 ```
 
-### List of 2010 csvs
+### List of 2021 CSVs
 
-Now we create `lahman_2010_csv_files`
+Now we import every 2021 CSV into a named list, `roster2021_csv_files`:
 
 ``` r
 
-lahman_2010_csv_files <- map(.x = lahman_2010_csv_paths, 
-  .f = load_flat_file) %>% 
-  set_names(x = ., nm = basename(lahman_2010_csv_paths))
-map(lahman_2010_csv_files, names)
-#> $Batting.csv
-#>  [1] "playerID"  "yearID"    "stint"     "teamID"    "lgID"      "G"        
-#>  [7] "G_batting" "AB"        "R"         "H"         "2B"        "3B"       
-#> [13] "HR"        "RBI"       "SB"        "CS"        "BB"        "SO"       
-#> [19] "IBB"       "HBP"       "SH"        "SF"        "GIDP"      "G_old"    
+roster2021_csv_files <- map(.x = roster2021_csv_paths,
+  .f = load_flat_file) %>%
+  set_names(x = ., nm = basename(roster2021_csv_paths))
+map(roster2021_csv_files, names)
+#> $Enroll.csv
+#> [1] "subject_id"   "enroll_year"  "enroll_month" "enroll_day"  
 #> 
-#> $Fielding.csv
-#>  [1] "playerID" "yearID"   "stint"    "teamID"   "lgID"     "POS"     
-#>  [7] "G"        "GS"       "InnOuts"  "PO"       "A"        "E"       
-#> [13] "DP"       "PB"       "WP"       "SB"       "CS"       "ZR"      
+#> $Name.csv
+#> [1] "subject_id" "full_name" 
 #> 
-#> $Master.csv
-#>  [1] "lahmanID"     "playerID"     "managerID"    "hofID"        "birthYear"   
-#>  [6] "birthMonth"   "birthDay"     "birthCountry" "birthState"   "birthCity"   
-#> [11] "deathYear"    "deathMonth"   "deathDay"     "deathCountry" "deathState"  
-#> [16] "deathCity"    "nameFirst"    "nameLast"     "nameNote"     "nameGiven"   
-#> [21] "nameNick"     "weight"       "height"       "bats"         "throws"      
-#> [26] "debut"        "finalGame"    "college"      "lahman40ID"   "lahman45ID"  
-#> [31] "retroID"      "holtzID"      "bbrefID"
+#> $Roster.csv
+#>  [1] "subject_id"       "first_name"       "last_name"        "site_id"         
+#>  [5] "enroll_year"      "enroll_month"     "enroll_day"       "height_cm"       
+#>  [9] "full_name"        "first_visit_date" "status"          
+#> 
+#> $Visit.csv
+#> [1] "subject_id"       "first_visit_date"
 ```
 
-We’ll test this on the
+We’ll also test this with the
 [`map_df()`](https://purrr.tidyverse.org/reference/map_dfr.html)
 function.
 
 ``` r
 
-tbl_2010_csv_files <- lahman_2010_csv_paths %>% 
-  set_names() %>% 
-  map_df(.x = ., 
-  .f = load_flat_file, .id = "source") %>% 
+tbl_2021_csv_files <- roster2021_csv_paths %>%
+  set_names() %>%
+  map_df(.x = .,
+  .f = load_flat_file, .id = "source") %>%
   mutate(source = basename(source))
-tbl_2010_csv_files %>% count(source)
-#> # A tibble: 3 × 2
-#>   source            n
-#>   <chr>         <int>
-#> 1 Batting.csv   93955
-#> 2 Fielding.csv 160710
-#> 3 Master.csv    17674
+tbl_2021_csv_files %>% count(source)
+#> # A tibble: 4 × 2
+#>   source         n
+#>   <chr>      <int>
+#> 1 Enroll.csv   200
+#> 2 Name.csv     200
+#> 3 Roster.csv   200
+#> 4 Visit.csv    200
 ```
 
 ### Test on dta
@@ -348,16 +282,6 @@ tbl_dta_files <- dta_paths %>%
   map_df(.x = ., 
   .f = load_flat_file, .id = "source") %>% 
   mutate(source = basename(source))
-#> Registered S3 methods overwritten by 'readr':
-#>   method                    from 
-#>   as.data.frame.spec_tbl_df vroom
-#>   as_tibble.spec_tbl_df     vroom
-#>   format.col_spec           vroom
-#>   print.col_spec            vroom
-#>   print.collector           vroom
-#>   print.date_names          vroom
-#>   print.locale              vroom
-#>   str.col_spec              vroom
 tbl_dta_files %>% count(source)
 #> # A tibble: 6 × 2
 #>   source                   n
@@ -427,12 +351,10 @@ tbl_tsv_files <- tsv_paths %>%
   .f = load_flat_file, .id = "source") %>% 
   mutate(source = basename(source))
 tbl_tsv_files %>% count(source)
-#> # A tibble: 3 × 2
-#>   source            n
-#>   <chr>         <int>
-#> 1 Batting.tsv  108789
-#> 2 Fielding.tsv 144768
-#> 3 People.tsv    20093
+#> # A tibble: 1 × 2
+#>   source         n
+#>   <chr>      <int>
+#> 1 Enroll.tsv    10
 ```
 
 ### Test on txt
@@ -447,10 +369,8 @@ tbl_txt_files <- txt_paths %>%
   .f = load_flat_file, .id = "source") %>% 
   mutate(source = basename(source))
 tbl_txt_files %>% count(source)
-#> # A tibble: 3 × 2
-#>   source            n
-#>   <chr>         <int>
-#> 1 Batting.txt  108789
-#> 2 Fielding.txt 144768
-#> 3 People.txt    20093
+#> # A tibble: 1 × 2
+#>   source         n
+#>   <chr>      <int>
+#> 1 Enroll.txt    10
 ```

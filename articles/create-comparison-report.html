@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,7 @@
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
-<p>The goal of the <code>dfdiffs</code> is to answer the following
+<p>The goal of <code>dfdiffs</code> is to answer the following
 questions:</p>
 <ol style="list-style-type: decimal">
 <li>What rows are here now that weren’t here before?<br>
@@ -94,7 +94,7 @@ questions:</p>
 </ol>
 <p>This vignette takes us through the
 <code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code> function, which runs all three
-comparison functions and exports the results to an excel file.</p>
+comparison functions and exports the results to an Excel file.</p>
 <div class="section level3">
 <h3 id="packages">Packages<a class="anchor" aria-label="anchor" href="#packages"></a>
 </h3>
@@ -110,11 +110,8 @@ comparison functions and exports the results to an excel file.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayoverse/arsenal" class="external-link">arsenal</a></span><span class="op">)</span> <span class="co"># comparedf</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gowerc.github.io/diffdf/" class="external-link">diffdf</a></span><span class="op">)</span> <span class="co"># diffdf</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org" class="external-link">testthat</a></span><span class="op">)</span> <span class="co"># expect_equal</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://forcats.tidyverse.org/" class="external-link">forcats</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org" class="external-link">lubridate</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://fs.r-lib.org" class="external-link">fs</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://vctrs.r-lib.org/" class="external-link">vctrs</a></span><span class="op">)</span></span>
@@ -123,23 +120,23 @@ comparison functions and exports the results to an excel file.</p>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ardata-fr.github.io/flextable-book/" class="external-link">flextable</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="lahman-data">Lahman data<a class="anchor" aria-label="anchor" href="#lahman-data"></a>
+<h3 id="site-roster-data">Site roster data<a class="anchor" aria-label="anchor" href="#site-roster-data"></a>
 </h3>
-<p>We have four <code>Lahman</code> master (People) datasets to use for
-comparisons</p>
+<p>We have four yearly pulls of a synthetic (not real) clinical site
+roster to use for comparisons (see <code><a href="../reference/Roster2021.html">?Roster2021</a></code>):</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">master15</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master15</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">master15</span><span class="op">$</span><span class="va">debut</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2015-10-03"</span></span>
-<span><span class="va">master20</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master20</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">master20</span><span class="op">$</span><span class="va">debut</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2019-09-27"</span></span>
-<span><span class="va">master21</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master21</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">master21</span><span class="op">$</span><span class="va">debut</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2020-09-27"</span></span>
-<span><span class="va">master22</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va">master22</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">master22</span><span class="op">$</span><span class="va">debut</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "2022-04-26"</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">roster2021</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/Roster2021.html">Roster2021</a></span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">roster2021</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 200</span></span>
+<span><span class="va">roster2022</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/Roster2022.html">Roster2022</a></span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">roster2022</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 237</span></span>
+<span><span class="va">roster2023</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/Roster2023.html">Roster2023</a></span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">roster2023</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 255</span></span>
+<span><span class="va">roster2024</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/Roster2024.html">Roster2024</a></span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">roster2024</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] 275</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -328,14 +325,14 @@ in <code>dfdiffs</code> are shown.</p>
 <div class="section level3">
 <h3 id="test-create_comparison_report">Test <code>create_comparison_report()</code><a class="anchor" aria-label="anchor" href="#test-create_comparison_report"></a>
 </h3>
-<p>We test this below with <code>master20</code> and
-<code>master15</code>:</p>
+<p>We test this below with <code>roster2022</code> and
+<code>roster2021</code>:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_comparison_report.html">create_comparison_report</a></span><span class="op">(</span></span>
-<span>  compare <span class="op">=</span> <span class="va">master20</span>,</span>
-<span>  base <span class="op">=</span> <span class="va">master15</span>,</span>
-<span>  by <span class="op">=</span> <span class="st">"playerID"</span>,</span>
-<span>  file <span class="op">=</span> <span class="st">"../inst/out/compare-report-lahman-15-20.xlsx"</span></span>
+<span>  compare <span class="op">=</span> <span class="va">roster2022</span>,</span>
+<span>  base <span class="op">=</span> <span class="va">roster2021</span>,</span>
+<span>  by <span class="op">=</span> <span class="st">"subject_id"</span>,</span>
+<span>  file <span class="op">=</span> <span class="st">"../inst/out/compare-report-roster-2021-2022.xlsx"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
