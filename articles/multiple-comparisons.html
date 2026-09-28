@@ -8,9 +8,8 @@
 <title>multiple-comparisons • dfdiffs</title>
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Inter-0.4.10/font.css" rel="stylesheet">
-<link href="../deps/IBM_Plex_Mono-0.4.10/font.css" rel="stylesheet">
-<link href="../deps/Space_Grotesk-0.4.10/font.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/Ubuntu-0.4.10/font.css" rel="stylesheet">
+<link href="../deps/Ubuntu_Mono-0.4.10/font.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="multiple-comparisons">
@@ -167,7 +166,7 @@ and name each path with its file name. Then we’ll pass the paths to
 <span><span class="co">#&gt;   .. ..   enroll_month = <span style="color: #00BB00;">col_double()</span>,</span></span>
 <span><span class="co">#&gt;   .. ..   enroll_day = <span style="color: #00BB00;">col_double()</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x55f7da5f7690&gt; </span></span>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x55cd144e61d0&gt; </span></span>
 <span><span class="co">#&gt;  $ Name.csv  : spc_tbl_ [200 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;   ..$ subject_id: chr [1:200] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
 <span><span class="co">#&gt;   ..$ full_name : chr [1:200] "Jamie Nguyen" "Riley Jensen" "Rowan Singh" "Reese Diaz" ...</span></span>
@@ -176,7 +175,7 @@ and name each path with its file name. Then we’ll pass the paths to
 <span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
 <span><span class="co">#&gt;   .. ..   full_name = <span style="color: #BB0000;">col_character()</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x55f7e070af50&gt; </span></span>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x55cd191ad070&gt; </span></span>
 <span><span class="co">#&gt;  $ Visit.csv : spc_tbl_ [200 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;   ..$ subject_id      : chr [1:200] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
 <span><span class="co">#&gt;   ..$ first_visit_date: Date[1:200], format: "2021-05-15" "2021-10-05" ...</span></span>
@@ -185,7 +184,7 @@ and name each path with its file name. Then we’ll pass the paths to
 <span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
 <span><span class="co">#&gt;   .. ..   first_visit_date = <span style="color: #0000BB;">col_date(format = "")</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x55f7e006b900&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x55cd18d992f0&gt;</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="import-compare-dfs">Import compare dfs<a class="anchor" aria-label="anchor" href="#import-compare-dfs"></a>
@@ -213,7 +212,7 @@ pull.</p>
 <span><span class="co">#&gt;   .. ..   enroll_month = <span style="color: #00BB00;">col_double()</span>,</span></span>
 <span><span class="co">#&gt;   .. ..   enroll_day = <span style="color: #00BB00;">col_double()</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x55f7e0fefa20&gt; </span></span>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x55cd1a782310&gt; </span></span>
 <span><span class="co">#&gt;  $ Name.csv  : spc_tbl_ [237 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;   ..$ subject_id: chr [1:237] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
 <span><span class="co">#&gt;   ..$ full_name : chr [1:237] "Jamie Nguyen" "Riley Jensen" "Rowan Singh" "Reese Diaz" ...</span></span>
@@ -222,7 +221,7 @@ pull.</p>
 <span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
 <span><span class="co">#&gt;   .. ..   full_name = <span style="color: #BB0000;">col_character()</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x55f7da8a55b0&gt; </span></span>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x55cd16f7e2c0&gt; </span></span>
 <span><span class="co">#&gt;  $ Visit.csv : spc_tbl_ [237 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;   ..$ subject_id      : chr [1:237] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
 <span><span class="co">#&gt;   ..$ first_visit_date: Date[1:237], format: "2021-05-15" "2021-10-05" ...</span></span>
@@ -231,7 +230,7 @@ pull.</p>
 <span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
 <span><span class="co">#&gt;   .. ..   first_visit_date = <span style="color: #0000BB;">col_date(format = "")</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x55f7ddcb5880&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x55cd1aa90710&gt;</span></span></code></pre></div>
 </div>
 </div>
 </div>
