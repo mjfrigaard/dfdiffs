@@ -4,7 +4,15 @@
 \alias{compare_data}
 \title{Compare data (create new, deleted, and changed data)}
 \usage{
-compare_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
+compare_data(
+  compare,
+  base,
+  by = NULL,
+  by_col = NULL,
+  cols = NULL,
+  ignore_case = FALSE,
+  trim_ws = FALSE
+)
 }
 \arguments{
 \item{compare}{comparison data table}
@@ -16,9 +24,15 @@ compare_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 \item{by_col}{new join column name}
 
 \item{cols}{columns to compare}
+
+\item{ignore_case, trim_ws}{passed to \code{compare_values()} for character
+comparisons.}
 }
 \value{
-list of comparison tables
+list of comparison tables, plus \code{changed_class_diffs} (class
+mismatches on shared columns) and \code{column_diffs} (a
+\code{dfdiffs_column_diff} from \code{compare_columns()}, columns only in \code{base}
+vs. only in \code{compare})
 }
 \description{
 Compare data (create new, deleted, and changed data)

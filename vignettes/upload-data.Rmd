@@ -19,7 +19,7 @@ options(
 
 # Motivation
 
-This vignette walks through the `upload_data()` function, which loads a variety of file types into the `dfdiffs` Shiny application.
+The data we want to compare rarely arrives in a single format. It might be a CSV export, a SAS or SPSS dataset, a Stata file, or an Excel workbook. This vignette walks through `upload_data()`, the function that reads each of these file types into the `dfdiffs` Shiny application.
 
 ```{r pkgs, message=FALSE, warning=FALSE}
 library(dfdiffs)
@@ -37,9 +37,9 @@ library(labelled)
 library(gtsummary)
 ```
 
-## External Data 
+## External data
 
-Test data can be found in the `../inst/extdata/` folder:
+The test files for each format are stored in the `inst/extdata/` folder:
 
 ```{r extdata-folder, echo=FALSE}
 fs::dir_tree("../inst/extdata/", recurse = TRUE)
@@ -48,7 +48,7 @@ fs::dir_tree("../inst/extdata/", recurse = TRUE)
 
 ## load_flat_file()
 
-The `load_flat_file()` function imports all forms of flat data files.  
+`load_flat_file()` chooses a reader based on the file extension. Text files (`.txt`, `.csv`, and `.tsv`) are read with `data.table::fread()`, and SAS, SPSS, and Stata files are read with `haven`. Every result is returned as a tibble.
 
 ```{r load_flat_file}
 load_flat_file <- function(path) {
@@ -67,7 +67,7 @@ load_flat_file <- function(path) {
 }
 ```
 
-The `upload_data()` function below also handles Excel files. If the file is an Excel file, pass the name of the sheet to `sheet`.
+`upload_data()` adds support for Excel workbooks on top of `load_flat_file()`. For `.xlsx` files, pass the name of the sheet to the `sheet` argument.
 
 ```{r upload_data}
 upload_data <- function(path, sheet = NULL) {
@@ -88,7 +88,7 @@ upload_data <- function(path, sheet = NULL) {
 
 ## Call structure
 
-`upload_data()` reads Excel workbooks (`.xlsx`) with `readxl::read_excel()` and hands every other file type to `load_flat_file()`, which picks the reader from the file extension. In the Shiny app, the upload module (`mod_upload_server()`) calls `upload_data()`. The call trees below were generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`); only functions defined in `dfdiffs` are shown.
+`upload_data()` reads Excel workbooks (`.xlsx`) with `readxl::read_excel()` and hands every other file type to `load_flat_file()`, which picks the reader from the file extension. In the Shiny app, the upload module (`mod_upload_server()`) calls `upload_data()`. The call trees below were generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in `dfdiffs` are shown.
 
 ```{r call-tree-mod_upload_server, eval=FALSE}
 stackcallr::call_tree_dir("R", root = "mod_upload_server")
@@ -96,11 +96,13 @@ stackcallr::call_tree_dir("R", root = "mod_upload_server")
 
 ```
 █─mod_upload_server
-└─█─upload_data
-  └─load_flat_file
+├─█─upload_data
+│ └─load_flat_file
+├─base_react_theme
+└─comp_react_theme
 ```
 
-The upload demo app (`launch_upload_demo()`) shows the module's UI and server sides together:
+The upload demo app (`launch_upload_demo()`) runs the module's UI and server functions together in a standalone app:
 
 ```{r call-tree-launch_upload_demo, eval=FALSE}
 stackcallr::call_tree_dir("R", root = "launch_upload_demo")
@@ -111,18 +113,22 @@ stackcallr::call_tree_dir("R", root = "launch_upload_demo")
 ├─dfdiffs_fresh_theme
 ├─mod_upload_ui
 └─█─mod_upload_server
-  └─█─upload_data
-    └─load_flat_file
+  ├─█─upload_data
+  │ └─load_flat_file
+  ├─base_react_theme
+  └─comp_react_theme
 ```
 
 ## 2021 site roster CSVs
+
+We'll start by listing the CSV files in the 2021 site roster folder.
 
 ```{r lahman_2010_csv_paths}
 roster2021_csv_paths <- list.files(path = "../inst/extdata/csv/site-roster/2021", full.names = TRUE, pattern = ".csv$")
 head(roster2021_csv_paths)
 ```
 
-We'll test this on `roster2021_csv_paths[4]` (the full `Roster.csv`).
+The fourth path (`roster2021_csv_paths[4]`) is the full `Roster.csv` file. We'll pass it to `load_flat_file()` and check the result with `glimpse()`.
 
 ```{r test-load_flat_file-1}
 roster_2021 <- load_flat_file(path = roster2021_csv_paths[4])
@@ -131,21 +137,23 @@ glimpse(roster_2021)
 
 ## 2022 site roster CSVs
 
+The 2022 site roster folder follows the same layout.
+
 ```{r lahman_2015_csv_paths}
 roster2022_csv_paths <- list.files(path = "../inst/extdata/csv/site-roster/2022", full.names = TRUE, pattern = ".csv$")
 head(roster2022_csv_paths)
 ```
 
-We'll test this on `roster2022_csv_paths[4]`.
+We'll load `roster2022_csv_paths[4]` the same way.
 
 ```{r test-master_2015}
 roster_csv_2022 <- load_flat_file(path = roster2022_csv_paths[4])
 glimpse(roster_csv_2022)
 ```
 
-## List of 2021 CSVs
+## Importing multiple files
 
-Now we import every 2021 CSV into a named list, `roster2021_csv_files`:
+`load_flat_file()` works with `purrr::map()`, so we can import every 2021 CSV at once. The code below stores each file in a named list (`roster2021_csv_files`) and prints the column names of each one.
 
 ```{r lahman_2010_csv_files}
 roster2021_csv_files <- map(.x = roster2021_csv_paths,
@@ -154,7 +162,7 @@ roster2021_csv_files <- map(.x = roster2021_csv_paths,
 map(roster2021_csv_files, names)
 ```
 
-We'll also test this with the `map_df()` function.
+We can also stack the files into a single tibble with `map_df()`. The `source` column records which file each row came from, and `count()` shows the number of rows per file.
 
 ```{r tbl_2010_csv_files}
 tbl_2021_csv_files <- roster2021_csv_paths %>%
@@ -166,67 +174,20 @@ tbl_2021_csv_files %>% count(source)
 ```
 
 
-## Test on dta 
+## Other formats
 
-```{r dta_paths}
-dta_paths <- list.files(path = "../inst/extdata/dta", 
-  full.names = TRUE, pattern = ".dta$")
-tbl_dta_files <- dta_paths %>% 
-  set_names() %>% 
-  map_df(.x = ., 
-  .f = load_flat_file, .id = "source") %>% 
-  mutate(source = basename(source))
-tbl_dta_files %>% count(source)
-```
+`load_flat_file()` handles `.dta`, `.sas7bdat`, `.sav`, `.tsv`, and `.txt` files the same way, so we can loop over all five formats instead of repeating the same steps for each one. The code below loads every file in each format's folder and counts the rows per file.
 
-## Test on sas7bdat 
-
-```{r sas7bdat_paths}
-sas7bdat_paths <- list.files(path = "../inst/extdata/sas7bdat", 
-  full.names = TRUE, pattern = ".sas7bdat$")
-tbl_sas7bdat_files <- sas7bdat_paths %>% 
-  set_names() %>% 
-  map_df(.x = ., 
-  .f = load_flat_file, .id = "source") %>% 
-  mutate(source = basename(source))
-tbl_sas7bdat_files %>% count(source)
-```
-
-## Test on sav 
-
-```{r sav_paths}
-sav_paths <- list.files(path = "../inst/extdata/sav", 
-  full.names = TRUE, pattern = ".sav$")
-tbl_sav_files <- sav_paths %>% 
-  set_names() %>% 
-  map_df(.x = ., 
-  .f = load_flat_file, .id = "source") %>% 
-  mutate(source = basename(source))
-tbl_sav_files %>% count(source)
-```
-
-## Test on tsv
-
-```{r tsv_paths}
-tsv_paths <- list.files(path = "../inst/extdata/tsv", 
-  full.names = TRUE, pattern = ".tsv$")
-tbl_tsv_files <- tsv_paths %>% 
-  set_names() %>% 
-  map_df(.x = ., 
-  .f = load_flat_file, .id = "source") %>% 
-  mutate(source = basename(source))
-tbl_tsv_files %>% count(source)
-```
-
-## Test on txt 
-
-```{r txt_paths}
-txt_paths <- list.files(path = "../inst/extdata/txt", 
-  full.names = TRUE, pattern = ".txt$")
-tbl_txt_files <- txt_paths %>% 
-  set_names() %>% 
-  map_df(.x = ., 
-  .f = load_flat_file, .id = "source") %>% 
-  mutate(source = basename(source))
-tbl_txt_files %>% count(source)
+```{r other-formats}
+formats <- c("dta", "sas7bdat", "sav", "tsv", "txt")
+format_tbls <- map(formats, function(ext) {
+  paths <- list.files(path = paste0("../inst/extdata/", ext),
+    full.names = TRUE, pattern = paste0("\\.", ext, "$"))
+  paths %>%
+    set_names() %>%
+    map_df(.f = load_flat_file, .id = "source") %>%
+    mutate(source = basename(source))
+}) %>%
+  set_names(formats)
+map(format_tbls, count, source)
 ```

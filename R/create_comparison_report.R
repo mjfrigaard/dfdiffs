@@ -20,10 +20,6 @@ create_comparison_report <- function(compare, base, by = NULL, by_col = NULL, co
   # convert to tibble
   comp_tbl <- tibble::as_tibble(compare)
   base_tbl <- tibble::as_tibble(base)
-  # get names
-  comp_nms <- colnames(compare)
-  base_nms <- colnames(base)
-  compare_nms <- intersect(comp_nms, base_nms)
 
   # args
   BY <- by
@@ -33,10 +29,10 @@ create_comparison_report <- function(compare, base, by = NULL, by_col = NULL, co
   # create new data
   new <- create_new_data(compare = comp_tbl, base = base_tbl,
                           by = BY, by_col = BY_COL, cols = COLS)
-  # create new data
+  # create deleted data
   deleted <- create_deleted_data(compare = comp_tbl, base = base_tbl,
                           by = BY, by_col = BY_COL, cols = COLS)
-  # create new data
+  # create changed/modified data
   changed <- create_modified_data(compare = comp_tbl, base = base_tbl,
                           by = BY, by_col = BY_COL, cols = COLS)
   # this creates a list of $diffs and $diffs_byvar
@@ -70,6 +66,32 @@ create_comparison_report <- function(compare, base, by = NULL, by_col = NULL, co
   } else {
     diffs_data <- changed$diffs
   }
+
+  # column structure diff (base-only / compare-only variables)
+  col_diffs <- compare_columns(base = base_tbl, compare = comp_tbl)
+  column_diffs_data <- data.frame(
+    variable = c(col_diffs$common, col_diffs$base_only, col_diffs$compare_only),
+    status = c(
+      rep("common", length(col_diffs$common)),
+      rep("base only", length(col_diffs$base_only)),
+      rep("compare only", length(col_diffs$compare_only))
+    ),
+    stringsAsFactors = FALSE
+  )
+
+  # class mismatches on shared columns
+  class_diffs_data <- changed$class_diffs
+
+  # headline summary stats
+  summary_obj <- unclass(compare_summary(
+    compare = comp_tbl, base = base_tbl, by = BY, by_col = BY_COL, cols = COLS
+  ))
+  summary_data <- data.frame(
+    metric = names(summary_obj),
+    value = unlist(summary_obj),
+    stringsAsFactors = FALSE
+  )
+
   # comparison list
   comparisons <- list(
       'new' = new_data,
@@ -77,7 +99,10 @@ create_comparison_report <- function(compare, base, by = NULL, by_col = NULL, co
       'diffs_byvar' = diffs_byvar_data,
       'diffs' = diffs_data,
       'base' = base_tbl,
-      'compare' = comp_tbl
+      'compare' = comp_tbl,
+      'column_diffs' = column_diffs_data,
+      'class_diffs' = class_diffs_data,
+      'summary' = summary_data
     )
 
   # create workbook
@@ -95,6 +120,12 @@ create_comparison_report <- function(compare, base, by = NULL, by_col = NULL, co
                          sheetName = "Base Data")
   openxlsx::addWorksheet(wb = comp_wb,
                          sheetName = "Compare Data")
+  openxlsx::addWorksheet(wb = comp_wb,
+                         sheetName = "Column Diffs")
+  openxlsx::addWorksheet(wb = comp_wb,
+                         sheetName = "Class Diffs")
+  openxlsx::addWorksheet(wb = comp_wb,
+                         sheetName = "Summary")
 
   #### write NEW DATA ----
   openxlsx::writeData(
@@ -141,6 +172,30 @@ create_comparison_report <- function(compare, base, by = NULL, by_col = NULL, co
     wb = comp_wb,
     sheet = "Compare Data",
     x = comparisons$compare,
+    startCol = 1,
+    startRow = 1
+  )
+  #### write COLUMN DIFFS ----
+  openxlsx::writeData(
+    wb = comp_wb,
+    sheet = "Column Diffs",
+    x = comparisons$column_diffs,
+    startCol = 1,
+    startRow = 1
+  )
+  #### write CLASS DIFFS ----
+  openxlsx::writeData(
+    wb = comp_wb,
+    sheet = "Class Diffs",
+    x = comparisons$class_diffs,
+    startCol = 1,
+    startRow = 1
+  )
+  #### write SUMMARY ----
+  openxlsx::writeData(
+    wb = comp_wb,
+    sheet = "Summary",
+    x = comparisons$summary,
     startCol = 1,
     startRow = 1
   )

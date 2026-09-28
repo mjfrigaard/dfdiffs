@@ -32,6 +32,8 @@ navbar:
       href: articles/changed-modified-data.html
     - text: Creating a comparison report
       href: articles/create-comparison-report.html
+    - text: PROC COMPARE parity
+      href: articles/proc-compare-parity.html
     - text: -------
     - text: More Comparisons
     - text: Run all comparisons
@@ -47,4 +49,52 @@ navbar:
     - text: Tests
       href: articles/tests.html
 
+reference:
+- title: Primary package functions
+  desc: Find new, deleted, and changed rows, summarize the differences, and export a report.
+  contents:
+  - compare_data
+  - compare_summary
+  - compare_columns
+  - create_new_data
+  - create_deleted_data
+  - create_changed_data
+  - create_modified_data
+  - create_comparison_report
+  - compare_values
+  - diff_values_by_key
+  - print.dfdiffs_column_diff
+  - print.dfdiffs_summary
 
+- title: Utilities
+  desc: Helpers for joining, selecting, and loading data.
+  contents:
+  - create_join_column
+  - create_new_column
+  - rename_join_col
+  - create_empty_tbl
+  - select_cols
+  - anti_join_base
+  - left_join_base
+  - cross_tabyl
+  - upload_data
+  - load_flat_file
+  - "`%nin%`"
+
+- title: Shiny functions
+  desc: The app, its modules, and its themes.
+  contents:
+  - launch_app
+  - launch_app_dev
+  - launch_select_demo
+  - launch_upload_demo
+  - app_ui
+  - app_server
+  - starts_with("mod_")
+  - dfdiffs_fresh_theme
+  - ends_with("_react_theme")
+
+- title: Example data
+  desc: Simulated datasets used in examples, vignettes, and tests.
+  contents:
+  - has_keyword("datasets")

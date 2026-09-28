@@ -1,6 +1,6 @@
 ---
 title: "create-deleted-data"
-output: 
+output:
   rmarkdown::html_vignette:
     toc: yes
     toc_depth: 3
@@ -12,20 +12,9 @@ vignette: >
 
 
 ```{r setup, include = FALSE}
-library(janitor) # compare_df_cols
-library(arsenal) # comparedf
-library(diffdf)  # diffdf
-library(testthat) # expect_equal
-library(vetr) # alike
-library(haven)
-library(readxl)
-library(shiny)
-library(data.table)
-library(flextable)
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>", 
-  error = TRUE
+  comment = "#>"
 )
 options(
   rmarkdown.html_vignette.check_title = FALSE,
@@ -34,54 +23,48 @@ options(
 
 # Motivation
 
-The goal of `dfdiffs` is to answer the following questions:
+When we receive an updated version of a dataset, `dfdiffs` helps us answer three questions:
 
-1. What rows are here now that weren't here before?  
+1. What rows are here now that weren't here before?
 2. *What rows were here before that aren't here now?*
-3. What values have been changed?   
+3. What values have been changed?
 
-This vignette takes us through the `create_deleted_data()` function, which answers the question, "*What rows were here before that aren't here now?*"
+This vignette covers `create_deleted_data()`, which answers the second question: "*What rows were here before that aren't here now?*"
 
 
 ## Packages
 
 ```{r pkgs, message=FALSE, warning=FALSE, results='hide'}
 library(dfdiffs)
-library(stringr)
-library(lubridate)
-library(fs)
-library(vctrs)
-library(glue)
-library(purrr)
 library(flextable)
 ```
 
-## What rows were here before that aren't here now? 
+## What rows were here before that aren't here now?
 
-We'll need three datasets to test for deleted data: `CompleteData`, `IncompleteData`, and `DeletedData`.
+We'll use three datasets from the package to test for deleted data: `CompleteData`, `IncompleteData`, and `DeletedData`.
 
 ### CompleteData
 
-`CompleteData` has 9 rows and 7 columns. Unique rows are identified by a combination of `subject` and `record`:
+`CompleteData` has 9 rows and 7 columns. Each row is uniquely identified by the combination of `subject` and `record`:
 
 ```{r CompleteData}
 CompleteData <- dfdiffs::CompleteData
 flextable::qflextable(CompleteData)
 ```
 
-### IncompleteData 
+### IncompleteData
 
-`IncompleteData` has 5 rows (4 have been removed).
+`IncompleteData` is `CompleteData` with 4 rows removed, leaving 5 rows:
 
 ```{r IncompleteData}
 IncompleteData <- dfdiffs::IncompleteData
-flextable::qflextable(IncompleteData) |> 
+flextable::qflextable(IncompleteData) |>
   flextable::set_table_properties(layout = "autofit")
 ```
 
-### DeletedData 
+### DeletedData
 
-`DeletedData` contains the 4 rows of data removed from `CompleteData` to create `IncompleteData`.
+`DeletedData` contains the 4 rows removed from `CompleteData` to create `IncompleteData`, so it's the result we expect `create_deleted_data()` to return:
 
 ```{r DeletedData}
 DeletedData <- dfdiffs::DeletedData
@@ -98,185 +81,15 @@ complete <- CompleteData[do.call(order, CompleteData), ]
 all.equal(combined, complete, check.attributes = FALSE)
 ```
 
-## Conditions 
+## Arguments
 
-Each function in the `dfdiffs` package assumes the following conditions: 
+`create_deleted_data()` takes the same `compare`, `base`, `by`, `by_col`, and `cols` arguments as `create_new_data()`. The [reference table](create-new-data.html#arguments) in that vignette lists every combination.
 
-1) Two datasets
+The only difference between the two functions is the direction of the anti join. `create_new_data()` looks for `compare` rows missing from `base`, and `create_deleted_data()` does the mirror image: it looks for `base` rows missing from `compare`.
 
-2) Multiple columns to compare (`cols`)
+# create_deleted_data()
 
-3) Single `by` column
-
-4) Single `by` column, new column name (`by_col`)
-
-5) Single `by` column, multiple compare columns (`cols`)
-
-6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
-
-7) Multiple `by` columns
-
-8) Multiple `by` columns, new column name (`by_col`)
-
-9) Multiple `by` columns, multiple compare columns (`cols`)
-
-10) Multiple `by` columns, a new `by_col`, and `cols`
-
-### Single by column conditions
-
-1) Two datasets, compare all columns:
-
-    ```{r cond-1, eval=FALSE}
-    create_deleted_data(
-      compare = IncompleteData, 
-      base = CompleteData)
-    ```
-
-2) Multiple columns to compare (`cols`): 
-
-    ```{r cond-2, eval=FALSE}
-    create_deleted_data(
-      compare = IncompleteDataJoin, 
-      base = CompleteDataJoin,
-      cols = c("text_var", "factor_var"))
-    ```
-
-
-3) Single `by` column, no new column name
-
-    ```{r cond-3, eval=FALSE}
-    create_deleted_data(
-      compare = IncompleteDataJoin, 
-      base = CompleteDataJoin, 
-      by = "join_var")
-    ```
-
-4) Single `by` column, new column name (`by_col`)
-
-    ```{r cond-4, eval=FALSE}
-    create_deleted_data(
-      compare = IncompleteDataJoin, 
-      base = CompleteDataJoin, 
-      by = "join_var", 
-      by_col = 'new_join_var')
-    ```
-
-5) Single `by` column, multiple compare columns (`cols`)
-
-    ```{r cond-5, eval=FALSE}
-    create_deleted_data(
-      compare = IncompleteDataJoin, 
-      base = CompleteDataJoin, 
-      by = "join_var", 
-      cols = c("subject", "record", "factor_var", "text_var"))
-    ```
-
-6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
-
-    ```{r cond-6, eval=FALSE}
-    create_deleted_data(
-      # data 
-      compare = IncompleteDataJoin, 
-      base = CompleteDataJoin, 
-      # unique id
-      by = "join_var", 
-      # new name for id
-      by_col = 'new_join_var', 
-      # cols to compare
-      cols = c("subject", "record", "text_var", "factor_var"))
-    ```
-
-
-### Multiple by column conditions
-
-7) Multiple `by` columns
-
-    ```{r cond-7, eval=FALSE}
-    create_deleted_data(
-      compare = IncompleteData, 
-      base = CompleteData, 
-      by = c('subject', 'record'))
-    ```
-
-
-8) Multiple `by` columns, new column name (`by_col`)
-
-    ```{r cond-8, eval=FALSE}
-    create_deleted_data(
-      compare = IncompleteData, 
-      base = CompleteData,
-      by = c('subject', 'record'),
-      by_col = "new_join_col")
-    ```
-
-9) Multiple `by` columns, multiple compare columns (`cols`)
-
-    ```{r cond-9, eval=FALSE}
-    create_deleted_data(
-      compare = IncompleteData, 
-      base = CompleteData, 
-      by = c('subject', 'record'),
-      cols = c("subject",  "record", "factor_var", "text_var"))
-    ```
-
-10) Multiple `by` columns, a new `by_col`, and `cols`
-
-    ```{r cond-10, eval=FALSE}
-    create_deleted_data(
-      compare = IncompleteData, 
-      base = CompleteData, 
-      by = c('subject', 'record'),
-      by_col = "new_join_col",
-      cols = c("subject", "record", "text_var", "factor_var"))
-    ```
-
-
-## create_new_column()
-
-We have a small helper function to create the join variables, `create_new_column()`:
-
-```{r create_new_column, eval=FALSE}
-create_new_column(data = , cols = , new_name = )
-```
-
-We can use `create_new_column()` with `CompleteData` and `IncompleteData` to create a joining variable with `subject` and `record`:
-
-```{r CompleteDataJoin, eval=FALSE}
-CompleteDataJoin <- create_new_column(data = CompleteData, 
-  cols = c("subject", "record"), 
-  new_name = "join_var")
-CompleteDataJoin
-```
-
-```{r CompleteDataJoin-show, echo=FALSE}
-CompleteDataJoin <- create_new_column(data = CompleteData, 
-  cols = c("subject", "record"), 
-  new_name = "join_var")
-flextable::qflextable(CompleteDataJoin) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-```{r IncompleteDataJoin, eval=FALSE}
-IncompleteDataJoin <- create_new_column(data = IncompleteData, 
-  cols = c("subject", "record"), 
-  new_name = "join_var")
-IncompleteDataJoin
-```
-
-```{r IncompleteDataJoin-show, echo=FALSE}
-IncompleteDataJoin <- create_new_column(
-  data = IncompleteData, 
-  cols = c("subject", "record"), 
-  new_name = "join_var")
-flextable::qflextable(IncompleteDataJoin) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-<br><br>
-
-# create_deleted_data() 
-
-Below is our `create_deleted_data()` function, which returns a tibble of the deleted rows. 
+The signature for `create_deleted_data()` is below. It returns a data frame of the deleted rows.
 
 ```{r args-create_deleted_data, eval=FALSE}
 create_deleted_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL)
@@ -284,7 +97,7 @@ create_deleted_data <- function(compare, base, by = NULL, by_col = NULL, cols = 
 
 ## Call structure
 
-`create_deleted_data()` relies on the same four helpers as `create_new_data()`: `anti_join_base()`, `select_cols()`, `rename_join_col()` (renames the join column), and `create_new_column()` (builds the join column from the `by` columns, covered above). The call tree below was generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in `dfdiffs` are shown.
+`create_deleted_data()` relies on the same four helpers as `create_new_data()`: `anti_join_base()`, `select_cols()`, `rename_join_col()` (which renames the join column), and `create_new_column()` (which builds the join column from the `by` columns, as shown in the [create-new-data](create-new-data.html#create_new_column) vignette). The call tree below was generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in `dfdiffs` are shown.
 
 ```{r call-tree-create_deleted_data, eval=FALSE}
 stackcallr::call_tree_dir("R", root = "create_deleted_data")
@@ -298,307 +111,67 @@ stackcallr::call_tree_dir("R", root = "create_deleted_data")
 └─create_new_column
 ```
 
-## Single `by` column conditions
+## Worked examples
 
-The function also needs to handle multiple conditions. Below we cover the conditions for a single `by` column (assuming each dataset already has a unique identifier). First, we'll cover a few uncommon conditions, like a missing `by` column, or a missing `by` column with specific columns selected for comparison.
+### No `by` column: matching whole rows
 
-### 1) Two datasets
-
-+ No `by` columns (only two datasets)
+When we supply only the two datasets, `create_deleted_data()` treats a row in `base` as deleted if no row in `compare` has identical values across every shared column. The result below matches `DeletedData`:
 
 ```{r only-datasets, eval=FALSE}
 create_deleted_data(
-  compare = IncompleteData, 
+  compare = IncompleteData,
   base = CompleteData)
 ```
 
 ```{r only-datasets-show, echo=FALSE}
 flextable::qflextable(
 create_deleted_data(
-  compare = IncompleteData, 
+  compare = IncompleteData,
   base = CompleteData)
 ) |>
   flextable::set_table_properties(layout = "autofit")
 ```
- 
 
-When we compare this to `DeletedData`, we can see it performs a row-by-row comparison.
+### A single `by` column
 
-```{r create_deleted_data-only-datasets-show-DeletedData, echo=FALSE}
-flextable::qflextable(
-  arrange(DeletedData, subject)
-) |>
-  flextable::set_table_properties(layout = "autofit")
+First, we'll use `create_new_column()` to build a `join_var` column from `subject` and `record` in both datasets:
+
+```{r CompleteDataJoin-IncompleteDataJoin}
+CompleteDataJoin <- create_new_column(data = CompleteData,
+  cols = c("subject", "record"),
+  new_name = "join_var")
+IncompleteDataJoin <- create_new_column(data = IncompleteData,
+  cols = c("subject", "record"),
+  new_name = "join_var")
 ```
 
+Passing `join_var` as the `by` column matches rows on that key instead of on row position:
 
-### 2) Multiple columns to compare (`cols`)
-
-+ No `by` columns (only two datasets) and multiple compare columns (`cols`)
-
-```{r create_deleted_data-no-by-no-by_col-multiple-cols, eval=FALSE}
+```{r single-by-column, eval=FALSE}
 create_deleted_data(
-  compare = IncompleteDataJoin, 
+  compare = IncompleteDataJoin,
   base = CompleteDataJoin,
-  cols = c("text_var", "factor_var"))
-```
-
-```{r create_deleted_data-no-by-no-by_col-multiple-cols-show, echo=FALSE}
-flextable::qflextable(
-create_deleted_data(
-  compare = IncompleteDataJoin, 
-  base = CompleteDataJoin,
-  cols = c("text_var", "factor_var"))
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-When we compare this to `DeletedData`, we can see the `text_var` and `factor_var` columns are identical.
-
-```{r create_deleted_data-multiple-cols-show-DeletedData, echo=FALSE}
-flextable::qflextable(
-DeletedData
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-### 3) Single `by` column
-
-+ If the tables have a joining column, like `CompleteDataJoin` and `IncompleteDataJoin`, we can supply that joining column with `by`.
-
-```{r create_deleted_data-single-by-column, eval=FALSE}
-create_deleted_data(
-  compare = IncompleteDataJoin, 
-  base = CompleteDataJoin, 
   by = "join_var")
 ```
 
-```{r create_deleted_data-single-by-column-show, echo=FALSE}
+```{r single-by-column-show, echo=FALSE}
 flextable::qflextable(
 create_deleted_data(
-  compare = IncompleteDataJoin, 
-  base = CompleteDataJoin, 
+  compare = IncompleteDataJoin,
+  base = CompleteDataJoin,
   by = "join_var")
 ) |>
   flextable::set_table_properties(layout = "autofit")
 ```
 
-When we compare this to `DeletedData`, we can see the rows are identical.
+### Multiple `by` columns, a new `by_col`, and `cols`
 
-```{r create_deleted_data-single-by-column-DeletedData, echo=FALSE}
-flextable::qflextable(
-DeletedData
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-### 4) Single `by` column, new column name (`by_col`)
-
-+ We can also provide a single `by` column (the unique identifier) and a new name for it with `by_col`.
-
-```{r single-by-column-new-by_col, eval=FALSE}
-create_deleted_data(
-  compare = IncompleteDataJoin, 
-  base = CompleteDataJoin, 
-  by = "join_var", 
-  by_col = 'new_join_var')
-```
-
-
-```{r single-by-column-new-by_col-show, echo=FALSE}
-flextable::qflextable(
-create_deleted_data(
-  compare = IncompleteDataJoin, 
-  base = CompleteDataJoin, 
-  by = "join_var", 
-  by_col = 'new_join_var')
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-When we compare this to `DeletedData`, we can see the rows are identical.
-
-```{r single-by-column-new-by_col-show-DeletedData, echo=FALSE}
-flextable::qflextable(
-DeletedData
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-### 5) Single `by` column, multiple compare columns (`cols`)
-
-+ Single `by` column and multiple compare columns (`cols`)  
-
-```{r  create_deleted_data-single-by-multiple-cols, eval=FALSE}
-create_deleted_data(
-  compare = IncompleteDataJoin, 
-  base = CompleteDataJoin, 
-  by = "join_var", 
-  cols = c("subject", "record", "factor_var", "text_var"))
-```
-
-```{r  kable-create_deleted_data-single-by-multiple-cols, echo=FALSE}
-flextable::qflextable(
-create_deleted_data(
-  compare = IncompleteDataJoin, 
-  base = CompleteDataJoin, 
-  by = "join_var", 
-  cols = c("subject", "record", "factor_var", "text_var"))
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-When we compare this to `DeletedData`, we can see the rows are identical.
-
-```{r kable-create_deleted_data-single-by-multiple-cols-DeletedData, echo=FALSE}
-flextable::qflextable(
-DeletedData
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-### 6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
-
-- Single `by` column, a new name for the by column (`by_col`), and multiple compare columns (`cols`)
-
-```{r create_deleted_data-multiple-by-by_col-multiple-cols, eval=FALSE}
-create_deleted_data(
-  compare = IncompleteDataJoin, 
-  base = CompleteDataJoin, 
-  by = "join_var", 
-  by_col = 'new_join_var', 
-  cols = c("subject", "record", "text_var", "factor_var"))
-```
-
-```{r create_deleted_data-multiple-by-by_col-multiple-cols-show, echo=FALSE}
-flextable::qflextable(
-create_deleted_data(
-  compare = IncompleteDataJoin, 
-  base = CompleteDataJoin, 
-  by = "join_var", 
-  by_col = 'new_join_var', 
-  cols =  c("subject", "record", "text_var", "factor_var"))
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-When we compare this to `DeletedData`, we can see the rows are identical.
-
-```{r create_deleted_data-multiple-by-by_col-multiple-cols-show-DeletedData, echo=FALSE}
-flextable::qflextable(
-DeletedData
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-## Multiple `by` column conditions
-
-Next, we'll test conditions in which multiple columns are used to create a unique identifier.
-
-### 7) Multiple `by` columns
-
-+ Multiple `by` columns (assuming the columns create a unique identifier) 
-
-```{r multiple-by, eval=FALSE}
-create_deleted_data(
-  compare = IncompleteData, 
-  base = CompleteData, 
-  by = c('subject', 'record'))
-```
-
-```{r multiple-by-show, echo=FALSE}
-flextable::qflextable(
-create_deleted_data(
-  compare = IncompleteData, 
-  base = CompleteData, 
-  by = c('subject', 'record'))
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-This creates a new `join` column that combines `subject` and `record`. When we compare this to `DeletedData`, we can see the rows are identical.
-
-```{r multiple-by-show-DeletedData, echo=FALSE}
-flextable::qflextable(
-DeletedData
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-### 8) Multiple `by` columns, new column name (`by_col`)
-
-We can provide multiple `by` columns, a new `by_col`, and **no `cols`**.
-
-```{r multiple-by-new-by_col, eval=FALSE}
-create_deleted_data(
-  compare = IncompleteData, 
-  base = CompleteData,
-  by = c('subject', 'record'),
-  by_col = "new_join_col")
-```
-
-
-```{r multiple-by-new-by_col-show, echo=FALSE}
-flextable::qflextable(
-create_deleted_data(
-  compare = IncompleteData, 
-  base = CompleteData, 
-  by = c('subject', 'record'),
-  by_col = "new_join_col")
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-This creates a new `new_join_col` column that combines `subject` and `record`. When we compare this to `DeletedData`, we can see the rows are identical.
-
-```{r multiple-by-new-by_col-show-DeletedData, echo=FALSE}
-flextable::qflextable(
-DeletedData
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-### 9) Multiple `by` columns, multiple compare columns (`cols`)  
-
-+ Multiple `by` columns and multiple compare columns (`cols`), and **no new `by_col`**.
-
-```{r create_deleted_data-multiple-by-cols, eval=FALSE}
-create_deleted_data(
-  compare = IncompleteData, 
-  base = CompleteData, 
-  by = c('subject', 'record'),
-  cols = c("subject",  "record", "factor_var", "text_var"))
-```
-
-
-```{r create_deleted_datamultiple-by-cols-show, echo=FALSE}
-flextable::qflextable(
-create_deleted_data(
-  compare = IncompleteData, 
-  base = CompleteData, 
-  by = c('subject', 'record'),
-  cols = c("subject",  "record", "factor_var", "text_var"))
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-This creates a new `join` column that combines `subject` and `record`. When we compare this to `DeletedData`, we can see the rows are identical.
-
-```{r create_deleted_datamultiple-by-cols-show-DeletedData, echo=FALSE}
-flextable::qflextable(
-DeletedData
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-### 10) Multiple `by` columns, a new `by_col`, and `cols`
-
-We can provide multiple `by` columns, a new `by_col`, and multiple `cols`.
+This is the most complete case. The `by` columns are combined into a single key named with `by_col`, and only the columns in `cols` are compared:
 
 ```{r multiple-by-new-by_col-cols, eval=FALSE}
 create_deleted_data(
-  compare = IncompleteData, 
-  base = CompleteData, 
+  compare = IncompleteData,
+  base = CompleteData,
   by = c('subject', 'record'),
   by_col = "new_join_col",
   cols = c("subject", "record", "text_var", "factor_var"))
@@ -607,20 +180,11 @@ create_deleted_data(
 ```{r multiple-by-new-by_col-cols-show, echo=FALSE}
 flextable::qflextable(
 create_deleted_data(
-  compare = IncompleteData, 
-  base = CompleteData, 
+  compare = IncompleteData,
+  base = CompleteData,
   by = c('subject', 'record'),
   by_col = "new_join_col",
   cols = c("subject", "record", "text_var", "factor_var"))
-) |>
-  flextable::set_table_properties(layout = "autofit")
-```
-
-This creates a new `join` column that combines `subject` and `record`. When we compare this to `DeletedData`, we can see the rows are identical.
-
-```{r multiple-by-new-by_col-cols-show-DeletedData, echo=FALSE}
-flextable::qflextable(
-DeletedData
 ) |>
   flextable::set_table_properties(layout = "autofit")
 ```

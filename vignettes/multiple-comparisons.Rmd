@@ -14,8 +14,7 @@ vignette: >
 library(knitr)
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>", 
-  error = TRUE,
+  comment = "#>",
   message = FALSE,
   warning = FALSE,
   echo = TRUE
@@ -34,58 +33,36 @@ The goal of `dfdiffs` is to answer the following questions:
 2.  What rows were here before that aren't here now?
 3.  **What values have been changed?**
 
-This vignette covers how to apply the functions in `dfdiffs` to multiple datasets (separated by folder).
+In this vignette I'll cover how to apply the functions in `dfdiffs` to multiple pairs of datasets stored in separate folders.
 
 ## Packages
 
-Load `dfdiffs`:
+First, we'll load `dfdiffs`.
 
 ```{r dfdiffs, echo = TRUE}
 library(dfdiffs)
 ```
 
-We'll also need packages for import/export, iteration, and wrangling:
+We'll also need packages for importing data, iteration, and building tables.
 
 ```{r more-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
 library(readr)
-library(dplyr)
-library(tidyr)
-library(stringr)
 library(purrr)
-library(glue)
-```
-
-These packages are for building tables:
-
-```{r tbl-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
-library(labelled)
-library(gtsummary)
-library(kableExtra)
-```
-
-These packages offer similar comparison functions:
-
-```{r similar-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
-library(janitor) # compare_df_cols
-library(arsenal) # comparedf
-library(diffdf)  # diffdf
-library(testthat) # expect_equal
-library(vetr) # alike
 ```
 
 ## Folder structure
 
-Below is a folder structure of datasets separated by year. It holds two yearly pulls of the synthetic (not real) `dfdiffs` site roster (see `?Roster2021`), which `data-raw/Roster.R` has already split into `Enroll`/`Visit`/`Name` files.
+The folder structure below stores datasets separated by year. It holds two yearly pulls of the synthetic (not real) `dfdiffs` site roster (see `?Roster2021`), which `data-raw/Roster.R` has already split into `Enroll`, `Visit`, and `Name` files.
 
-```{r lahman-tree}
+```{r site-roster-tree}
 fs::dir_tree("../inst/extdata/csv/site-roster")
 ```
 
-We start by storing these file paths in a vector with `list.files()`. Then we clean up the names a bit and pass the paths to `readr::read_csv` with `purrr::map()`.
+We'll store the file paths in a vector with `list.files()` and name each path with its file name. Then we'll pass the paths to `readr::read_csv()` with `purrr::map()`.
 
 ### Import base dfs
 
-Below we import the base data tables (from the 2021 pull).
+The code below imports the base data tables from the 2021 pull.
 
 ```{r base_files, message=FALSE, warning=FALSE}
 base_files <- list.files(path = "../inst/extdata/csv/site-roster/2021",
@@ -99,7 +76,7 @@ base_dfs |> str()
 
 ### Import compare dfs
 
-Below we import the compare data tables (from the 2022 pull).
+The code below imports the compare data tables from the 2022 pull.
 
 ```{r compare_files, message=FALSE, warning=FALSE}
 compare_files <- list.files(path = "../inst/extdata/csv/site-roster/2022",
@@ -113,145 +90,66 @@ compare_dfs |> str()
 
 # Iteration
 
-We're going to follow the iteration steps from [Charlotte Wickham's Happy R Users Purrr Tutorial](https://www.rstudio.com/resources/rstudioconf-2017/happy-r-users-purrr-tutorial-/):
+We'll follow the three iteration steps from [Charlotte Wickham's Happy R Users Purrr Tutorial](https://www.rstudio.com/resources/rstudioconf-2017/happy-r-users-purrr-tutorial-/):
 
-1. DO IT FOR ONE   
-2. TURN IT INTO A RECIPE  
-3. DO IT FOR ALL!  
+1. DO IT FOR ONE
+2. TURN IT INTO A RECIPE
+3. DO IT FOR ALL!
 
 ## 1) Do it for one (or two)
 
-We'll start with the `arsenal::comparedf()` function. Remember that this function requires an additional `summary()` call.
+`compare_data()` runs all three comparisons (new, deleted, and changed) in a single call. We'll start with a single pair of tables, `Enroll.csv`.
 
-### `arsenal::comparedf`
-
-```{r cdf_people}
+```{r one_comparison}
 by_var <- "subject_id"
-cdf_people <- arsenal::comparedf(
-  x = base_dfs$Enroll.csv, 
-  y = compare_dfs$Enroll.csv, 
+enroll_comparison <- compare_data(
+  compare = compare_dfs$Enroll.csv,
+  base = base_dfs$Enroll.csv,
   by = by_var)
-sumcdf_people <- summary(cdf_people)
-names(sumcdf_people)
+names(enroll_comparison)
 ```
 
+`compare_summary()` adds a headline summary for the same pair of tables, in the style of SAS's `PROC COMPARE`.
 
-### `diffdf::diffdf`
-
-Next we'll use the `diffdf::diffdf()` function.
-
-```{r diffdf_people}
-diffdf_people <- diffdf::diffdf(
-  compare = compare_dfs$Enroll.csv, 
-  base = base_dfs$Enroll.csv, 
-  keys = "subject_id")
-diffdf_people |> names()
-```
-
-
-To make sure the output from both functions is displayed the same way, we'll use the `diffs.byvar.table`/`NumDiff` tables and the `diffs.table`/`VarDiff_` tables.
-
-#### `diffs.byvar.table`
-
-```{r diffs.byvar.table}
-sumcdf_people[["diffs.byvar.table"]] |> 
-  select(Variable = var.x, 
-         `No of Differences` = n) |> 
-  knitr::kable(caption = "diffs.byvar.table") |> 
-  kableExtra::kable_paper()
-```
-
-#### `NumDiff`
-
-```{r NumDiff}
-diffdf_people[["NumDiff"]] |> 
-  knitr::kable(caption = "NumDiff") |> 
-  kableExtra::kable_paper()
-```
-
-
-#### `diffs.table`
-
-```{r diffs.table}
-sumcdf_people[["diffs.table"]] |> 
-  unnest(values.x) |> 
-  unnest(values.y) |> 
-  select(
-    VARIABLE = var.x,
-    all_of(by_var),
-    BASE = values.x,
-    COMPARE = values.y
-  ) |> 
-  knitr::kable(caption = "diffs.table") |> 
-  kableExtra::kable_paper()
-```
-
-
-#### `VarDiff_` tables
-
-```{r VarDiff_tables}
-tbl_names <- names(diffdf_people)
-vardiff_tbls <- tbl_names[stringr::str_detect(tbl_names, "VarDiff_")]
-bind_rows(diffdf_people[vardiff_tbls]) |> 
-  knitr::kable(caption = "'VarDiff_' tables") |> 
-  kableExtra::kable_paper()
+```{r one_summary}
+compare_summary(
+  compare = compare_dfs$Enroll.csv,
+  base = base_dfs$Enroll.csv,
+  by = by_var)
 ```
 
 ## 2) Turn it into a recipe
 
-We have two vectors with file paths (`.x` and `.y`).
-
-```{r x-y, eval=FALSE}
-map2(.x = base_dfs, .y = compare_files, )
-```
-
-The `.f` argument is either the `arsenal::comparedf` or the `diffdf::diffdf` function.
+`compare_data()` takes `compare` and `base` as its first two arguments, so `purrr::map2()` can pass the matching elements of `compare_dfs` and `base_dfs` straight through. The `by` argument is passed along via `...`. Note that `map2()` pairs the two lists by position, not by name, so this relies on `list.files()` returning the files in the same order in both folders (which it does here, because both folders hold the same three file names).
 
 ```{r function-map2, eval=FALSE}
-map2(.x = base_dfs, .y = compare_files, .f = arsenal::comparedf)
-map2(.x = compare_files, .y = base_dfs, .f = diffdf::diffdf)
+purrr::map2(.x = compare_dfs, .y = base_dfs,
+            .f = compare_data, by = "subject_id")
 ```
-
-We can pass the `by` and `keys` arguments through `...`.
-
-```{r eval=FALSE}
-purrr::map2(.x =  base_dfs, .y = compare_dfs, 
-            .f = arsenal::comparedf, by = "subject_id")
-```
-
-```{r eval=FALSE}
-purrr::map2(.x =  compare_dfs,  .y = base_dfs, 
-            .f = diffdf::diffdf, keys = "subject_id")
-```
-
 
 ## 3) Do it for all
 
-### `map2()` + `arsenal::comparedf`
+Now we'll apply the recipe to every pair of files in `compare_dfs` and `base_dfs`.
 
-Now we use the `purrr::map2()` function to compare all of the items in `base_dfs` to `compare_dfs`.
-
-```{r all_cdfs}
-all_cdfs <- purrr::map2(
-  .x =  base_dfs, 
-  .y = compare_dfs, 
-  .f = arsenal::comparedf, 
+```{r all_comparisons}
+all_comparisons <- purrr::map2(
+  .x = compare_dfs,
+  .y = base_dfs,
+  .f = compare_data,
   by = "subject_id")
-all_scdfs <- purrr::map(all_cdfs, .f = summary)
-all_scdfs[["Name.csv"]] |> names()
+names(all_comparisons)
+names(all_comparisons$Name.csv)
 ```
 
-### `map2()` + `diffdf::diffdf`
+The same recipe works with `compare_summary()` and gives us one headline summary per file. Below we print the summary for `Visit.csv`.
 
-We can do the same with `diffdf::diffdf()`.
-
-```{r all_diffdfs}
-all_diffdfs <- purrr::map2(
-  .x = base_dfs, 
-  .y = compare_dfs, 
-  .f = diffdf::diffdf, 
-  keys = "subject_id")
-all_diffdfs[["Name.csv"]] |> names()
+```{r all_summaries}
+all_summaries <- purrr::map2(
+  .x = compare_dfs,
+  .y = base_dfs,
+  .f = compare_summary,
+  by = "subject_id")
+all_summaries$Visit.csv
 ```
 
 
