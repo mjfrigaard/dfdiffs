@@ -1,22 +1,28 @@
 url: https://mjfrigaard.github.io/dfdiffs/
 template:
   bootstrap: 5
-  theme: atom-one-dark
+  theme: atom-one-light
   bslib:
     preset: "shiny"
-    bg: "#011627" # deep space navy
-    fg: "#CBCBCB" # brushed aluminum
-    primary: "#2EC4B6" # atomic teal
-    secondary: "#CBCBCB" # brushed aluminum
-    success: "#2EC4B6" # atomic teal
-    info: "#2EC4B6" # atomic teal
-    warning: "#FFD23F" # golden yellow
-    danger: "#FF6F3C" # rocket orange
+    bg: "#EAE2B7" # pulp cream
+    fg: "#14213D" # midnight ink
+    primary: "#1D3461" # cover navy
+    secondary: "#14213D" # midnight ink
+    success: "#1D3461" # cover navy
+    info: "#1D3461" # cover navy
+    warning: "#F4A300" # pulp amber
+    danger: "#D62828" # rocket red
+    navbar-bg: "#1D3461"
+    navbar-dark-color: "#EAE2B7"
+    navbar-dark-hover-color: "#F4A300"
+    navbar-dark-active-color: "#F4A300"
     base_font: {google: "Inter"}
     heading_font: {google: "Space Grotesk"}
     code_font: {google: "IBM Plex Mono"}
 
 navbar:
+ type: dark
+ bg: primary
  components:
    articles:
     text: Articles
