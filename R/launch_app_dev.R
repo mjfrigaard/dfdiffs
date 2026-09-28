@@ -16,7 +16,7 @@ launch_app_dev <- function() {
     id = "main_nav",
     title = "(dev) dfdiffs",
     theme = compare_theme,
-    navbar_options = bslib::navbar_options(bg = "#011627", theme = "dark"),
+    navbar_options = bslib::navbar_options(bg = "#1D3461", theme = "dark"),
     # 1) upload data -----
     bslib::nav_panel(
       title = "1) Upload Data",

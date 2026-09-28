@@ -70,7 +70,7 @@ mod_compare_ui <- function(id, dev = FALSE) {
       # New Data ------
       bslib::nav_panel(
         title = "New Data",
-        icon = icon("plus", style = "color:#2EC4B6;"),
+        icon = icon("plus", style = "color:#1D3461;"),
         h5(
           "Rows in ", code("compare"), " not found in ", code("base"), ":"
         ),
@@ -88,7 +88,7 @@ mod_compare_ui <- function(id, dev = FALSE) {
       # Deleted Data ------
       bslib::nav_panel(
         title = "Deleted Data",
-        icon = icon("minus", style = "color:#FF6F3C;"),
+        icon = icon("minus", style = "color:#D62828;"),
         h5(
           "Rows in ", code("base"), " not found in ", code("compare"), ":"
         ),
@@ -106,7 +106,7 @@ mod_compare_ui <- function(id, dev = FALSE) {
       # Changed Data ------
       bslib::nav_panel(
         title = "Changed Data",
-        icon = icon("pen", style = "color:#8A6D00;"),
+        icon = icon("pen", style = "color:#B87D00;"),
         h5(
           "Values that differ between ", code("base"), " and ", code("compare"), ":"
         ),
@@ -130,7 +130,7 @@ mod_compare_ui <- function(id, dev = FALSE) {
       # Review Changes ------
       bslib::nav_panel(
         title = "Review Changes",
-        icon = icon("magnifying-glass", style = "color:#8A6D00;"),
+        icon = icon("magnifying-glass", style = "color:#B87D00;"),
         h5(
           "Row-by-row changes between ", code("base"), " and ", code("compare"),
           bslib::tooltip(

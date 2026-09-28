@@ -7,26 +7,26 @@ base_react_theme <- function(dark = FALSE) {
   if (isTRUE(dark)) {
     reactable::reactableTheme(
       color = "#FFFFFF",
-      backgroundColor = "#1E1F24",
-      borderColor = "#3A3B45",
-      stripedColor = "#26272E",
-      highlightColor = "#33343D",
-      inputStyle = list(backgroundColor = "#26272E"),
-      selectStyle = list(backgroundColor = "#26272E"),
-      pageButtonHoverStyle = list(backgroundColor = "#26272E"),
-      pageButtonActiveStyle = list(backgroundColor = "#33343D")
+      backgroundColor = "#14213D", # midnight ink
+      borderColor = "#2C3E66",
+      stripedColor = "#1A2A4D",
+      highlightColor = "#24365E",
+      inputStyle = list(backgroundColor = "#1A2A4D"),
+      selectStyle = list(backgroundColor = "#1A2A4D"),
+      pageButtonHoverStyle = list(backgroundColor = "#1A2A4D"),
+      pageButtonActiveStyle = list(backgroundColor = "#24365E")
     )
   } else {
     reactable::reactableTheme(
-      color = "#FFFFFF",
-      backgroundColor = "#4A4A4A", # graphite (brushed aluminum, in shadow)
-      borderColor = "#646464",
-      stripedColor = "#3A3B45",
-      highlightColor = "#5E5E5E",
-      inputStyle = list(backgroundColor = "#3A3B45"),
-      selectStyle = list(backgroundColor = "#3A3B45"),
-      pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-      pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+      color = "#EAE2B7", # pulp cream
+      backgroundColor = "#1D3461", # cover navy
+      borderColor = "#14213D",
+      stripedColor = "#24406F",
+      highlightColor = "#35548C",
+      inputStyle = list(backgroundColor = "#14213D"),
+      selectStyle = list(backgroundColor = "#14213D"),
+      pageButtonHoverStyle = list(backgroundColor = "#14213D"),
+      pageButtonActiveStyle = list(backgroundColor = "#35548C")
     )
   }
 }
@@ -39,26 +39,26 @@ comp_react_theme <- function(dark = FALSE) {
   if (isTRUE(dark)) {
     reactable::reactableTheme(
       color = "#FFFFFF",
-      backgroundColor = "#010B15", # deep space navy, darkened further
-      borderColor = "#3A3B45",
-      stripedColor = "#1B2733",
-      highlightColor = "#22303D",
-      inputStyle = list(backgroundColor = "#1B2733"),
-      selectStyle = list(backgroundColor = "#1B2733"),
-      pageButtonHoverStyle = list(backgroundColor = "#1B2733"),
-      pageButtonActiveStyle = list(backgroundColor = "#22303D")
+      backgroundColor = "#0E172B", # midnight ink, darkened further
+      borderColor = "#2C3E66",
+      stripedColor = "#14213D",
+      highlightColor = "#1D3461",
+      inputStyle = list(backgroundColor = "#14213D"),
+      selectStyle = list(backgroundColor = "#14213D"),
+      pageButtonHoverStyle = list(backgroundColor = "#14213D"),
+      pageButtonActiveStyle = list(backgroundColor = "#1D3461")
     )
   } else {
     reactable::reactableTheme(
-      color = "#FFFFFF",
-      backgroundColor = "#011627", # deep space navy (primary)
-      borderColor = "#646464",
-      stripedColor = "#3A3B45",
-      highlightColor = "#344552", # lighter navy
-      inputStyle = list(backgroundColor = "#3A3B45"),
-      selectStyle = list(backgroundColor = "#3A3B45"),
-      pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-      pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+      color = "#EAE2B7", # pulp cream
+      backgroundColor = "#14213D", # midnight ink
+      borderColor = "#1D3461",
+      stripedColor = "#1D3461",
+      highlightColor = "#2A4578",
+      inputStyle = list(backgroundColor = "#1D3461"),
+      selectStyle = list(backgroundColor = "#1D3461"),
+      pageButtonHoverStyle = list(backgroundColor = "#1D3461"),
+      pageButtonActiveStyle = list(backgroundColor = "#2A4578")
     )
   }
 }
@@ -70,27 +70,27 @@ comp_react_theme <- function(dark = FALSE) {
 new_react_theme <- function(dark = FALSE) {
   if (isTRUE(dark)) {
     reactable::reactableTheme(
-      color = "#2EC4B6", # add / atomic teal
-      backgroundColor = "#1E1F24",
-      borderColor = "#3A3B45",
-      stripedColor = "#26272E",
-      highlightColor = "#33343D",
-      inputStyle = list(backgroundColor = "#26272E"),
-      selectStyle = list(backgroundColor = "#26272E"),
-      pageButtonHoverStyle = list(backgroundColor = "#26272E"),
-      pageButtonActiveStyle = list(backgroundColor = "#33343D")
+      color = "#9DB8EA", # cover navy, lightened for legibility on dark
+      backgroundColor = "#14213D", # midnight ink
+      borderColor = "#2C3E66",
+      stripedColor = "#1A2A4D",
+      highlightColor = "#24365E",
+      inputStyle = list(backgroundColor = "#1A2A4D"),
+      selectStyle = list(backgroundColor = "#1A2A4D"),
+      pageButtonHoverStyle = list(backgroundColor = "#1A2A4D"),
+      pageButtonActiveStyle = list(backgroundColor = "#24365E")
     )
   } else {
     reactable::reactableTheme(
-      color = "#2EC4B6", # add / atomic teal
-      backgroundColor = "#FFFFFF",
-      borderColor = "#CBCBCB", # brushed aluminum
-      stripedColor = "#3A3B45",
-      highlightColor = "#eeeeee",
-      inputStyle = list(backgroundColor = "#eeeeee"),
-      selectStyle = list(backgroundColor = "#eeeeee"),
-      pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-      pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+      color = "#1D3461", # add / cover navy
+      backgroundColor = "#F5F0D6", # pale pulp cream
+      borderColor = "#C9BE8A", # aged cream
+      stripedColor = "#EFE8C6",
+      highlightColor = "#E3D9A2",
+      inputStyle = list(backgroundColor = "#E3D9A2"),
+      selectStyle = list(backgroundColor = "#E3D9A2"),
+      pageButtonHoverStyle = list(backgroundColor = "#E3D9A2"),
+      pageButtonActiveStyle = list(backgroundColor = "#E3D9A2")
     )
   }
 }
@@ -102,27 +102,27 @@ new_react_theme <- function(dark = FALSE) {
 deleted_react_theme <- function(dark = FALSE) {
   if (isTRUE(dark)) {
     reactable::reactableTheme(
-      color = "#FF6F3C", # delete / rocket orange
-      backgroundColor = "#1E1F24",
-      borderColor = "#3A3B45",
-      stripedColor = "#26272E",
-      highlightColor = "#33343D",
-      inputStyle = list(backgroundColor = "#26272E"),
-      selectStyle = list(backgroundColor = "#26272E"),
-      pageButtonHoverStyle = list(backgroundColor = "#26272E"),
-      pageButtonActiveStyle = list(backgroundColor = "#33343D")
+      color = "#F0574F", # rocket red, lightened for legibility on dark
+      backgroundColor = "#14213D", # midnight ink
+      borderColor = "#2C3E66",
+      stripedColor = "#1A2A4D",
+      highlightColor = "#24365E",
+      inputStyle = list(backgroundColor = "#1A2A4D"),
+      selectStyle = list(backgroundColor = "#1A2A4D"),
+      pageButtonHoverStyle = list(backgroundColor = "#1A2A4D"),
+      pageButtonActiveStyle = list(backgroundColor = "#24365E")
     )
   } else {
     reactable::reactableTheme(
-      color = "#FF6F3C", # delete / rocket orange
-      backgroundColor = "#FFFFFF",
-      borderColor = "#CBCBCB", # brushed aluminum
-      stripedColor = "#3A3B45",
-      highlightColor = "#eeeeee",
-      inputStyle = list(backgroundColor = "#eeeeee"),
-      selectStyle = list(backgroundColor = "#eeeeee"),
-      pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-      pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+      color = "#D62828", # delete / rocket red
+      backgroundColor = "#F5F0D6", # pale pulp cream
+      borderColor = "#C9BE8A", # aged cream
+      stripedColor = "#EFE8C6",
+      highlightColor = "#E3D9A2",
+      inputStyle = list(backgroundColor = "#E3D9A2"),
+      selectStyle = list(backgroundColor = "#E3D9A2"),
+      pageButtonHoverStyle = list(backgroundColor = "#E3D9A2"),
+      pageButtonActiveStyle = list(backgroundColor = "#E3D9A2")
     )
   }
 }
@@ -134,27 +134,27 @@ deleted_react_theme <- function(dark = FALSE) {
 changed_react_theme <- function(dark = FALSE) {
   if (isTRUE(dark)) {
     reactable::reactableTheme(
-      color = "#E8BE3B", # change / golden yellow, brightened for legibility on dark
-      backgroundColor = "#1E1F24",
-      borderColor = "#3A3B45",
-      stripedColor = "#26272E",
-      highlightColor = "#33343D",
-      inputStyle = list(backgroundColor = "#26272E"),
-      selectStyle = list(backgroundColor = "#26272E"),
-      pageButtonHoverStyle = list(backgroundColor = "#26272E"),
-      pageButtonActiveStyle = list(backgroundColor = "#33343D")
+      color = "#F4A300", # change / pulp amber
+      backgroundColor = "#14213D", # midnight ink
+      borderColor = "#2C3E66",
+      stripedColor = "#1A2A4D",
+      highlightColor = "#24365E",
+      inputStyle = list(backgroundColor = "#1A2A4D"),
+      selectStyle = list(backgroundColor = "#1A2A4D"),
+      pageButtonHoverStyle = list(backgroundColor = "#1A2A4D"),
+      pageButtonActiveStyle = list(backgroundColor = "#24365E")
     )
   } else {
     reactable::reactableTheme(
-      color = "#8A6D00", # change / golden yellow, darkened for legibility on white
-      backgroundColor = "#FFFFFF",
-      borderColor = "#CBCBCB", # brushed aluminum
-      stripedColor = "#3A3B45",
-      highlightColor = "#eeeeee",
-      inputStyle = list(backgroundColor = "#eeeeee"),
-      selectStyle = list(backgroundColor = "#eeeeee"),
-      pageButtonHoverStyle = list(backgroundColor = "3A3B45"),
-      pageButtonActiveStyle = list(backgroundColor = "#3A3B45")
+      color = "#8A6D00", # change / pulp amber, darkened for legibility on cream
+      backgroundColor = "#F5F0D6", # pale pulp cream
+      borderColor = "#C9BE8A", # aged cream
+      stripedColor = "#EFE8C6",
+      highlightColor = "#E3D9A2",
+      inputStyle = list(backgroundColor = "#E3D9A2"),
+      selectStyle = list(backgroundColor = "#E3D9A2"),
+      pageButtonHoverStyle = list(backgroundColor = "#E3D9A2"),
+      pageButtonActiveStyle = list(backgroundColor = "#E3D9A2")
     )
   }
 }
@@ -168,18 +168,18 @@ info_react_theme <- function(dark = FALSE) {
   if (isTRUE(dark)) {
     reactable::reactableTheme(
       color = "#FFFFFF",
-      backgroundColor = "#1E1F24",
-      borderColor = "#3A3B45",
-      stripedColor = "#26272E",
-      highlightColor = "#33343D",
+      backgroundColor = "#14213D",
+      borderColor = "#2C3E66",
+      stripedColor = "#1A2A4D",
+      highlightColor = "#24365E",
       cellPadding = "8px 12px"
     )
   } else {
     reactable::reactableTheme(
-      color = "#011627",
-      borderColor = "#e5eaee",
-      stripedColor = "#f6f8fa",
-      highlightColor = "#f0f5f9",
+      color = "#14213D",
+      borderColor = "#C9BE8A",
+      stripedColor = "#EFE8C6",
+      highlightColor = "#E3D9A2",
       cellPadding = "8px 12px"
     )
   }
