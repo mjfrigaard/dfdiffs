@@ -1,6 +1,6 @@
 Package: dfdiffs
 Title: Data Frame Differences (What's New, Deleted, and Changed?)
-Version: 2.1.0
+Version: 2.2.0
 Authors@R:
     person("Martin", "Frigaard", , "mjfrigaard@pm.me", role = c("aut", "cre"))
 Description: dfdiffs answers three questions: What is here now that wasn't

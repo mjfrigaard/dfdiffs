@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,7 @@
     <li><a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a></li>
     <li><a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a></li>
     <li><a class="dropdown-item" href="../articles/create-comparison-report.html">Creating a comparison report</a></li>
+    <li><a class="dropdown-item" href="../articles/proc-compare-parity.html">PROC COMPARE parity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Comparisons</h6></li>
     <li><a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a></li>
@@ -84,48 +85,53 @@
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
-<p>This vignette covers similar functions and packages that compare two
-datasets to each other.</p>
+<p><code>dfdiffs</code> isn’t the only way to compare two datasets in R.
+In this vignette I’ll cover other functions and packages that solve
+similar problems, and how their output differs from what
+<code>dfdiffs</code> returns.</p>
 <div class="section level3">
 <h3 id="packages">Packages<a class="anchor" aria-label="anchor" href="#packages"></a>
 </h3>
-<p>Load <code>dfdiffs</code>:</p>
+<p>First, we’ll load <code>dfdiffs</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mjfrigaard.github.io/dfdiffs/">dfdiffs</a></span><span class="op">)</span></span></code></pre></div>
-<p>We’ll also need packages for import/export, iteration, and
-wrangling:</p>
+<p>We’ll also need packages for importing and exporting data, iteration,
+and string wrangling.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org" class="external-link">readr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glue.tidyverse.org/" class="external-link">glue</a></span><span class="op">)</span></span></code></pre></div>
-<p>These packages are for building tables:</p>
+<p>The packages below are used for building tables.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://larmarange.github.io/labelled/" class="external-link">labelled</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary" class="external-link">gtsummary</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span></code></pre></div>
-<p>These packages offer similar comparison functions:</p>
+<p>The packages below offer comparison functions similar to those in
+<code>dfdiffs</code>.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor" class="external-link">janitor</a></span><span class="op">)</span> <span class="co"># compare_df_cols</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayoverse/arsenal" class="external-link">arsenal</a></span><span class="op">)</span> <span class="co"># comparedf</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gowerc.github.io/diffdf/" class="external-link">diffdf</a></span><span class="op">)</span>  <span class="co"># diffdf</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor" class="external-link">janitor</a></span><span class="op">)</span> <span class="co"># compare_df_cols</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org" class="external-link">testthat</a></span><span class="op">)</span> <span class="co"># expect_equal</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/brodieG/vetr" class="external-link">vetr</a></span><span class="op">)</span> <span class="co"># alike</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://larmarange.github.io/labelled/" class="external-link">labelled</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary" class="external-link">gtsummary</a></span><span class="op">)</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/brodieG/vetr" class="external-link">vetr</a></span><span class="op">)</span> <span class="co"># alike</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="data">Data<a class="anchor" aria-label="anchor" href="#data"></a>
 </h3>
-<p>We’ll use the data in this package to cover similar
-<code>packages::functions()</code>.</p>
+<p>Before looking at the alternatives, we’ll run the
+<code>dfdiffs</code> functions on the example datasets included in the
+package. These outputs give us a baseline for comparing the other
+<code>package::function()</code> options below.</p>
 <div class="section level4">
 <h4 id="new-data">New data<a class="anchor" aria-label="anchor" href="#new-data"></a>
 </h4>
 <p>To check for new data, we’ll use <code>T1Data</code> and
 <code>T2Data</code>. The <code><a href="../reference/create_new_data.html">create_new_data()</a></code> function returns
-the ‘new data’ (i.e., the rows that are here now but weren’t here
+the new data (i.e., the rows that are here now but weren’t here
 before).</p>
-<p>We can check this against the <code>NewData</code> dataset, which
-should match the output from <code><a href="../reference/create_new_data.html">create_new_data()</a></code>.</p>
+<p>The <code>NewData</code> dataset stores the expected result, so we
+can check it against the output from <code><a href="../reference/create_new_data.html">create_new_data()</a></code>.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">T1Data</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/T1Data.html">T1Data</a></span></span>
 <span><span class="va">T2Data</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/T2Data.html">T2Data</a></span></span>
@@ -347,8 +353,8 @@ cough
 </tr>
 </tbody>
 </table>
-<p>We can see the only differences between the datasets are the formats
-of the date columns:</p>
+<p>Comparing the two tables with <code><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">waldo::compare()</a></code> shows the
+only differences are the formats of the date columns.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">T1T2New</span>, y <span class="op">=</span> <span class="va">NewData</span><span class="op">)</span></span>
 <span><span class="co">#&gt; `class(old)`: <span style="color: #00BB00;">"data.frame"</span>                   </span></span>
@@ -371,7 +377,7 @@ of the date columns:</p>
 </h4>
 <p>To test for deleted data, we’ll use <code>CompleteData</code>,
 <code>IncompleteData</code>, and <code>DeletedData</code>.</p>
-<p><code>CompleteData</code> represents a ‘complete’ set of data.</p>
+<p><code>CompleteData</code> is the complete (baseline) dataset.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">CompleteData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/CompleteData.html">CompleteData</a></span></span>
 <span><span class="va">CompleteData</span> <span class="op">|&gt;</span> </span>
@@ -614,8 +620,8 @@ labs
 </tr>
 </tbody>
 </table>
-<p><code>IncompleteData</code> is a dataset with rows removed from
-<code>CompleteData</code>.</p>
+<p><code>IncompleteData</code> is <code>CompleteData</code> with some of
+its rows removed.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">IncompleteData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/IncompleteData.html">IncompleteData</a></span></span>
 <span><span class="va">IncompleteData</span> <span class="op">|&gt;</span> </span>
@@ -766,22 +772,155 @@ labs
 </tr>
 </tbody>
 </table>
-<p>Running <code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code> checks for rows that were
-deleted between <code>CompleteData</code> and
-<code>IncompleteData</code>.</p>
+<p><code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code> returns the rows in
+<code>CompleteData</code> that are missing from
+<code>IncompleteData</code>. We’ll sort the result by
+<code>subject</code> before printing it.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">IncompCompDiff</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_deleted_data.html">create_deleted_data</a></span><span class="op">(</span></span>
-<span>  compare <span class="op">=</span> <span class="va">IncompleteData</span>, </span>
-<span>  base <span class="op">=</span> <span class="va">CompleteData</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">subject</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `arrange()`:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> could not find function "arrange"</span></span>
-<span><span class="va">IncompCompDiff</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"IncompCompDiff"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'IncompCompDiff' not found</span></span></code></pre></div>
-<p>The output above is identical to the data stored in
+<span>  compare <span class="op">=</span> <span class="va">IncompleteData</span>,</span>
+<span>  base <span class="op">=</span> <span class="va">CompleteData</span><span class="op">)</span></span>
+<span><span class="va">IncompCompDiff</span> <span class="op">&lt;-</span> <span class="va">IncompCompDiff</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="va">IncompCompDiff</span><span class="op">$</span><span class="va">subject</span><span class="op">)</span>, <span class="op">]</span></span>
+<span><span class="va">IncompCompDiff</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"IncompCompDiff"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
+<caption>
+IncompCompDiff
+</caption>
+<thead><tr>
+<th style="text-align:left;">
+</th>
+<th style="text-align:left;">
+subject
+</th>
+<th style="text-align:left;">
+record
+</th>
+<th style="text-align:left;">
+start_date
+</th>
+<th style="text-align:left;">
+mid_date
+</th>
+<th style="text-align:left;">
+end_date
+</th>
+<th style="text-align:left;">
+text_var
+</th>
+<th style="text-align:left;">
+factor_var
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+A
+</td>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+2021-12-28
+</td>
+<td style="text-align:left;">
+2022-01-27
+</td>
+<td style="text-align:left;">
+2022-02-26
+</td>
+<td style="text-align:left;">
+Concomitant medication reported at baseline.
+</td>
+<td style="text-align:left;">
+conmed
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:left;">
+B
+</td>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+2021-12-26
+</td>
+<td style="text-align:left;">
+2022-01-25
+</td>
+<td style="text-align:left;">
+2022-02-24
+</td>
+<td style="text-align:left;">
+Concomitant medication updated at visit two.
+</td>
+<td style="text-align:left;">
+conmed
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+C
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2021-12-30
+</td>
+<td style="text-align:left;">
+2022-01-29
+</td>
+<td style="text-align:left;">
+2022-02-28
+</td>
+<td style="text-align:left;">
+Physical exam completed with no abnormalities noted.
+</td>
+<td style="text-align:left;">
+exam
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+D
+</td>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+2021-12-27
+</td>
+<td style="text-align:left;">
+2022-01-26
+</td>
+<td style="text-align:left;">
+2022-02-25
+</td>
+<td style="text-align:left;">
+Medical history reviewed and confirmed complete.
+</td>
+<td style="text-align:left;">
+history
+</td>
+</tr>
+</tbody>
+</table>
+<p>The output above should match the data stored in
 <code>DeletedData</code>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">DeletedData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/DeletedData.html">DeletedData</a></span></span>
@@ -910,23 +1049,41 @@ history
 </tr>
 </tbody>
 </table>
-<p>We can confirm this with <code><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">waldo::compare()</a></code>:</p>
+<p>We can confirm the two tables are identical with
+<code><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">waldo::compare()</a></code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">IncompCompDiff</span>, y <span class="op">=</span> <span class="va">DeletedData</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'IncompCompDiff' not found</span></span></code></pre></div>
+<span><span class="co">#&gt; `class(old)`: <span style="color: #00BB00;">"data.frame"</span>                   </span></span>
+<span><span class="co">#&gt; `class(new)`: <span style="color: #00BB00;">"tbl_df"</span>     <span style="color: #00BB00;">"tbl"</span> <span style="color: #00BB00;">"data.frame"</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; `attr(old, 'row.names')`: <span style="color: #00BB00;">2</span> <span style="color: #00BB00;">8</span> <span style="color: #00BB00;">5</span> <span style="color: #00BB00;">6</span></span></span>
+<span><span class="co">#&gt; `attr(new, 'row.names')`: <span style="color: #00BB00;">1</span> <span style="color: #00BB00;">2</span> <span style="color: #00BB00;">3</span> <span style="color: #00BB00;">4</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; `old$record` is <span style="color: #00BB00;">a character vector</span> ('2', '3', '1', '1')</span></span>
+<span><span class="co">#&gt; `new$record` is <span style="color: #00BB00;">an integer vector</span> (2, 3, 1, 1)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; `old$start_date` is <span style="color: #00BB00;">a character vector</span> ('2021-12-28', '2021-12-26', '2021-12-30', '2021-12-27')</span></span>
+<span><span class="co">#&gt; `new$start_date` is <span style="color: #00BB00;">an S3 object of class &lt;Date&gt;, a double vector</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; `old$mid_date` is <span style="color: #00BB00;">a character vector</span> ('2022-01-27', '2022-01-25', '2022-01-29', '2022-01-26')</span></span>
+<span><span class="co">#&gt; `new$mid_date` is <span style="color: #00BB00;">an S3 object of class &lt;Date&gt;, a double vector</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; `old$end_date` is <span style="color: #00BB00;">a character vector</span> ('2022-02-26', '2022-02-24', '2022-02-28', '2022-02-25')</span></span>
+<span><span class="co">#&gt; `new$end_date` is <span style="color: #00BB00;">an S3 object of class &lt;Date&gt;, a double vector</span></span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="changed-data">Changed data<a class="anchor" aria-label="anchor" href="#changed-data"></a>
 </h4>
-<p>To check for changes between two datasets, we’ll use
-<code>InitialData</code> and <code>ChangedData</code>.</p>
+<p>To check for changed values between two datasets, we’ll pass
+<code>InitialData</code> and <code>ChangedData</code> to
+<code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">InitialData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/InitialData.html">InitialData</a></span></span>
 <span><span class="va">ChangedData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/ChangedData.html">ChangedData</a></span></span>
 <span><span class="va">mods</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>, base <span class="op">=</span> <span class="va">InitialData</span><span class="op">)</span></span></code></pre></div>
-<p>The changes by variable are stored in <code>diffs_byvar</code>.</p>
+<p><code><a href="../reference/create_modified_data.html">create_modified_data()</a></code> returns a list. The changes by
+variable are stored in <code>diffs_byvar</code>.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">mods</span><span class="op">$</span><span class="va">diffs_byvar</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"diffs_byvar"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
@@ -1213,29 +1370,133 @@ entered_date
 </div>
 </div>
 <div class="section level3">
+<h3 id="diffdfdiffdf">
+<code>diffdf::diffdf()</code><a class="anchor" aria-label="anchor" href="#diffdfdiffdf"></a>
+</h3>
+<p>Before version 2.1.0, <code><a href="../reference/create_changed_data.html">create_changed_data()</a></code> was built
+directly on <code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf()</a></code>, which makes
+<code>diffdf</code> the closest thing to a drop-in alternative. It takes
+the same two data frames with no extra setup.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">diffdf</span><span class="fu">::</span><span class="fu"><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf</a></span><span class="op">(</span>base <span class="op">=</span> <span class="va">InitialData</span>, compare <span class="op">=</span> <span class="va">ChangedData</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Differences found between the objects!</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Summary of BASE and COMPARE</span></span>
+<span><span class="co">#&gt;   ==================================================================</span></span>
+<span><span class="co">#&gt;     PROPERTY             BASE                       COMP            </span></span>
+<span><span class="co">#&gt;   ------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;       Name            InitialData                ChangedData        </span></span>
+<span><span class="co">#&gt;      Class     "tbl_df, tbl, data.frame"  "tbl_df, tbl, data.frame" </span></span>
+<span><span class="co">#&gt;     Rows(#)                5                          5             </span></span>
+<span><span class="co">#&gt;    Columns(#)              7                          7             </span></span>
+<span><span class="co">#&gt;   ------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Not all Values Compared Equal</span></span>
+<span><span class="co">#&gt;   =================================</span></span>
+<span><span class="co">#&gt;      Variable    No of Differences </span></span>
+<span><span class="co">#&gt;   ---------------------------------</span></span>
+<span><span class="co">#&gt;    text_value_a          2         </span></span>
+<span><span class="co">#&gt;    text_value_b          1         </span></span>
+<span><span class="co">#&gt;    updated_date          5         </span></span>
+<span><span class="co">#&gt;    entered_date          5         </span></span>
+<span><span class="co">#&gt;   ---------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   ===================================================================</span></span>
+<span><span class="co">#&gt;      VARIABLE    ..ROWNUMBER..         BASE             COMPARE      </span></span>
+<span><span class="co">#&gt;   -------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;    text_value_a        1        "Issue unresolved"  "Issue resolved" </span></span>
+<span><span class="co">#&gt;    text_value_a        2        "Issue unresolved"  "Issue resolved" </span></span>
+<span><span class="co">#&gt;   -------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   ================================================================================</span></span>
+<span><span class="co">#&gt;      VARIABLE    ..ROWNUMBER..      BASE                    COMPARE               </span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt;    text_value_b        4        "Joint pain"  "Joint pain, stiffness and swel..." </span></span>
+<span><span class="co">#&gt;   --------------------------------------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   =====================================================</span></span>
+<span><span class="co">#&gt;      VARIABLE    ..ROWNUMBER..     BASE      COMPARE   </span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------</span></span>
+<span><span class="co">#&gt;    updated_date        1        2021-09-29  2021-10-03 </span></span>
+<span><span class="co">#&gt;    updated_date        2        2021-10-03  2021-11-27 </span></span>
+<span><span class="co">#&gt;    updated_date        3        2021-09-02  2021-10-20 </span></span>
+<span><span class="co">#&gt;    updated_date        4        2021-10-03  2021-10-13 </span></span>
+<span><span class="co">#&gt;    updated_date        5        2021-09-20  2021-10-14 </span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;   =====================================================</span></span>
+<span><span class="co">#&gt;      VARIABLE    ..ROWNUMBER..     BASE      COMPARE   </span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------</span></span>
+<span><span class="co">#&gt;    entered_date        1        2021-09-29  2021-11-30 </span></span>
+<span><span class="co">#&gt;    entered_date        2        2021-10-29  2021-11-30 </span></span>
+<span><span class="co">#&gt;    entered_date        3        2021-08-18  2021-11-21 </span></span>
+<span><span class="co">#&gt;    entered_date        4        2021-10-03  2021-11-11 </span></span>
+<span><span class="co">#&gt;    entered_date        5        2021-10-20  2021-11-16 </span></span>
+<span><span class="co">#&gt;   -----------------------------------------------------</span></span></code></pre></div>
+<p><code>diffdf</code> is a solid, well-tested package
+(<code>dfdiffs</code> even inherited its numeric tolerance formula; see
+<code><a href="../reference/compare_values.html">?compare_values</a></code>). However, its output is a list of small
+<code>NumDiff</code> and <code>VarDiff_*</code> tables, one per
+differing variable, rather than the two tidy tables
+(<code>num_diffs</code> and <code>var_diffs</code>) returned by
+<code><a href="../reference/create_changed_data.html">create_changed_data()</a></code>.</p>
+</div>
+<div class="section level3">
+<h3 id="arsenalcomparedf">
+<code>arsenal::comparedf()</code><a class="anchor" aria-label="anchor" href="#arsenalcomparedf"></a>
+</h3>
+<p><code><a href="../reference/create_modified_data.html">create_modified_data()</a></code> was originally built the same
+way, but on <code><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">arsenal::comparedf()</a></code>. The code below prints the
+by-variable table from the <code><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">comparedf()</a></code> summary.</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">arsenal_cdf</span> <span class="op">&lt;-</span> <span class="fu">arsenal</span><span class="fu">::</span><span class="fu"><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">comparedf</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">InitialData</span>, y <span class="op">=</span> <span class="va">ChangedData</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">arsenal_cdf</span><span class="op">)</span><span class="op">$</span><span class="va">diffs.byvar.table</span></span>
+<span><span class="co">#&gt;          var.x        var.y n NAs</span></span>
+<span><span class="co">#&gt; 1   subject_id   subject_id 0   0</span></span>
+<span><span class="co">#&gt; 2       record       record 0   0</span></span>
+<span><span class="co">#&gt; 3 text_value_a text_value_a 2   0</span></span>
+<span><span class="co">#&gt; 4 text_value_b text_value_b 1   0</span></span>
+<span><span class="co">#&gt; 5 created_date created_date 0   0</span></span>
+<span><span class="co">#&gt; 6 updated_date updated_date 5   0</span></span>
+<span><span class="co">#&gt; 7 entered_date entered_date 5   0</span></span></code></pre></div>
+<p>Both packages report differences well, but neither provides the row
+and column headline summary produced by SAS’s <code>PROC COMPARE</code>.
+The <code><a href="../reference/compare_summary.html">compare_summary()</a></code> and <code><a href="../reference/compare_columns.html">compare_columns()</a></code>
+functions in <code>dfdiffs</code> fill that gap (see the <a href="proc-compare-parity.html">proc-compare-parity</a> vignette).</p>
+</div>
+<div class="section level3">
 <h3 id="janitorcompare_df_cols_same">
 <code>janitor::compare_df_cols_same()</code><a class="anchor" aria-label="anchor" href="#janitorcompare_df_cols_same"></a>
 </h3>
 <p>The <code><a href="https://sfirke.github.io/janitor/reference/compare_df_cols_same.html" class="external-link">compare_df_cols_same()</a></code> function from
-<code>janitor</code> compares two datasets and “<em>indicates if they
-will successfully bind together by rows.</em>”</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code>janitor</code> compares the columns in two datasets and
+“<em>indicates if they will successfully bind together by
+rows.</em>”</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://sfirke.github.io/janitor/reference/compare_df_cols_same.html" class="external-link">compare_df_cols_same</a></span><span class="op">(</span><span class="va">T1Data</span>, <span class="va">T2Data</span>, strict_description <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span><span class="fu"><a href="https://sfirke.github.io/janitor/reference/compare_df_cols_same.html" class="external-link">compare_df_cols_same</a></span><span class="op">(</span><span class="va">CompleteData</span>, <span class="va">IncompleteData</span>, strict_description <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span>
 <span><span class="fu"><a href="https://sfirke.github.io/janitor/reference/compare_df_cols_same.html" class="external-link">compare_df_cols_same</a></span><span class="op">(</span><span class="va">InitialData</span>, <span class="va">ChangedData</span>, strict_description <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
-<p>All of our test datasets meet this condition, but this check could be
-used as a step in one of our <code>create_</code> functions (to confirm
-the datasets can be bound together).</p>
+<p>All of our test datasets pass this check. It could also serve as a
+step in one of the <code>create_</code> functions to confirm the
+datasets can be bound together before they’re compared.</p>
 </div>
 <div class="section level3">
 <h3 id="testthatexpect_equal">
 <code>testthat::expect_equal()</code><a class="anchor" aria-label="anchor" href="#testthatexpect_equal"></a>
 </h3>
-<p>This works, but it returns the result as an error.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<p><code><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">testthat::expect_equal()</a></code> detects the differences, but it
+reports them by throwing an error. That’s the right behavior inside a
+unit test, but it makes the result harder to work with in an interactive
+comparison.</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">InitialData</span>, expected <span class="op">=</span> <span class="va">ChangedData</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Expected `InitialData` to equal `ChangedData`.</span></span>
@@ -1280,7 +1541,7 @@ the datasets can be bound together).</p>
 <span><span class="co">#&gt; [3] <span style="color: #00BB00;">"2021-08-18"</span>        - <span style="color: #00BB00;">"2021-11-21"</span>          [3]</span></span>
 <span><span class="co">#&gt; [4] <span style="color: #00BB00;">"2021-10-03"</span>        - <span style="color: #00BB00;">"2021-11-11"</span>          [4]</span></span>
 <span><span class="co">#&gt; [5] <span style="color: #00BB00;">"2021-10-20"</span>        - <span style="color: #00BB00;">"2021-11-16"</span>          [5]</span></span></code></pre></div>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span>object <span class="op">=</span> <span class="va">T1Data</span>, expected <span class="op">=</span> <span class="va">T2Data</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> Expected `T1Data` to equal `T2Data`.</span></span>
@@ -1375,7 +1636,11 @@ the datasets can be bound together).</p>
 <h3 id="vetralike">
 <code>vetr::alike()</code><a class="anchor" aria-label="anchor" href="#vetralike"></a>
 </h3>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<p><code><a href="https://rdrr.io/pkg/vetr/man/alike.html" class="external-link">vetr::alike()</a></code> compares the structure of two objects
+rather than their values. It returns <code>TRUE</code> when
+<code>current</code> is structurally alike <code>target</code>, or a
+character string describing the first mismatch.</p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">vetr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/vetr/man/alike.html" class="external-link">alike</a></span><span class="op">(</span>target <span class="op">=</span> <span class="va">InitialData</span>, current <span class="op">=</span> <span class="va">ChangedData</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] TRUE</span></span></code></pre></div>
 </div>

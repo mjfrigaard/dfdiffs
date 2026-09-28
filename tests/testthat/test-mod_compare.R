@@ -68,7 +68,10 @@ test_that("mod_compare_server() download report works via the 'join_column' path
       sheets <- openxlsx::getSheetNames(path)
       expect_setequal(
         sheets,
-        c("New Data", "Deleted Data", "Changed Data", "Review Changes")
+        c(
+          "New Data", "Deleted Data", "Changed Data", "Review Changes",
+          "Base Data", "Compare Data", "Column Diffs", "Class Diffs", "Summary"
+        )
       )
       review <- openxlsx::read.xlsx(path, sheet = "Review Changes")
       expect_gt(nrow(review), 0)
@@ -96,7 +99,10 @@ test_that("mod_compare_server() download report works via the row-by-row path", 
       sheets <- openxlsx::getSheetNames(path)
       expect_setequal(
         sheets,
-        c("New Data", "Deleted Data", "Changed Data", "Review Changes")
+        c(
+          "New Data", "Deleted Data", "Changed Data", "Review Changes",
+          "Base Data", "Compare Data", "Column Diffs", "Class Diffs", "Summary"
+        )
       )
       review <- openxlsx::read.xlsx(path, sheet = "Review Changes")
       expect_gt(nrow(review), 0)

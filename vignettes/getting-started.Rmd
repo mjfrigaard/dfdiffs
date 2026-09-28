@@ -13,8 +13,7 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>", 
-  error = TRUE
+  comment = "#>"
 )
 options(
   rmarkdown.html_vignette.check_title = FALSE,
@@ -24,7 +23,7 @@ extdata_folder <- "../inst/extdata/"
 
 # Motivation
 
-This vignette introduces the `dfdiffs` package. The goal of `dfdiffs` is to answer the following questions:
+When a new version of a dataset arrives, the first thing we usually want to know is what changed since the last one. `dfdiffs` answers that with three questions:
 
 1. What rows are here now that weren't here before?  
 2. What rows were here before that aren't here now?   
@@ -32,13 +31,13 @@ This vignette introduces the `dfdiffs` package. The goal of `dfdiffs` is to answ
 
 ## Packages 
 
-Load `dfdiffs`:
+We'll start by loading `dfdiffs`:
 
 ```{r dfdiffs, echo = TRUE}
 library(dfdiffs)
 ```
 
-Load the other packages used in this vignette:
+The code below loads the other packages used in this vignette:
 
 ```{r similar-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
 library(shiny)
@@ -59,11 +58,11 @@ library(gtsummary)
 
 ## Package functions 
 
-`dfdiffs` has a function for each of the questions posed above, and each function comes with a pair of example datasets that demonstrate how it works (which we'll cover below).
+`dfdiffs` has a function for each question above, and each function comes with a pair of example datasets that show how it works. We'll walk through each pair below.
 
 ### Call structure
 
-The four comparison functions below are built from a few small helpers, and the same functions power the package's Shiny app. The call trees in this section were generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in `dfdiffs` are shown.
+The four comparison functions are built from a few small helpers, and the same functions power the package's Shiny app. I generated the call trees in this section from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`), and they only show functions defined in `dfdiffs`.
 
 ```{r call-tree-getting-started, eval=FALSE}
 library(stackcallr)
@@ -73,7 +72,7 @@ call_tree_dir("R", root = "create_changed_data")
 call_tree_dir("R", root = "create_modified_data")
 ```
 
-`create_new_data()` and `create_deleted_data()` (the "new rows"/"deleted rows" answers) share `anti_join_base()`, `select_cols()`, `rename_join_col()`, and `create_new_column()`. These are all base-R helpers, so no external comparison package is involved:
+`create_new_data()` and `create_deleted_data()` answer the first two questions (new rows and deleted rows), and both rely on the same four helpers: `anti_join_base()`, `select_cols()`, `rename_join_col()`, and `create_new_column()`. These helpers are written in base R, so no external comparison package is involved:
 
 ```
 █─create_new_data
@@ -91,7 +90,7 @@ call_tree_dir("R", root = "create_modified_data")
 └─create_new_column
 ```
 
-`create_changed_data()` and `create_modified_data()` (the "changed values" answer) both build on `diff_values_by_key()`, which compares matched rows column-by-column with `compare_values()` (tolerance-aware for numeric/date-time values, label-aware for factors) and records any class mismatches via `class_diffs()`:
+`create_changed_data()` and `create_modified_data()` answer the third question (changed values), and both build on `diff_values_by_key()`. `diff_values_by_key()` compares matched rows column by column with `compare_values()`, which is tolerance-aware for numeric and date-time values and label-aware for factors. Any class mismatches are recorded with `class_diffs()`. The call tree for `create_changed_data()` is shown below:
 
 ```
 █─create_changed_data
@@ -100,10 +99,11 @@ call_tree_dir("R", root = "create_modified_data")
 │ ├─compare_values
 │ └─class_diffs
 ├─rename_join_col
-└─create_new_column
+├─create_new_column
+└─class_diffs
 ```
 
-The Shiny app (`launch_app()`) wires these functions together with three modules (upload, select, and compare), each with a UI function and a server function. `app_ui()` and `app_server()` assemble the modules, and `dfdiffs_fresh_theme()` supplies the app's theme:
+The Shiny app (`launch_app()`) wires these functions together with three modules (upload, select, and compare), and each module has a UI function and a server function. `app_ui()` and `app_server()` assemble the modules, and `dfdiffs_fresh_theme()` supplies the app's theme. The code below generates the full call tree for the app:
 
 ```{r call-tree-launch-app, eval=FALSE}
 call_tree_dir("R", root = "launch_app")
@@ -130,6 +130,7 @@ call_tree_dir("R", root = "launch_app")
   │ └─█─create_join_column
   │   └─select_cols
   └─█─mod_compare_server
+    ├─compare_columns
     ├─%nin%
     ├─info_react_theme
     ├─█─create_new_data
@@ -150,15 +151,60 @@ call_tree_dir("R", root = "launch_app")
     │ │ ├─compare_values
     │ │ └─class_diffs
     │ ├─rename_join_col
-    │ └─create_new_column
+    │ ├─create_new_column
+    │ └─class_diffs
     ├─select_cols
     ├─changed_react_theme
-    └─left_join_base
+    ├─left_join_base
+    └─█─create_comparison_report
+      ├─█─create_new_data
+      │ ├─anti_join_base
+      │ ├─select_cols
+      │ ├─rename_join_col
+      │ └─create_new_column
+      ├─█─create_deleted_data
+      │ ├─anti_join_base
+      │ ├─select_cols
+      │ ├─rename_join_col
+      │ └─create_new_column
+      ├─█─create_modified_data
+      │ ├─select_cols
+      │ ├─█─diff_values_by_key
+      │ │ ├─compare_values
+      │ │ └─class_diffs
+      │ ├─rename_join_col
+      │ ├─create_new_column
+      │ └─class_diffs
+      ├─create_empty_tbl
+      ├─compare_columns
+      ├─class_diffs
+      └─█─compare_summary
+        └─█─compare_data
+          ├─█─create_new_data
+          │ ├─anti_join_base
+          │ ├─select_cols
+          │ ├─rename_join_col
+          │ └─create_new_column
+          ├─█─create_deleted_data
+          │ ├─anti_join_base
+          │ ├─select_cols
+          │ ├─rename_join_col
+          │ └─create_new_column
+          ├─█─create_changed_data
+          │ ├─select_cols
+          │ ├─█─diff_values_by_key
+          │ │ ├─compare_values
+          │ │ └─class_diffs
+          │ ├─rename_join_col
+          │ ├─create_new_column
+          │ └─class_diffs
+          ├─class_diffs
+          └─compare_columns
 ```
 
 ## *What rows are here now that weren't here before?*
 
-To check for new data, we'll use `T1Data` and `T2Data`.
+To find new rows, we'll compare `T1Data` and `T2Data`, then check the result against `NewData`.
 
 ```{r T1Data-T2Data-NewData, echo=TRUE}
 T1Data <- dfdiffs::T1Data
@@ -188,7 +234,7 @@ reactable::reactable(T2Data, resizable = TRUE, highlight = TRUE, compact = TRUE,
 
 ### `create_new_data()`
 
-The `create_new_data()` function returns the 'new data' (i.e., the rows that are here now but weren't here before).
+`create_new_data()` returns the 'new data' (i.e., the rows that are here now but weren't here before). We pass the newer dataset to `compare` and the original dataset to `base`:
 
 ```{r , eval=FALSE}
 create_new_data(
@@ -197,7 +243,7 @@ create_new_data(
 ```
 
 
-Output from **`create_new_data()`**: Difference between 'time-point 1' & 'time-point 2'
+Output from **`create_new_data()`**: Differences between 'time-point 1' and 'time-point 2'
 
 ```{r create_new_data, echo=FALSE}
 create_new_data(
@@ -206,7 +252,7 @@ create_new_data(
   reactable::reactable(resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
-We can check this against the `NewData` dataset, which should match the output from `create_new_data()`.
+We can confirm this output is correct by checking it against the stored `NewData` dataset. The two tables should match.
 
 **`NewData`**: stored differences from `create_new_data()`
 
@@ -226,7 +272,7 @@ DeletedData <- dfdiffs::DeletedData
 
 ### A complete dataset
 
-`CompleteData` represents a 'complete' set of data. 
+`CompleteData` is the full dataset, before any rows were removed.
 
 **`CompleteData`**: simulated data for checking 'deleted data'
 
@@ -237,7 +283,7 @@ reactable::reactable(CompleteData, resizable = TRUE, highlight = TRUE, compact =
 
 ### An incomplete dataset
 
-This is a dataset with rows removed from `CompleteData`.
+`IncompleteData` is a copy of `CompleteData` with some rows removed.
 
 **`IncompleteData`**: simulated data for checking 'deleted data'
 
@@ -247,7 +293,7 @@ reactable::reactable(IncompleteData, resizable = TRUE, highlight = TRUE, compact
 
 ### `create_deleted_data()`
 
-Running `create_deleted_data()` checks for rows that were deleted between `CompleteData` and `IncompleteData`.
+`create_deleted_data()` returns the rows in `base` that are missing from `compare`. Here, that means the rows in `CompleteData` that were dropped from `IncompleteData`:
 
 ```{r create_deleted_data, echo=TRUE, eval=FALSE}
 create_deleted_data(
@@ -267,7 +313,7 @@ reactable::reactable(deleted, resizable = TRUE, highlight = TRUE, compact = TRUE
 
 ### The deleted data
 
-The output above is identical to the data stored in `DeletedData`.
+The output above matches the data stored in `DeletedData`, which confirms the deleted rows were identified correctly.
 
 **`DeletedData`**: Output from **`create_deleted_data()`**
 
@@ -278,16 +324,18 @@ reactable::reactable(DeletedData, resizable = TRUE, highlight = TRUE, compact = 
 
 ## *What values have been changed?*
 
-To answer this question, we have two options: `create_changed_data()` and `create_modified_data()`. Both build on the same base-R `diff_values_by_key()`/`compare_values()` engine and differ only in the shape of their output: `create_changed_data()` returns `$num_diffs`/`$var_diffs` (used by `compare_data()`), and `create_modified_data()` returns `$diffs_byvar`/`$diffs` (used by `mod_compare` and `create_comparison_report()`).
+`dfdiffs` has two functions for this question: `create_changed_data()` and `create_modified_data()`. Both build on the same base-R engine (`diff_values_by_key()` and `compare_values()`), and they differ only in the shape of their output. `create_changed_data()` returns `$num_diffs` and `$var_diffs`, which `compare_data()` uses. `create_modified_data()` returns `$diffs_byvar` and `$diffs`, which the app's compare module (`mod_compare`) and `create_comparison_report()` use.
 
-To check for changes between two datasets, we'll use `InitialData` and `ChangedData`.
+To check for changed values, we'll compare `InitialData` and `ChangedData`:
 
 ```{r InitialData-ChangedData, echo=TRUE}
 InitialData <- dfdiffs::InitialData
 ChangedData <- dfdiffs::ChangedData
 ```
 
-### Initial data 
+### Initial data
+
+`InitialData` is the original version of the data.
 
 **`InitialData`**: simulated data for checking 'changed/modified data'
 
@@ -297,6 +345,8 @@ reactable::reactable(InitialData, resizable = TRUE, highlight = TRUE, compact = 
 
 ### Changed data
 
+`ChangedData` is the version we'll compare against `InitialData`.
+
 **`ChangedData`**: simulated data for checking 'modified data'
 
 ```{r ChangedData, echo=FALSE}
@@ -305,7 +355,7 @@ reactable::reactable(ChangedData, resizable = TRUE, highlight = TRUE, compact = 
 
 ### `create_changed_data()` 
 
-`create_changed_data()` creates a list of tables. 
+`create_changed_data()` returns a list of tables. The code below stores the result and prints the names of its elements:
 
 ```{r changed}
 changed <- create_changed_data(
@@ -316,7 +366,7 @@ names(changed)
 
 #### Counts of changes (`num_diffs`)
 
-The counts of changes by variable are stored in `num_diffs`.
+`num_diffs` stores the number of changes for each variable.
 
 **`num_diffs`**: counts of changes for 'changed data'
 
@@ -326,7 +376,7 @@ reactable::reactable(changed$num_diffs, resizable = TRUE, highlight = TRUE, comp
 
 #### Changes by row (`var_diffs`)
 
-The changes by row are stored in `var_diffs`.
+`var_diffs` lists the changes row by row.
 
 **`var_diffs`**: Row-by-row of changes for 'changed data'
 
@@ -337,7 +387,7 @@ reactable::reactable(changed$var_diffs, resizable = TRUE, highlight = TRUE, comp
 
 ### `create_modified_data()` 
 
-The `create_modified_data()` function also creates a list of tables. 
+`create_modified_data()` also returns a list of tables, with different element names:
 
 ```{r modified}
 modified <- create_modified_data(
@@ -348,7 +398,7 @@ names(modified)
 
 #### Counts of changes (`diffs_byvar`)
 
-The counts of changes by variable are stored in `diffs_byvar`.
+`diffs_byvar` stores the number of changes for each variable.
 
 **`diffs_byvar`**: counts of changes for 'modified data'
 
@@ -356,9 +406,9 @@ The counts of changes by variable are stored in `diffs_byvar`.
 reactable::reactable(modified$diffs_byvar, resizable = TRUE, highlight = TRUE, compact = TRUE, wrap = FALSE, bordered = TRUE, filterable = TRUE)
 ```
 
-#### Changes by row 
+#### Changes by row (`diffs`)
 
-The changes by row are stored in `diffs`.
+`diffs` lists the changes row by row.
 
 **`diffs`**: Row-by-row changes of 'modified data'
 

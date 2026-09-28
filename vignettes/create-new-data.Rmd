@@ -11,15 +11,9 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-library(janitor) # compare_df_cols
-library(arsenal) # comparedf
-library(diffdf)  # diffdf
-library(testthat) # expect_equal
-library(vetr) # alike
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>", 
-  error = TRUE
+  comment = "#>"
 )
 options(
   rmarkdown.html_vignette.check_title = FALSE,
@@ -29,41 +23,35 @@ extdata_folder <- "../inst/extdata/"
 
 # Motivation
 
-The goal of `dfdiffs` is to answer the following questions:
+When we receive an updated version of a dataset, `dfdiffs` helps us answer three questions:
 
 1. *What rows are here now that weren't here before?*
-2. What rows were here before that aren't here now?   
-3. What values have been changed?   
+2. What rows were here before that aren't here now?
+3. What values have been changed?
 
-This vignette takes us through the `create_new_data()` function, which answers the question, "*What rows are here now that weren't here before?*"
+This vignette covers `create_new_data()`, which answers the first question: "*What rows are here now that weren't here before?*"
 
 ## Packages
 
 ```{r pkgs, message=FALSE, warning=FALSE, results='hide'}
 library(dfdiffs)
 library(dplyr)
-library(stringr)
-library(lubridate)
-library(fs)
-library(vctrs)
-library(glue)
-library(purrr)
 ```
 
 ## What rows are here now that weren't here before? 
 
-We're going to use two test datasets to demonstrate the `create_new_data()` function.
+We'll use two test datasets from the package to demonstrate `create_new_data()`.
 
-### Base Data 
+### Base Data
 
-The `T1Data` below contains six rows and eight variables.
+`T1Data` is our base (original) dataset. It contains six rows and eight variables.
 
 ```{r Original}
 T1Data <- dfdiffs::T1Data
 glimpse(T1Data)
 ```
 
-The unique identifier in this dataset is the combination of subject and record (which we can see below):
+Each row in `T1Data` is uniquely identified by the combination of `subject` and `record`, which we can confirm below:
 
 ```{r distinct-subject-record}
 distinct(T1Data, subject)
@@ -73,14 +61,14 @@ distinct(T1Data, subject, record)
 
 ### Compare Data 
 
-We'll compare `T2Data` to the original data. `T2Data` has the same six rows as `T1Data`, plus three additional rows.
+`T2Data` is the dataset we'll compare against `T1Data`. It has the same six rows as `T1Data`, plus three additional rows.
 
 ```{r T2Data}
 T2Data <- dfdiffs::T2Data
 glimpse(T2Data)
 ```
 
-The unique identifier in this dataset is the combination of subject and record (which we can see below):
+The same `subject` and `record` combination uniquely identifies each row in `T2Data`:
 
 ```{r distinct-subject-record-T2Data}
 distinct(T2Data, subject)
@@ -89,9 +77,7 @@ distinct(T2Data, subject, record)
 
 ### Creating a unique identifier
 
-We also need a function that lets users specify the joining variables. It creates a new `join_var` from the supplied columns that together form a unique identifier in each dataset.
-
-For example, we can create a unique identifier named `join_var` in `T1Data` and `T2Data`:
+Matching rows between two datasets requires a joining variable that uniquely identifies each row. The simplest option is a row number, so we'll start by adding a `join_var` column to both `T1Data` and `T2Data` and moving it to the front:
 
 ```{r T1DataJoin-T2DataJoin}
 T1DataJoin <- mutate(T1Data, 
@@ -101,6 +87,8 @@ T2DataJoin <- mutate(T2Data,
   join_var = as.character(row_number())) %>% 
   dplyr::relocate(join_var, everything())
 ```
+
+Both datasets now start with a `join_var` column:
 
 ```{r T1DataJoin, eval=FALSE}
 T1DataJoin
@@ -118,141 +106,53 @@ T2DataJoin
 knitr::kable(T2DataJoin)
 ```
 
-## Conditions 
+## `create_new_column()`
 
-Each function in the `dfdiffs` package assumes the following conditions: 
+`T1DataJoin` and `T2DataJoin` use a plain row number as the join key. When the unique identifier is a *combination* of existing columns (like `subject` and `record`), `create_new_column()` pastes those columns together into a single new column. The function takes the data, the columns to combine, and a name for the new column:
 
-1) Two datasets
+```{r create_new_column, eval=FALSE}
+create_new_column(data = , cols = , new_name = )
+```
 
-2) Multiple columns to compare (`cols`)
+Below we combine `subject` and `record` into `join_var` for both datasets:
 
-3) Single `by` column
+```{r T1DataSubjRec-T2DataSubjRec}
+T1DataSubjRec <- create_new_column(data = T1Data,
+  cols = c("subject", "record"),
+  new_name = "join_var")
+T2DataSubjRec <- create_new_column(data = T2Data,
+  cols = c("subject", "record"),
+  new_name = "join_var")
+```
 
-4) Single `by` column, new column name (`by_col`)
+```{r show-T1DataSubjRec, echo=FALSE}
+knitr::kable(T1DataSubjRec)
+```
 
-5) Single `by` column, multiple compare columns (`cols`)
+`create_new_data()`, `create_deleted_data()`, `create_changed_data()`, and `create_modified_data()` all call this same helper internally whenever `by` has more than one column (see the call trees below and in [create-deleted-data](create-deleted-data.html#call-structure)).
 
-6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
+## Arguments
 
-7) Multiple `by` columns
+`create_new_data()` takes five arguments, and every comparison function in the package shares them: `compare`, `base`, `by`, `by_col`, and `cols`. The last three are optional, and the combination we supply determines how rows are matched and which columns are compared:
 
-8) Multiple `by` columns, new column name (`by_col`)
+| `by` | `by_col` | `cols` | What happens |
+|:---|:---|:---|:---|
+| (none) | (none) | (none) | rows are matched on their values across every shared column (`create_changed_data()` and `create_modified_data()` match by row position instead) |
+| (none) | (none) | given | the same matching, restricted to `cols` |
+| single column | (none) | (none) | join on `by`, compare every shared column |
+| single column | given | (none) | join, renaming the key column to `by_col` |
+| single column | (none) | given | join on `by`, compare only `cols` |
+| single column | given | given | join renamed to `by_col`, compare only `cols` |
+| multiple columns | (none) | (none) | `by` columns combined into one `join` key |
+| multiple columns | given | (none) | `by` columns combined into a key named `by_col` |
+| multiple columns | (none) | given | combined key, compare only `cols` |
+| multiple columns | given | given | combined key named `by_col`, compare only `cols` |
 
-9) Multiple `by` columns, multiple compare columns (`cols`)
-
-10) Multiple `by` columns, a new `by_col`, and `cols`
-
-### Single by column conditions
-
-1) Two datasets, compare all columns:
-
-    ```{r cond-1, eval=FALSE}
-    create_new_data(
-      compare = T2Data, 
-      base = T1Data)
-    ```
-
-2) Multiple columns to compare (`cols`): 
-
-    ```{r cond-2, eval=FALSE}
-    create_new_data(
-      compare = T2Data, 
-      base = T1Data,
-      cols = c("text_var", "factor_var"))
-    ```
-
-
-3) Single `by` column, no new column name
-
-    ```{r cond-3, eval=FALSE}
-    create_new_data(
-      compare = T2DataJoin, 
-      base = T1DataJoin, 
-      by = "join_var")
-    ```
-
-4) Single `by` column, new column name (`by_col`)
-
-    ```{r cond-4, eval=FALSE}
-    create_new_data(
-      compare = T2DataJoin, 
-      base = T1DataJoin, 
-      by = "join_var", 
-      by_col = 'new_join_var')
-    ```
-
-5) Single `by` column, multiple compare columns (`cols`)
-
-    ```{r cond-5, eval=FALSE}
-    create_new_data(
-      compare = T2DataJoin, 
-      base = T1DataJoin, 
-      by = "join_var", 
-      cols = c("text_var", "factor_var", "subject", "record"))
-    ```
-
-6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
-
-    ```{r cond-6, eval=FALSE}
-    create_new_data(
-    compare = T2DataJoin, 
-    base = T1DataJoin, 
-    # unique id
-    by = "join_var", 
-    # new name for id
-    by_col = 'new_join_var', 
-    # cols to compare
-    cols = c("subject", "record", "text_var", "factor_var"))
-    ```
-
-
-### Multiple by column conditions
-
-7) Multiple `by` columns
-
-    ```{r cond-7, eval=FALSE}
-    create_new_data(
-      compare = T2Data, 
-      base = T1Data, 
-      by = c('subject', 'record'))
-    ```
-
-
-8) Multiple `by` columns, new column name (`by_col`)
-
-    ```{r cond-8, eval=FALSE}
-    create_new_data(
-      compare = T2Data, 
-      base = T1Data, 
-      by = c('subject', 'record'),
-      by_col = "new_join_col")
-    ```
-
-9) Multiple `by` columns, multiple compare columns (`cols`)
-
-    ```{r cond-9, eval=FALSE}
-    create_new_data(
-      compare = T2Data, 
-      base = T1Data, 
-      by = c('subject', 'record'),
-      cols = c("subject",  "record", "factor_var", "text_var"))
-    ```
-
-10) Multiple `by` columns, a new `by_col`, and `cols`
-
-    ```{r cond-10, eval=FALSE}
-    create_new_data(
-      compare = T2Data, 
-      base = T1Data, 
-      by = c('subject', 'record'),
-      by_col = "new_join_col",
-      cols = c("subject", "record", "text_var", "factor_var"))
-    ```
-
+The worked examples below cover three of these cases: no `by` column, a single `by` column, and multiple `by` columns with `by_col` and `cols`. Every other row in the table is a combination of the same pieces.
 
 # create_new_data()
 
-Below is the `create_new_data()` function:
+The signature and source for `create_new_data()` are below:
 
 ```{r args-create_new_data, eval=FALSE}
 create_new_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
@@ -341,50 +241,23 @@ create_new_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL
 }
 ```
 
-The `cond-1` through `cond-10` examples above call the real, exported `dfdiffs::create_new_data()`. The source shown here is display-only (`eval=FALSE`) and no longer redefines the function, so it can't shadow the package's own implementation.
+The source above is for display only (`eval=FALSE`). The examples below call the exported `dfdiffs::create_new_data()`.
 
-```{r create_new_data_cond_test, eval=FALSE, echo=FALSE}
-create_new_data_cond_test <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
-  # convert all columns to character
-  compare <- mutate(compare, across(.cols = everything(), .fns = as.character))
-  base <- mutate(base, across(.cols = everything(), .fns = as.character))
-  compare <- rename_join_col(compare, by = by, by_col = by_col)
-  base <- rename_join_col(base, by = by, by_col = by_col)
-  compare_cols <- select(compare, all_of(by_col), all_of(cols))
-  base_cols <- select(base, all_of(by_col), all_of(cols))
-  new_data_join <- dplyr::anti_join(x = compare_cols, y = base_cols,
-                                    by = {{by_col}})
-  new_data <- dplyr::distinct(new_data_join)
-    return(new_data)
-}
-create_new_data_cond_test(
-  # data 
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
-  # unique id
-  by = "join_var", 
-  # new name for id
-  by_col = 'new_join_var', 
-  # cols to compare
-  cols = c("text_var", "factor_var", "subject", "record")
-)
-```
+`compare` = the current (new) dataset in the comparison
 
+`base` = the previous (old) dataset in the comparison
 
+`by` = the unique identifier for joining the two tables
 
-`compare` = The current or new dataset in the comparison 
-
-`base` = The previous or old dataset in the comparison 
-
-`by` = the unique identifier for joining the two tables 
-
-`by_col` = a new name for the joining column 
+`by_col` = a new name for the joining column
 
 `cols` = the columns to compare (if none are provided, all columns are compared)
 
 ## Call structure
 
-`create_new_data()` relies on four helpers from the package: `anti_join_base()` and `select_cols()` (base-R replacements for `dplyr::anti_join()`/`dplyr::select()`), `rename_join_col()` (renames the join column), and `create_new_column()` (builds the join column from the `by` columns). The call tree below was generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in `dfdiffs` are shown.
+`create_new_data()` relies on four helpers from the package. `anti_join_base()` and `select_cols()` are base R replacements for `dplyr::anti_join()` and `dplyr::select()`, `rename_join_col()` renames the join column, and `create_new_column()` builds the join column from the `by` columns.
+
+The call tree below was generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in `dfdiffs` are shown.
 
 ```{r call-tree-create_new_data, eval=FALSE}
 stackcallr::call_tree_dir("R", root = "create_new_data")
@@ -398,259 +271,54 @@ stackcallr::call_tree_dir("R", root = "create_new_data")
 └─create_new_column
 ```
 
-## Single `by` column conditions
+## Worked examples
 
-The function also needs to handle multiple conditions. Below we cover the conditions for a single `by` column (assuming each dataset already has a unique identifier). First, we'll cover a few uncommon conditions, like a missing `by` column, or a missing `by` column with specific columns selected for comparison.
+### No `by` column: matching whole rows
 
-### 1) Two datasets
-
-+ No `by` columns (only two datasets)
+When we supply only the two datasets, `create_new_data()` treats a row in `compare` as new if no row in `base` has identical values across every shared column:
 
 ```{r only-datasets, eval=FALSE}
 create_new_data(
-  compare = T2Data, 
+  compare = T2Data,
   base = T1Data)
 ```
 
 ```{r only-datasets-show, echo=FALSE}
 knitr::kable(
 create_new_data(
-  compare = T2Data, 
+  compare = T2Data,
   base = T1Data)
 )
 ```
 
+### A single `by` column
 
-```{r only-datasets-join-data, eval=FALSE}
-create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin)
-```
-
-```{r only-datasets-join-data-show, echo=FALSE}
-knitr::kable(
-create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin)
-)
-```
-
-We can see this performs a row-by-row comparison. 
-
-### 2) Multiple columns to compare (`cols`)
-
-+ No `by` columns (only two datasets) and multiple compare columns (`cols`)
-
-```{r create_new_data-no-by-no-by_col-multiple-cols, eval=FALSE}
-create_new_data(
-  compare = T2Data, 
-  base = T1Data,
-  cols = c("text_var", "factor_var"))
-```
-
-```{r create_new_data-no-by-no-by_col-multiple-cols-show, echo=FALSE}
-knitr::kable(
-create_new_data(
-  compare = T2Data, 
-  base = T1Data,
-  cols = c("text_var", "factor_var"))
-)
-```
-
-```{r create_new_data-no-by-no-by_col-multiple-cols-join-data, eval=FALSE}
-create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin,
-  cols = c("text_var", "factor_var"))
-```
-
-```{r create_new_data-no-by-no-by_col-multiple-cols-join-data-show, echo=FALSE}
-knitr::kable(
-create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin,
-  cols = c("text_var", "factor_var")))
-```
-
-### 3) Single `by` column
-
-+ We can provide a single `by` column using the `T1DataJoin` and `T2DataJoin` datasets we created above.
+`T1DataJoin` and `T2DataJoin` both contain the `join_var` identifier we created above. Passing it as a single `by` column matches rows on that key instead of on row position:
 
 ```{r single-by-column, eval=FALSE}
 create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
+  compare = T2DataJoin,
+  base = T1DataJoin,
   by = "join_var")
 ```
 
 ```{r single-by-column-show, echo=FALSE}
 knitr::kable(
 create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
+  compare = T2DataJoin,
+  base = T1DataJoin,
   by = "join_var")
 )
 ```
 
-### 4) Single `by` column, new column name (`by_col`)
+### Multiple `by` columns, a new `by_col`, and `cols`
 
-+ We can also provide a single `by` column (the unique identifier) and a new name for it with `by_col`.
-
-```{r single-by-column-new-by_col, eval=FALSE}
-create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
-  by = "join_var", 
-  by_col = 'new_join_var')
-```
-
-
-```{r single-by-column-new-by_col-show, echo=FALSE}
-knitr::kable(
-create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
-  by = "join_var", 
-  by_col = 'new_join_var')
-)
-```
-
-
-### 5) Single `by` column, multiple compare columns (`cols`)
-
-+ Single `by` column and multiple compare columns (`cols`)   
-
-```{r  create_new_data-single-by-multiple-cols, eval=FALSE}
-create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
-  by = "join_var", 
-  cols = c("text_var", "factor_var", "subject", "record"))
-```
-
-```{r  kable-create_new_data-single-by-multiple-cols, echo=FALSE}
-knitr::kable(
-create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
-  by = "join_var", 
-  cols = c("text_var", "factor_var", "subject", "record"))
-)
-```
-
-
-### 6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
-
-- Single `by` column, a new name for the by column (`by_col`), and multiple compare columns (`cols`)
-
-```{r create_new_data-multiple-by-by_col-multiple-cols, eval=FALSE}
-create_new_data(
-  # data 
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
-  # unique id
-  by = "join_var", 
-  # new name for id
-  by_col = 'new_join_var', 
-  # cols to compare
-  cols = c("subject", "record", "text_var", "factor_var"))
-```
-
-```{r create_new_data-multiple-by-by_col-multiple-cols-show, echo=FALSE}
-knitr::kable(
-create_new_data(
-  # data 
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
-  # unique id
-  by = "join_var", 
-  # new name for id
-  by_col = 'new_join_var', 
-  # cols to compare
-  cols =  c("subject", "record", "text_var", "factor_var"))
-)
-```
-
-## Multiple `by` column conditions
-
-Next, we'll test conditions in which multiple columns are used to create a unique identifier.
-
-### 7) Multiple `by` columns
-
-+ Multiple `by` columns (assuming the columns create a unique identifier) 
-
-```{r multiple-by, eval=FALSE}
-create_new_data(
-  compare = T2Data, 
-  base = T1Data, 
-  by = c('subject', 'record'))
-```
-
-```{r multiple-by-show, echo=FALSE}
-knitr::kable(
-create_new_data(
-  compare = T2Data, 
-  base = T1Data, 
-  by = c('subject', 'record'))
-)
-```
-
-This creates a new `join` column that combines `subject` and `record`.
-
-### 8) Multiple `by` columns, new column name (`by_col`)
-
-We can provide multiple `by` columns, a new `by_col`, and **no `cols`**.
-
-```{r multiple-by-new-by_col, eval=FALSE}
-create_new_data(
-  compare = T2Data, 
-  base = T1Data, 
-  by = c('subject', 'record'),
-  by_col = "new_join_col")
-```
-
-
-```{r multiple-by-new-by_col-show, echo=FALSE}
-knitr::kable(
-create_new_data(
-  compare = T2Data, 
-  base = T1Data, 
-  by = c('subject', 'record'),
-  by_col = "new_join_col")
-)
-```
-
-### 9) Multiple `by` columns, multiple compare columns (`cols`)  
-
-+ Multiple `by` columns and multiple compare columns (`cols`), and **no new `by_col`**.
-
-```{r create_new_data-multiple-by-cols, eval=FALSE}
-create_new_data(
-  compare = T2Data, 
-  base = T1Data, 
-  by = c('subject', 'record'),
-  cols = c("subject",  "record", "factor_var", "text_var"))
-```
-
-
-```{r create_new_datamultiple-by-cols-show, echo=FALSE}
-knitr::kable(
-create_new_data(
-  compare = T2Data, 
-  base = T1Data, 
-  by = c('subject', 'record'),
-  cols = c("subject",  "record", "factor_var", "text_var"))
-)
-```
-
-### 10) Multiple `by` columns, a new `by_col`, and `cols`
-
-We can provide multiple `by` columns, a new `by_col`, and multiple `cols`.
+This is the most complete case. The `by` columns are combined into a single key named with `by_col`, and only the columns in `cols` are compared:
 
 ```{r multiple-by-new-by_col-cols, eval=FALSE}
 create_new_data(
-  compare = T2Data, 
-  base = T1Data, 
+  compare = T2Data,
+  base = T1Data,
   by = c('subject', 'record'),
   by_col = "new_join_col",
   cols = c("subject", "record", "text_var", "factor_var"))
@@ -659,8 +327,8 @@ create_new_data(
 ```{r multiple-by-new-by_col-cols-eval, echo=FALSE}
 knitr::kable(
 create_new_data(
-  compare = T2Data, 
-  base = T1Data, 
+  compare = T2Data,
+  base = T1Data,
   by = c('subject', 'record'),
   by_col = "new_join_col",
   cols = c("subject", "record", "text_var", "factor_var"))

@@ -14,8 +14,7 @@ vignette: >
 library(knitr)
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>", 
-  error = TRUE,
+  comment = "#>",
   message = FALSE,
   warning = FALSE,
   echo = TRUE
@@ -28,17 +27,17 @@ extdata_folder <- "../inst/extdata/"
 
 # Motivation 
 
-This vignette covers similar functions and packages that compare two datasets to each other.
+`dfdiffs` isn't the only way to compare two datasets in R. In this vignette I'll cover other functions and packages that solve similar problems, and how their output differs from what `dfdiffs` returns.
 
 ## Packages
 
-Load `dfdiffs`:
+First, we'll load `dfdiffs`.
 
 ```{r dfdiffs, echo = TRUE}
 library(dfdiffs)
 ```
 
-We'll also need packages for import/export, iteration, and wrangling:
+We'll also need packages for importing and exporting data, iteration, and string wrangling.
 
 ```{r more-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
 library(readr)
@@ -47,7 +46,7 @@ library(purrr)
 library(glue)
 ```
 
-These packages are for building tables:
+The packages below are used for building tables.
 
 ```{r tbl-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
 library(labelled)
@@ -56,25 +55,25 @@ library(kableExtra)
 ```
 
 
-These packages offer similar comparison functions:
+The packages below offer comparison functions similar to those in `dfdiffs`.
 
 ```{r similar-pkgs, message=FALSE, warning=FALSE, echo = TRUE}
+library(arsenal) # comparedf
+library(diffdf)  # diffdf
 library(janitor) # compare_df_cols
 library(testthat) # expect_equal
 library(vetr) # alike
-library(labelled)
-library(gtsummary)
 ```
 
 ## Data 
 
-We'll use the data in this package to cover similar `packages::functions()`.
+Before looking at the alternatives, we'll run the `dfdiffs` functions on the example datasets included in the package. These outputs give us a baseline for comparing the other `package::function()` options below.
 
 ### New data
 
-To check for new data, we'll use `T1Data` and `T2Data`. The `create_new_data()` function returns the 'new data' (i.e., the rows that are here now but weren't here before).
+To check for new data, we'll use `T1Data` and `T2Data`. The `create_new_data()` function returns the new data (i.e., the rows that are here now but weren't here before).
 
-We can check this against the `NewData` dataset, which should match the output from `create_new_data()`.
+The `NewData` dataset stores the expected result, so we can check it against the output from `create_new_data()`.
 
 ```{r T1Data-T2Data-NewData, echo=TRUE}
 T1Data <- dfdiffs::T1Data
@@ -93,7 +92,7 @@ NewData |>
 ```
 
 
-We can see the only differences between the datasets are the formats of the date columns:
+Comparing the two tables with `waldo::compare()` shows the only differences are the formats of the date columns.
 
 ```{r waldo-compare-T1T2New-NewData}
 waldo::compare(x = T1T2New, y = NewData)
@@ -104,7 +103,7 @@ waldo::compare(x = T1T2New, y = NewData)
 
 To test for deleted data, we'll use `CompleteData`, `IncompleteData`, and `DeletedData`.
 
-`CompleteData` represents a 'complete' set of data.
+`CompleteData` is the complete (baseline) dataset.
 
 ```{r CompleteData}
 CompleteData <- dfdiffs::CompleteData
@@ -114,7 +113,7 @@ CompleteData |>
 ```
 
 
-`IncompleteData` is a dataset with rows removed from `CompleteData`.
+`IncompleteData` is `CompleteData` with some of its rows removed.
 
 ```{r IncompleteData}
 IncompleteData <- dfdiffs::IncompleteData
@@ -124,19 +123,19 @@ IncompleteData |>
 ```
 
 
-Running `create_deleted_data()` checks for rows that were deleted between `CompleteData` and `IncompleteData`.
+`create_deleted_data()` returns the rows in `CompleteData` that are missing from `IncompleteData`. We'll sort the result by `subject` before printing it.
 
 ```{r CompleteData-IncompleteData, echo = TRUE}
 IncompCompDiff <- create_deleted_data(
-  compare = IncompleteData, 
-  base = CompleteData) |> 
-  arrange(subject)
-IncompCompDiff |> 
-  knitr::kable(caption = "IncompCompDiff") |> 
+  compare = IncompleteData,
+  base = CompleteData)
+IncompCompDiff <- IncompCompDiff[order(IncompCompDiff$subject), ]
+IncompCompDiff |>
+  knitr::kable(caption = "IncompCompDiff") |>
   kableExtra::kable_paper()
 ```
 
-The output above is identical to the data stored in `DeletedData`.
+The output above should match the data stored in `DeletedData`.
 
 ```{r DeletedData}
 DeletedData <- dfdiffs::DeletedData
@@ -145,7 +144,7 @@ DeletedData |>
   kableExtra::kable_paper()
 ```
 
-We can confirm this with `waldo::compare()`:
+We can confirm the two tables are identical with `waldo::compare()`.
 
 ```{r waldo-compare-IncompCompDiff-DeletedData}
 waldo::compare(x = IncompCompDiff, y = DeletedData)
@@ -153,7 +152,7 @@ waldo::compare(x = IncompCompDiff, y = DeletedData)
 
 ### Changed data
 
-To check for changes between two datasets, we'll use `InitialData` and `ChangedData`.
+To check for changed values between two datasets, we'll pass `InitialData` and `ChangedData` to `create_modified_data()`.
 
 ```{r InitialData-ChangedData, echo=TRUE}
 InitialData <- dfdiffs::InitialData
@@ -162,7 +161,7 @@ mods <- create_modified_data(
   compare = ChangedData, base = InitialData)
 ```
 
-The changes by variable are stored in `diffs_byvar`.
+`create_modified_data()` returns a list. The changes by variable are stored in `diffs_byvar`.
 
 ```{r diffs_byvar}
 mods$diffs_byvar |> 
@@ -179,9 +178,30 @@ mods$diffs |>
 ```
 
 
+## `diffdf::diffdf()`
+
+Before version 2.1.0, `create_changed_data()` was built directly on `diffdf::diffdf()`, which makes `diffdf` the closest thing to a drop-in alternative. It takes the same two data frames with no extra setup.
+
+```{r diffdf_diffdf, echo=TRUE}
+diffdf::diffdf(base = InitialData, compare = ChangedData)
+```
+
+`diffdf` is a solid, well-tested package (`dfdiffs` even inherited its numeric tolerance formula; see `?compare_values`). However, its output is a list of small `NumDiff` and `VarDiff_*` tables, one per differing variable, rather than the two tidy tables (`num_diffs` and `var_diffs`) returned by `create_changed_data()`.
+
+## `arsenal::comparedf()`
+
+`create_modified_data()` was originally built the same way, but on `arsenal::comparedf()`. The code below prints the by-variable table from the `comparedf()` summary.
+
+```{r arsenal_comparedf, echo=TRUE}
+arsenal_cdf <- arsenal::comparedf(x = InitialData, y = ChangedData)
+summary(arsenal_cdf)$diffs.byvar.table
+```
+
+Both packages report differences well, but neither provides the row and column headline summary produced by SAS's `PROC COMPARE`. The `compare_summary()` and `compare_columns()` functions in `dfdiffs` fill that gap (see the [proc-compare-parity](proc-compare-parity.html) vignette).
+
 ## `janitor::compare_df_cols_same()`
 
-The `compare_df_cols_same()` function from `janitor` compares two datasets and "*indicates if they will successfully bind together by rows.*"
+The `compare_df_cols_same()` function from `janitor` compares the columns in two datasets and "*indicates if they will successfully bind together by rows.*"
 
 ```{r compare_df_cols_same, echo=TRUE}
 compare_df_cols_same(T1Data, T2Data, strict_description = FALSE)
@@ -189,11 +209,11 @@ compare_df_cols_same(CompleteData, IncompleteData, strict_description = FALSE)
 compare_df_cols_same(InitialData, ChangedData, strict_description = FALSE)
 ```
 
-All of our test datasets meet this condition, but this check could be used as a step in one of our `create_` functions (to confirm the datasets can be bound together).
+All of our test datasets pass this check. It could also serve as a step in one of the `create_` functions to confirm the datasets can be bound together before they're compared.
 
 ## `testthat::expect_equal()`
 
-This works, but it returns the result as an error.
+`testthat::expect_equal()` detects the differences, but it reports them by throwing an error. That's the right behavior inside a unit test, but it makes the result harder to work with in an interactive comparison.
 
 ```{r expect_equal-initial-changed, error=TRUE}
 testthat::expect_equal(object = InitialData, expected = ChangedData)
@@ -205,6 +225,8 @@ testthat::expect_equal(object = T1Data, expected = T2Data)
 
 
 ## `vetr::alike()`
+
+`vetr::alike()` compares the structure of two objects rather than their values. It returns `TRUE` when `current` is structurally alike `target`, or a character string describing the first mismatch.
 
 ```{r}
 vetr::alike(target = InitialData, current = ChangedData)

@@ -83,3 +83,33 @@ test_that("diff_values_by_key() records a genuine class mismatch", {
   expect_equal(nrow(out$class_diffs), 1)
   expect_equal(out$class_diffs$variable, "x")
 })
+
+test_that("compare_values() with ignore_case = TRUE treats differently-cased strings as equal", {
+  expect_true(compare_values("Headache", "headache"))
+  expect_false(compare_values("Headache", "headache", ignore_case = TRUE))
+})
+
+test_that("compare_values() with trim_ws = TRUE ignores leading/trailing whitespace", {
+  expect_true(compare_values("headache", " headache "))
+  expect_false(compare_values("headache", " headache ", trim_ws = TRUE))
+})
+
+test_that("compare_values() ignore_case/trim_ws apply to factor labels too", {
+  expect_false(compare_values(factor("Headache"), " headache ", ignore_case = TRUE, trim_ws = TRUE))
+})
+
+test_that("diff_values_by_key() warns once per side on duplicate keys, still compares first match", {
+  base <- data.frame(id = c(1, 1, 2), val = c("a", "z", "b"), stringsAsFactors = FALSE)
+  compare <- data.frame(id = c(1, 2), val = c("A", "b"), stringsAsFactors = FALSE)
+  expect_warning(
+    diff_values_by_key(base, compare, by = "id"),
+    "duplicate key"
+  )
+})
+
+test_that("diff_values_by_key() passes ignore_case/trim_ws through to compare_values()", {
+  base <- data.frame(id = 1, val = "Headache", stringsAsFactors = FALSE)
+  compare <- data.frame(id = 1, val = " headache ", stringsAsFactors = FALSE)
+  out <- diff_values_by_key(base, compare, by = "id", ignore_case = TRUE, trim_ws = TRUE)
+  expect_equal(nrow(out$diffs), 0)
+})

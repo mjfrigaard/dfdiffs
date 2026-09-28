@@ -14,8 +14,7 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>", 
-  error = TRUE
+  comment = "#>"
 )
 options(
   rmarkdown.html_vignette.check_title = FALSE,
@@ -40,15 +39,15 @@ library(readxl)
 
 # Motivation
 
-The goal of `dfdiffs` is to answer the following questions:
+The other vignettes answer each `dfdiffs` question with its own function. In this vignette I'll cover `compare_data()`, which answers all three questions in a single call:
 
-1. What rows are here now that weren't here before?  
-2. What rows were here before that aren't here now?   
+1. What rows are here now that weren't here before?
+2. What rows were here before that aren't here now?
 3. What values have been changed?
 
 ## Test data
 
-`Roster2021` and `Roster2022` are two yearly pulls of a synthetic (not real) clinical site roster, used here to demonstrate `dfdiffs` at a larger scale than the small toy datasets in the other vignettes. See `?Roster2021` for details.
+`Roster2021` and `Roster2022` are two yearly pulls of a synthetic (not real) clinical site roster. They're larger than the toy datasets in the other vignettes, so they show how `dfdiffs` works at a more realistic scale (see `?Roster2021` for details). The code below loads both rosters and prints their row counts:
 
 ```{r masters}
 r21 <- dfdiffs::Roster2021
@@ -59,35 +58,41 @@ nrow(r22)
 
 ## The `compare_data()` function
 
-Below are the arguments for `compare_data()`:
+`compare_data()` takes the following arguments:
 
 ```{r compare_data-args, eval=FALSE}
-compare_data(compare = , base = , by = , by_col = , cols = )
+compare_data(compare = , base = , by = , by_col = , cols = , ignore_case = , trim_ws = )
 ```
 
 ```{r compare_data, echo=FALSE, eval=FALSE}
-compare_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL) {
-  
+compare_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL,
+                          ignore_case = FALSE, trim_ws = FALSE) {
+
   new_data <- create_new_data(
     compare = compare, base = base, by = by, by_col = by_col, cols = cols)
-  
+
   deleted_data <- create_deleted_data(
     compare = compare, base = base, by = by, by_col = by_col, cols = cols)
-  
+
   changed_data <- create_changed_data(
-    compare = compare, base = base, by = by, by_col = by_col, cols = cols)
-  
+    compare = compare, base = base, by = by, by_col = by_col, cols = cols,
+    ignore_case = ignore_case, trim_ws = trim_ws)
+
   changed_num_diffs <- changed_data$num_diffs
   changed_var_diffs <- changed_data$var_diffs
-  
+
   return(list(
     'new_data' = new_data,
     'deleted_data' = deleted_data,
     'changed_num_diffs' = changed_num_diffs,
-    'changed_var_diffs' = changed_var_diffs
+    'changed_var_diffs' = changed_var_diffs,
+    'changed_class_diffs' = changed_data$class_diffs,
+    'column_diffs' = compare_columns(base = base, compare = compare)
   ))
 }
 ```
+
+The code below compares the 2022 roster against the 2021 roster, matches rows on `subject_id`, and limits the comparison to four columns. `compare_data()` returns a named list:
 
 ```{r test-compare_data}
 comparisons <- compare_data(
@@ -99,7 +104,7 @@ names(comparisons)
 
 ## Call structure
 
-`compare_data()` runs `create_new_data()`, `create_deleted_data()`, and `create_changed_data()`, and returns their results in a single list. The call tree below was generated from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`); only functions defined in `dfdiffs` are shown.
+`compare_data()` runs `create_new_data()`, `create_deleted_data()`, and `create_changed_data()`, adds the column-structure diff from `compare_columns()`, and returns everything in a single list. I generated the call tree below from the package source with [stackcallr](https://github.com/mjfrigaard/stackcallr) (`pak::pak("mjfrigaard/stackcallr")`), and it only shows functions defined in `dfdiffs`.
 
 ```{r call-tree-compare_data, eval=FALSE}
 stackcallr::call_tree_dir("R", root = "compare_data")
@@ -117,16 +122,19 @@ stackcallr::call_tree_dir("R", root = "compare_data")
 │ ├─select_cols
 │ ├─rename_join_col
 │ └─create_new_column
-└─█─create_changed_data
-  ├─select_cols
-  ├─█─diff_values_by_key
-  │ ├─compare_values
-  │ └─class_diffs
-  ├─rename_join_col
-  └─create_new_column
+├─█─create_changed_data
+│ ├─select_cols
+│ ├─█─diff_values_by_key
+│ │ ├─compare_values
+│ │ └─class_diffs
+│ ├─rename_join_col
+│ ├─create_new_column
+│ └─class_diffs
+├─class_diffs
+└─compare_columns
 ```
 
-The Shiny app's compare module (`mod_compare_server()`) orchestrates three comparison functions (`create_new_data()`, `create_deleted_data()`, and `create_modified_data()`; `create_changed_data()` is used by `compare_data()` instead), and uses the `%nin%` helper to drop `join_column`, `data_source`, and `join_source` from the list of compared columns:
+The Shiny app's compare module (`mod_compare_server()`) orchestrates three comparison functions: `create_new_data()`, `create_deleted_data()`, and `create_modified_data()` (`compare_data()` uses `create_changed_data()` instead). The module uses `compare_columns()` for its column-intersection reactive, and it uses the `%nin%` helper to drop `join_column`, `data_source`, and `join_source` from the list of compared columns. Its download handler calls `create_comparison_report()` directly, so the module has no report-building logic of its own:
 
 ```{r call-tree-mod_compare_server, eval=FALSE}
 stackcallr::call_tree_dir("R", root = "mod_compare_server")
@@ -134,6 +142,7 @@ stackcallr::call_tree_dir("R", root = "mod_compare_server")
 
 ```
 █─mod_compare_server
+├─compare_columns
 ├─%nin%
 ├─info_react_theme
 ├─█─create_new_data
@@ -154,13 +163,60 @@ stackcallr::call_tree_dir("R", root = "mod_compare_server")
 │ │ ├─compare_values
 │ │ └─class_diffs
 │ ├─rename_join_col
-│ └─create_new_column
+│ ├─create_new_column
+│ └─class_diffs
 ├─select_cols
 ├─changed_react_theme
-└─left_join_base
+├─left_join_base
+└─█─create_comparison_report
+  ├─█─create_new_data
+  │ ├─anti_join_base
+  │ ├─select_cols
+  │ ├─rename_join_col
+  │ └─create_new_column
+  ├─█─create_deleted_data
+  │ ├─anti_join_base
+  │ ├─select_cols
+  │ ├─rename_join_col
+  │ └─create_new_column
+  ├─█─create_modified_data
+  │ ├─select_cols
+  │ ├─█─diff_values_by_key
+  │ │ ├─compare_values
+  │ │ └─class_diffs
+  │ ├─rename_join_col
+  │ ├─create_new_column
+  │ └─class_diffs
+  ├─create_empty_tbl
+  ├─compare_columns
+  ├─class_diffs
+  └─█─compare_summary
+    └─█─compare_data
+      ├─█─create_new_data
+      │ ├─anti_join_base
+      │ ├─select_cols
+      │ ├─rename_join_col
+      │ └─create_new_column
+      ├─█─create_deleted_data
+      │ ├─anti_join_base
+      │ ├─select_cols
+      │ ├─rename_join_col
+      │ └─create_new_column
+      ├─█─create_changed_data
+      │ ├─select_cols
+      │ ├─█─diff_values_by_key
+      │ │ ├─compare_values
+      │ │ └─class_diffs
+      │ ├─rename_join_col
+      │ ├─create_new_column
+      │ └─class_diffs
+      ├─class_diffs
+      └─compare_columns
 ```
 
 ## `$new_data`
+
+`$new_data` holds the rows in `r22` that aren't in `r21`. The table below shows the first six:
 
 ```{r new_data, eval=FALSE}
 comparisons$new_data
@@ -173,6 +229,8 @@ knitr::kable(head(comparisons$new_data), caption = "head(comparisons$new_data)")
 
 
 ## `$deleted_data`
+
+`$deleted_data` holds the rows in `r21` that are missing from `r22`. The table below shows the first six:
 
 ```{r deleted_data, eval=FALSE}
 comparisons$deleted_data
@@ -187,6 +245,8 @@ knitr::kable(head(comparisons$deleted_data),
 
 ## `$changed_num_diffs`
 
+`$changed_num_diffs` stores the number of changed values for each compared column:
+
 ```{r changed_num_diffs, eval=FALSE}
 comparisons$changed_num_diffs
 ```
@@ -200,13 +260,42 @@ knitr::kable(comparisons$changed_num_diffs,
 
 ## `$changed_var_diffs`
 
+`$changed_var_diffs` lists the changed values row by row:
+
 ```{r changed_var_diffs, eval=FALSE}
 comparisons$changed_var_diffs
 ```
 
 ```{r , echo=FALSE}
-knitr::kable(comparisons$changed_var_diffs, 
-  caption = "comparisons$changed_var_diffs") |> 
+knitr::kable(comparisons$changed_var_diffs,
+  caption = "comparisons$changed_var_diffs") |>
   kableExtra::kable_paper()
+```
+
+## `$changed_class_diffs`
+
+`$changed_class_diffs` lists class mismatches on shared columns, and it's
+empty when every shared column has a matching class. `Date`/`POSIXct` pairs
+and factor/character pairs are unified before the check, so they aren't
+reported as mismatches:
+
+```{r changed_class_diffs, eval=FALSE}
+comparisons$changed_class_diffs
+```
+
+```{r , echo=FALSE}
+knitr::kable(comparisons$changed_class_diffs,
+  caption = "comparisons$changed_class_diffs") |>
+  kableExtra::kable_paper()
+```
+
+## `$column_diffs`
+
+`$column_diffs` is a `compare_columns()` object that lists the columns found
+only in `base`, only in `compare`, and in both. It prints readably at the
+console:
+
+```{r column_diffs}
+comparisons$column_diffs
 ```
 

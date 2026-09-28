@@ -4,7 +4,15 @@
 \alias{create_changed_data}
 \title{Create changed data}
 \usage{
-create_changed_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
+create_changed_data(
+  compare,
+  base,
+  by = NULL,
+  by_col = NULL,
+  cols = NULL,
+  ignore_case = FALSE,
+  trim_ws = FALSE
+)
 }
 \arguments{
 \item{compare}{A 'current' or 'new' dataset (tibble or data.frame)}
@@ -16,11 +24,15 @@ create_changed_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 \item{by_col}{A new name for the joining column.}
 
 \item{cols}{Columns to be compared.}
+
+\item{ignore_case, trim_ws}{passed to \code{compare_values()} for character
+comparisons.}
 }
 \value{
-a list with \code{num_diffs} (count of differing values per variable)
-and \code{var_diffs} (long format: \verb{Variable name}, key column(s),
-\verb{Current Value}, \verb{Previous Value})
+a list with \code{num_diffs} (count of differing values per variable),
+\code{var_diffs} (long format: \verb{Variable name}, key column(s),
+\verb{Current Value}, \verb{Previous Value}), and \code{class_diffs} (class
+mismatches by shared column)
 }
 \description{
 Create changed data

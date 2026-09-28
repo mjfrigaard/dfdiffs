@@ -10,7 +10,9 @@ diff_values_by_key(
   by = NULL,
   tolerance = sqrt(.Machine$double.eps),
   scale = NULL,
-  strict_factor = FALSE
+  strict_factor = FALSE,
+  ignore_case = FALSE,
+  trim_ws = FALSE
 )
 }
 \arguments{
@@ -21,7 +23,8 @@ diff_values_by_key(
 \item{by}{character vector of shared key column(s), or \code{NULL} to match
 rows by position (base row 1 vs. compare row 1, etc.)}
 
-\item{tolerance, scale, strict_factor}{passed to \code{compare_values()}}
+\item{tolerance, scale, strict_factor, ignore_case, trim_ws}{passed to
+\code{compare_values()}}
 }
 \value{
 a list with \code{diffs} (long format: \verb{Variable name}, \code{by} key
@@ -34,5 +37,8 @@ Base-R replacement for \code{diffdf::diffdf()}. Matches \code{base}
 and \code{compare} rows on \code{by}, then compares every other shared column
 row-by-row with \code{compare_values()}. With \code{by = NULL}, rows are matched
 by position instead (matching \code{diffdf::diffdf()}'s own behavior when
-\code{keys} is unset).
+\code{keys} is unset). Warns (doesn't error) if \code{by} doesn't uniquely
+identify rows in \code{base} or \code{compare}, matching PROC COMPARE's own
+non-fatal duplicate-ID note; only the first matching row per key is
+compared.
 }

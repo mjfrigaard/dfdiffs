@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,6 +24,7 @@
     <li><a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a></li>
     <li><a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a></li>
     <li><a class="dropdown-item" href="../articles/create-comparison-report.html">Creating a comparison report</a></li>
+    <li><a class="dropdown-item" href="../articles/proc-compare-parity.html">PROC COMPARE parity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Comparisons</h6></li>
     <li><a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a></li>
@@ -49,6 +50,17 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="2.2.0" id="dfdiffs-220">dfdiffs 2.2.0<a class="anchor" aria-label="anchor" href="#dfdiffs-220"></a></h2>
+<p><code>PROC COMPARE</code> parity: <code>dfdiffs</code> now reports the headline summary statistics and variable-structure diffs that <code>PROC COMPARE</code> prints before its detailed value comparison, and closes a gap where the app’s download handler had drifted from the package functions it should have been calling.</p>
+<ul><li><p>New <code><a href="../reference/compare_columns.html">compare_columns()</a></code>: reports which columns are only in <code>base</code>, only in <code>compare</code>, or common to both, with a <code><a href="../reference/print.dfdiffs_column_diff.html">print.dfdiffs_column_diff()</a></code> console method.</p></li>
+<li><p>New <code><a href="../reference/compare_summary.html">compare_summary()</a></code>: row/column/value headline counts (common, new, and deleted rows; common and dataset-only columns; differing values and class mismatches), with a <code><a href="../reference/print.dfdiffs_summary.html">print.dfdiffs_summary()</a></code> console method. Built entirely on <code><a href="../reference/compare_data.html">compare_data()</a></code> and <code><a href="../reference/compare_columns.html">compare_columns()</a></code>, no new comparison logic.</p></li>
+<li><p><code><a href="../reference/compare_values.html">compare_values()</a></code> gains <code>ignore_case</code>/<code>trim_ws</code> arguments for character comparisons, and <code><a href="../reference/diff_values_by_key.html">diff_values_by_key()</a></code> now warns (not errors) when <code>by</code> doesn’t uniquely identify rows in <code>base</code> or <code>compare</code> – both threaded through <code><a href="../reference/create_changed_data.html">create_changed_data()</a></code>, <code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>, and <code><a href="../reference/compare_data.html">compare_data()</a></code>.</p></li>
+<li><p><code>class_diffs</code> (already computed by <code><a href="../reference/diff_values_by_key.html">diff_values_by_key()</a></code>, but previously discarded) is now surfaced through <code><a href="../reference/create_changed_data.html">create_changed_data()</a></code>, <code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>, and <code><a href="../reference/compare_data.html">compare_data()</a></code> (as <code>changed_class_diffs</code>).</p></li>
+<li><p><code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code> writes three new xlsx sheets – “Column Diffs”, “Class Diffs”, and “Summary” – alongside the existing six.</p></li>
+<li><p>The vignettes were rewritten. The repeated walkthroughs of all ten <code>by</code>/<code>by_col</code>/<code>cols</code> combinations in <code>create-new-data</code>, <code>create-deleted-data</code>, and <code>changed-modified-data</code> are now one reference table plus three worked examples each, and <code>modified-data</code> was merged into <code>changed-modified-data</code>. <code>multiple-comparisons</code> now iterates <code><a href="../reference/compare_data.html">compare_data()</a></code> instead of <code>arsenal</code>/<code>diffdf</code>, and <code>similar-work</code> compares against them directly. Document-wide <code>error = TRUE</code> was removed, which had been hiding a missing <code>dplyr</code> import in <code>similar-work</code> and a stale file path in <code>change-frequency-from-proc-compare</code>.</p></li>
+<li><p><code>mod_compare.R</code>’s download handler no longer reimplements <code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code>’s logic by hand; it now calls <code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code> directly, which also fixes the downloaded report being missing the “Base Data”/“Compare Data” sheets the package function already produced.</p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="2.1.0" id="dfdiffs-210">dfdiffs 2.1.0<a class="anchor" aria-label="anchor" href="#dfdiffs-210"></a></h2>
 <p>The comparison engine (<code><a href="../reference/create_new_data.html">create_new_data()</a></code>, <code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code>, <code><a href="../reference/create_changed_data.html">create_changed_data()</a></code>, <code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>, and the helpers behind them) is now built entirely on base R. <code>dplyr</code>, <code>tidyr</code>, <code>tidyselect</code>, and <code>diffdf</code> are no longer required to use the package; <code>Imports</code> drops from 16 packages to 11.</p>
