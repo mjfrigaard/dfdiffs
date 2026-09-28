@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,7 @@
     <li><a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a></li>
     <li><a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a></li>
     <li><a class="dropdown-item" href="../articles/create-comparison-report.html">Creating a comparison report</a></li>
+    <li><a class="dropdown-item" href="../articles/proc-compare-parity.html">PROC COMPARE parity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Comparisons</h6></li>
     <li><a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a></li>
@@ -84,59 +85,58 @@
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
-<p>This vignette walks through the <code><a href="../reference/create_join_column.html">create_join_column()</a></code>
-function, which creates new columns in the <code>dfdiffs</code> Shiny
-application.</p>
+<p>Comparing two datasets requires a way to match each row in one to its
+counterpart in the other. When no single column identifies a row, we
+need to combine several columns into one. This vignette walks through
+<code><a href="../reference/create_join_column.html">create_join_column()</a></code>, the function the <code>dfdiffs</code>
+Shiny app uses to build that combined ‘join’ column.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mjfrigaard.github.io/dfdiffs/">dfdiffs</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/" class="external-link">shiny</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org" class="external-link">lubridate</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glue.tidyverse.org/" class="external-link">glue</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glin.github.io/reactable/" class="external-link">reactable</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://haven.tidyverse.org" class="external-link">haven</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://readxl.tidyverse.org" class="external-link">readxl</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor" class="external-link">janitor</a></span><span class="op">)</span> <span class="co"># compare_df_cols</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayoverse/arsenal" class="external-link">arsenal</a></span><span class="op">)</span> <span class="co"># comparedf</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gowerc.github.io/diffdf/" class="external-link">diffdf</a></span><span class="op">)</span>  <span class="co"># diffdf</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org" class="external-link">testthat</a></span><span class="op">)</span> <span class="co"># expect_equal</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/brodieG/vetr" class="external-link">vetr</a></span><span class="op">)</span> <span class="co"># alike</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="create_join_column">create_join_column()<a class="anchor" aria-label="anchor" href="#create_join_column"></a>
 </h3>
-<p>This function allows us to create a new ‘join’ column from any number
-of column inputs.</p>
+<p><code><a href="../reference/create_join_column.html">create_join_column()</a></code> combines any number of columns in
+<code>df</code> into a single join column. The columns to combine go in
+<code>by_colums</code>, and <code>new_by_column_name</code> sets the
+name of the new column.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_join_column.html">create_join_column</a></span><span class="op">(</span><span class="va">df</span>, <span class="va">by_colums</span>, <span class="va">new_by_column_name</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="call-structure">Call structure<a class="anchor" aria-label="anchor" href="#call-structure"></a>
 </h3>
-<p><code><a href="../reference/create_join_column.html">create_join_column()</a></code> doesn’t call any other
-<code>dfdiffs</code> functions. Inside the Shiny app, it’s called by the
-select module (<code><a href="../reference/mod_select_server.html">mod_select_server()</a></code>) to build the
-<code>join_column</code> from the columns chosen in the <em>Select Join
-Columns</em> panel. The call tree below was generated from the package
-source with <a href="https://github.com/mjfrigaard/stackcallr" class="external-link">stackcallr</a>
-(<code>pak::pak("mjfrigaard/stackcallr")</code>); only functions defined
+<p><code><a href="../reference/create_join_column.html">create_join_column()</a></code> calls one other
+<code>dfdiffs</code> function, <code><a href="../reference/select_cols.html">select_cols()</a></code>, to pull out
+the columns being combined before pasting them together. Inside the
+Shiny app, the select module (<code><a href="../reference/mod_select_server.html">mod_select_server()</a></code>) calls
+<code><a href="../reference/create_join_column.html">create_join_column()</a></code> to build the <code>join_column</code>
+from the columns chosen in the <em>Select Join Columns</em> panel. The
+call tree below was generated from the package source with <a href="https://github.com/mjfrigaard/stackcallr" class="external-link">stackcallr</a>
+(<code>pak::pak("mjfrigaard/stackcallr")</code>). Only functions defined
 in <code>dfdiffs</code> are shown.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">stackcallr</span><span class="fu">::</span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"mod_select_server"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>█─mod_select_server
-└─create_join_column</code></pre>
+├─select_cols
+├─base_react_theme
+├─comp_react_theme
+├─info_react_theme
+└─█─create_join_column
+  └─select_cols</code></pre>
 </div>
 <div class="section level3">
 <h3 id="test-data">Test data<a class="anchor" aria-label="anchor" href="#test-data"></a>
 </h3>
-<p>We’ll load some test data from the synthetic (not real)
-<code>dfdiffs</code> site roster (see <code><a href="../reference/Roster2021.html">?Roster2021</a></code>) to
-demonstrate how this function works.</p>
+<p>To show how <code><a href="../reference/create_join_column.html">create_join_column()</a></code> works, we’ll load two
+pulls of the synthetic (not real) <code>dfdiffs</code> site roster (see
+<code><a href="../reference/Roster2021.html">?Roster2021</a></code>).</p>
 <div class="section level4">
 <h4 id="roster-pull-2021">Roster pull (2021)<a class="anchor" aria-label="anchor" href="#roster-pull-2021"></a>
 </h4>
-<p>Below is the 2021 roster pull.</p>
+<p>The 2021 roster pull is stored in
+<code>inst/extdata/csv/site-roster/2021/</code>. The code below lists
+the files in that folder.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">roster2021_files</span> <span class="op">&lt;-</span> <span class="st">"../inst/extdata/csv/site-roster/2021/"</span></span>
 <span><span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/dir_tree.html" class="external-link">dir_tree</a></span><span class="op">(</span><span class="va">roster2021_files</span><span class="op">)</span></span>
@@ -145,6 +145,8 @@ demonstrate how this function works.</p>
 <span><span class="co">#&gt; ├── Name.csv</span></span>
 <span><span class="co">#&gt; ├── Roster.csv</span></span>
 <span><span class="co">#&gt; └── Visit.csv</span></span></code></pre></div>
+<p>Next, we’ll locate the <code>Roster</code> file and read it with
+<code><a href="https://rdrr.io/pkg/data.table/man/fread.html" class="external-link">data.table::fread()</a></code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">roster2021_csv_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span></span>
 <span>  path <span class="op">=</span> <span class="va">roster2021_files</span>,</span>
@@ -166,12 +168,13 @@ demonstrate how this function works.</p>
 <span><span class="co">#&gt;    ...</span></span>
 <span><span class="co">#&gt; $ first_visit_date: IDate, format: "2021-05-15" "2021-10-05" ...</span></span>
 <span><span class="co">#&gt; $ status : chr "Active" "Active" "Active" "Active" ...</span></span>
-<span><span class="co">#&gt; - attr(*, ".internal.selfref")=&lt;pointer: 0x559396bfdf00&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt; - attr(*, ".internal.selfref")=&lt;pointer: 0x5579d93cbf00&gt;</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="roster-pull-2022">Roster pull (2022)<a class="anchor" aria-label="anchor" href="#roster-pull-2022"></a>
 </h4>
-<p>Below is the 2022 roster pull.</p>
+<p>The 2022 roster pull follows the same layout in
+<code>inst/extdata/csv/site-roster/2022/</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">roster2022_files</span> <span class="op">&lt;-</span> <span class="st">"../inst/extdata/csv/site-roster/2022/"</span></span>
 <span><span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/dir_tree.html" class="external-link">dir_tree</a></span><span class="op">(</span><span class="va">roster2022_files</span><span class="op">)</span></span>
@@ -180,6 +183,7 @@ demonstrate how this function works.</p>
 <span><span class="co">#&gt; ├── Name.csv</span></span>
 <span><span class="co">#&gt; ├── Roster.csv</span></span>
 <span><span class="co">#&gt; └── Visit.csv</span></span></code></pre></div>
+<p>We’ll read the 2022 <code>Roster</code> file the same way.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">roster2022_csv_paths</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">roster2022_files</span>,</span>
 <span>                                    full.names <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -200,10 +204,13 @@ demonstrate how this function works.</p>
 <span><span class="co">#&gt;    ...</span></span>
 <span><span class="co">#&gt; $ first_visit_date: IDate, format: "2021-05-15" "2021-10-05" ...</span></span>
 <span><span class="co">#&gt; $ status : chr "Active" "Active" "Active" "Active" ...</span></span>
-<span><span class="co">#&gt; - attr(*, ".internal.selfref")=&lt;pointer: 0x559396bfdf00&gt;</span></span></code></pre></div>
-<p>Assume we want to create a new join column that identifies unique
-rows by <code>first_name</code>, <code>last_name</code>, and
-<code>enroll_year</code>.</p>
+<span><span class="co">#&gt; - attr(*, ".internal.selfref")=&lt;pointer: 0x5579d93cbf00&gt;</span></span></code></pre></div>
+<p>Suppose we want a join column that identifies unique rows by
+<code>first_name</code>, <code>last_name</code>, and
+<code>enroll_year</code>. The code below creates
+<code>name_year_id</code> in both roster pulls, then passes them to
+<code><a href="../reference/anti_join_base.html">anti_join_base()</a></code> to find the 2021 rows with no match in
+2022.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">join_roster_2021</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_join_column.html">create_join_column</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">roster_2021</span>,</span>
 <span>  by_colums <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"first_name"</span>, <span class="st">"last_name"</span>, <span class="st">"enroll_year"</span><span class="op">)</span>,</span>
@@ -231,8 +238,10 @@ rows by <code>first_name</code>, <code>last_name</code>, and
 <span><span class="co">#&gt; $ full_name : chr "Jamie Singh" "Skyler Kim"</span></span>
 <span><span class="co">#&gt; $ first_visit_date: IDate, format: "2021-02-19" "2021-11-16"</span></span>
 <span><span class="co">#&gt; $ status : chr "Active" "Active"</span></span></code></pre></div>
-<p>These are the rows in <code>join_roster_2021</code> that aren’t in
-<code>join_roster_2022</code>.</p>
+<p>The output above shows the rows in <code>join_roster_2021</code> that
+aren’t in <code>join_roster_2022</code>. Because
+<code>name_year_id</code> combines three columns, a row only matches
+when the first name, last name, and enrollment year all agree.</p>
 </div>
 </div>
 </div>

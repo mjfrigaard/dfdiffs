@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,7 @@
     <li><a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a></li>
     <li><a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a></li>
     <li><a class="dropdown-item" href="../articles/create-comparison-report.html">Creating a comparison report</a></li>
+    <li><a class="dropdown-item" href="../articles/proc-compare-parity.html">PROC COMPARE parity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Comparisons</h6></li>
     <li><a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a></li>
@@ -68,7 +69,7 @@
 
 
 
-<script src="multiple-comparisons_files/kePrint-0.0.1/kePrint.js"></script><link href="multiple-comparisons_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
@@ -91,45 +92,31 @@ questions:</p>
 <li>What rows were here before that aren’t here now?</li>
 <li><strong>What values have been changed?</strong></li>
 </ol>
-<p>This vignette covers how to apply the functions in
-<code>dfdiffs</code> to multiple datasets (separated by folder).</p>
+<p>In this vignette I’ll cover how to apply the functions in
+<code>dfdiffs</code> to multiple pairs of datasets stored in separate
+folders.</p>
 <div class="section level3">
 <h3 id="packages">Packages<a class="anchor" aria-label="anchor" href="#packages"></a>
 </h3>
-<p>Load <code>dfdiffs</code>:</p>
+<p>First, we’ll load <code>dfdiffs</code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mjfrigaard.github.io/dfdiffs/">dfdiffs</a></span><span class="op">)</span></span></code></pre></div>
-<p>We’ll also need packages for import/export, iteration, and
-wrangling:</p>
+<p>We’ll also need packages for importing data, iteration, and building
+tables.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://readr.tidyverse.org" class="external-link">readr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://stringr.tidyverse.org" class="external-link">stringr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://glue.tidyverse.org/" class="external-link">glue</a></span><span class="op">)</span></span></code></pre></div>
-<p>These packages are for building tables:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://larmarange.github.io/labelled/" class="external-link">labelled</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/ddsjoberg/gtsummary" class="external-link">gtsummary</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://haozhu233.github.io/kableExtra/" class="external-link">kableExtra</a></span><span class="op">)</span></span></code></pre></div>
-<p>These packages offer similar comparison functions:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor" class="external-link">janitor</a></span><span class="op">)</span> <span class="co"># compare_df_cols</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayoverse/arsenal" class="external-link">arsenal</a></span><span class="op">)</span> <span class="co"># comparedf</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://gowerc.github.io/diffdf/" class="external-link">diffdf</a></span><span class="op">)</span>  <span class="co"># diffdf</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org" class="external-link">testthat</a></span><span class="op">)</span> <span class="co"># expect_equal</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/brodieG/vetr" class="external-link">vetr</a></span><span class="op">)</span> <span class="co"># alike</span></span></code></pre></div>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://purrr.tidyverse.org/" class="external-link">purrr</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="folder-structure">Folder structure<a class="anchor" aria-label="anchor" href="#folder-structure"></a>
 </h3>
-<p>Below is a folder structure of datasets separated by year. It holds
-two yearly pulls of the synthetic (not real) <code>dfdiffs</code> site
-roster (see <code><a href="../reference/Roster2021.html">?Roster2021</a></code>), which
+<p>The folder structure below stores datasets separated by year. It
+holds two yearly pulls of the synthetic (not real) <code>dfdiffs</code>
+site roster (see <code><a href="../reference/Roster2021.html">?Roster2021</a></code>), which
 <code>data-raw/Roster.R</code> has already split into
-<code>Enroll</code>/<code>Visit</code>/<code>Name</code> files.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code>Enroll</code>, <code>Visit</code>, and <code>Name</code>
+files.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">fs</span><span class="fu">::</span><span class="fu"><a href="https://fs.r-lib.org/reference/dir_tree.html" class="external-link">dir_tree</a></span><span class="op">(</span><span class="st">"../inst/extdata/csv/site-roster"</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #0000BB; font-weight: bold;">../inst/extdata/csv/site-roster</span></span></span>
 <span><span class="co">#&gt; ├── <span style="color: #0000BB; font-weight: bold;">2021</span></span></span>
@@ -152,15 +139,14 @@ roster (see <code><a href="../reference/Roster2021.html">?Roster2021</a></code>)
 <span><span class="co">#&gt;     ├── Name.csv</span></span>
 <span><span class="co">#&gt;     ├── Roster.csv</span></span>
 <span><span class="co">#&gt;     └── Visit.csv</span></span></code></pre></div>
-<p>We start by storing these file paths in a vector with
-<code><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files()</a></code>. Then we clean up the names a bit and pass the
-paths to <code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv</a></code> with
-<code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">purrr::map()</a></code>.</p>
+<p>We’ll store the file paths in a vector with <code><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files()</a></code>
+and name each path with its file name. Then we’ll pass the paths to
+<code><a href="https://readr.tidyverse.org/reference/read_delim.html" class="external-link">readr::read_csv()</a></code> with <code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">purrr::map()</a></code>.</p>
 <div class="section level4">
 <h4 id="import-base-dfs">Import base dfs<a class="anchor" aria-label="anchor" href="#import-base-dfs"></a>
 </h4>
-<p>Below we import the base data tables (from the 2021 pull).</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>The code below imports the base data tables from the 2021 pull.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">base_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"../inst/extdata/csv/site-roster/2021"</span>,</span>
 <span>  pattern <span class="op">=</span> <span class="st">"Enroll|Visit|Name"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">base_files_nms</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_chr</a></span><span class="op">(</span><span class="va">base_files</span>, <span class="fu">base</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">)</span></span>
@@ -181,7 +167,7 @@ paths to <code><a href="https://readr.tidyverse.org/reference/read_delim.html" c
 <span><span class="co">#&gt;   .. ..   enroll_month = <span style="color: #00BB00;">col_double()</span>,</span></span>
 <span><span class="co">#&gt;   .. ..   enroll_day = <span style="color: #00BB00;">col_double()</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x5582ed075ae0&gt; </span></span>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x559edc95af70&gt; </span></span>
 <span><span class="co">#&gt;  $ Name.csv  : spc_tbl_ [200 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;   ..$ subject_id: chr [1:200] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
 <span><span class="co">#&gt;   ..$ full_name : chr [1:200] "Jamie Nguyen" "Riley Jensen" "Rowan Singh" "Reese Diaz" ...</span></span>
@@ -190,7 +176,7 @@ paths to <code><a href="https://readr.tidyverse.org/reference/read_delim.html" c
 <span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
 <span><span class="co">#&gt;   .. ..   full_name = <span style="color: #BB0000;">col_character()</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x5582ebf8bbc0&gt; </span></span>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x559edc95afb0&gt; </span></span>
 <span><span class="co">#&gt;  $ Visit.csv : spc_tbl_ [200 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;   ..$ subject_id      : chr [1:200] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
 <span><span class="co">#&gt;   ..$ first_visit_date: Date[1:200], format: "2021-05-15" "2021-10-05" ...</span></span>
@@ -199,13 +185,14 @@ paths to <code><a href="https://readr.tidyverse.org/reference/read_delim.html" c
 <span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
 <span><span class="co">#&gt;   .. ..   first_visit_date = <span style="color: #0000BB;">col_date(format = "")</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x5582e94bf220&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x559ed6501720&gt;</span></span></code></pre></div>
 </div>
 <div class="section level4">
 <h4 id="import-compare-dfs">Import compare dfs<a class="anchor" aria-label="anchor" href="#import-compare-dfs"></a>
 </h4>
-<p>Below we import the compare data tables (from the 2022 pull).</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p>The code below imports the compare data tables from the 2022
+pull.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">compare_files</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span>path <span class="op">=</span> <span class="st">"../inst/extdata/csv/site-roster/2022"</span>,</span>
 <span>  pattern <span class="op">=</span> <span class="st">"Enroll|Visit|Name"</span>, recursive <span class="op">=</span> <span class="cn">TRUE</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">compare_files_nms</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_chr</a></span><span class="op">(</span><span class="va">compare_files</span>, <span class="fu">base</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/base/basename.html" class="external-link">basename</a></span><span class="op">)</span></span>
@@ -226,7 +213,7 @@ paths to <code><a href="https://readr.tidyverse.org/reference/read_delim.html" c
 <span><span class="co">#&gt;   .. ..   enroll_month = <span style="color: #00BB00;">col_double()</span>,</span></span>
 <span><span class="co">#&gt;   .. ..   enroll_day = <span style="color: #00BB00;">col_double()</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x5582e98beb10&gt; </span></span>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x559edb91a610&gt; </span></span>
 <span><span class="co">#&gt;  $ Name.csv  : spc_tbl_ [237 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;   ..$ subject_id: chr [1:237] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
 <span><span class="co">#&gt;   ..$ full_name : chr [1:237] "Jamie Nguyen" "Riley Jensen" "Rowan Singh" "Reese Diaz" ...</span></span>
@@ -235,7 +222,7 @@ paths to <code><a href="https://readr.tidyverse.org/reference/read_delim.html" c
 <span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
 <span><span class="co">#&gt;   .. ..   full_name = <span style="color: #BB0000;">col_character()</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x5582e66c08a0&gt; </span></span>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x559edd1360d0&gt; </span></span>
 <span><span class="co">#&gt;  $ Visit.csv : spc_tbl_ [237 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)</span></span>
 <span><span class="co">#&gt;   ..$ subject_id      : chr [1:237] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...</span></span>
 <span><span class="co">#&gt;   ..$ first_visit_date: Date[1:237], format: "2021-05-15" "2021-10-05" ...</span></span>
@@ -244,247 +231,95 @@ paths to <code><a href="https://readr.tidyverse.org/reference/read_delim.html" c
 <span><span class="co">#&gt;   .. ..   subject_id = <span style="color: #BB0000;">col_character()</span>,</span></span>
 <span><span class="co">#&gt;   .. ..   first_visit_date = <span style="color: #0000BB;">col_date(format = "")</span></span></span>
 <span><span class="co">#&gt;   .. .. )</span></span>
-<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x5582e940d520&gt;</span></span></code></pre></div>
+<span><span class="co">#&gt;   ..- attr(*, "problems")=&lt;pointer: 0x559ed5f92680&gt;</span></span></code></pre></div>
 </div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="iteration">Iteration<a class="anchor" aria-label="anchor" href="#iteration"></a>
 </h2>
-<p>We’re going to follow the iteration steps from <a href="https://www.rstudio.com/resources/rstudioconf-2017/happy-r-users-purrr-tutorial-/" class="external-link">Charlotte
+<p>We’ll follow the three iteration steps from <a href="https://www.rstudio.com/resources/rstudioconf-2017/happy-r-users-purrr-tutorial-/" class="external-link">Charlotte
 Wickham’s Happy R Users Purrr Tutorial</a>:</p>
 <ol style="list-style-type: decimal">
-<li>DO IT FOR ONE<br>
-</li>
-<li>TURN IT INTO A RECIPE<br>
-</li>
+<li>DO IT FOR ONE</li>
+<li>TURN IT INTO A RECIPE</li>
 <li>DO IT FOR ALL!</li>
 </ol>
 <div class="section level3">
 <h3 id="do-it-for-one-or-two">1) Do it for one (or two)<a class="anchor" aria-label="anchor" href="#do-it-for-one-or-two"></a>
 </h3>
-<p>We’ll start with the <code><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">arsenal::comparedf()</a></code> function.
-Remember that this function requires an additional
-<code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> call.</p>
-<div class="section level4">
-<h4 id="arsenalcomparedf">
-<code>arsenal::comparedf</code><a class="anchor" aria-label="anchor" href="#arsenalcomparedf"></a>
-</h4>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<p><code><a href="../reference/compare_data.html">compare_data()</a></code> runs all three comparisons (new, deleted,
+and changed) in a single call. We’ll start with a single pair of tables,
+<code>Enroll.csv</code>.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">by_var</span> <span class="op">&lt;-</span> <span class="st">"subject_id"</span></span>
-<span><span class="va">cdf_people</span> <span class="op">&lt;-</span> <span class="fu">arsenal</span><span class="fu">::</span><span class="fu"><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">comparedf</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="va">base_dfs</span><span class="op">$</span><span class="va">Enroll.csv</span>, </span>
-<span>  y <span class="op">=</span> <span class="va">compare_dfs</span><span class="op">$</span><span class="va">Enroll.csv</span>, </span>
+<span><span class="va">enroll_comparison</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/compare_data.html">compare_data</a></span><span class="op">(</span></span>
+<span>  compare <span class="op">=</span> <span class="va">compare_dfs</span><span class="op">$</span><span class="va">Enroll.csv</span>,</span>
+<span>  base <span class="op">=</span> <span class="va">base_dfs</span><span class="op">$</span><span class="va">Enroll.csv</span>,</span>
 <span>  by <span class="op">=</span> <span class="va">by_var</span><span class="op">)</span></span>
-<span><span class="va">sumcdf_people</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cdf_people</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">sumcdf_people</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "frame.summary.table"      "comparison.summary.table"</span></span>
-<span><span class="co">#&gt; [3] "vars.ns.table"            "vars.nc.table"           </span></span>
-<span><span class="co">#&gt; [5] "obs.table"                "diffs.byvar.table"       </span></span>
-<span><span class="co">#&gt; [7] "diffs.table"              "attrs.table"             </span></span>
-<span><span class="co">#&gt; [9] "control"</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="diffdfdiffdf">
-<code>diffdf::diffdf</code><a class="anchor" aria-label="anchor" href="#diffdfdiffdf"></a>
-</h4>
-<p>Next we’ll use the <code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf()</a></code> function.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">diffdf_people</span> <span class="op">&lt;-</span> <span class="fu">diffdf</span><span class="fu">::</span><span class="fu"><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf</a></span><span class="op">(</span></span>
-<span>  compare <span class="op">=</span> <span class="va">compare_dfs</span><span class="op">$</span><span class="va">Enroll.csv</span>, </span>
-<span>  base <span class="op">=</span> <span class="va">base_dfs</span><span class="op">$</span><span class="va">Enroll.csv</span>, </span>
-<span>  keys <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span>
-<span><span class="va">diffdf_people</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "DataSummary" "ExtRowsBase" "ExtRowsComp"</span></span></code></pre></div>
-<p>To make sure the output from both functions is displayed the same
-way, we’ll use the <code>diffs.byvar.table</code>/<code>NumDiff</code>
-tables and the <code>diffs.table</code>/<code>VarDiff_</code>
-tables.</p>
-<div class="section level5">
-<h5 id="diffs-byvar-table">
-<code>diffs.byvar.table</code><a class="anchor" aria-label="anchor" href="#diffs-byvar-table"></a>
-</h5>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sumcdf_people</span><span class="op">[[</span><span class="st">"diffs.byvar.table"</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span>Variable <span class="op">=</span> <span class="va">var.x</span>, </span>
-<span>         `No of Differences` <span class="op">=</span> <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"diffs.byvar.table"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
-<caption>
-diffs.byvar.table
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-Variable
-</th>
-<th style="text-align:right;">
-No of Differences
-</th>
-</tr></thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-enroll_year
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-enroll_month
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-enroll_day
-</td>
-<td style="text-align:right;">
-0
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level5">
-<h5 id="numdiff">
-<code>NumDiff</code><a class="anchor" aria-label="anchor" href="#numdiff"></a>
-</h5>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">diffdf_people</span><span class="op">[[</span><span class="st">"NumDiff"</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"NumDiff"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `matrix()`:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> data is too long</span></span></code></pre></div>
-</div>
-<div class="section level5">
-<h5 id="diffs-table">
-<code>diffs.table</code><a class="anchor" aria-label="anchor" href="#diffs-table"></a>
-</h5>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sumcdf_people</span><span class="op">[[</span><span class="st">"diffs.table"</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">values.x</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">values.y</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
-<span>    VARIABLE <span class="op">=</span> <span class="va">var.x</span>,</span>
-<span>    <span class="fu"><a href="https://tidyselect.r-lib.org/reference/all_of.html" class="external-link">all_of</a></span><span class="op">(</span><span class="va">by_var</span><span class="op">)</span>,</span>
-<span>    BASE <span class="op">=</span> <span class="va">values.x</span>,</span>
-<span>    COMPARE <span class="op">=</span> <span class="va">values.y</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"diffs.table"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table  lightable-paper" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
-<caption>
-diffs.table
-</caption>
-<thead><tr>
-<th style="text-align:left;">
-VARIABLE
-</th>
-<th style="text-align:left;">
-subject_id
-</th>
-<th style="text-align:left;">
-BASE
-</th>
-<th style="text-align:left;">
-COMPARE
-</th>
-</tr></thead>
-<tbody><tr>
-<td style="text-align:left;">
-character(0)
-</td>
-<td style="text-align:left;">
-c(“:——–”, “:———-”, “:—-”, “:——-”)
-</td>
-<td style="text-align:left;">
-character(0)
-</td>
-<td style="text-align:left;">
-c(“:——–”, “:———-”, “:—-”, “:——-”)
-</td>
-</tr></tbody>
-</table>
-</div>
-<div class="section level5">
-<h5 id="vardiff_-tables">
-<code>VarDiff_</code> tables<a class="anchor" aria-label="anchor" href="#vardiff_-tables"></a>
-</h5>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">tbl_names</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">diffdf_people</span><span class="op">)</span></span>
-<span><span class="va">vardiff_tbls</span> <span class="op">&lt;-</span> <span class="va">tbl_names</span><span class="op">[</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">tbl_names</span>, <span class="st">"VarDiff_"</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">diffdf_people</span><span class="op">[</span><span class="va">vardiff_tbls</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span>caption <span class="op">=</span> <span class="st">"'VarDiff_' tables"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">kableExtra</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/kableExtra/man/kable_classic.html" class="external-link">kable_paper</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;"> in `matrix()`:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> data is too long</span></span></code></pre></div>
-</div>
-</div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">enroll_comparison</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "new_data"            "deleted_data"        "changed_num_diffs"  </span></span>
+<span><span class="co">#&gt; [4] "changed_var_diffs"   "changed_class_diffs" "column_diffs"</span></span></code></pre></div>
+<p><code><a href="../reference/compare_summary.html">compare_summary()</a></code> adds a headline summary for the same
+pair of tables, in the style of SAS’s <code>PROC COMPARE</code>.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/compare_summary.html">compare_summary</a></span><span class="op">(</span></span>
+<span>  compare <span class="op">=</span> <span class="va">compare_dfs</span><span class="op">$</span><span class="va">Enroll.csv</span>,</span>
+<span>  base <span class="op">=</span> <span class="va">base_dfs</span><span class="op">$</span><span class="va">Enroll.csv</span>,</span>
+<span>  by <span class="op">=</span> <span class="va">by_var</span><span class="op">)</span></span>
+<span><span class="co">#&gt; &lt;dfdiffs comparison summary&gt;</span></span>
+<span><span class="co">#&gt;   Observations: base = 200, compare = 237</span></span>
+<span><span class="co">#&gt;     common: 197 | new: 40 | deleted: 3</span></span>
+<span><span class="co">#&gt;   Variables: base = 4, compare = 4 (4 common, 0 base only, 0 compare only)</span></span>
+<span><span class="co">#&gt;   No unequal values found.</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="turn-it-into-a-recipe">2) Turn it into a recipe<a class="anchor" aria-label="anchor" href="#turn-it-into-a-recipe"></a>
 </h3>
-<p>We have two vectors with file paths (<code>.x</code> and
-<code>.y</code>).</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span>.x <span class="op">=</span> <span class="va">base_dfs</span>, .y <span class="op">=</span> <span class="va">compare_files</span>, <span class="op">)</span></span></code></pre></div>
-<p>The <code>.f</code> argument is either the
-<code><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">arsenal::comparedf</a></code> or the <code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf</a></code>
-function.</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span>.x <span class="op">=</span> <span class="va">base_dfs</span>, .y <span class="op">=</span> <span class="va">compare_files</span>, .f <span class="op">=</span> <span class="fu">arsenal</span><span class="fu">::</span><span class="va"><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">comparedf</a></span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span>.x <span class="op">=</span> <span class="va">compare_files</span>, .y <span class="op">=</span> <span class="va">base_dfs</span>, .f <span class="op">=</span> <span class="fu">diffdf</span><span class="fu">::</span><span class="va"><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf</a></span><span class="op">)</span></span></code></pre></div>
-<p>We can pass the <code>by</code> and <code>keys</code> arguments
-through <code>...</code>.</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span>.x <span class="op">=</span>  <span class="va">base_dfs</span>, .y <span class="op">=</span> <span class="va">compare_dfs</span>, </span>
-<span>            .f <span class="op">=</span> <span class="fu">arsenal</span><span class="fu">::</span><span class="va"><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">comparedf</a></span>, by <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span>.x <span class="op">=</span>  <span class="va">compare_dfs</span>,  .y <span class="op">=</span> <span class="va">base_dfs</span>, </span>
-<span>            .f <span class="op">=</span> <span class="fu">diffdf</span><span class="fu">::</span><span class="va"><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf</a></span>, keys <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="../reference/compare_data.html">compare_data()</a></code> takes <code>compare</code> and
+<code>base</code> as its first two arguments, so
+<code><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">purrr::map2()</a></code> can pass the matching elements of
+<code>compare_dfs</code> and <code>base_dfs</code> straight through. The
+<code>by</code> argument is passed along via <code>...</code>. Note that
+<code><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2()</a></code> pairs the two lists by position, not by name, so
+this relies on <code><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files()</a></code> returning the files in the same
+order in both folders (which it does here, because both folders hold the
+same three file names).</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span>.x <span class="op">=</span> <span class="va">compare_dfs</span>, .y <span class="op">=</span> <span class="va">base_dfs</span>,</span>
+<span>            .f <span class="op">=</span> <span class="va">compare_data</span>, by <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="do-it-for-all">3) Do it for all<a class="anchor" aria-label="anchor" href="#do-it-for-all"></a>
 </h3>
-<div class="section level4">
-<h4 id="map2-arsenalcomparedf">
-<code>map2()</code> + <code>arsenal::comparedf</code><a class="anchor" aria-label="anchor" href="#map2-arsenalcomparedf"></a>
-</h4>
-<p>Now we use the <code><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">purrr::map2()</a></code> function to compare all of
-the items in <code>base_dfs</code> to <code>compare_dfs</code>.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">all_cdfs</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span></span>
-<span>  .x <span class="op">=</span>  <span class="va">base_dfs</span>, </span>
-<span>  .y <span class="op">=</span> <span class="va">compare_dfs</span>, </span>
-<span>  .f <span class="op">=</span> <span class="fu">arsenal</span><span class="fu">::</span><span class="va"><a href="https://mayoverse.github.io/arsenal/reference/comparedf.html" class="external-link">comparedf</a></span>, </span>
+<p>Now we’ll apply the recipe to every pair of files in
+<code>compare_dfs</code> and <code>base_dfs</code>.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">all_comparisons</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span></span>
+<span>  .x <span class="op">=</span> <span class="va">compare_dfs</span>,</span>
+<span>  .y <span class="op">=</span> <span class="va">base_dfs</span>,</span>
+<span>  .f <span class="op">=</span> <span class="va">compare_data</span>,</span>
 <span>  by <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span>
-<span><span class="va">all_scdfs</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="va">all_cdfs</span>, .f <span class="op">=</span> <span class="va">summary</span><span class="op">)</span></span>
-<span><span class="va">all_scdfs</span><span class="op">[[</span><span class="st">"Name.csv"</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "frame.summary.table"      "comparison.summary.table"</span></span>
-<span><span class="co">#&gt; [3] "vars.ns.table"            "vars.nc.table"           </span></span>
-<span><span class="co">#&gt; [5] "obs.table"                "diffs.byvar.table"       </span></span>
-<span><span class="co">#&gt; [7] "diffs.table"              "attrs.table"             </span></span>
-<span><span class="co">#&gt; [9] "control"</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="map2-diffdfdiffdf">
-<code>map2()</code> + <code>diffdf::diffdf</code><a class="anchor" aria-label="anchor" href="#map2-diffdfdiffdf"></a>
-</h4>
-<p>We can do the same with <code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf()</a></code>.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">all_diffdfs</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span></span>
-<span>  .x <span class="op">=</span> <span class="va">base_dfs</span>, </span>
-<span>  .y <span class="op">=</span> <span class="va">compare_dfs</span>, </span>
-<span>  .f <span class="op">=</span> <span class="fu">diffdf</span><span class="fu">::</span><span class="va"><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf</a></span>, </span>
-<span>  keys <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span>
-<span><span class="va">all_diffdfs</span><span class="op">[[</span><span class="st">"Name.csv"</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "DataSummary" "ExtRowsBase" "ExtRowsComp"</span></span></code></pre></div>
-</div>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">all_comparisons</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "Enroll.csv" "Name.csv"   "Visit.csv"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">all_comparisons</span><span class="op">$</span><span class="va">Name.csv</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "new_data"            "deleted_data"        "changed_num_diffs"  </span></span>
+<span><span class="co">#&gt; [4] "changed_var_diffs"   "changed_class_diffs" "column_diffs"</span></span></code></pre></div>
+<p>The same recipe works with <code><a href="../reference/compare_summary.html">compare_summary()</a></code> and gives
+us one headline summary per file. Below we print the summary for
+<code>Visit.csv</code>.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">all_summaries</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span></span>
+<span>  .x <span class="op">=</span> <span class="va">compare_dfs</span>,</span>
+<span>  .y <span class="op">=</span> <span class="va">base_dfs</span>,</span>
+<span>  .f <span class="op">=</span> <span class="va">compare_summary</span>,</span>
+<span>  by <span class="op">=</span> <span class="st">"subject_id"</span><span class="op">)</span></span>
+<span><span class="va">all_summaries</span><span class="op">$</span><span class="va">Visit.csv</span></span>
+<span><span class="co">#&gt; &lt;dfdiffs comparison summary&gt;</span></span>
+<span><span class="co">#&gt;   Observations: base = 200, compare = 237</span></span>
+<span><span class="co">#&gt;     common: 197 | new: 40 | deleted: 3</span></span>
+<span><span class="co">#&gt;   Variables: base = 2, compare = 2 (2 common, 0 base only, 0 compare only)</span></span>
+<span><span class="co">#&gt;   No unequal values found.</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

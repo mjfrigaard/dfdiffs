@@ -10,8 +10,8 @@
 - [create-join-column](https://mjfrigaard.github.io/dfdiffs/articles/create-join-column.md):
 - [create-new-data](https://mjfrigaard.github.io/dfdiffs/articles/create-new-data.md):
 - [getting-started](https://mjfrigaard.github.io/dfdiffs/articles/getting-started.md):
-- [modified-data](https://mjfrigaard.github.io/dfdiffs/articles/modified-data.md):
 - [multiple-comparisons](https://mjfrigaard.github.io/dfdiffs/articles/multiple-comparisons.md):
+- [proc-compare-parity](https://mjfrigaard.github.io/dfdiffs/articles/proc-compare-parity.md):
 - [similar-work](https://mjfrigaard.github.io/dfdiffs/articles/similar-work.md):
 - [tests](https://mjfrigaard.github.io/dfdiffs/articles/tests.md):
 - [upload-data](https://mjfrigaard.github.io/dfdiffs/articles/upload-data.md):

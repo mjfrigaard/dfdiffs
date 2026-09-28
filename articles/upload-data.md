@@ -2,10 +2,12 @@
 
 ## Motivation
 
-This vignette walks through the
-[`upload_data()`](https://mjfrigaard.github.io/dfdiffs/reference/upload_data.md)
-function, which loads a variety of file types into the `dfdiffs` Shiny
-application.
+The data we want to compare rarely arrives in a single format. It might
+be a CSV export, a SAS or SPSS dataset, a Stata file, or an Excel
+workbook. This vignette walks through
+[`upload_data()`](https://mjfrigaard.github.io/dfdiffs/reference/upload_data.md),
+the function that reads each of these file types into the `dfdiffs`
+Shiny application.
 
 ``` r
 
@@ -24,9 +26,9 @@ library(labelled)
 library(gtsummary)
 ```
 
-### External Data
+### External data
 
-Test data can be found in the `../inst/extdata/` folder:
+The test files for each format are stored in the `inst/extdata/` folder:
 
     #> ../inst/extdata/
     #> ├── csv
@@ -91,9 +93,12 @@ Test data can be found in the `../inst/extdata/` folder:
 
 ### load_flat_file()
 
-The
 [`load_flat_file()`](https://mjfrigaard.github.io/dfdiffs/reference/load_flat_file.md)
-function imports all forms of flat data files.
+chooses a reader based on the file extension. Text files (`.txt`,
+`.csv`, and `.tsv`) are read with
+[`data.table::fread()`](https://rdrr.io/pkg/data.table/man/fread.html),
+and SAS, SPSS, and Stata files are read with `haven`. Every result is
+returned as a tibble.
 
 ``` r
 
@@ -113,10 +118,10 @@ load_flat_file <- function(path) {
 }
 ```
 
-The
 [`upload_data()`](https://mjfrigaard.github.io/dfdiffs/reference/upload_data.md)
-function below also handles Excel files. If the file is an Excel file,
-pass the name of the sheet to `sheet`.
+adds support for Excel workbooks on top of
+[`load_flat_file()`](https://mjfrigaard.github.io/dfdiffs/reference/load_flat_file.md).
+For `.xlsx` files, pass the name of the sheet to the `sheet` argument.
 
 ``` r
 
@@ -149,7 +154,7 @@ calls
 [`upload_data()`](https://mjfrigaard.github.io/dfdiffs/reference/upload_data.md).
 The call trees below were generated from the package source with
 [stackcallr](https://github.com/mjfrigaard/stackcallr)
-(`pak::pak("mjfrigaard/stackcallr")`); only functions defined in
+(`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in
 `dfdiffs` are shown.
 
 ``` r
@@ -158,12 +163,14 @@ stackcallr::call_tree_dir("R", root = "mod_upload_server")
 ```
 
     █─mod_upload_server
-    └─█─upload_data
-      └─load_flat_file
+    ├─█─upload_data
+    │ └─load_flat_file
+    ├─base_react_theme
+    └─comp_react_theme
 
 The upload demo app
 ([`launch_upload_demo()`](https://mjfrigaard.github.io/dfdiffs/reference/launch_upload_demo.md))
-shows the module’s UI and server sides together:
+runs the module’s UI and server functions together in a standalone app:
 
 ``` r
 
@@ -174,10 +181,14 @@ stackcallr::call_tree_dir("R", root = "launch_upload_demo")
     ├─dfdiffs_fresh_theme
     ├─mod_upload_ui
     └─█─mod_upload_server
-      └─█─upload_data
-        └─load_flat_file
+      ├─█─upload_data
+      │ └─load_flat_file
+      ├─base_react_theme
+      └─comp_react_theme
 
 ### 2021 site roster CSVs
+
+We’ll start by listing the CSV files in the 2021 site roster folder.
 
 ``` r
 
@@ -189,7 +200,11 @@ head(roster2021_csv_paths)
 #> [4] "../inst/extdata/csv/site-roster/2021/Visit.csv"
 ```
 
-We’ll test this on `roster2021_csv_paths[4]` (the full `Roster.csv`).
+The fourth path (`roster2021_csv_paths[4]`) is the full `Roster.csv`
+file. We’ll pass it to
+[`load_flat_file()`](https://mjfrigaard.github.io/dfdiffs/reference/load_flat_file.md)
+and check the result with
+[`glimpse()`](https://pillar.r-lib.org/reference/glimpse.html).
 
 ``` r
 
@@ -203,6 +218,8 @@ glimpse(roster_2021)
 
 ### 2022 site roster CSVs
 
+The 2022 site roster folder follows the same layout.
+
 ``` r
 
 roster2022_csv_paths <- list.files(path = "../inst/extdata/csv/site-roster/2022", full.names = TRUE, pattern = ".csv$")
@@ -213,7 +230,7 @@ head(roster2022_csv_paths)
 #> [4] "../inst/extdata/csv/site-roster/2022/Visit.csv"
 ```
 
-We’ll test this on `roster2022_csv_paths[4]`.
+We’ll load `roster2022_csv_paths[4]` the same way.
 
 ``` r
 
@@ -225,9 +242,14 @@ glimpse(roster_csv_2022)
 #> $ first_visit_date <IDate> 2021-05-15, 2021-10-05, 2021-10-28, 2021-06-09, 202…
 ```
 
-### List of 2021 CSVs
+### Importing multiple files
 
-Now we import every 2021 CSV into a named list, `roster2021_csv_files`:
+[`load_flat_file()`](https://mjfrigaard.github.io/dfdiffs/reference/load_flat_file.md)
+works with
+[`purrr::map()`](https://purrr.tidyverse.org/reference/map.html), so we
+can import every 2021 CSV at once. The code below stores each file in a
+named list (`roster2021_csv_files`) and prints the column names of each
+one.
 
 ``` r
 
@@ -250,9 +272,11 @@ map(roster2021_csv_files, names)
 #> [1] "subject_id"       "first_visit_date"
 ```
 
-We’ll also test this with the
-[`map_df()`](https://purrr.tidyverse.org/reference/map_dfr.html)
-function.
+We can also stack the files into a single tibble with
+[`map_df()`](https://purrr.tidyverse.org/reference/map_dfr.html). The
+`source` column records which file each row came from, and
+[`count()`](https://dplyr.tidyverse.org/reference/count.html) shows the
+number of rows per file.
 
 ``` r
 
@@ -271,18 +295,28 @@ tbl_2021_csv_files %>% count(source)
 #> 4 Visit.csv    200
 ```
 
-### Test on dta
+### Other formats
+
+[`load_flat_file()`](https://mjfrigaard.github.io/dfdiffs/reference/load_flat_file.md)
+handles `.dta`, `.sas7bdat`, `.sav`, `.tsv`, and `.txt` files the same
+way, so we can loop over all five formats instead of repeating the same
+steps for each one. The code below loads every file in each format’s
+folder and counts the rows per file.
 
 ``` r
 
-dta_paths <- list.files(path = "../inst/extdata/dta", 
-  full.names = TRUE, pattern = ".dta$")
-tbl_dta_files <- dta_paths %>% 
-  set_names() %>% 
-  map_df(.x = ., 
-  .f = load_flat_file, .id = "source") %>% 
-  mutate(source = basename(source))
-tbl_dta_files %>% count(source)
+formats <- c("dta", "sas7bdat", "sav", "tsv", "txt")
+format_tbls <- map(formats, function(ext) {
+  paths <- list.files(path = paste0("../inst/extdata/", ext),
+    full.names = TRUE, pattern = paste0("\\.", ext, "$"))
+  paths %>%
+    set_names() %>%
+    map_df(.f = load_flat_file, .id = "source") %>%
+    mutate(source = basename(source))
+}) %>%
+  set_names(formats)
+map(format_tbls, count, source)
+#> $dta
 #> # A tibble: 6 × 2
 #>   source                   n
 #>   <chr>                <int>
@@ -292,20 +326,8 @@ tbl_dta_files %>% count(source)
 #> 4 tagged-na-double.dta     8
 #> 5 tagged-na-int.dta        8
 #> 6 types.dta                2
-```
-
-### Test on sas7bdat
-
-``` r
-
-sas7bdat_paths <- list.files(path = "../inst/extdata/sas7bdat", 
-  full.names = TRUE, pattern = ".sas7bdat$")
-tbl_sas7bdat_files <- sas7bdat_paths %>% 
-  set_names() %>% 
-  map_df(.x = ., 
-  .f = load_flat_file, .id = "source") %>% 
-  mutate(source = basename(source))
-tbl_sas7bdat_files %>% count(source)
+#> 
+#> $sas7bdat
 #> # A tibble: 4 × 2
 #>   source                 n
 #>   <chr>              <int>
@@ -313,20 +335,8 @@ tbl_sas7bdat_files %>% count(source)
 #> 2 hadley.sas7bdat        8
 #> 3 iris.sas7bdat        150
 #> 4 tagged-na.sas7bdat     8
-```
-
-### Test on sav
-
-``` r
-
-sav_paths <- list.files(path = "../inst/extdata/sav", 
-  full.names = TRUE, pattern = ".sav$")
-tbl_sav_files <- sav_paths %>% 
-  set_names() %>% 
-  map_df(.x = ., 
-  .f = load_flat_file, .id = "source") %>% 
-  mutate(source = basename(source))
-tbl_sav_files %>% count(source)
+#> 
+#> $sav
 #> # A tibble: 7 × 2
 #>   source                  n
 #>   <chr>               <int>
@@ -337,38 +347,14 @@ tbl_sav_files %>% count(source)
 #> 5 labelled-str.sav        2
 #> 6 umlauts.sav             4
 #> 7 variable-label.sav      1
-```
-
-### Test on tsv
-
-``` r
-
-tsv_paths <- list.files(path = "../inst/extdata/tsv", 
-  full.names = TRUE, pattern = ".tsv$")
-tbl_tsv_files <- tsv_paths %>% 
-  set_names() %>% 
-  map_df(.x = ., 
-  .f = load_flat_file, .id = "source") %>% 
-  mutate(source = basename(source))
-tbl_tsv_files %>% count(source)
+#> 
+#> $tsv
 #> # A tibble: 1 × 2
 #>   source         n
 #>   <chr>      <int>
 #> 1 Enroll.tsv    10
-```
-
-### Test on txt
-
-``` r
-
-txt_paths <- list.files(path = "../inst/extdata/txt", 
-  full.names = TRUE, pattern = ".txt$")
-tbl_txt_files <- txt_paths %>% 
-  set_names() %>% 
-  map_df(.x = ., 
-  .f = load_flat_file, .id = "source") %>% 
-  mutate(source = basename(source))
-tbl_txt_files %>% count(source)
+#> 
+#> $txt
 #> # A tibble: 1 × 2
 #>   source         n
 #>   <chr>      <int>

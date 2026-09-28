@@ -5,7 +5,15 @@ Create modified data
 ## Usage
 
 ``` r
-create_modified_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
+create_modified_data(
+  compare,
+  base,
+  by = NULL,
+  by_col = NULL,
+  cols = NULL,
+  ignore_case = FALSE,
+  trim_ws = FALSE
+)
 ```
 
 ## Arguments
@@ -31,11 +39,18 @@ create_modified_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 
   Columns to be compared.
 
+- ignore_case, trim_ws:
+
+  passed to
+  [`compare_values()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_values.md)
+  for character comparisons.
+
 ## Value
 
 a list with `diffs` (long format: `Variable name`, key column(s),
-`Current Value`, `Previous Value`) and `diffs_byvar` (count of differing
-values per variable)
+`Current Value`, `Previous Value`), `diffs_byvar` (count of differing
+values per variable), and `class_diffs` (class mismatches by shared
+column)
 
 ## Examples
 
@@ -68,6 +83,10 @@ create_modified_data(
 #> 1 text_value_a                    2
 #> 2 text_value_b                    1
 #> 3 updated_date                    5
+#> 
+#> $class_diffs
+#> # A tibble: 0 × 3
+#> # ℹ 3 variables: variable <chr>, class_base <chr>, class_compare <chr>
 #> 
 create_modified_data(
            compare = CurrentData,
@@ -102,5 +121,9 @@ create_modified_data(
 #> 5 created_date                    0
 #> 6 updated_date                    5
 #> 7 entered_date                    5
+#> 
+#> $class_diffs
+#> # A tibble: 0 × 3
+#> # ℹ 3 variables: variable <chr>, class_base <chr>, class_compare <chr>
 #> 
 ```

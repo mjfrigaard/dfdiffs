@@ -3,11 +3,17 @@
 and compare rows on by, then compares every other shared column
 row-by-row with compare_values(). With by = NULL, rows are matched
 by position instead (matching diffdf::diffdf()'s own behavior when
-keys is unset)."><meta property="og:description" content="Base-R replacement for diffdf::diffdf(). Matches base
+keys is unset). Warns (doesn't error) if by doesn't uniquely
+identify rows in base or compare, matching PROC COMPARE's own
+non-fatal duplicate-ID note; only the first matching row per key is
+compared."><meta property="og:description" content="Base-R replacement for diffdf::diffdf(). Matches base
 and compare rows on by, then compares every other shared column
 row-by-row with compare_values(). With by = NULL, rows are matched
 by position instead (matching diffdf::diffdf()'s own behavior when
-keys is unset)."></head><body>
+keys is unset). Warns (doesn't error) if by doesn't uniquely
+identify rows in base or compare, matching PROC COMPARE's own
+non-fatal duplicate-ID note; only the first matching row per key is
+compared."></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -15,7 +21,7 @@ keys is unset)."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +38,7 @@ keys is unset)."></head><body>
     <li><a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a></li>
     <li><a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a></li>
     <li><a class="dropdown-item" href="../articles/create-comparison-report.html">Creating a comparison report</a></li>
+    <li><a class="dropdown-item" href="../articles/proc-compare-parity.html">PROC COMPARE parity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Comparisons</h6></li>
     <li><a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a></li>
@@ -63,7 +70,10 @@ keys is unset)."></head><body>
 and <code>compare</code> rows on <code>by</code>, then compares every other shared column
 row-by-row with <code><a href="compare_values.html">compare_values()</a></code>. With <code>by = NULL</code>, rows are matched
 by position instead (matching <code><a href="https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html" class="external-link">diffdf::diffdf()</a></code>'s own behavior when
-<code>keys</code> is unset).</p>
+<code>keys</code> is unset). Warns (doesn't error) if <code>by</code> doesn't uniquely
+identify rows in <code>base</code> or <code>compare</code>, matching PROC COMPARE's own
+non-fatal duplicate-ID note; only the first matching row per key is
+compared.</p>
     </div>
 
     <div class="section level2">
@@ -74,7 +84,9 @@ by position instead (matching <code><a href="https://gowerc.github.io/diffdf/lat
 <span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  tolerance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">sqrt</a></span><span class="op">(</span><span class="va">.Machine</span><span class="op">$</span><span class="va">double.eps</span><span class="op">)</span>,</span>
 <span>  scale <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  strict_factor <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  strict_factor <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  ignore_case <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  trim_ws <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -95,8 +107,9 @@ by position instead (matching <code><a href="https://gowerc.github.io/diffdf/lat
 rows by position (base row 1 vs. compare row 1, etc.)</p></dd>
 
 
-<dt id="arg-tolerance-scale-strict-factor">tolerance, scale, strict_factor<a class="anchor" aria-label="anchor" href="#arg-tolerance-scale-strict-factor"></a></dt>
-<dd><p>passed to <code><a href="compare_values.html">compare_values()</a></code></p></dd>
+<dt id="arg-tolerance-scale-strict-factor-ignore-case-trim-ws">tolerance, scale, strict_factor, ignore_case, trim_ws<a class="anchor" aria-label="anchor" href="#arg-tolerance-scale-strict-factor-ignore-case-trim-ws"></a></dt>
+<dd><p>passed to
+<code><a href="compare_values.html">compare_values()</a></code></p></dd>
 
 </dl></div>
     <div class="section level2">

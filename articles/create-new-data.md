@@ -2,16 +2,17 @@
 
 ## Motivation
 
-The goal of `dfdiffs` is to answer the following questions:
+When we receive an updated version of a dataset, `dfdiffs` helps us
+answer three questions:
 
 1.  *What rows are here now that weren’t here before?*
-2.  What rows were here before that aren’t here now?  
+2.  What rows were here before that aren’t here now?
 3.  What values have been changed?
 
-This vignette takes us through the
-[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)
-function, which answers the question, “*What rows are here now that
-weren’t here before?*”
+This vignette covers
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md),
+which answers the first question: “*What rows are here now that weren’t
+here before?*”
 
 ### Packages
 
@@ -19,23 +20,17 @@ weren’t here before?*”
 
 library(dfdiffs)
 library(dplyr)
-library(stringr)
-library(lubridate)
-library(fs)
-library(vctrs)
-library(glue)
-library(purrr)
 ```
 
 ### What rows are here now that weren’t here before?
 
-We’re going to use two test datasets to demonstrate the
-[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)
-function.
+We’ll use two test datasets from the package to demonstrate
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md).
 
 #### Base Data
 
-The `T1Data` below contains six rows and eight variables.
+`T1Data` is our base (original) dataset. It contains six rows and eight
+variables.
 
 ``` r
 
@@ -52,8 +47,8 @@ glimpse(T1Data)
 #> $ factor_var <chr> "headache", "nausea", "fatigue", "dizziness", "rash", "fev…
 ```
 
-The unique identifier in this dataset is the combination of subject and
-record (which we can see below):
+Each row in `T1Data` is uniquely identified by the combination of
+`subject` and `record`, which we can confirm below:
 
 ``` r
 
@@ -79,8 +74,8 @@ distinct(T1Data, subject, record)
 
 #### Compare Data
 
-We’ll compare `T2Data` to the original data. `T2Data` has the same six
-rows as `T1Data`, plus three additional rows.
+`T2Data` is the dataset we’ll compare against `T1Data`. It has the same
+six rows as `T1Data`, plus three additional rows.
 
 ``` r
 
@@ -97,8 +92,8 @@ glimpse(T2Data)
 #> $ factor_var <chr> "rash", "fever", "back pain", "dizziness", "fatigue", "ins…
 ```
 
-The unique identifier in this dataset is the combination of subject and
-record (which we can see below):
+The same `subject` and `record` combination uniquely identifies each row
+in `T2Data`:
 
 ``` r
 
@@ -125,12 +120,10 @@ distinct(T2Data, subject, record)
 
 #### Creating a unique identifier
 
-We also need a function that lets users specify the joining variables.
-It creates a new `join_var` from the supplied columns that together form
-a unique identifier in each dataset.
-
-For example, we can create a unique identifier named `join_var` in
-`T1Data` and `T2Data`:
+Matching rows between two datasets requires a joining variable that
+uniquely identifies each row. The simplest option is a row number, so
+we’ll start by adding a `join_var` column to both `T1Data` and `T2Data`
+and moving it to the front:
 
 ``` r
 
@@ -141,6 +134,8 @@ T2DataJoin <- mutate(T2Data,
   join_var = as.character(row_number())) %>% 
   dplyr::relocate(join_var, everything())
 ```
+
+Both datasets now start with a `join_var` column:
 
 ``` r
 
@@ -173,151 +168,81 @@ T2DataJoin
 | 8 | A | 2 | 2022-01-25 | 2022-03-15 | 2022-03-29 | Patient reports occasional nausea following meals. | nausea |
 | 9 | A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | Patient reports dry cough lasting several days. | cough |
 
-### Conditions
+### `create_new_column()`
 
-Each function in the `dfdiffs` package assumes the following conditions:
+`T1DataJoin` and `T2DataJoin` use a plain row number as the join key.
+When the unique identifier is a *combination* of existing columns (like
+`subject` and `record`),
+[`create_new_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_column.md)
+pastes those columns together into a single new column. The function
+takes the data, the columns to combine, and a name for the new column:
 
-1.  Two datasets
+``` r
 
-2.  Multiple columns to compare (`cols`)
+create_new_column(data = , cols = , new_name = )
+```
 
-3.  Single `by` column
+Below we combine `subject` and `record` into `join_var` for both
+datasets:
 
-4.  Single `by` column, new column name (`by_col`)
+``` r
 
-5.  Single `by` column, multiple compare columns (`cols`)
+T1DataSubjRec <- create_new_column(data = T1Data,
+  cols = c("subject", "record"),
+  new_name = "join_var")
+T2DataSubjRec <- create_new_column(data = T2Data,
+  cols = c("subject", "record"),
+  new_name = "join_var")
+```
 
-6.  Single `by` column, new column name (`by_col`), multiple compare
-    columns (`cols`)
+| join_var | subject | record | start_date | mid_date | end_date | text_var | factor_var |
+|:---|:---|---:|:---|:---|:---|:---|:---|
+| A-1 | A | 1 | 2022-01-28 | 2022-03-20 | 2022-03-30 | Patient reports mild headache after morning dose. | headache |
+| A-2 | A | 2 | 2022-01-25 | 2022-03-15 | 2022-03-29 | Patient reports occasional nausea following meals. | nausea |
+| B-3 | B | 3 | 2022-01-26 | 2022-03-19 | 2022-03-25 | Patient reports persistent fatigue throughout the day. | fatigue |
+| C-4 | C | 4 | 2022-01-29 | 2022-03-18 | 2022-03-27 | Patient reports brief dizziness upon standing. | dizziness |
+| D-5 | D | 5 | 2022-01-30 | 2022-03-16 | 2022-03-26 | Patient reports mild rash on the left forearm. | rash |
+| D-6 | D | 6 | 2022-01-27 | 2022-03-17 | 2022-03-31 | Patient reports low-grade fever in the evening. | fever |
 
-7.  Multiple `by` columns
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md),
+[`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md),
+[`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md),
+and
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
+all call this same helper internally whenever `by` has more than one
+column (see the call trees below and in
+[create-deleted-data](https://mjfrigaard.github.io/dfdiffs/articles/create-deleted-data.html#call-structure)).
 
-8.  Multiple `by` columns, new column name (`by_col`)
+### Arguments
 
-9.  Multiple `by` columns, multiple compare columns (`cols`)
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)
+takes five arguments, and every comparison function in the package
+shares them: `compare`, `base`, `by`, `by_col`, and `cols`. The last
+three are optional, and the combination we supply determines how rows
+are matched and which columns are compared:
 
-10. Multiple `by` columns, a new `by_col`, and `cols`
+| `by` | `by_col` | `cols` | What happens |
+|:---|:---|:---|:---|
+| (none) | (none) | (none) | rows are matched on their values across every shared column ([`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md) and [`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md) match by row position instead) |
+| (none) | (none) | given | the same matching, restricted to `cols` |
+| single column | (none) | (none) | join on `by`, compare every shared column |
+| single column | given | (none) | join, renaming the key column to `by_col` |
+| single column | (none) | given | join on `by`, compare only `cols` |
+| single column | given | given | join renamed to `by_col`, compare only `cols` |
+| multiple columns | (none) | (none) | `by` columns combined into one `join` key |
+| multiple columns | given | (none) | `by` columns combined into a key named `by_col` |
+| multiple columns | (none) | given | combined key, compare only `cols` |
+| multiple columns | given | given | combined key named `by_col`, compare only `cols` |
 
-#### Single by column conditions
-
-1.  Two datasets, compare all columns:
-
-    ``` r
-
-    create_new_data(
-      compare = T2Data, 
-      base = T1Data)
-    ```
-
-2.  Multiple columns to compare (`cols`):
-
-    ``` r
-
-    create_new_data(
-      compare = T2Data, 
-      base = T1Data,
-      cols = c("text_var", "factor_var"))
-    ```
-
-3.  Single `by` column, no new column name
-
-    ``` r
-
-    create_new_data(
-      compare = T2DataJoin, 
-      base = T1DataJoin, 
-      by = "join_var")
-    ```
-
-4.  Single `by` column, new column name (`by_col`)
-
-    ``` r
-
-    create_new_data(
-      compare = T2DataJoin, 
-      base = T1DataJoin, 
-      by = "join_var", 
-      by_col = 'new_join_var')
-    ```
-
-5.  Single `by` column, multiple compare columns (`cols`)
-
-    ``` r
-
-    create_new_data(
-      compare = T2DataJoin, 
-      base = T1DataJoin, 
-      by = "join_var", 
-      cols = c("text_var", "factor_var", "subject", "record"))
-    ```
-
-6.  Single `by` column, new column name (`by_col`), multiple compare
-    columns (`cols`)
-
-    ``` r
-
-    create_new_data(
-    compare = T2DataJoin, 
-    base = T1DataJoin, 
-    # unique id
-    by = "join_var", 
-    # new name for id
-    by_col = 'new_join_var', 
-    # cols to compare
-    cols = c("subject", "record", "text_var", "factor_var"))
-    ```
-
-#### Multiple by column conditions
-
-7.  Multiple `by` columns
-
-    ``` r
-
-    create_new_data(
-      compare = T2Data, 
-      base = T1Data, 
-      by = c('subject', 'record'))
-    ```
-
-8.  Multiple `by` columns, new column name (`by_col`)
-
-    ``` r
-
-    create_new_data(
-      compare = T2Data, 
-      base = T1Data, 
-      by = c('subject', 'record'),
-      by_col = "new_join_col")
-    ```
-
-9.  Multiple `by` columns, multiple compare columns (`cols`)
-
-    ``` r
-
-    create_new_data(
-      compare = T2Data, 
-      base = T1Data, 
-      by = c('subject', 'record'),
-      cols = c("subject",  "record", "factor_var", "text_var"))
-    ```
-
-10. Multiple `by` columns, a new `by_col`, and `cols`
-
-    ``` r
-
-    create_new_data(
-      compare = T2Data, 
-      base = T1Data, 
-      by = c('subject', 'record'),
-      by_col = "new_join_col",
-      cols = c("subject", "record", "text_var", "factor_var"))
-    ```
+The worked examples below cover three of these cases: no `by` column, a
+single `by` column, and multiple `by` columns with `by_col` and `cols`.
+Every other row in the table is a combination of the same pieces.
 
 ## create_new_data()
 
-Below is the
+The signature and source for
 [`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)
-function:
+are below:
 
 ``` r
 
@@ -408,15 +333,13 @@ create_new_data <- function(compare, base, by = NULL, by_col = NULL, cols = NULL
 }
 ```
 
-The `cond-1` through `cond-10` examples above call the real, exported
+The source above is for display only (`eval=FALSE`). The examples below
+call the exported
 [`dfdiffs::create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md).
-The source shown here is display-only (`eval=FALSE`) and no longer
-redefines the function, so it can’t shadow the package’s own
-implementation.
 
-`compare` = The current or new dataset in the comparison
+`compare` = the current (new) dataset in the comparison
 
-`base` = The previous or old dataset in the comparison
+`base` = the previous (old) dataset in the comparison
 
 `by` = the unique identifier for joining the two tables
 
@@ -428,17 +351,20 @@ compared)
 ### Call structure
 
 [`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)
-relies on four helpers from the package:
+relies on four helpers from the package.
 [`anti_join_base()`](https://mjfrigaard.github.io/dfdiffs/reference/anti_join_base.md)
 and
 [`select_cols()`](https://mjfrigaard.github.io/dfdiffs/reference/select_cols.md)
-(base-R replacements for
-[`dplyr::anti_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)/[`dplyr::select()`](https://dplyr.tidyverse.org/reference/select.html)),
+are base R replacements for
+[`dplyr::anti_join()`](https://dplyr.tidyverse.org/reference/filter-joins.html)
+and
+[`dplyr::select()`](https://dplyr.tidyverse.org/reference/select.html),
 [`rename_join_col()`](https://mjfrigaard.github.io/dfdiffs/reference/rename_join_col.md)
-(renames the join column), and
+renames the join column, and
 [`create_new_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_column.md)
-(builds the join column from the `by` columns). The call tree below was
-generated from the package source with
+builds the join column from the `by` columns.
+
+The call tree below was generated from the package source with
 [stackcallr](https://github.com/mjfrigaard/stackcallr)
 (`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in
 `dfdiffs` are shown.
@@ -454,22 +380,19 @@ stackcallr::call_tree_dir("R", root = "create_new_data")
     ├─rename_join_col
     └─create_new_column
 
-### Single `by` column conditions
+### Worked examples
 
-The function also needs to handle multiple conditions. Below we cover
-the conditions for a single `by` column (assuming each dataset already
-has a unique identifier). First, we’ll cover a few uncommon conditions,
-like a missing `by` column, or a missing `by` column with specific
-columns selected for comparison.
+#### No `by` column: matching whole rows
 
-#### 1) Two datasets
-
-- No `by` columns (only two datasets)
+When we supply only the two datasets,
+[`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)
+treats a row in `compare` as new if no row in `base` has identical
+values across every shared column:
 
 ``` r
 
 create_new_data(
-  compare = T2Data, 
+  compare = T2Data,
   base = T1Data)
 ```
 
@@ -479,69 +402,17 @@ create_new_data(
 | 6 | B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | Patient reports difficulty sleeping through the night. | insomnia |
 | 9 | A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | Patient reports dry cough lasting several days. | cough |
 
-``` r
+#### A single `by` column
 
-create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin)
-```
-
-|  | join_var | subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|
-| 1 | 1 | D | 5 | 2022-01-30 | 2022-03-16 | 2022-03-26 | Patient reports mild rash on the left forearm. | rash |
-| 2 | 2 | D | 6 | 2022-01-27 | 2022-03-17 | 2022-03-31 | Patient reports low-grade fever in the evening. | fever |
-| 3 | 3 | D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Patient reports lower back pain after activity. | back pain |
-| 5 | 5 | B | 3 | 2022-01-26 | 2022-03-19 | 2022-03-25 | Patient reports persistent fatigue throughout the day. | fatigue |
-| 6 | 6 | B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | Patient reports difficulty sleeping through the night. | insomnia |
-| 7 | 7 | A | 1 | 2022-01-28 | 2022-03-20 | 2022-03-30 | Patient reports mild headache after morning dose. | headache |
-| 8 | 8 | A | 2 | 2022-01-25 | 2022-03-15 | 2022-03-29 | Patient reports occasional nausea following meals. | nausea |
-| 9 | 9 | A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | Patient reports dry cough lasting several days. | cough |
-
-We can see this performs a row-by-row comparison.
-
-#### 2) Multiple columns to compare (`cols`)
-
-- No `by` columns (only two datasets) and multiple compare columns
-  (`cols`)
+`T1DataJoin` and `T2DataJoin` both contain the `join_var` identifier we
+created above. Passing it as a single `by` column matches rows on that
+key instead of on row position:
 
 ``` r
 
 create_new_data(
-  compare = T2Data, 
-  base = T1Data,
-  cols = c("text_var", "factor_var"))
-```
-
-|     | text_var                                               | factor_var |
-|:----|:-------------------------------------------------------|:-----------|
-| 3   | Patient reports lower back pain after activity.        | back pain  |
-| 6   | Patient reports difficulty sleeping through the night. | insomnia   |
-| 9   | Patient reports dry cough lasting several days.        | cough      |
-
-``` r
-
-create_new_data(
-  compare = T2DataJoin, 
+  compare = T2DataJoin,
   base = T1DataJoin,
-  cols = c("text_var", "factor_var"))
-```
-
-|     | text_var                                               | factor_var |
-|:----|:-------------------------------------------------------|:-----------|
-| 3   | Patient reports lower back pain after activity.        | back pain  |
-| 6   | Patient reports difficulty sleeping through the night. | insomnia   |
-| 9   | Patient reports dry cough lasting several days.        | cough      |
-
-#### 3) Single `by` column
-
-- We can provide a single `by` column using the `T1DataJoin` and
-  `T2DataJoin` datasets we created above.
-
-``` r
-
-create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
   by = "join_var")
 ```
 
@@ -551,145 +422,17 @@ create_new_data(
 | 8 | 8 | A | 2 | 2022-01-25 | 2022-03-15 | 2022-03-29 | Patient reports occasional nausea following meals. | nausea |
 | 9 | 9 | A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | Patient reports dry cough lasting several days. | cough |
 
-#### 4) Single `by` column, new column name (`by_col`)
+#### Multiple `by` columns, a new `by_col`, and `cols`
 
-- We can also provide a single `by` column (the unique identifier) and a
-  new name for it with `by_col`.
-
-``` r
-
-create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
-  by = "join_var", 
-  by_col = 'new_join_var')
-```
-
-|  | new_join_var | subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|
-| 7 | 7 | A | 1 | 2022-01-28 | 2022-03-20 | 2022-03-30 | Patient reports mild headache after morning dose. | headache |
-| 8 | 8 | A | 2 | 2022-01-25 | 2022-03-15 | 2022-03-29 | Patient reports occasional nausea following meals. | nausea |
-| 9 | 9 | A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | Patient reports dry cough lasting several days. | cough |
-
-#### 5) Single `by` column, multiple compare columns (`cols`)
-
-- Single `by` column and multiple compare columns (`cols`)
+This is the most complete case. The `by` columns are combined into a
+single key named with `by_col`, and only the columns in `cols` are
+compared:
 
 ``` r
 
 create_new_data(
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
-  by = "join_var", 
-  cols = c("text_var", "factor_var", "subject", "record"))
-```
-
-|  | join_var | text_var | factor_var | subject | record |
-|:---|:---|:---|:---|:---|:---|
-| 7 | 7 | Patient reports mild headache after morning dose. | headache | A | 1 |
-| 8 | 8 | Patient reports occasional nausea following meals. | nausea | A | 2 |
-| 9 | 9 | Patient reports dry cough lasting several days. | cough | A | 2 |
-
-#### 6) Single `by` column, new column name (`by_col`), multiple compare columns (`cols`)
-
-- Single `by` column, a new name for the by column (`by_col`), and
-  multiple compare columns (`cols`)
-
-``` r
-
-create_new_data(
-  # data 
-  compare = T2DataJoin, 
-  base = T1DataJoin, 
-  # unique id
-  by = "join_var", 
-  # new name for id
-  by_col = 'new_join_var', 
-  # cols to compare
-  cols = c("subject", "record", "text_var", "factor_var"))
-```
-
-|  | new_join_var | subject | record | text_var | factor_var |
-|:---|:---|:---|:---|:---|:---|
-| 7 | 7 | A | 1 | Patient reports mild headache after morning dose. | headache |
-| 8 | 8 | A | 2 | Patient reports occasional nausea following meals. | nausea |
-| 9 | 9 | A | 2 | Patient reports dry cough lasting several days. | cough |
-
-### Multiple `by` column conditions
-
-Next, we’ll test conditions in which multiple columns are used to create
-a unique identifier.
-
-#### 7) Multiple `by` columns
-
-- Multiple `by` columns (assuming the columns create a unique
-  identifier)
-
-``` r
-
-create_new_data(
-  compare = T2Data, 
-  base = T1Data, 
-  by = c('subject', 'record'))
-```
-
-|  | join | subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|
-| 3 | D-5 | D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Patient reports lower back pain after activity. | back pain |
-| 6 | B-4 | B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | Patient reports difficulty sleeping through the night. | insomnia |
-| 9 | A-2 | A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | Patient reports dry cough lasting several days. | cough |
-
-This creates a new `join` column that combines `subject` and `record`.
-
-#### 8) Multiple `by` columns, new column name (`by_col`)
-
-We can provide multiple `by` columns, a new `by_col`, and **no `cols`**.
-
-``` r
-
-create_new_data(
-  compare = T2Data, 
-  base = T1Data, 
-  by = c('subject', 'record'),
-  by_col = "new_join_col")
-```
-
-|  | new_join_col | subject | record | start_date | mid_date | end_date | text_var | factor_var |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|
-| 3 | D-5 | D | 5 | 2022-04-04 | 2022-04-13 | 2022-04-22 | Patient reports lower back pain after activity. | back pain |
-| 6 | B-4 | B | 4 | 2022-04-02 | 2022-04-14 | 2022-04-20 | Patient reports difficulty sleeping through the night. | insomnia |
-| 9 | A-2 | A | 2 | 2022-04-04 | 2022-04-15 | 2022-04-21 | Patient reports dry cough lasting several days. | cough |
-
-#### 9) Multiple `by` columns, multiple compare columns (`cols`)
-
-- Multiple `by` columns and multiple compare columns (`cols`), and **no
-  new `by_col`**.
-
-``` r
-
-create_new_data(
-  compare = T2Data, 
-  base = T1Data, 
-  by = c('subject', 'record'),
-  cols = c("subject",  "record", "factor_var", "text_var"))
-```
-
-|  | join | subject | record | factor_var | text_var |
-|:---|:---|:---|:---|:---|:---|
-| 3 | D-5 | D | 5 | back pain | Patient reports lower back pain after activity. |
-| 6 | B-4 | B | 4 | insomnia | Patient reports difficulty sleeping through the night. |
-| 9 | A-2 | A | 2 | cough | Patient reports dry cough lasting several days. |
-
-#### 10) Multiple `by` columns, a new `by_col`, and `cols`
-
-We can provide multiple `by` columns, a new `by_col`, and multiple
-`cols`.
-
-``` r
-
-create_new_data(
-  compare = T2Data, 
-  base = T1Data, 
+  compare = T2Data,
+  base = T1Data,
   by = c('subject', 'record'),
   by_col = "new_join_col",
   cols = c("subject", "record", "text_var", "factor_var"))

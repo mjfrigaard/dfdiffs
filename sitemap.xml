@@ -11,8 +11,8 @@
 <url><loc>https://mjfrigaard.github.io/dfdiffs/articles/create-new-data.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/articles/getting-started.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/articles/index.html</loc></url>
-<url><loc>https://mjfrigaard.github.io/dfdiffs/articles/modified-data.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/articles/multiple-comparisons.html</loc></url>
+<url><loc>https://mjfrigaard.github.io/dfdiffs/articles/proc-compare-parity.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/articles/similar-work.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/articles/tests.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/articles/upload-data.html</loc></url>
@@ -37,7 +37,9 @@
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/base_react_theme.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/changed_react_theme.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/comp_react_theme.html</loc></url>
+<url><loc>https://mjfrigaard.github.io/dfdiffs/reference/compare_columns.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/compare_data.html</loc></url>
+<url><loc>https://mjfrigaard.github.io/dfdiffs/reference/compare_summary.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/compare_values.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/create_comparison_report.html</loc></url>
@@ -67,6 +69,8 @@
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/mod_upload_server.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/mod_upload_ui.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/new_react_theme.html</loc></url>
+<url><loc>https://mjfrigaard.github.io/dfdiffs/reference/print.dfdiffs_column_diff.html</loc></url>
+<url><loc>https://mjfrigaard.github.io/dfdiffs/reference/print.dfdiffs_summary.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/rename_join_col.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/select_cols.html</loc></url>
 <url><loc>https://mjfrigaard.github.io/dfdiffs/reference/upload_data.html</loc></url>

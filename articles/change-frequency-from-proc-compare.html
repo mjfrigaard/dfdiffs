@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,7 @@
     <li><a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a></li>
     <li><a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a></li>
     <li><a class="dropdown-item" href="../articles/create-comparison-report.html">Creating a comparison report</a></li>
+    <li><a class="dropdown-item" href="../articles/proc-compare-parity.html">PROC COMPARE parity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Comparisons</h6></li>
     <li><a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a></li>
@@ -92,44 +93,66 @@
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
-<p>This vignette covers how to calculate the frequency of changes per
-column in the datasets used in the PROC COMPARE file,
+<p>In this vignette I’ll cover how to calculate the frequency of changes
+per column for each dataset in a PROC COMPARE output file,
 <code>snapshot_compare_270301_20221116_year3_preview_noDAP.xlsx</code>.</p>
-<p>Below we import the Excel file and build a regular expression for
-separating the changes in the <code>value_changes</code> and
-<code>newvalues</code> columns.</p>
+<p>We’ll import the Excel file, then build a regular expression for
+separating the changes recorded in the <code>value_changes</code> column
+(the cleaned name of the <code>Value changes</code> column).</p>
 </div>
 <div class="section level2">
 <h2 id="import-data">Import data<a class="anchor" aria-label="anchor" href="#import-data"></a>
 </h2>
-<p>Below we check the names of the sheets in the
+<p>The code below lists the sheet names in the
 <code>snapshot_compare_270301_20221116_year3_preview_noDAP.xlsx</code>
 file.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">snapshot_pth</span> <span class="op">&lt;-</span> <span class="st">"../inst/extdata/app-testing/xlsx/snapshot_compare_270301_20221116_year3_preview_noDAP.xlsx"</span></span>
+<code class="sourceCode R"><span><span class="va">snapshot_pth</span> <span class="op">&lt;-</span> <span class="st">"../inst/extdata/xlsx/snapshot_compare_270301_20221116_year3_preview_noDAP.xlsx"</span></span>
 <span><span class="va">snapshoty3_sheets</span> <span class="op">&lt;-</span> <span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://readxl.tidyverse.org/reference/excel_sheets.html" class="external-link">excel_sheets</a></span><span class="op">(</span><span class="va">snapshot_pth</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `path` does not exist: '../inst/extdata/app-testing/xlsx/snapshot_compare_270301_20221116_year3_preview_noDAP.xlsx'</span></span>
 <span><span class="va">snapshoty3_sheets</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'snapshoty3_sheets' not found</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] "Summary"       "Key variables" "AE"            "AEYN"         </span></span>
+<span><span class="co">#&gt;  [5] "CER"           "CM"            "CMAIS"         "DM"           </span></span>
+<span><span class="co">#&gt;  [9] "DS"            "DSIC"          "DSLB"          "DSSH"         </span></span>
+<span><span class="co">#&gt; [13] "DSSS"          "ECIF"          "EG"            "ENR"          </span></span>
+<span><span class="co">#&gt; [17] "FAFS"          "FALB"          "FALBA"         "IE"           </span></span>
+<span><span class="co">#&gt; [21] "LBC"           "LBCG"          "LBF8GENO"      "LBF8GENO_CP"  </span></span>
+<span><span class="co">#&gt; [25] "LBH"           "LBU"           "LBV"           "MH"           </span></span>
+<span><span class="co">#&gt; [29] "MHB"           "MHH"           "MHT"           "MOU"          </span></span>
+<span><span class="co">#&gt; [33] "PE"            "PEH"           "PR"            "PREGFU"       </span></span>
+<span><span class="co">#&gt; [37] "PRGRPT"        "PROTDEV"       "QSEM"          "QSEQ"         </span></span>
+<span><span class="co">#&gt; [41] "QSHAL"         "QSHAL2"        "QSPROBE"       "QSPROBE2"     </span></span>
+<span><span class="co">#&gt; [45] "QSQOL"         "QSWPAI"        "SRS"           "SV"           </span></span>
+<span><span class="co">#&gt; [49] "UCRF"          "VS"            "VST"</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="ae">AE<a class="anchor" aria-label="anchor" href="#ae"></a>
 </h3>
-<p>Import the <code>"AE"</code> sheet and check the column names.</p>
+<p>We’ll import the <code>"AE"</code> sheet and check the column
+names.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">snap_ae_raw</span> <span class="op">&lt;-</span> <span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://readxl.tidyverse.org/reference/read_excel.html" class="external-link">read_excel</a></span><span class="op">(</span><span class="va">snapshot_pth</span>, sheet <span class="op">=</span> <span class="st">"AE"</span><span class="op">)</span> </span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> `path` does not exist: '../inst/extdata/app-testing/xlsx/snapshot_compare_270301_20221116_year3_preview_noDAP.xlsx'</span></span>
+<span><span class="co">#&gt; New names:</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> `Surgical Procedure` -&gt; `Surgical Procedure...92`</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> `Surgical Procedure` -&gt; `Surgical Procedure...94`</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">snap_ae_raw</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'snap_ae_raw' not found</span></span>
+<span><span class="co">#&gt;  [1] "DATASET"                    "Subject name or identifier"</span></span>
+<span><span class="co">#&gt;  [3] "Site name"                  "Project"                   </span></span>
+<span><span class="co">#&gt;  [5] "Folder instance name"       "Folder OID"                </span></span>
+<span><span class="co">#&gt;  [7] "Folder name"                "SiteNumber"                </span></span>
+<span><span class="co">#&gt;  [9] "Environment"                "eCRF Form Name"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">snap_ae_raw</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="fl">10</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'snap_ae_raw' not found</span></span></code></pre></div>
-<p>We’ll reformat the column names and filter the <code>"AE"</code>
-dataset to only the rows with an <code>"Updated"</code> value in the
-<code>status</code> column.</p>
+<span><span class="co">#&gt;  [1] "Reporter Last Name"                                  </span></span>
+<span><span class="co">#&gt;  [2] "E2B Transmit Flag"                                   </span></span>
+<span><span class="co">#&gt;  [3] "E2B Transmit Flag(Character)"                        </span></span>
+<span><span class="co">#&gt;  [4] "Transmit"                                            </span></span>
+<span><span class="co">#&gt;  [5] "Transmit(Character)"                                 </span></span>
+<span><span class="co">#&gt;  [6] "Relationship to immunosuppressant therapy"           </span></span>
+<span><span class="co">#&gt;  [7] "Relationship to immunosuppressant therapyCoded Value"</span></span>
+<span><span class="co">#&gt;  [8] "STATUS"                                              </span></span>
+<span><span class="co">#&gt;  [9] "Value changes"                                       </span></span>
+<span><span class="co">#&gt; [10] "NEWVALUES"</span></span></code></pre></div>
+<p>Next, we’ll select and rename the columns we need, clean their names,
+and filter the <code>"AE"</code> dataset to the rows with an
+<code>"Updated"</code> value in the <code>status</code> column.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">snap_updated</span> <span class="op">&lt;-</span> <span class="va">snap_ae_raw</span> <span class="op">|&gt;</span>  </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
@@ -141,39 +164,45 @@ dataset to only the rows with an <code>"Updated"</code> value in the
 <span>    NEW_VALUES <span class="op">=</span> <span class="va">NEWVALUES</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
 <span>  <span class="fu">janitor</span><span class="fu">::</span><span class="fu"><a href="https://sfirke.github.io/janitor/reference/clean_names.html" class="external-link">clean_names</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">status</span> <span class="op">==</span> <span class="st">"Updated"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'snap_ae_raw' not found</span></span>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">snap_updated</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'snap_updated' not found</span></span></code></pre></div>
+<span><span class="co">#&gt; Rows: 114</span></span>
+<span><span class="co">#&gt; Columns: 6</span></span>
+<span><span class="co">#&gt; $ subject_id    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "0009-3901"<span style="color: #949494;">, </span>"0023-3904"<span style="color: #949494;">, </span>"0023-3905"<span style="color: #949494;">, </span>"0109-3901"<span style="color: #949494;">, </span>"010…</span></span>
+<span><span class="co">#&gt; $ record_num    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0<span style="color: #949494;">,</span>…</span></span>
+<span><span class="co">#&gt; $ dataset       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "AE"<span style="color: #949494;">, </span>"AE"<span style="color: #949494;">, </span>"AE"<span style="color: #949494;">, </span>"AE"<span style="color: #949494;">, </span>"AE"<span style="color: #949494;">, </span>"AE"<span style="color: #949494;">, </span>"AE"<span style="color: #949494;">, </span>"AE"<span style="color: #949494;">, </span>"AE"<span style="color: #949494;">, </span>"A…</span></span>
+<span><span class="co">#&gt; $ status        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Updated"<span style="color: #949494;">, </span>"Updated"<span style="color: #949494;">, </span>"Updated"<span style="color: #949494;">, </span>"Updated"<span style="color: #949494;">, </span>"Updated"<span style="color: #949494;">, </span>"…</span></span>
+<span><span class="co">#&gt; $ value_changes <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "SAENPC=, SAENPC_COD=, AERELNST=, SAEDESC1=ALT on 12/7/2…</span></span>
+<span><span class="co">#&gt; $ new_values    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "SAENPC=Yes, SAENPC_COD=Y, AERELNST=unknown, SAEDESC1=AL…</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="testing-saedesc1">Testing <code>SAEDESC1</code><a class="anchor" aria-label="anchor" href="#testing-saedesc1"></a>
 </h4>
-<p>The <code>SAEDESC1</code> columns contain a lot of unstructured text
-with multiple commas, so we’ll use them to test separating the column
-names from the <code>value_changes</code> and <code>newvalues</code>
-columns.</p>
+<p>Changes to <code>SAEDESC1</code> contain a lot of unstructured text
+with multiple commas, which makes them a good test case for separating
+the column names from the <code>value_changes</code> column.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">test_SAEDESC1</span> <span class="op">&lt;-</span> <span class="va">snap_updated</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">snap_updated</span><span class="op">$</span><span class="va">value_changes</span>, <span class="st">"SAEDESC1"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'snap_updated' not found</span></span>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">test_SAEDESC1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'test_SAEDESC1' not found</span></span></code></pre></div>
+<span><span class="co">#&gt; Rows: 3</span></span>
+<span><span class="co">#&gt; Columns: 6</span></span>
+<span><span class="co">#&gt; $ subject_id    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "0009-3901"<span style="color: #949494;">, </span>"0146-3901"<span style="color: #949494;">, </span>"0157-3902"</span></span>
+<span><span class="co">#&gt; $ record_num    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0<span style="color: #949494;">, </span>0<span style="color: #949494;">, </span>0</span></span>
+<span><span class="co">#&gt; $ dataset       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "AE"<span style="color: #949494;">, </span>"AE"<span style="color: #949494;">, </span>"AE"</span></span>
+<span><span class="co">#&gt; $ status        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Updated"<span style="color: #949494;">, </span>"Updated"<span style="color: #949494;">, </span>"Updated"</span></span>
+<span><span class="co">#&gt; $ value_changes <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "SAENPC=, SAENPC_COD=, AERELNST=, SAEDESC1=ALT on 12/7/2…</span></span>
+<span><span class="co">#&gt; $ new_values    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "SAENPC=Yes, SAENPC_COD=Y, AERELNST=unknown, SAEDESC1=AL…</span></span></code></pre></div>
 </div>
 <div class="section level4">
-<h4 id="test-with-regular-expression">Test with regular expression<a class="anchor" aria-label="anchor" href="#test-with-regular-expression"></a>
+<h4 id="testing-the-regular-expression">Testing the regular expression<a class="anchor" aria-label="anchor" href="#testing-the-regular-expression"></a>
 </h4>
-<p>Below is the regular expression pattern we’ll test these rows
-against.</p>
+<p>Below is the regular expression we’ll test these rows against.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">sas_cols_regex</span> <span class="op">&lt;-</span> <span class="st">"\\w*[A-Z]\\w*[A-Z]\\w*="</span></span>
 <span><span class="va">sas_cols_regex</span></span>
 <span><span class="co">#&gt; [1] "\\w*[A-Z]\\w*[A-Z]\\w*="</span></span></code></pre></div>
-<p>We’ll start by using the <code><a href="https://stringr.tidyverse.org/reference/str_view.html" class="external-link">str_view_all()</a></code> function to
-check if our regular expression is working.</p>
+<p>We’ll use <code><a href="https://stringr.tidyverse.org/reference/str_view.html" class="external-link">str_view_all()</a></code> to check whether the regular
+expression matches the column names.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_view.html" class="external-link">str_view_all</a></span><span class="op">(</span>string <span class="op">=</span> <span class="va">test_SAEDESC1</span><span class="op">$</span><span class="va">value_changes</span>, </span>
 <span>  pattern <span class="op">=</span> <span class="va">sas_cols_regex</span><span class="op">)</span> </span>
@@ -182,17 +211,18 @@ check if our regular expression is working.</p>
 <span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'test_SAEDESC1' not found</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #555555;">[1] │</span> <span style="color: #00BBBB;">&lt;SAENPC=&gt;</span>, <span style="color: #00BBBB;">&lt;SAENPC_COD=&gt;</span>, <span style="color: #00BBBB;">&lt;AERELNST=&gt;</span>, <span style="color: #00BBBB;">&lt;SAEDESC1=&gt;</span>ALT on 12/7/2021: 36; baseline = 24, <span style="color: #00BBBB;">&lt;AETOXGR=&gt;</span>, <span style="color: #00BBBB;">&lt;AETOXGR_COD=&gt;</span>, <span style="color: #00BBBB;">&lt;AEREL=&gt;</span>, <span style="color: #00BBBB;">&lt;AEREL_COD=&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">[2] │</span> <span style="color: #00BBBB;">&lt;PRMANDAT=&gt;</span>No, <span style="color: #00BBBB;">&lt;PRMANDAT_COD=&gt;</span>N, <span style="color: #00BBBB;">&lt;LOTNO=&gt;</span>L271036, <span style="color: #00BBBB;">&lt;LOTEXDAT=&gt;</span>31JAN2020:00:00:00.000, <span style="color: #00BBBB;">&lt;LOTEXDAT_RAW=&gt;</span>31 Jan 2020, <span style="color: #00BBBB;">&lt;LOTEXDAT_YY=&gt;</span>2020, <span style="color: #00BBBB;">&lt;LOTEXDAT_MM=&gt;</span>1, <span style="color: #00BBBB;">&lt;LOTEXDAT_DD=&gt;</span>31, <span style="color: #00BBBB;">&lt;SAENPC=&gt;</span>Yes, <span style="color: #00BBBB;">&lt;SAENPC_COD=&gt;</span>Y, <span style="color: #00BBBB;">&lt;SAEDESC1=&gt;</span>Central AST: 147</span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">[3] │</span> <span style="color: #00BBBB;">&lt;SAEDRSN=&gt;</span>, <span style="color: #00BBBB;">&lt;SAEDESC1=&gt;</span>.</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
 <h3 id="count_change_columns">
 <code>count_change_columns()</code><a class="anchor" aria-label="anchor" href="#count_change_columns"></a>
 </h3>
-<p>Now that we have a regular expression for matching the column names
-in <code>value_changes</code>, we’ll count the occurrences of each
-match.</p>
+<p>Now that we have a regular expression that matches the column names
+in <code>value_changes</code>, we’ll write a function that counts the
+occurrences of each match.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">count_change_columns</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">sas_cols_regex</span> <span class="op">&lt;-</span> <span class="st">"\\w*[A-Z]\\w*[A-Z]\\w*="</span></span>
@@ -222,21 +252,103 @@ match.</p>
 <div class="section level3">
 <h3 id="field-and-change-count">Field and Change Count<a class="anchor" aria-label="anchor" href="#field-and-change-count"></a>
 </h3>
-<p>We can derive <code>Field</code> and <code>ChangeCount</code> from
-<code>snap_ae_raw</code> (the data imported from the spreadsheet).</p>
+<p>We can derive <code>Field</code> and <code>ChangeCount</code> by
+passing <code>snap_ae_raw</code> (the data imported from the
+spreadsheet) to <code>count_change_columns()</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">ae_change_freq</span> <span class="op">&lt;-</span> <span class="fu">count_change_columns</span><span class="op">(</span>df <span class="op">=</span> <span class="va">snap_ae_raw</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'snap_ae_raw' not found</span></span>
 <span><span class="va">ae_change_freq</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'ae_change_freq' not found</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 82 × 2</span></span></span>
+<span><span class="co">#&gt;    Field                   ChangeCount</span></span>
+<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> AEACMED                           2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> AEACMED_RAW                       2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> AEACOTH                           2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> AEACOTH_RAW                       2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> AEACPROC                          2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> AEACPROC_RAW                      2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> AEADDTRT                          2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> AECAT                             2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> AECAT_COD                         2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> AEENDAT                          46</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">11</span> AEENDAT_DD                       46</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">12</span> AEENDAT_MM                       45</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">13</span> AEENDAT_RAW                      47</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">14</span> AEENDAT_YY                       45</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">15</span> AEENRTPT                         45</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">16</span> AEENRTPT_RAW                     45</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">17</span> AEENTIM                           8</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">18</span> AEOUT                            45</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">19</span> AEOUT_COD                        45</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">20</span> AEPRELEC                          2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">21</span> AEPRELEC_COD                      2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">22</span> AEPRSPEC                          2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">23</span> AEREL                             1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">24</span> AERELNST                          3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">25</span> AEREL_COD                         1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">26</span> AESCONG                           3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">27</span> AESCONG_COD                       3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">28</span> AESDISAB                          3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">29</span> AESDISAB_COD                      3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">30</span> AESDTH                            3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">31</span> AESDTH_COD                        3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">32</span> AESER                             3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">33</span> AESER_COD                         3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">34</span> AESHOSP                           3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">35</span> AESHOSP_COD                       3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">36</span> AESLIFE                           3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">37</span> AESLIFE_COD                       3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">38</span> AESMIE                            3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">39</span> AESMIE_COD                        3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">40</span> AESTDAT                           3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">41</span> AESTDAT_DD                        2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">42</span> AESTDAT_MM                        2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">43</span> AESTDAT_RAW                       3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">44</span> AESTTIM                           1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">45</span> AETERM                            5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">46</span> AETERMDECOD                       2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">47</span> AETERMHLGT                        1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">48</span> AETERMHLGTCD                      1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">49</span> AETERMHLT                         2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">50</span> AETERMHLTCD                       2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">51</span> AETERMLLT                         2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">52</span> AETERMLLTCD                       2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">53</span> AETERMPTCD                        2</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">54</span> AETERMSOC                         1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">55</span> AETERMSOCCD                       1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">56</span> AETERM_CODERDICTNAME              1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">57</span> AETERM_CODERDICTVERSION           1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">58</span> AETOXGR                           3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">59</span> AETOXGR_COD                       3</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">60</span> DATAPAGENAME                      6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">61</span> LOTEXDAT                         20</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">62</span> LOTEXDAT2                         5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">63</span> LOTEXDAT2_DD                      5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">64</span> LOTEXDAT2_MM                      5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">65</span> LOTEXDAT2_RAW                     5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">66</span> LOTEXDAT2_YY                      5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">67</span> LOTEXDAT_DD                      20</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">68</span> LOTEXDAT_MM                      20</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">69</span> LOTEXDAT_RAW                     20</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">70</span> LOTEXDAT_YY                      20</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">71</span> LOTNO                             5</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">72</span> LOTNO2                            1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">73</span> PRMANDAT                          4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">74</span> PRMANDAT_COD                      4</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">75</span> SAEDESC1                         18</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">76</span> SAEDRSN                           6</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">77</span> SAENPC                            7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">78</span> SAENPC_COD                        7</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">79</span> SITE                             28</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">80</span> SITENUMBER                       28</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">81</span> TRANSMIT                          1</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">82</span> TRANSMIT_RAW                      1</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="graph-changes">Graph Changes<a class="anchor" aria-label="anchor" href="#graph-changes"></a>
 </h3>
-<p>We can build a graph of these changes, but we have to manually set
-the font size because of the long <code>y</code> axis.</p>
+<p>We can graph these changes, but we have to set the font size manually
+because of the long <code>y</code> axis.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">ae_change_freq</span>, </span>
 <span>       mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ChangeCount</span>, </span>
@@ -246,70 +358,116 @@ the font size because of the long <code>y</code> axis.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"AE Changes"</span>, </span>
 <span>       y <span class="op">=</span> <span class="st">"Field"</span>, </span>
 <span>       x <span class="op">=</span> <span class="st">"Number of Changes"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'ae_change_freq' not found</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
+<p><img src="change-frequency-from-proc-compare_files/figure-html/graph-ae-changes-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 </div>
 <div class="section level2">
 <h2 id="map-to-other-sheets">Map to other sheets<a class="anchor" aria-label="anchor" href="#map-to-other-sheets"></a>
 </h2>
-<p>Now we can apply <code>count_change_columns()</code> to all sheets in
+<p>Now we can apply <code>count_change_columns()</code> to every sheet
+in
 <code>snapshot_compare_270301_20221116_year3_preview_noDAP.xlsx</code>.</p>
-<p>First, we remove the first two sheets from
-<code>snapshoty3_sheets</code>:</p>
+<p>First, we remove the <code>Summary</code> and
+<code>Key variables</code> sheets from
+<code>snapshoty3_sheets</code>.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">form_sheets</span> <span class="op">&lt;-</span> <span class="va">snapshoty3_sheets</span><span class="op">[</span><span class="op">!</span> <span class="va">snapshoty3_sheets</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">'Summary'</span>, <span class="st">'Key variables'</span><span class="op">)</span><span class="op">]</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'snapshoty3_sheets' not found</span></span>
 <span><span class="va">form_sheets</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'form_sheets' not found</span></span></code></pre></div>
-<p>Then we name each sheet in the vector and store the result in
-<code>form_sheets_nmd</code>:</p>
+<span><span class="co">#&gt;  [1] "AE"          "AEYN"        "CER"         "CM"          "CMAIS"      </span></span>
+<span><span class="co">#&gt;  [6] "DM"          "DS"          "DSIC"        "DSLB"        "DSSH"       </span></span>
+<span><span class="co">#&gt; [11] "DSSS"        "ECIF"        "EG"          "ENR"         "FAFS"       </span></span>
+<span><span class="co">#&gt; [16] "FALB"        "FALBA"       "IE"          "LBC"         "LBCG"       </span></span>
+<span><span class="co">#&gt; [21] "LBF8GENO"    "LBF8GENO_CP" "LBH"         "LBU"         "LBV"        </span></span>
+<span><span class="co">#&gt; [26] "MH"          "MHB"         "MHH"         "MHT"         "MOU"        </span></span>
+<span><span class="co">#&gt; [31] "PE"          "PEH"         "PR"          "PREGFU"      "PRGRPT"     </span></span>
+<span><span class="co">#&gt; [36] "PROTDEV"     "QSEM"        "QSEQ"        "QSHAL"       "QSHAL2"     </span></span>
+<span><span class="co">#&gt; [41] "QSPROBE"     "QSPROBE2"    "QSQOL"       "QSWPAI"      "SRS"        </span></span>
+<span><span class="co">#&gt; [46] "SV"          "UCRF"        "VS"          "VST"</span></span></code></pre></div>
+<p>Then we name each element in the vector with its own sheet name and
+store the result in <code>form_sheets_nmd</code>.</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">form_sheets_nmd</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://rlang.r-lib.org/reference/set_names.html" class="external-link">set_names</a></span><span class="op">(</span><span class="va">form_sheets</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'form_sheets' not found</span></span>
 <span><span class="va">form_sheets_nmd</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'form_sheets_nmd' not found</span></span></code></pre></div>
+<span><span class="co">#&gt;            AE          AEYN           CER            CM         CMAIS </span></span>
+<span><span class="co">#&gt;          "AE"        "AEYN"         "CER"          "CM"       "CMAIS" </span></span>
+<span><span class="co">#&gt;            DM            DS          DSIC          DSLB          DSSH </span></span>
+<span><span class="co">#&gt;          "DM"          "DS"        "DSIC"        "DSLB"        "DSSH" </span></span>
+<span><span class="co">#&gt;          DSSS          ECIF            EG           ENR          FAFS </span></span>
+<span><span class="co">#&gt;        "DSSS"        "ECIF"          "EG"         "ENR"        "FAFS" </span></span>
+<span><span class="co">#&gt;          FALB         FALBA            IE           LBC          LBCG </span></span>
+<span><span class="co">#&gt;        "FALB"       "FALBA"          "IE"         "LBC"        "LBCG" </span></span>
+<span><span class="co">#&gt;      LBF8GENO   LBF8GENO_CP           LBH           LBU           LBV </span></span>
+<span><span class="co">#&gt;    "LBF8GENO" "LBF8GENO_CP"         "LBH"         "LBU"         "LBV" </span></span>
+<span><span class="co">#&gt;            MH           MHB           MHH           MHT           MOU </span></span>
+<span><span class="co">#&gt;          "MH"         "MHB"         "MHH"         "MHT"         "MOU" </span></span>
+<span><span class="co">#&gt;            PE           PEH            PR        PREGFU        PRGRPT </span></span>
+<span><span class="co">#&gt;          "PE"         "PEH"          "PR"      "PREGFU"      "PRGRPT" </span></span>
+<span><span class="co">#&gt;       PROTDEV          QSEM          QSEQ         QSHAL        QSHAL2 </span></span>
+<span><span class="co">#&gt;     "PROTDEV"        "QSEM"        "QSEQ"       "QSHAL"      "QSHAL2" </span></span>
+<span><span class="co">#&gt;       QSPROBE      QSPROBE2         QSQOL        QSWPAI           SRS </span></span>
+<span><span class="co">#&gt;     "QSPROBE"    "QSPROBE2"       "QSQOL"      "QSWPAI"         "SRS" </span></span>
+<span><span class="co">#&gt;            SV          UCRF            VS           VST </span></span>
+<span><span class="co">#&gt;          "SV"        "UCRF"          "VS"         "VST"</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="import-all-sheets">Import all sheets<a class="anchor" aria-label="anchor" href="#import-all-sheets"></a>
 </h3>
-<p>We can now import all the sheets from the file at
-<code>snapshot_pth</code> and store them in <code>all_sheets</code>.</p>
+<p>We can now import every sheet from the file at
+<code>snapshot_pth</code> and store them in the <code>all_sheets</code>
+list.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">all_sheets</span> <span class="op">&lt;-</span> <span class="va">form_sheets_nmd</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span><span class="op">~</span> <span class="fu">readxl</span><span class="fu">::</span><span class="fu"><a href="https://readxl.tidyverse.org/reference/read_excel.html" class="external-link">read_excel</a></span><span class="op">(</span>path <span class="op">=</span> <span class="va">snapshot_pth</span>, sheet <span class="op">=</span> <span class="va">.x</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'form_sheets_nmd' not found</span></span></code></pre></div>
-<p>Checking the names of this list confirms it contains all the imported
-sheets.</p>
+<span><span class="co">#&gt; New names:</span></span>
+<span><span class="co">#&gt; New names:</span></span>
+<span><span class="co">#&gt; New names:</span></span>
+<span><span class="co">#&gt; New names:</span></span>
+<span><span class="co">#&gt; New names:</span></span>
+<span><span class="co">#&gt; New names:</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> `Surgical Procedure` -&gt; `Surgical Procedure...92`</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> `Surgical Procedure` -&gt; `Surgical Procedure...94`</span></span></code></pre></div>
+<p>The names of <code>all_sheets</code> confirm the list contains every
+imported sheet.</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">all_sheets</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'all_sheets' not found</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] "AE"          "AEYN"        "CER"         "CM"          "CMAIS"      </span></span>
+<span><span class="co">#&gt;  [6] "DM"          "DS"          "DSIC"        "DSLB"        "DSSH"       </span></span>
+<span><span class="co">#&gt; [11] "DSSS"        "ECIF"        "EG"          "ENR"         "FAFS"       </span></span>
+<span><span class="co">#&gt; [16] "FALB"        "FALBA"       "IE"          "LBC"         "LBCG"       </span></span>
+<span><span class="co">#&gt; [21] "LBF8GENO"    "LBF8GENO_CP" "LBH"         "LBU"         "LBV"        </span></span>
+<span><span class="co">#&gt; [26] "MH"          "MHB"         "MHH"         "MHT"         "MOU"        </span></span>
+<span><span class="co">#&gt; [31] "PE"          "PEH"         "PR"          "PREGFU"      "PRGRPT"     </span></span>
+<span><span class="co">#&gt; [36] "PROTDEV"     "QSEM"        "QSEQ"        "QSHAL"       "QSHAL2"     </span></span>
+<span><span class="co">#&gt; [41] "QSPROBE"     "QSPROBE2"    "QSQOL"       "QSWPAI"      "SRS"        </span></span>
+<span><span class="co">#&gt; [46] "SV"          "UCRF"        "VS"          "VST"</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="map-count_change_columns-to-all_sheets">Map <code>count_change_columns()</code> to
 <code>all_sheets</code><a class="anchor" aria-label="anchor" href="#map-count_change_columns-to-all_sheets"></a>
 </h3>
-<p>We <code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map()</a></code> the <code>count_change_columns()</code>
-function over every item in <code>all_sheets</code> and store the
-results in the <code>all_field_counts</code> list.</p>
+<p>We’ll <code><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map()</a></code> <code>count_change_columns()</code> over
+each element in <code>all_sheets</code> and store the results in the
+<code>all_field_counts</code> list.</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">all_field_counts</span> <span class="op">&lt;-</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map</a></span><span class="op">(</span>.x <span class="op">=</span> <span class="va">all_sheets</span>, .f <span class="op">=</span> <span class="va">count_change_columns</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'all_sheets' not found</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">all_field_counts</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'all_field_counts' not found</span></span></code></pre></div>
+<span><span class="co">#&gt;  [1] "AE"          "AEYN"        "CER"         "CM"          "CMAIS"      </span></span>
+<span><span class="co">#&gt;  [6] "DM"          "DS"          "DSIC"        "DSLB"        "DSSH"       </span></span>
+<span><span class="co">#&gt; [11] "DSSS"        "ECIF"        "EG"          "ENR"         "FAFS"       </span></span>
+<span><span class="co">#&gt; [16] "FALB"        "FALBA"       "IE"          "LBC"         "LBCG"       </span></span>
+<span><span class="co">#&gt; [21] "LBF8GENO"    "LBF8GENO_CP" "LBH"         "LBU"         "LBV"        </span></span>
+<span><span class="co">#&gt; [26] "MH"          "MHB"         "MHH"         "MHT"         "MOU"        </span></span>
+<span><span class="co">#&gt; [31] "PE"          "PEH"         "PR"          "PREGFU"      "PRGRPT"     </span></span>
+<span><span class="co">#&gt; [36] "PROTDEV"     "QSEM"        "QSEQ"        "QSHAL"       "QSHAL2"     </span></span>
+<span><span class="co">#&gt; [41] "QSPROBE"     "QSPROBE2"    "QSQOL"       "QSWPAI"      "SRS"        </span></span>
+<span><span class="co">#&gt; [46] "SV"          "UCRF"        "VS"          "VST"</span></span></code></pre></div>
 <p>We can check the results by graphing the changes in a few of the
 forms.</p>
 <div class="section level4">
 <h4 id="cm-changes">CM Changes<a class="anchor" aria-label="anchor" href="#cm-changes"></a>
 </h4>
+<p>The graph below shows the number of changes per field in the
+<code>CM</code> form.</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">all_field_counts</span><span class="op">$</span><span class="va">CM</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ChangeCount</span>, </span>
@@ -319,13 +477,14 @@ forms.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"CM Changes"</span>, </span>
 <span>       y <span class="op">=</span> <span class="st">"Field"</span>, </span>
 <span>       x <span class="op">=</span> <span class="st">"Number of Changes"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'all_field_counts' not found</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
+<p><img src="change-frequency-from-proc-compare_files/figure-html/graph-cm-changes-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level4">
 <h4 id="qsqol-changes">QSQOL Changes<a class="anchor" aria-label="anchor" href="#qsqol-changes"></a>
 </h4>
+<p>The graph below shows the number of changes per field in the
+<code>QSQOL</code> form.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">all_field_counts</span><span class="op">$</span><span class="va">QSQOL</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ChangeCount</span>, </span>
@@ -335,13 +494,14 @@ forms.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"QSQOL Changes"</span>, </span>
 <span>       y <span class="op">=</span> <span class="st">"Field"</span>, </span>
 <span>       x <span class="op">=</span> <span class="st">"Number of Changes"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'all_field_counts' not found</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
+<p><img src="change-frequency-from-proc-compare_files/figure-html/graph-qsqol-changes-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level4">
 <h4 id="vs-changes">VS Changes<a class="anchor" aria-label="anchor" href="#vs-changes"></a>
 </h4>
+<p>The graph below shows the number of changes per field in the
+<code>VS</code> form.</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">all_field_counts</span><span class="op">$</span><span class="va">VS</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span>mapping <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">ChangeCount</span>, </span>
@@ -351,27 +511,20 @@ forms.</p>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>title <span class="op">=</span> <span class="st">"VS Changes"</span>, </span>
 <span>       y <span class="op">=</span> <span class="st">"Field"</span>, </span>
 <span>       x <span class="op">=</span> <span class="st">"Number of Changes"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'all_field_counts' not found</span></span></code></pre></div>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_minimal</a></span><span class="op">(</span>base_size <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span></code></pre></div>
+<p><img src="change-frequency-from-proc-compare_files/figure-html/graph-vs-changes-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 </div>
 <div class="section level3">
 <h3 id="export-field-count-tables">Export field count tables<a class="anchor" aria-label="anchor" href="#export-field-count-tables"></a>
 </h3>
-<p>We can export these into the <code>inst/out/</code> folder as
-<code>all-field-counts.xlsx</code>.</p>
+<p>We can export these tables to the <code>inst/out/</code> folder as
+<code>all-field-counts.xlsx</code>, with one sheet per form.</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ycphs.github.io/openxlsx/index.html" class="external-link">openxlsx</a></span><span class="op">)</span></span>
 <span><span class="co"># create wb</span></span>
 <span><span class="fu">openxlsx</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/openxlsx/man/write.xlsx.html" class="external-link">write.xlsx</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">all_field_counts</span>,</span>
-<span>                file <span class="op">=</span> <span class="st">"../inst/out/all-field-counts.xlsx"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00; font-weight: bold;">Error</span><span style="font-weight: bold;">:</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> object 'all_field_counts' not found</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="collapse-into-a-single-table">Collapse into a single table<a class="anchor" aria-label="anchor" href="#collapse-into-a-single-table"></a>
-</h3>
+<span>                file <span class="op">=</span> <span class="st">"../inst/out/all-field-counts.xlsx"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
