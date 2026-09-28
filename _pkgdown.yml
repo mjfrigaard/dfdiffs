@@ -1,28 +1,31 @@
 url: https://mjfrigaard.github.io/dfdiffs/
+
 template:
   bootstrap: 5
-  theme: atom-one-light
   bslib:
-    preset: "shiny"
-    bg: "#EAE2B7" # pulp cream
-    fg: "#14213D" # midnight ink
-    primary: "#1D3461" # cover navy
-    secondary: "#14213D" # midnight ink
-    success: "#1D3461" # cover navy
-    info: "#1D3461" # cover navy
-    warning: "#F4A300" # pulp amber
-    danger: "#D62828" # rocket red
-    navbar-bg: "#1D3461"
-    navbar-dark-color: "#EAE2B7"
-    navbar-dark-hover-color: "#F4A300"
-    navbar-dark-active-color: "#F4A300"
-    base_font: {google: "Inter"}
-    heading_font: {google: "Space Grotesk"}
-    code_font: {google: "IBM Plex Mono"}
+    bg: "#f7f2dc"          # Page background (light tint of pulp cream)
+    fg: "#14213d"          # Body text (pulp navy)
+    primary:   "#1d3461"   # Cover blue            - navbar, headings, links
+    secondary: "#d62828"   # Pulp red              - hover, secondary accents
+    success:   "#2e7d4f"   # Green                 - success, gains
+    info:      "#1d3461"   # Cover blue            - info accents
+    warning:   "#f4a300"   # Amber                 - warning accent
+    danger:    "#d62828"   # Pulp red              - danger, losses
+    body-bg:   "#f7f2dc"   # Light cream background
+    body-color: "#14213d"  # Navy text
+    border-color: "#d9cf9c" # Darker cream borders
+    code-color: "#d62828"  # Red inline code
+    code-bg:    "#eae2b7"  # Pulp cream code background
+    base_font:
+      google: "Ubuntu"
+    heading_font:
+      google: "Ubuntu"
+    code_font:
+      google: "Ubuntu Mono"
 
 navbar:
- type: dark
  bg: primary
+ type: dark
  components:
    articles:
     text: Articles
