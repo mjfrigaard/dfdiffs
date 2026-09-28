@@ -48,6 +48,12 @@ been calling.
     hiding a missing `dplyr` import in `similar-work` and a stale file
     path in `change-frequency-from-proc-compare`.
 
+-   The app now uses the "Golden Age Pulp Cover" palette (cream page,
+    navy/red/amber accents), the same one as the pkgdown site, in place
+    of "Atomic Age Space Race". `dfdiffs_fresh_theme()`, the navbar, the
+    results-tab icons, and every `*_react_theme()` (light and dark)
+    were updated.
+
 -   `mod_compare.R`'s download handler no longer reimplements
     `create_comparison_report()`'s logic by hand; it now calls
     `create_comparison_report()` directly, which also fixes the
