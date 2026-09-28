@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,7 @@
     <li><a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a></li>
     <li><a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a></li>
     <li><a class="dropdown-item" href="../articles/create-comparison-report.html">Creating a comparison report</a></li>
+    <li><a class="dropdown-item" href="../articles/proc-compare-parity.html">PROC COMPARE parity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Comparisons</h6></li>
     <li><a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a></li>
@@ -85,8 +86,9 @@
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
-<p>This vignette introduces the <code>dfdiffs</code> package. The goal
-of <code>dfdiffs</code> is to answer the following questions:</p>
+<p>When a new version of a dataset arrives, the first thing we usually
+want to know is what changed since the last one. <code>dfdiffs</code>
+answers that with three questions:</p>
 <ol style="list-style-type: decimal">
 <li>What rows are here now that weren’t here before?<br>
 </li>
@@ -97,10 +99,10 @@ of <code>dfdiffs</code> is to answer the following questions:</p>
 <div class="section level3">
 <h3 id="packages">Packages<a class="anchor" aria-label="anchor" href="#packages"></a>
 </h3>
-<p>Load <code>dfdiffs</code>:</p>
+<p>We’ll start by loading <code>dfdiffs</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mjfrigaard.github.io/dfdiffs/">dfdiffs</a></span><span class="op">)</span></span></code></pre></div>
-<p>Load the other packages used in this vignette:</p>
+<p>The code below loads the other packages used in this vignette:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://shiny.posit.co/" class="external-link">shiny</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://r-datatable.com" class="external-link">data.table</a></span><span class="op">)</span></span>
@@ -120,17 +122,17 @@ of <code>dfdiffs</code> is to answer the following questions:</p>
 <div class="section level3">
 <h3 id="package-functions">Package functions<a class="anchor" aria-label="anchor" href="#package-functions"></a>
 </h3>
-<p><code>dfdiffs</code> has a function for each of the questions posed
-above, and each function comes with a pair of example datasets that
-demonstrate how it works (which we’ll cover below).</p>
+<p><code>dfdiffs</code> has a function for each question above, and each
+function comes with a pair of example datasets that show how it works.
+We’ll walk through each pair below.</p>
 <div class="section level4">
 <h4 id="call-structure">Call structure<a class="anchor" aria-label="anchor" href="#call-structure"></a>
 </h4>
-<p>The four comparison functions below are built from a few small
-helpers, and the same functions power the package’s Shiny app. The call
-trees in this section were generated from the package source with <a href="https://github.com/mjfrigaard/stackcallr" class="external-link">stackcallr</a>
-(<code>pak::pak("mjfrigaard/stackcallr")</code>). Only functions defined
-in <code>dfdiffs</code> are shown.</p>
+<p>The four comparison functions are built from a few small helpers, and
+the same functions power the package’s Shiny app. I generated the call
+trees in this section from the package source with <a href="https://github.com/mjfrigaard/stackcallr" class="external-link">stackcallr</a>
+(<code>pak::pak("mjfrigaard/stackcallr")</code>), and they only show
+functions defined in <code>dfdiffs</code>.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">stackcallr</span><span class="op">)</span></span>
 <span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"create_new_data"</span><span class="op">)</span></span>
@@ -138,11 +140,11 @@ in <code>dfdiffs</code> are shown.</p>
 <span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"create_changed_data"</span><span class="op">)</span></span>
 <span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"create_modified_data"</span><span class="op">)</span></span></code></pre></div>
 <p><code><a href="../reference/create_new_data.html">create_new_data()</a></code> and <code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code>
-(the “new rows”/“deleted rows” answers) share
-<code><a href="../reference/anti_join_base.html">anti_join_base()</a></code>, <code><a href="../reference/select_cols.html">select_cols()</a></code>,
-<code><a href="../reference/rename_join_col.html">rename_join_col()</a></code>, and <code><a href="../reference/create_new_column.html">create_new_column()</a></code>.
-These are all base-R helpers, so no external comparison package is
-involved:</p>
+answer the first two questions (new rows and deleted rows), and both
+rely on the same four helpers: <code><a href="../reference/anti_join_base.html">anti_join_base()</a></code>,
+<code><a href="../reference/select_cols.html">select_cols()</a></code>, <code><a href="../reference/rename_join_col.html">rename_join_col()</a></code>, and
+<code><a href="../reference/create_new_column.html">create_new_column()</a></code>. These helpers are written in base R,
+so no external comparison package is involved:</p>
 <pre><code>█─create_new_data
 ├─anti_join_base
 ├─select_cols
@@ -154,23 +156,27 @@ involved:</p>
 ├─rename_join_col
 └─create_new_column</code></pre>
 <p><code><a href="../reference/create_changed_data.html">create_changed_data()</a></code> and
-<code><a href="../reference/create_modified_data.html">create_modified_data()</a></code> (the “changed values” answer) both
-build on <code><a href="../reference/diff_values_by_key.html">diff_values_by_key()</a></code>, which compares matched rows
-column-by-column with <code><a href="../reference/compare_values.html">compare_values()</a></code> (tolerance-aware for
-numeric/date-time values, label-aware for factors) and records any class
-mismatches via <code>class_diffs()</code>:</p>
+<code><a href="../reference/create_modified_data.html">create_modified_data()</a></code> answer the third question (changed
+values), and both build on <code><a href="../reference/diff_values_by_key.html">diff_values_by_key()</a></code>.
+<code><a href="../reference/diff_values_by_key.html">diff_values_by_key()</a></code> compares matched rows column by column
+with <code><a href="../reference/compare_values.html">compare_values()</a></code>, which is tolerance-aware for numeric
+and date-time values and label-aware for factors. Any class mismatches
+are recorded with <code>class_diffs()</code>. The call tree for
+<code><a href="../reference/create_changed_data.html">create_changed_data()</a></code> is shown below:</p>
 <pre><code>█─create_changed_data
 ├─select_cols
 ├─█─diff_values_by_key
 │ ├─compare_values
 │ └─class_diffs
 ├─rename_join_col
-└─create_new_column</code></pre>
+├─create_new_column
+└─class_diffs</code></pre>
 <p>The Shiny app (<code><a href="../reference/launch_app.html">launch_app()</a></code>) wires these functions
-together with three modules (upload, select, and compare), each with a
-UI function and a server function. <code><a href="../reference/app_ui.html">app_ui()</a></code> and
-<code><a href="../reference/app_server.html">app_server()</a></code> assemble the modules, and
-<code><a href="../reference/dfdiffs_fresh_theme.html">dfdiffs_fresh_theme()</a></code> supplies the app’s theme:</p>
+together with three modules (upload, select, and compare), and each
+module has a UI function and a server function. <code><a href="../reference/app_ui.html">app_ui()</a></code>
+and <code><a href="../reference/app_server.html">app_server()</a></code> assemble the modules, and
+<code><a href="../reference/dfdiffs_fresh_theme.html">dfdiffs_fresh_theme()</a></code> supplies the app’s theme. The code
+below generates the full call tree for the app:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">call_tree_dir</span><span class="op">(</span><span class="st">"R"</span>, root <span class="op">=</span> <span class="st">"launch_app"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>█─launch_app
@@ -193,6 +199,7 @@ UI function and a server function. <code><a href="../reference/app_ui.html">app_
   │ └─█─create_join_column
   │   └─select_cols
   └─█─mod_compare_server
+    ├─compare_columns
     ├─%nin%
     ├─info_react_theme
     ├─█─create_new_data
@@ -213,18 +220,64 @@ UI function and a server function. <code><a href="../reference/app_ui.html">app_
     │ │ ├─compare_values
     │ │ └─class_diffs
     │ ├─rename_join_col
-    │ └─create_new_column
+    │ ├─create_new_column
+    │ └─class_diffs
     ├─select_cols
     ├─changed_react_theme
-    └─left_join_base</code></pre>
+    ├─left_join_base
+    └─█─create_comparison_report
+      ├─█─create_new_data
+      │ ├─anti_join_base
+      │ ├─select_cols
+      │ ├─rename_join_col
+      │ └─create_new_column
+      ├─█─create_deleted_data
+      │ ├─anti_join_base
+      │ ├─select_cols
+      │ ├─rename_join_col
+      │ └─create_new_column
+      ├─█─create_modified_data
+      │ ├─select_cols
+      │ ├─█─diff_values_by_key
+      │ │ ├─compare_values
+      │ │ └─class_diffs
+      │ ├─rename_join_col
+      │ ├─create_new_column
+      │ └─class_diffs
+      ├─create_empty_tbl
+      ├─compare_columns
+      ├─class_diffs
+      └─█─compare_summary
+        └─█─compare_data
+          ├─█─create_new_data
+          │ ├─anti_join_base
+          │ ├─select_cols
+          │ ├─rename_join_col
+          │ └─create_new_column
+          ├─█─create_deleted_data
+          │ ├─anti_join_base
+          │ ├─select_cols
+          │ ├─rename_join_col
+          │ └─create_new_column
+          ├─█─create_changed_data
+          │ ├─select_cols
+          │ ├─█─diff_values_by_key
+          │ │ ├─compare_values
+          │ │ └─class_diffs
+          │ ├─rename_join_col
+          │ ├─create_new_column
+          │ └─class_diffs
+          ├─class_diffs
+          └─compare_columns</code></pre>
 </div>
 </div>
 <div class="section level3">
 <h3 id="what-rows-are-here-now-that-werent-here-before">
 <em>What rows are here now that weren’t here before?</em><a class="anchor" aria-label="anchor" href="#what-rows-are-here-now-that-werent-here-before"></a>
 </h3>
-<p>To check for new data, we’ll use <code>T1Data</code> and
-<code>T2Data</code>.</p>
+<p>To find new rows, we’ll compare <code>T1Data</code> and
+<code>T2Data</code>, then check the result against
+<code>NewData</code>.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">T1Data</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/T1Data.html">T1Data</a></span></span>
 <span><span class="va">T2Data</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/T2Data.html">T2Data</a></span></span>
@@ -253,17 +306,18 @@ data</p>
 <h4 id="create_new_data">
 <code>create_new_data()</code><a class="anchor" aria-label="anchor" href="#create_new_data"></a>
 </h4>
-<p>The <code><a href="../reference/create_new_data.html">create_new_data()</a></code> function returns the ‘new data’
-(i.e., the rows that are here now but weren’t here before).</p>
+<p><code><a href="../reference/create_new_data.html">create_new_data()</a></code> returns the ‘new data’ (i.e., the rows
+that are here now but weren’t here before). We pass the newer dataset to
+<code>compare</code> and the original dataset to <code>base</code>:</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_new_data.html">create_new_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">T2Data</span>, </span>
 <span>  base <span class="op">=</span> <span class="va">T1Data</span><span class="op">)</span></span></code></pre></div>
 <p>Output from <strong><code><a href="../reference/create_new_data.html">create_new_data()</a></code></strong>:
-Difference between ‘time-point 1’ &amp; ‘time-point 2’</p>
+Differences between ‘time-point 1’ and ‘time-point 2’</p>
 <div class="reactable html-widget html-fill-item" id="htmlwidget-36aa3d2a04d42bbc2145" style="width:auto;height:auto;"></div>
-<script type="application/json" data-for="htmlwidget-36aa3d2a04d42bbc2145">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"subject":["D","B","A"],"record":["5","4","2"],"start_date":["2022-04-04","2022-04-02","2022-04-04"],"mid_date":["2022-04-13","2022-04-14","2022-04-15"],"end_date":["2022-04-22","2022-04-20","2022-04-21"],"text_var":["Patient reports lower back pain after activity.","Patient reports difficulty sleeping through the night.","Patient reports dry cough lasting several days."],"factor_var":["back pain","insomnia","cough"]},"columns":[{"id":"subject","name":"subject","type":"character"},{"id":"record","name":"record","type":"character"},{"id":"start_date","name":"start_date","type":"character"},{"id":"mid_date","name":"mid_date","type":"character"},{"id":"end_date","name":"end_date","type":"character"},{"id":"text_var","name":"text_var","type":"character"},{"id":"factor_var","name":"factor_var","type":"character"}],"resizable":true,"filterable":true,"highlight":true,"bordered":true,"compact":true,"nowrap":true,"dataKey":"b720567f4d9b7d7cced30e9ec08735f1"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script><p>We can check this against the <code>NewData</code> dataset, which
-should match the output from <code><a href="../reference/create_new_data.html">create_new_data()</a></code>.</p>
+<script type="application/json" data-for="htmlwidget-36aa3d2a04d42bbc2145">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"subject":["D","B","A"],"record":["5","4","2"],"start_date":["2022-04-04","2022-04-02","2022-04-04"],"mid_date":["2022-04-13","2022-04-14","2022-04-15"],"end_date":["2022-04-22","2022-04-20","2022-04-21"],"text_var":["Patient reports lower back pain after activity.","Patient reports difficulty sleeping through the night.","Patient reports dry cough lasting several days."],"factor_var":["back pain","insomnia","cough"]},"columns":[{"id":"subject","name":"subject","type":"character"},{"id":"record","name":"record","type":"character"},{"id":"start_date","name":"start_date","type":"character"},{"id":"mid_date","name":"mid_date","type":"character"},{"id":"end_date","name":"end_date","type":"character"},{"id":"text_var","name":"text_var","type":"character"},{"id":"factor_var","name":"factor_var","type":"character"}],"resizable":true,"filterable":true,"highlight":true,"bordered":true,"compact":true,"nowrap":true,"dataKey":"b720567f4d9b7d7cced30e9ec08735f1"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script><p>We can confirm this output is correct by checking it against the
+stored <code>NewData</code> dataset. The two tables should match.</p>
 <p><strong><code>NewData</code></strong>: stored differences from
 <code><a href="../reference/create_new_data.html">create_new_data()</a></code></p>
 <div class="reactable html-widget html-fill-item" id="htmlwidget-febe03efa1a2d8d52a86" style="width:auto;height:auto;"></div>
@@ -284,7 +338,8 @@ should match the output from <code><a href="../reference/create_new_data.html">c
 <div class="section level4">
 <h4 id="a-complete-dataset">A complete dataset<a class="anchor" aria-label="anchor" href="#a-complete-dataset"></a>
 </h4>
-<p><code>CompleteData</code> represents a ‘complete’ set of data.</p>
+<p><code>CompleteData</code> is the full dataset, before any rows were
+removed.</p>
 <p><strong><code>CompleteData</code></strong>: simulated data for
 checking ‘deleted data’</p>
 <div class="reactable html-widget html-fill-item" id="htmlwidget-1fb4450895fe099f74a1" style="width:auto;height:auto;"></div>
@@ -293,8 +348,8 @@ checking ‘deleted data’</p>
 <div class="section level4">
 <h4 id="an-incomplete-dataset">An incomplete dataset<a class="anchor" aria-label="anchor" href="#an-incomplete-dataset"></a>
 </h4>
-<p>This is a dataset with rows removed from
-<code>CompleteData</code>.</p>
+<p><code>IncompleteData</code> is a copy of <code>CompleteData</code>
+with some rows removed.</p>
 <p><strong><code>IncompleteData</code></strong>: simulated data for
 checking ‘deleted data’</p>
 <div class="reactable html-widget html-fill-item" id="htmlwidget-10b3b7155e8045a1b2ad" style="width:auto;height:auto;"></div>
@@ -304,9 +359,10 @@ checking ‘deleted data’</p>
 <h4 id="create_deleted_data">
 <code>create_deleted_data()</code><a class="anchor" aria-label="anchor" href="#create_deleted_data"></a>
 </h4>
-<p>Running <code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code> checks for rows that were
-deleted between <code>CompleteData</code> and
-<code>IncompleteData</code>.</p>
+<p><code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code> returns the rows in
+<code>base</code> that are missing from <code>compare</code>. Here, that
+means the rows in <code>CompleteData</code> that were dropped from
+<code>IncompleteData</code>:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/create_deleted_data.html">create_deleted_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">IncompleteData</span>, </span>
@@ -320,8 +376,8 @@ Differences between <code>CompleteData</code> and
 <div class="section level4">
 <h4 id="the-deleted-data">The deleted data<a class="anchor" aria-label="anchor" href="#the-deleted-data"></a>
 </h4>
-<p>The output above is identical to the data stored in
-<code>DeletedData</code>.</p>
+<p>The output above matches the data stored in <code>DeletedData</code>,
+which confirms the deleted rows were identified correctly.</p>
 <p><strong><code>DeletedData</code></strong>: Output from
 <strong><code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code></strong></p>
 <div class="reactable html-widget html-fill-item" id="htmlwidget-5b1b2f4ad92281566982" style="width:auto;height:auto;"></div>
@@ -332,25 +388,26 @@ Differences between <code>CompleteData</code> and
 <h3 id="what-values-have-been-changed">
 <em>What values have been changed?</em><a class="anchor" aria-label="anchor" href="#what-values-have-been-changed"></a>
 </h3>
-<p>To answer this question, we have two options:
+<p><code>dfdiffs</code> has two functions for this question:
 <code><a href="../reference/create_changed_data.html">create_changed_data()</a></code> and
 <code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>. Both build on the same base-R
-<code><a href="../reference/diff_values_by_key.html">diff_values_by_key()</a></code>/<code><a href="../reference/compare_values.html">compare_values()</a></code> engine
-and differ only in the shape of their output:
-<code><a href="../reference/create_changed_data.html">create_changed_data()</a></code> returns
-<code>$num_diffs</code>/<code>$var_diffs</code> (used by
-<code><a href="../reference/compare_data.html">compare_data()</a></code>), and <code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>
-returns <code>$diffs_byvar</code>/<code>$diffs</code> (used by
-<code>mod_compare</code> and
-<code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code>).</p>
-<p>To check for changes between two datasets, we’ll use
-<code>InitialData</code> and <code>ChangedData</code>.</p>
+engine (<code><a href="../reference/diff_values_by_key.html">diff_values_by_key()</a></code> and
+<code><a href="../reference/compare_values.html">compare_values()</a></code>), and they differ only in the shape of
+their output. <code><a href="../reference/create_changed_data.html">create_changed_data()</a></code> returns
+<code>$num_diffs</code> and <code>$var_diffs</code>, which
+<code><a href="../reference/compare_data.html">compare_data()</a></code> uses. <code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>
+returns <code>$diffs_byvar</code> and <code>$diffs</code>, which the
+app’s compare module (<code>mod_compare</code>) and
+<code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code> use.</p>
+<p>To check for changed values, we’ll compare <code>InitialData</code>
+and <code>ChangedData</code>:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">InitialData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/InitialData.html">InitialData</a></span></span>
 <span><span class="va">ChangedData</span> <span class="op">&lt;-</span> <span class="fu">dfdiffs</span><span class="fu">::</span><span class="va"><a href="../reference/ChangedData.html">ChangedData</a></span></span></code></pre></div>
 <div class="section level4">
 <h4 id="initial-data">Initial data<a class="anchor" aria-label="anchor" href="#initial-data"></a>
 </h4>
+<p><code>InitialData</code> is the original version of the data.</p>
 <p><strong><code>InitialData</code></strong>: simulated data for
 checking ‘changed/modified data’</p>
 <div class="reactable html-widget html-fill-item" id="htmlwidget-25c3e940e6859592f801" style="width:auto;height:auto;"></div>
@@ -359,6 +416,8 @@ checking ‘changed/modified data’</p>
 <div class="section level4">
 <h4 id="changed-data">Changed data<a class="anchor" aria-label="anchor" href="#changed-data"></a>
 </h4>
+<p><code>ChangedData</code> is the version we’ll compare against
+<code>InitialData</code>.</p>
 <p><strong><code>ChangedData</code></strong>: simulated data for
 checking ‘modified data’</p>
 <div class="reactable html-widget html-fill-item" id="htmlwidget-3f27c09be0c60bb52829" style="width:auto;height:auto;"></div>
@@ -368,18 +427,19 @@ checking ‘modified data’</p>
 <h4 id="create_changed_data">
 <code>create_changed_data()</code><a class="anchor" aria-label="anchor" href="#create_changed_data"></a>
 </h4>
-<p><code><a href="../reference/create_changed_data.html">create_changed_data()</a></code> creates a list of tables.</p>
+<p><code><a href="../reference/create_changed_data.html">create_changed_data()</a></code> returns a list of tables. The code
+below stores the result and prints the names of its elements:</p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">changed</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_changed_data.html">create_changed_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>,</span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">changed</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "num_diffs" "var_diffs"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "num_diffs"   "var_diffs"   "class_diffs"</span></span></code></pre></div>
 <div class="section level5">
 <h5 id="counts-of-changes-num_diffs">Counts of changes (<code>num_diffs</code>)<a class="anchor" aria-label="anchor" href="#counts-of-changes-num_diffs"></a>
 </h5>
-<p>The counts of changes by variable are stored in
-<code>num_diffs</code>.</p>
+<p><code>num_diffs</code> stores the number of changes for each
+variable.</p>
 <p><strong><code>num_diffs</code></strong>: counts of changes for
 ‘changed data’</p>
 <div class="reactable html-widget html-fill-item" id="htmlwidget-416566eb193bf50d04e6" style="width:auto;height:auto;"></div>
@@ -388,7 +448,7 @@ checking ‘modified data’</p>
 <div class="section level5">
 <h5 id="changes-by-row-var_diffs">Changes by row (<code>var_diffs</code>)<a class="anchor" aria-label="anchor" href="#changes-by-row-var_diffs"></a>
 </h5>
-<p>The changes by row are stored in <code>var_diffs</code>.</p>
+<p><code>var_diffs</code> lists the changes row by row.</p>
 <p><strong><code>var_diffs</code></strong>: Row-by-row of changes for
 ‘changed data’</p>
 <div class="reactable html-widget html-fill-item" id="htmlwidget-72cbf064100ce560a04c" style="width:auto;height:auto;"></div>
@@ -399,28 +459,28 @@ checking ‘modified data’</p>
 <h4 id="create_modified_data">
 <code>create_modified_data()</code><a class="anchor" aria-label="anchor" href="#create_modified_data"></a>
 </h4>
-<p>The <code><a href="../reference/create_modified_data.html">create_modified_data()</a></code> function also creates a list
-of tables.</p>
+<p><code><a href="../reference/create_modified_data.html">create_modified_data()</a></code> also returns a list of tables,
+with different element names:</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">modified</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/create_modified_data.html">create_modified_data</a></span><span class="op">(</span></span>
 <span>  compare <span class="op">=</span> <span class="va">ChangedData</span>,</span>
 <span>  base <span class="op">=</span> <span class="va">InitialData</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">modified</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [1] "diffs"       "diffs_byvar"</span></span></code></pre></div>
+<span><span class="co">#&gt; [1] "diffs"       "diffs_byvar" "class_diffs"</span></span></code></pre></div>
 <div class="section level5">
 <h5 id="counts-of-changes-diffs_byvar">Counts of changes (<code>diffs_byvar</code>)<a class="anchor" aria-label="anchor" href="#counts-of-changes-diffs_byvar"></a>
 </h5>
-<p>The counts of changes by variable are stored in
-<code>diffs_byvar</code>.</p>
+<p><code>diffs_byvar</code> stores the number of changes for each
+variable.</p>
 <p><strong><code>diffs_byvar</code></strong>: counts of changes for
 ‘modified data’</p>
 <div class="reactable html-widget html-fill-item" id="htmlwidget-d11fc4360aa0230696d7" style="width:auto;height:auto;"></div>
 <script type="application/json" data-for="htmlwidget-d11fc4360aa0230696d7">{"x":{"tag":{"name":"Reactable","attribs":{"data":{"Variable name":["subject_id","record","text_value_a","text_value_b","created_date","updated_date","entered_date"],"Modified Values":[0,0,2,1,0,5,5]},"columns":[{"id":"Variable name","name":"Variable name","type":"character"},{"id":"Modified Values","name":"Modified Values","type":"numeric"}],"resizable":true,"filterable":true,"highlight":true,"bordered":true,"compact":true,"nowrap":true,"dataKey":"a2df43af5fd10a7c0f15ed3496de464e"},"children":[]},"class":"reactR_markup"},"evals":[],"jsHooks":[]}</script>
 </div>
 <div class="section level5">
-<h5 id="changes-by-row">Changes by row<a class="anchor" aria-label="anchor" href="#changes-by-row"></a>
+<h5 id="changes-by-row-diffs">Changes by row (<code>diffs</code>)<a class="anchor" aria-label="anchor" href="#changes-by-row-diffs"></a>
 </h5>
-<p>The changes by row are stored in <code>diffs</code>.</p>
+<p><code>diffs</code> lists the changes row by row.</p>
 <p><strong><code>diffs</code></strong>: Row-by-row changes of ‘modified
 data’</p>
 <div class="reactable html-widget html-fill-item" id="htmlwidget-21c7483268bafca56cec" style="width:auto;height:auto;"></div>

@@ -12,6 +12,8 @@ tolerance, so a `Date` and a `POSIXct` representing the same instant
 compare as equal. Factors are cast to character before comparing (label
 comparison), unless `strict_factor = TRUE`, in which case a
 factor/non-factor class mismatch is always flagged as different.
+`ignore_case`/`trim_ws` apply to character and factor-label comparisons
+only.
 
 ## Usage
 
@@ -21,7 +23,9 @@ compare_values(
   compare_val,
   tolerance = sqrt(.Machine$double.eps),
   scale = NULL,
-  strict_factor = FALSE
+  strict_factor = FALSE,
+  ignore_case = FALSE,
+  trim_ws = FALSE
 )
 ```
 
@@ -51,6 +55,16 @@ compare_values(
   if `TRUE`, a factor compared against a non-factor is always flagged as
   different, regardless of label (default `FALSE`, which compares
   factor/character pairs by label)
+
+- ignore_case:
+
+  if `TRUE`, character/factor-label comparisons ignore case (default
+  `FALSE`)
+
+- trim_ws:
+
+  if `TRUE`, character/factor-label comparisons ignore leading/trailing
+  whitespace (default `FALSE`)
 
 ## Value
 

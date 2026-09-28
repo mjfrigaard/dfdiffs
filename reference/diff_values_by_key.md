@@ -7,7 +7,10 @@ shared column row-by-row with
 [`compare_values()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_values.md).
 With `by = NULL`, rows are matched by position instead (matching
 [`diffdf::diffdf()`](https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html)'s
-own behavior when `keys` is unset).
+own behavior when `keys` is unset). Warns (doesn't error) if `by`
+doesn't uniquely identify rows in `base` or `compare`, matching PROC
+COMPARE's own non-fatal duplicate-ID note; only the first matching row
+per key is compared.
 
 ## Usage
 
@@ -18,7 +21,9 @@ diff_values_by_key(
   by = NULL,
   tolerance = sqrt(.Machine$double.eps),
   scale = NULL,
-  strict_factor = FALSE
+  strict_factor = FALSE,
+  ignore_case = FALSE,
+  trim_ws = FALSE
 )
 ```
 
@@ -37,7 +42,7 @@ diff_values_by_key(
   character vector of shared key column(s), or `NULL` to match rows by
   position (base row 1 vs. compare row 1, etc.)
 
-- tolerance, scale, strict_factor:
+- tolerance, scale, strict_factor, ignore_case, trim_ws:
 
   passed to
   [`compare_values()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_values.md)

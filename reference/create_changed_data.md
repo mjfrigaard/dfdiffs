@@ -5,7 +5,15 @@ Create changed data
 ## Usage
 
 ``` r
-create_changed_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
+create_changed_data(
+  compare,
+  base,
+  by = NULL,
+  by_col = NULL,
+  cols = NULL,
+  ignore_case = FALSE,
+  trim_ws = FALSE
+)
 ```
 
 ## Arguments
@@ -31,11 +39,18 @@ create_changed_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 
   Columns to be compared.
 
+- ignore_case, trim_ws:
+
+  passed to
+  [`compare_values()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_values.md)
+  for character comparisons.
+
 ## Value
 
-a list with `num_diffs` (count of differing values per variable) and
+a list with `num_diffs` (count of differing values per variable),
 `var_diffs` (long format: `Variable name`, key column(s),
-`Current Value`, `Previous Value`)
+`Current Value`, `Previous Value`), and `class_diffs` (class mismatches
+by shared column)
 
 ## Examples
 
@@ -69,6 +84,10 @@ create_changed_data(
 #> 6 updated_date    B-3   2021-10-20                         2021-09-02      
 #> 7 updated_date    C-4   2021-10-13                         2021-10-03      
 #> 8 updated_date    C-5   2021-10-14                         2021-09-20      
+#> 
+#> $class_diffs
+#> # A tibble: 0 × 3
+#> # ℹ 3 variables: variable <chr>, class_base <chr>, class_compare <chr>
 #> 
 create_changed_data(
   compare = ChangedData,
@@ -104,5 +123,9 @@ create_changed_data(
 #> 11 entered_date    B-3   2021-11-21                         2021-08-18      
 #> 12 entered_date    C-4   2021-11-11                         2021-10-03      
 #> 13 entered_date    C-5   2021-11-16                         2021-10-20      
+#> 
+#> $class_diffs
+#> # A tibble: 0 × 3
+#> # ℹ 3 variables: variable <chr>, class_base <chr>, class_compare <chr>
 #> 
 ```

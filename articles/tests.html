@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,7 @@
     <li><a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a></li>
     <li><a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a></li>
     <li><a class="dropdown-item" href="../articles/create-comparison-report.html">Creating a comparison report</a></li>
+    <li><a class="dropdown-item" href="../articles/proc-compare-parity.html">PROC COMPARE parity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Comparisons</h6></li>
     <li><a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a></li>
@@ -84,29 +85,33 @@
 <div class="section level2">
 <h2 id="motivation">Motivation<a class="anchor" aria-label="anchor" href="#motivation"></a>
 </h2>
-<p>The Shiny modules in <code>dfdiffs</code> (upload, select, and
-compare) keep their reactive logic in server functions. These are tested
-with <code><a href="https://rdrr.io/pkg/shiny/man/testServer.html" class="external-link">shiny::testServer()</a></code>, which runs a module’s server
-function without starting an app or a browser: the test sets inputs with
-<code>session$setInputs()</code>, and then checks the reactive values
-(or rendered outputs) the module returns. The base-R comparison engine
-(<code><a href="../reference/compare_values.html">compare_values()</a></code>, <code><a href="../reference/diff_values_by_key.html">diff_values_by_key()</a></code>, and
-the join helpers) is tested directly with plain <code><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that()</a></code>
-blocks, no Shiny session needed.</p>
-<p>The tests live in <code>tests/testthat/</code>. Run them with:</p>
+<p><code>dfdiffs</code> has two kinds of code to test: the Shiny modules
+(upload, select, and compare) and the base-R comparison engine. The
+modules keep their reactive logic in server functions, which are tested
+with <code><a href="https://rdrr.io/pkg/shiny/man/testServer.html" class="external-link">shiny::testServer()</a></code>. <code><a href="https://rdrr.io/pkg/shiny/man/testServer.html" class="external-link">testServer()</a></code> runs a
+module’s server function without starting an app or a browser. Each test
+sets inputs with <code>session$setInputs()</code>, then checks the
+reactive values (or rendered outputs) the module returns.</p>
+<p>The comparison engine (<code><a href="../reference/compare_values.html">compare_values()</a></code>,
+<code><a href="../reference/diff_values_by_key.html">diff_values_by_key()</a></code>, and the join helpers) is tested
+directly with plain <code><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that()</a></code> blocks, so no Shiny session
+is needed.</p>
+<p>The tests live in <code>tests/testthat/</code>, and we can run the
+full suite with <code><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">devtools::test()</a></code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/test.html" class="external-link">test</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>There are currently 8 test files containing 36 tests
-(<code><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that()</a></code> blocks) and 82 expectations.</p>
+<p>There are currently 10 test files containing 48 tests
+(<code><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that()</a></code> blocks) and 118 expectations.</p>
 </div>
 <div class="section level2">
 <h2 id="test-inventory">Test inventory<a class="anchor" aria-label="anchor" href="#test-inventory"></a>
 </h2>
-<p>Each row is one <code><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that()</a></code> block. The first column
-gives the file and the test name (the string passed to
-<code><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that()</a></code>), the second column is the app feature or
-function the test protects, and the third describes what the test does
-and expects.</p>
+<p>Each row is one <code><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that()</a></code> block, except the last few
+rows, which each summarize several tests from one file (the row says how
+many). The first column gives the file and the test name (the string
+passed to <code><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that()</a></code>). The second column names the app
+feature or function the test protects, and the third describes what the
+test does and what it expects.</p>
 <table class="table">
 <colgroup>
 <col width="54%">
@@ -237,20 +242,23 @@ returns new, deleted, and changed comparison tables</em>
 <code>Roster2021</code>/<code>Roster2022</code> with
 <code>by = "subject_id"</code> and expects a named list of
 <code>new_data</code>, <code>deleted_data</code>,
-<code>changed_num_diffs</code>, <code>changed_var_diffs</code>, with
-<code>new_data</code>/<code>deleted_data</code> non-empty data
-frames.</td>
+<code>changed_num_diffs</code>, <code>changed_var_diffs</code>,
+<code>changed_class_diffs</code>, <code>column_diffs</code>, with
+<code>new_data</code>/<code>deleted_data</code> non-empty data frames
+and <code>column_diffs</code> a <code>dfdiffs_column_diff</code>
+object.</td>
 </tr>
 <tr class="odd">
 <td align="left">
 <code>test-create_comparison_report.R</code><br><em>create_comparison_report()
-writes all six sheets to the xlsx file</em>
+writes all nine sheets to the xlsx file</em>
 </td>
 <td align="left"><code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code></td>
 <td align="left">Runs <code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code> on
 <code>Roster2021</code>/<code>Roster2022</code> and expects the output
-file to exist with all six expected sheets, and the “New Data” sheet to
-be non-empty.</td>
+file to exist with all nine expected sheets, the “New Data” sheet to be
+non-empty, the “Column Diffs” sheet to mark every shared column
+“common”, and the “Summary” sheet to include <code>n_base</code>.</td>
 </tr>
 <tr class="even">
 <td align="left">
@@ -279,7 +287,7 @@ rows.</td>
 </tr>
 <tr class="even">
 <td align="left">
-<code>test-compare_values.R</code><br><em>(fourteen
+<code>test-compare_values.R</code><br><em>(nineteen
 tests)</em>
 </td>
 <td align="left">
@@ -293,15 +301,39 @@ tolerance (default and custom
 <code>Date</code> vs. same-instant <code>POSIXct</code> (equal) and
 different <code>POSIXct</code> (not equal), factor/character label
 comparison (default and <code>strict_factor = TRUE</code>),
-vectorization, and <code><a href="../reference/diff_values_by_key.html">diff_values_by_key()</a></code>’s row-matching,
-zero-diff, and class-mismatch behavior.</td>
+<code>ignore_case</code>/<code>trim_ws</code> (including on factor
+labels), vectorization, and <code><a href="../reference/diff_values_by_key.html">diff_values_by_key()</a></code>’s
+row-matching, zero-diff, class-mismatch, duplicate-key-warning, and
+<code>ignore_case</code>/<code>trim_ws</code> pass-through
+behavior.</td>
+</tr>
+<tr class="odd">
+<td align="left">
+<code>test-compare_columns.R</code><br><em>(three
+tests)</em>
+</td>
+<td align="left"><code><a href="../reference/compare_columns.html">compare_columns()</a></code></td>
+<td align="left">Covers base-only/compare-only/common column reporting,
+the all-common case, and a <code><a href="../reference/print.dfdiffs_column_diff.html">print.dfdiffs_column_diff()</a></code>
+smoke test.</td>
+</tr>
+<tr class="even">
+<td align="left">
+<code>test-compare_summary.R</code><br><em>(four
+tests)</em>
+</td>
+<td align="left"><code><a href="../reference/compare_summary.html">compare_summary()</a></code></td>
+<td align="left">Covers row/column counts against the
+<code>Roster2021</code>/<code>Roster2022</code> fixture,
+base-only/compare-only column counts, value-diff/class-mismatch counts,
+and a <code><a href="../reference/print.dfdiffs_summary.html">print.dfdiffs_summary()</a></code> smoke test.</td>
 </tr>
 </tbody>
 </table>
 <div class="section level3">
 <h3 id="test-data">Test data<a class="anchor" aria-label="anchor" href="#test-data"></a>
 </h3>
-<p>The tests use the package’s own datasets, so they don’t depend on
+<p>The tests use the package’s own datasets, so they don’t depend on any
 files outside of <code>dfdiffs</code>:</p>
 <ul>
 <li>
@@ -310,9 +342,9 @@ files outside of <code>dfdiffs</code>:</p>
 compare tests.</li>
 <li>
 <code>Roster2021</code>/<code>Roster2022</code> are the base and
-compare data for the
-<code><a href="../reference/compare_data.html">compare_data()</a></code>/<code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code>
-tests.</li>
+compare data for the <code><a href="../reference/compare_data.html">compare_data()</a></code>,
+<code><a href="../reference/compare_summary.html">compare_summary()</a></code>, and
+<code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code> tests.</li>
 <li>
 <code>inst/extdata/csv/InitialData.csv</code> and
 <code>inst/extdata/csv/ChangedData.csv</code> are the files uploaded in
@@ -323,13 +355,14 @@ the CSV upload tests.</li>
 <div class="section level2">
 <h2 id="call-structure">Call structure<a class="anchor" aria-label="anchor" href="#call-structure"></a>
 </h2>
-<p>Each Shiny-module test targets a module’s server function; the call
-trees below show the <code>dfdiffs</code> functions those tests exercise
-indirectly (for example, the compare module tests also run
+<p>Each Shiny module test targets a module’s server function, but those
+server functions call other <code>dfdiffs</code> functions along the
+way. The call trees below show the functions each module test exercises
+indirectly. For example, the compare module tests also run
 <code><a href="../reference/create_new_data.html">create_new_data()</a></code>, <code><a href="../reference/create_deleted_data.html">create_deleted_data()</a></code>, and
-<code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>). They were generated from the
-package source with <a href="https://github.com/mjfrigaard/stackcallr" class="external-link">stackcallr</a>
-(<code>pak::pak("mjfrigaard/stackcallr")</code>); only functions defined
+<code><a href="../reference/create_modified_data.html">create_modified_data()</a></code>.</p>
+<p>The trees were generated from the package source with <a href="https://github.com/mjfrigaard/stackcallr" class="external-link">stackcallr</a>
+(<code>pak::pak("mjfrigaard/stackcallr")</code>). Only functions defined
 in <code>dfdiffs</code> are shown.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">stackcallr</span><span class="op">)</span></span>
@@ -349,6 +382,7 @@ in <code>dfdiffs</code> are shown.</p>
 └─█─create_join_column
   └─select_cols</code></pre>
 <pre><code>█─mod_compare_server
+├─compare_columns
 ├─%nin%
 ├─info_react_theme
 ├─█─create_new_data
@@ -369,32 +403,84 @@ in <code>dfdiffs</code> are shown.</p>
 │ │ ├─compare_values
 │ │ └─class_diffs
 │ ├─rename_join_col
-│ └─create_new_column
+│ ├─create_new_column
+│ └─class_diffs
 ├─select_cols
 ├─changed_react_theme
-└─left_join_base</code></pre>
-<p><code>test-compare_data.R</code>,
+├─left_join_base
+└─█─create_comparison_report
+  ├─█─create_new_data
+  │ ├─anti_join_base
+  │ ├─select_cols
+  │ ├─rename_join_col
+  │ └─create_new_column
+  ├─█─create_deleted_data
+  │ ├─anti_join_base
+  │ ├─select_cols
+  │ ├─rename_join_col
+  │ └─create_new_column
+  ├─█─create_modified_data
+  │ ├─select_cols
+  │ ├─█─diff_values_by_key
+  │ │ ├─compare_values
+  │ │ └─class_diffs
+  │ ├─rename_join_col
+  │ ├─create_new_column
+  │ └─class_diffs
+  ├─create_empty_tbl
+  ├─compare_columns
+  ├─class_diffs
+  └─█─compare_summary
+    └─█─compare_data
+      ├─█─create_new_data
+      │ ├─anti_join_base
+      │ ├─select_cols
+      │ ├─rename_join_col
+      │ └─create_new_column
+      ├─█─create_deleted_data
+      │ ├─anti_join_base
+      │ ├─select_cols
+      │ ├─rename_join_col
+      │ └─create_new_column
+      ├─█─create_changed_data
+      │ ├─select_cols
+      │ ├─█─diff_values_by_key
+      │ │ ├─compare_values
+      │ │ └─class_diffs
+      │ ├─rename_join_col
+      │ ├─create_new_column
+      │ └─class_diffs
+      ├─class_diffs
+      └─compare_columns</code></pre>
+<p>The download-handler tests for <code><a href="../reference/mod_compare_server.html">mod_compare_server()</a></code> also
+exercise <code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code> (shown as a subtree
+above), because the module calls it instead of building the report
+itself.</p>
+<p>The remaining test files (<code>test-compare_data.R</code>,
 <code>test-create_comparison_report.R</code>,
-<code>test-join_helpers.R</code>, and <code>test-compare_values.R</code>
-call their target functions directly and don’t go through a Shiny
-module, so there’s no call tree to show for them beyond what’s already
-in the <a href="getting-started.html">getting-started</a> vignette.</p>
+<code>test-join_helpers.R</code>, <code>test-compare_values.R</code>,
+<code>test-compare_columns.R</code>, and
+<code>test-compare_summary.R</code>) call their target functions
+directly instead of going through a Shiny module. Their call trees are
+already covered in the <a href="getting-started.html">getting-started</a> and <a href="compare-data.html">compare-data</a> vignettes.</p>
 </div>
 <div class="section level2">
 <h2 id="what-isnt-tested">What isn’t tested<a class="anchor" aria-label="anchor" href="#what-isnt-tested"></a>
 </h2>
 <p>The current tests cover the reactive logic of the three modules, the
 base-R comparison engine, <code><a href="../reference/compare_data.html">compare_data()</a></code>,
-<code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code>, and a build smoke test for
-every <code>launch_*()</code> entry point. These areas don’t have tests
-yet:</p>
+<code><a href="../reference/compare_columns.html">compare_columns()</a></code>, <code><a href="../reference/compare_summary.html">compare_summary()</a></code>, and
+<code><a href="../reference/create_comparison_report.html">create_comparison_report()</a></code>. They also include a build smoke
+test for every <code>launch_*()</code> entry point. The following areas
+don’t have tests yet:</p>
 <ul>
 <li>The UI functions (<code><a href="../reference/mod_upload_ui.html">mod_upload_ui()</a></code>,
 <code><a href="../reference/mod_select_ui.html">mod_select_ui()</a></code>, <code><a href="../reference/mod_compare_ui.html">mod_compare_ui()</a></code>, and
 <code><a href="../reference/app_ui.html">app_ui()</a></code>).</li>
 <li>
-<code><a href="../reference/cross_tabyl.html">cross_tabyl()</a></code> and <code><a href="../reference/create_join_column.html">create_join_column()</a></code>’s
-multi-column <code>by_colums</code> path.</li>
+<code><a href="../reference/cross_tabyl.html">cross_tabyl()</a></code>, and a standalone (non-module) test of
+<code><a href="../reference/create_join_column.html">create_join_column()</a></code>. It’s only exercised indirectly,
+through the select and compare module tests.</li>
 <li>
 <code>class_diffs()</code> beyond the one genuine-class-mismatch
 case covered in <code>test-compare_values.R</code>.</li>

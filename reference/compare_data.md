@@ -5,7 +5,15 @@ Compare data (create new, deleted, and changed data)
 ## Usage
 
 ``` r
-compare_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
+compare_data(
+  compare,
+  base,
+  by = NULL,
+  by_col = NULL,
+  cols = NULL,
+  ignore_case = FALSE,
+  trim_ws = FALSE
+)
 ```
 
 ## Arguments
@@ -30,9 +38,18 @@ compare_data(compare, base, by = NULL, by_col = NULL, cols = NULL)
 
   columns to compare
 
+- ignore_case, trim_ws:
+
+  passed to
+  [`compare_values()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_values.md)
+  for character comparisons.
+
 ## Value
 
-list of comparison tables
+list of comparison tables, plus `changed_class_diffs` (class mismatches
+on shared columns) and `column_diffs` (a `dfdiffs_column_diff` from
+[`compare_columns()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_columns.md),
+columns only in `base` vs. only in `compare`)
 
 ## Examples
 
@@ -104,5 +121,16 @@ compare_data(compare = r22, base = r21,
 #> # A tibble: 0 × 4
 #> # ℹ 4 variables: Variable name <chr>, Current Value <chr>,
 #> #   Previous Value <chr>, subject_id <chr>
+#> 
+#> $changed_class_diffs
+#> # A tibble: 0 × 3
+#> # ℹ 3 variables: variable <chr>, class_base <chr>, class_compare <chr>
+#> 
+#> $column_diffs
+#> <dfdiffs column diff>
+#>   common to both: 11
+#>     subject_id, first_name, last_name, site_id, enroll_year, enroll_month, enroll_day, height_cm, full_name, first_visit_date, status 
+#>   base only: 0
+#>   compare only: 0
 #> 
 ```

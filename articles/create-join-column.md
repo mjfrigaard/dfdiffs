@@ -2,33 +2,25 @@
 
 ## Motivation
 
-This vignette walks through the
-[`create_join_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_join_column.md)
-function, which creates new columns in the `dfdiffs` Shiny application.
+Comparing two datasets requires a way to match each row in one to its
+counterpart in the other. When no single column identifies a row, we
+need to combine several columns into one. This vignette walks through
+[`create_join_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_join_column.md),
+the function the `dfdiffs` Shiny app uses to build that combined ‘join’
+column.
 
 ``` r
 
 library(dfdiffs)
-library(shiny)
 library(data.table)
-library(stringr)
-library(lubridate)
-library(glue)
-library(purrr)
-library(reactable)
-library(haven)
-library(readxl)
-library(janitor) # compare_df_cols
-library(arsenal) # comparedf
-library(diffdf)  # diffdf
-library(testthat) # expect_equal
-library(vetr) # alike
 ```
 
 ### create_join_column()
 
-This function allows us to create a new ‘join’ column from any number of
-column inputs.
+[`create_join_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_join_column.md)
+combines any number of columns in `df` into a single join column. The
+columns to combine go in `by_colums`, and `new_by_column_name` sets the
+name of the new column.
 
 ``` r
 
@@ -38,13 +30,17 @@ create_join_column(df, by_colums, new_by_column_name)
 ### Call structure
 
 [`create_join_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_join_column.md)
-doesn’t call any other `dfdiffs` functions. Inside the Shiny app, it’s
-called by the select module
+calls one other `dfdiffs` function,
+[`select_cols()`](https://mjfrigaard.github.io/dfdiffs/reference/select_cols.md),
+to pull out the columns being combined before pasting them together.
+Inside the Shiny app, the select module
 ([`mod_select_server()`](https://mjfrigaard.github.io/dfdiffs/reference/mod_select_server.md))
+calls
+[`create_join_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_join_column.md)
 to build the `join_column` from the columns chosen in the *Select Join
 Columns* panel. The call tree below was generated from the package
 source with [stackcallr](https://github.com/mjfrigaard/stackcallr)
-(`pak::pak("mjfrigaard/stackcallr")`); only functions defined in
+(`pak::pak("mjfrigaard/stackcallr")`). Only functions defined in
 `dfdiffs` are shown.
 
 ``` r
@@ -53,18 +49,25 @@ stackcallr::call_tree_dir("R", root = "mod_select_server")
 ```
 
     █─mod_select_server
-    └─create_join_column
+    ├─select_cols
+    ├─base_react_theme
+    ├─comp_react_theme
+    ├─info_react_theme
+    └─█─create_join_column
+      └─select_cols
 
 ### Test data
 
-We’ll load some test data from the synthetic (not real) `dfdiffs` site
+To show how
+[`create_join_column()`](https://mjfrigaard.github.io/dfdiffs/reference/create_join_column.md)
+works, we’ll load two pulls of the synthetic (not real) `dfdiffs` site
 roster (see
-[`?Roster2021`](https://mjfrigaard.github.io/dfdiffs/reference/Roster2021.md))
-to demonstrate how this function works.
+[`?Roster2021`](https://mjfrigaard.github.io/dfdiffs/reference/Roster2021.md)).
 
 #### Roster pull (2021)
 
-Below is the 2021 roster pull.
+The 2021 roster pull is stored in `inst/extdata/csv/site-roster/2021/`.
+The code below lists the files in that folder.
 
 ``` r
 
@@ -76,6 +79,9 @@ fs::dir_tree(roster2021_files)
 #> ├── Roster.csv
 #> └── Visit.csv
 ```
+
+Next, we’ll locate the `Roster` file and read it with
+[`data.table::fread()`](https://rdrr.io/pkg/data.table/man/fread.html).
 
 ``` r
 
@@ -99,12 +105,13 @@ str(roster_2021)
 #>    ...
 #> $ first_visit_date: IDate, format: "2021-05-15" "2021-10-05" ...
 #> $ status : chr "Active" "Active" "Active" "Active" ...
-#> - attr(*, ".internal.selfref")=<pointer: 0x559396bfdf00>
+#> - attr(*, ".internal.selfref")=<pointer: 0x5579d93cbf00>
 ```
 
 #### Roster pull (2022)
 
-Below is the 2022 roster pull.
+The 2022 roster pull follows the same layout in
+`inst/extdata/csv/site-roster/2022/`.
 
 ``` r
 
@@ -116,6 +123,8 @@ fs::dir_tree(roster2022_files)
 #> ├── Roster.csv
 #> └── Visit.csv
 ```
+
+We’ll read the 2022 `Roster` file the same way.
 
 ``` r
 
@@ -138,11 +147,14 @@ str(roster_2022)
 #>    ...
 #> $ first_visit_date: IDate, format: "2021-05-15" "2021-10-05" ...
 #> $ status : chr "Active" "Active" "Active" "Active" ...
-#> - attr(*, ".internal.selfref")=<pointer: 0x559396bfdf00>
+#> - attr(*, ".internal.selfref")=<pointer: 0x5579d93cbf00>
 ```
 
-Assume we want to create a new join column that identifies unique rows
-by `first_name`, `last_name`, and `enroll_year`.
+Suppose we want a join column that identifies unique rows by
+`first_name`, `last_name`, and `enroll_year`. The code below creates
+`name_year_id` in both roster pulls, then passes them to
+[`anti_join_base()`](https://mjfrigaard.github.io/dfdiffs/reference/anti_join_base.md)
+to find the 2021 rows with no match in 2022.
 
 ``` r
 
@@ -174,5 +186,7 @@ anti_join_base(
 #> $ status : chr "Active" "Active"
 ```
 
-These are the rows in `join_roster_2021` that aren’t in
-`join_roster_2022`.
+The output above shows the rows in `join_roster_2021` that aren’t in
+`join_roster_2022`. Because `name_year_id` combines three columns, a row
+only matches when the first name, last name, and enrollment year all
+agree.

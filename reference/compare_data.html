@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">dfdiffs</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -24,6 +24,7 @@
     <li><a class="dropdown-item" href="../articles/create-deleted-data.html">Deleted Data</a></li>
     <li><a class="dropdown-item" href="../articles/changed-modified-data.html">Changed/Modified Data</a></li>
     <li><a class="dropdown-item" href="../articles/create-comparison-report.html">Creating a comparison report</a></li>
+    <li><a class="dropdown-item" href="../articles/proc-compare-parity.html">PROC COMPARE parity</a></li>
     <li><hr class="dropdown-divider"></li>
     <li><h6 class="dropdown-header" data-toc-skip>More Comparisons</h6></li>
     <li><a class="dropdown-item" href="../articles/compare-data.html">Run all comparisons</a></li>
@@ -56,7 +57,15 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">compare_data</span><span class="op">(</span><span class="va">compare</span>, <span class="va">base</span>, by <span class="op">=</span> <span class="cn">NULL</span>, by_col <span class="op">=</span> <span class="cn">NULL</span>, cols <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">compare_data</span><span class="op">(</span></span>
+<span>  <span class="va">compare</span>,</span>
+<span>  <span class="va">base</span>,</span>
+<span>  by <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  by_col <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  cols <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  ignore_case <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  trim_ws <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -82,10 +91,18 @@
 <dt id="arg-cols">cols<a class="anchor" aria-label="anchor" href="#arg-cols"></a></dt>
 <dd><p>columns to compare</p></dd>
 
+
+<dt id="arg-ignore-case-trim-ws">ignore_case, trim_ws<a class="anchor" aria-label="anchor" href="#arg-ignore-case-trim-ws"></a></dt>
+<dd><p>passed to <code><a href="compare_values.html">compare_values()</a></code> for character
+comparisons.</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>list of comparison tables</p>
+    <p>list of comparison tables, plus <code>changed_class_diffs</code> (class
+mismatches on shared columns) and <code>column_diffs</code> (a
+<code>dfdiffs_column_diff</code> from <code><a href="compare_columns.html">compare_columns()</a></code>, columns only in <code>base</code>
+vs. only in <code>compare</code>)</p>
     </div>
 
     <div class="section level2">
@@ -157,6 +174,17 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 0 × 4</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4 variables: Variable name &lt;chr&gt;, Current Value &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   Previous Value &lt;chr&gt;, subject_id &lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $changed_class_diffs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 0 × 3</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3 variables: variable &lt;chr&gt;, class_base &lt;chr&gt;, class_compare &lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $column_diffs</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;dfdiffs column diff&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   common to both: 11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     subject_id, first_name, last_name, site_id, enroll_year, enroll_month, enroll_day, height_cm, full_name, first_visit_date, status </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   base only: 0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   compare only: 0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 </code></pre></div>
     </div>

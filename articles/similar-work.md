@@ -2,19 +2,21 @@
 
 ## Motivation
 
-This vignette covers similar functions and packages that compare two
-datasets to each other.
+`dfdiffs` isn’t the only way to compare two datasets in R. In this
+vignette I’ll cover other functions and packages that solve similar
+problems, and how their output differs from what `dfdiffs` returns.
 
 ### Packages
 
-Load `dfdiffs`:
+First, we’ll load `dfdiffs`.
 
 ``` r
 
 library(dfdiffs)
 ```
 
-We’ll also need packages for import/export, iteration, and wrangling:
+We’ll also need packages for importing and exporting data, iteration,
+and string wrangling.
 
 ``` r
 
@@ -24,7 +26,7 @@ library(purrr)
 library(glue)
 ```
 
-These packages are for building tables:
+The packages below are used for building tables.
 
 ``` r
 
@@ -33,31 +35,33 @@ library(gtsummary)
 library(kableExtra)
 ```
 
-These packages offer similar comparison functions:
+The packages below offer comparison functions similar to those in
+`dfdiffs`.
 
 ``` r
 
+library(arsenal) # comparedf
+library(diffdf)  # diffdf
 library(janitor) # compare_df_cols
 library(testthat) # expect_equal
 library(vetr) # alike
-library(labelled)
-library(gtsummary)
 ```
 
 ### Data
 
-We’ll use the data in this package to cover similar
-`packages::functions()`.
+Before looking at the alternatives, we’ll run the `dfdiffs` functions on
+the example datasets included in the package. These outputs give us a
+baseline for comparing the other `package::function()` options below.
 
 #### New data
 
 To check for new data, we’ll use `T1Data` and `T2Data`. The
 [`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md)
-function returns the ‘new data’ (i.e., the rows that are here now but
+function returns the new data (i.e., the rows that are here now but
 weren’t here before).
 
-We can check this against the `NewData` dataset, which should match the
-output from
+The `NewData` dataset stores the expected result, so we can check it
+against the output from
 [`create_new_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_new_data.md).
 
 ``` r
@@ -96,8 +100,9 @@ NewData |>
 New data (Comparison) {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
 
-We can see the only differences between the datasets are the formats of
-the date columns:
+Comparing the two tables with
+[`waldo::compare()`](https://waldo.r-lib.org/reference/compare.html)
+shows the only differences are the formats of the date columns.
 
 ``` r
 
@@ -123,7 +128,7 @@ waldo::compare(x = T1T2New, y = NewData)
 To test for deleted data, we’ll use `CompleteData`, `IncompleteData`,
 and `DeletedData`.
 
-`CompleteData` represents a ‘complete’ set of data.
+`CompleteData` is the complete (baseline) dataset.
 
 ``` r
 
@@ -148,7 +153,7 @@ CompleteData |>
 CompleteData {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
 
-`IncompleteData` is a dataset with rows removed from `CompleteData`.
+`IncompleteData` is `CompleteData` with some of its rows removed.
 
 ``` r
 
@@ -169,27 +174,32 @@ IncompleteData |>
 IncompleteData {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
 
-Running
 [`create_deleted_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_deleted_data.md)
-checks for rows that were deleted between `CompleteData` and
-`IncompleteData`.
+returns the rows in `CompleteData` that are missing from
+`IncompleteData`. We’ll sort the result by `subject` before printing it.
 
 ``` r
 
 IncompCompDiff <- create_deleted_data(
-  compare = IncompleteData, 
-  base = CompleteData) |> 
-  arrange(subject)
-#> Error in `arrange()`:
-#> ! could not find function "arrange"
-IncompCompDiff |> 
-  knitr::kable(caption = "IncompCompDiff") |> 
+  compare = IncompleteData,
+  base = CompleteData)
+IncompCompDiff <- IncompCompDiff[order(IncompCompDiff$subject), ]
+IncompCompDiff |>
+  knitr::kable(caption = "IncompCompDiff") |>
   kableExtra::kable_paper()
-#> Error:
-#> ! object 'IncompCompDiff' not found
 ```
 
-The output above is identical to the data stored in `DeletedData`.
+|  | subject | record | start_date | mid_date | end_date | text_var | factor_var |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| 2 | A | 2 | 2021-12-28 | 2022-01-27 | 2022-02-26 | Concomitant medication reported at baseline. | conmed |
+| 8 | B | 3 | 2021-12-26 | 2022-01-25 | 2022-02-24 | Concomitant medication updated at visit two. | conmed |
+| 5 | C | 1 | 2021-12-30 | 2022-01-29 | 2022-02-28 | Physical exam completed with no abnormalities noted. | exam |
+| 6 | D | 1 | 2021-12-27 | 2022-01-26 | 2022-02-25 | Medical history reviewed and confirmed complete. | history |
+
+IncompCompDiff {.table .lightable-paper
+style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
+
+The output above should match the data stored in `DeletedData`.
 
 ``` r
 
@@ -209,20 +219,36 @@ DeletedData |>
 DeletedData {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
 
-We can confirm this with
-[`waldo::compare()`](https://waldo.r-lib.org/reference/compare.html):
+We can confirm the two tables are identical with
+[`waldo::compare()`](https://waldo.r-lib.org/reference/compare.html).
 
 ``` r
 
 waldo::compare(x = IncompCompDiff, y = DeletedData)
-#> Error:
-#> ! object 'IncompCompDiff' not found
+#> `class(old)`: "data.frame"                   
+#> `class(new)`: "tbl_df"     "tbl" "data.frame"
+#> 
+#> `attr(old, 'row.names')`: 2 8 5 6
+#> `attr(new, 'row.names')`: 1 2 3 4
+#> 
+#> `old$record` is a character vector ('2', '3', '1', '1')
+#> `new$record` is an integer vector (2, 3, 1, 1)
+#> 
+#> `old$start_date` is a character vector ('2021-12-28', '2021-12-26', '2021-12-30', '2021-12-27')
+#> `new$start_date` is an S3 object of class <Date>, a double vector
+#> 
+#> `old$mid_date` is a character vector ('2022-01-27', '2022-01-25', '2022-01-29', '2022-01-26')
+#> `new$mid_date` is an S3 object of class <Date>, a double vector
+#> 
+#> `old$end_date` is a character vector ('2022-02-26', '2022-02-24', '2022-02-28', '2022-02-25')
+#> `new$end_date` is an S3 object of class <Date>, a double vector
 ```
 
 #### Changed data
 
-To check for changes between two datasets, we’ll use `InitialData` and
-`ChangedData`.
+To check for changed values between two datasets, we’ll pass
+`InitialData` and `ChangedData` to
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md).
 
 ``` r
 
@@ -232,7 +258,8 @@ mods <- create_modified_data(
   compare = ChangedData, base = InitialData)
 ```
 
-The changes by variable are stored in `diffs_byvar`.
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
+returns a list. The changes by variable are stored in `diffs_byvar`.
 
 ``` r
 
@@ -282,12 +309,125 @@ mods$diffs |>
 diffs {.table .lightable-paper
 style="font-family: \"Arial Narrow\", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;"}
 
+### `diffdf::diffdf()`
+
+Before version 2.1.0,
+[`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md)
+was built directly on
+[`diffdf::diffdf()`](https://gowerc.github.io/diffdf/latest-tag/reference/diffdf.html),
+which makes `diffdf` the closest thing to a drop-in alternative. It
+takes the same two data frames with no extra setup.
+
+``` r
+
+diffdf::diffdf(base = InitialData, compare = ChangedData)
+#> Differences found between the objects!
+#> 
+#> Summary of BASE and COMPARE
+#>   ==================================================================
+#>     PROPERTY             BASE                       COMP            
+#>   ------------------------------------------------------------------
+#>       Name            InitialData                ChangedData        
+#>      Class     "tbl_df, tbl, data.frame"  "tbl_df, tbl, data.frame" 
+#>     Rows(#)                5                          5             
+#>    Columns(#)              7                          7             
+#>   ------------------------------------------------------------------
+#> 
+#> 
+#> Not all Values Compared Equal
+#>   =================================
+#>      Variable    No of Differences 
+#>   ---------------------------------
+#>    text_value_a          2         
+#>    text_value_b          1         
+#>    updated_date          5         
+#>    entered_date          5         
+#>   ---------------------------------
+#> 
+#> 
+#>   ===================================================================
+#>      VARIABLE    ..ROWNUMBER..         BASE             COMPARE      
+#>   -------------------------------------------------------------------
+#>    text_value_a        1        "Issue unresolved"  "Issue resolved" 
+#>    text_value_a        2        "Issue unresolved"  "Issue resolved" 
+#>   -------------------------------------------------------------------
+#> 
+#> 
+#>   ================================================================================
+#>      VARIABLE    ..ROWNUMBER..      BASE                    COMPARE               
+#>   --------------------------------------------------------------------------------
+#>    text_value_b        4        "Joint pain"  "Joint pain, stiffness and swel..." 
+#>   --------------------------------------------------------------------------------
+#> 
+#> 
+#>   =====================================================
+#>      VARIABLE    ..ROWNUMBER..     BASE      COMPARE   
+#>   -----------------------------------------------------
+#>    updated_date        1        2021-09-29  2021-10-03 
+#>    updated_date        2        2021-10-03  2021-11-27 
+#>    updated_date        3        2021-09-02  2021-10-20 
+#>    updated_date        4        2021-10-03  2021-10-13 
+#>    updated_date        5        2021-09-20  2021-10-14 
+#>   -----------------------------------------------------
+#> 
+#> 
+#>   =====================================================
+#>      VARIABLE    ..ROWNUMBER..     BASE      COMPARE   
+#>   -----------------------------------------------------
+#>    entered_date        1        2021-09-29  2021-11-30 
+#>    entered_date        2        2021-10-29  2021-11-30 
+#>    entered_date        3        2021-08-18  2021-11-21 
+#>    entered_date        4        2021-10-03  2021-11-11 
+#>    entered_date        5        2021-10-20  2021-11-16 
+#>   -----------------------------------------------------
+```
+
+`diffdf` is a solid, well-tested package (`dfdiffs` even inherited its
+numeric tolerance formula; see
+[`?compare_values`](https://mjfrigaard.github.io/dfdiffs/reference/compare_values.md)).
+However, its output is a list of small `NumDiff` and `VarDiff_*` tables,
+one per differing variable, rather than the two tidy tables (`num_diffs`
+and `var_diffs`) returned by
+[`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md).
+
+### `arsenal::comparedf()`
+
+[`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md)
+was originally built the same way, but on
+[`arsenal::comparedf()`](https://mayoverse.github.io/arsenal/reference/comparedf.html).
+The code below prints the by-variable table from the
+[`comparedf()`](https://mayoverse.github.io/arsenal/reference/comparedf.html)
+summary.
+
+``` r
+
+arsenal_cdf <- arsenal::comparedf(x = InitialData, y = ChangedData)
+summary(arsenal_cdf)$diffs.byvar.table
+#>          var.x        var.y n NAs
+#> 1   subject_id   subject_id 0   0
+#> 2       record       record 0   0
+#> 3 text_value_a text_value_a 2   0
+#> 4 text_value_b text_value_b 1   0
+#> 5 created_date created_date 0   0
+#> 6 updated_date updated_date 5   0
+#> 7 entered_date entered_date 5   0
+```
+
+Both packages report differences well, but neither provides the row and
+column headline summary produced by SAS’s `PROC COMPARE`. The
+[`compare_summary()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_summary.md)
+and
+[`compare_columns()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_columns.md)
+functions in `dfdiffs` fill that gap (see the
+[proc-compare-parity](https://mjfrigaard.github.io/dfdiffs/articles/proc-compare-parity.md)
+vignette).
+
 ### `janitor::compare_df_cols_same()`
 
 The
 [`compare_df_cols_same()`](https://sfirke.github.io/janitor/reference/compare_df_cols_same.html)
-function from `janitor` compares two datasets and “*indicates if they
-will successfully bind together by rows.*”
+function from `janitor` compares the columns in two datasets and
+“*indicates if they will successfully bind together by rows.*”
 
 ``` r
 
@@ -299,13 +439,16 @@ compare_df_cols_same(InitialData, ChangedData, strict_description = FALSE)
 #> [1] TRUE
 ```
 
-All of our test datasets meet this condition, but this check could be
-used as a step in one of our `create_` functions (to confirm the
-datasets can be bound together).
+All of our test datasets pass this check. It could also serve as a step
+in one of the `create_` functions to confirm the datasets can be bound
+together before they’re compared.
 
 ### `testthat::expect_equal()`
 
-This works, but it returns the result as an error.
+[`testthat::expect_equal()`](https://testthat.r-lib.org/reference/equality-expectations.html)
+detects the differences, but it reports them by throwing an error.
+That’s the right behavior inside a unit test, but it makes the result
+harder to work with in an interactive comparison.
 
 ``` r
 
@@ -449,6 +592,11 @@ testthat::expect_equal(object = T1Data, expected = T2Data)
 ```
 
 ### `vetr::alike()`
+
+[`vetr::alike()`](https://rdrr.io/pkg/vetr/man/alike.html) compares the
+structure of two objects rather than their values. It returns `TRUE`
+when `current` is structurally alike `target`, or a character string
+describing the first mismatch.
 
 ``` r
 

@@ -1,5 +1,75 @@
 # Changelog
 
+## dfdiffs 2.2.0
+
+`PROC COMPARE` parity: `dfdiffs` now reports the headline summary
+statistics and variable-structure diffs that `PROC COMPARE` prints
+before its detailed value comparison, and closes a gap where the app’s
+download handler had drifted from the package functions it should have
+been calling.
+
+- New
+  [`compare_columns()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_columns.md):
+  reports which columns are only in `base`, only in `compare`, or common
+  to both, with a
+  [`print.dfdiffs_column_diff()`](https://mjfrigaard.github.io/dfdiffs/reference/print.dfdiffs_column_diff.md)
+  console method.
+
+- New
+  [`compare_summary()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_summary.md):
+  row/column/value headline counts (common, new, and deleted rows;
+  common and dataset-only columns; differing values and class
+  mismatches), with a
+  [`print.dfdiffs_summary()`](https://mjfrigaard.github.io/dfdiffs/reference/print.dfdiffs_summary.md)
+  console method. Built entirely on
+  [`compare_data()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_data.md)
+  and
+  [`compare_columns()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_columns.md),
+  no new comparison logic.
+
+- [`compare_values()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_values.md)
+  gains `ignore_case`/`trim_ws` arguments for character comparisons, and
+  [`diff_values_by_key()`](https://mjfrigaard.github.io/dfdiffs/reference/diff_values_by_key.md)
+  now warns (not errors) when `by` doesn’t uniquely identify rows in
+  `base` or `compare` – both threaded through
+  [`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md),
+  [`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md),
+  and
+  [`compare_data()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_data.md).
+
+- `class_diffs` (already computed by
+  [`diff_values_by_key()`](https://mjfrigaard.github.io/dfdiffs/reference/diff_values_by_key.md),
+  but previously discarded) is now surfaced through
+  [`create_changed_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_changed_data.md),
+  [`create_modified_data()`](https://mjfrigaard.github.io/dfdiffs/reference/create_modified_data.md),
+  and
+  [`compare_data()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_data.md)
+  (as `changed_class_diffs`).
+
+- [`create_comparison_report()`](https://mjfrigaard.github.io/dfdiffs/reference/create_comparison_report.md)
+  writes three new xlsx sheets – “Column Diffs”, “Class Diffs”, and
+  “Summary” – alongside the existing six.
+
+- The vignettes were rewritten. The repeated walkthroughs of all ten
+  `by`/`by_col`/`cols` combinations in `create-new-data`,
+  `create-deleted-data`, and `changed-modified-data` are now one
+  reference table plus three worked examples each, and `modified-data`
+  was merged into `changed-modified-data`. `multiple-comparisons` now
+  iterates
+  [`compare_data()`](https://mjfrigaard.github.io/dfdiffs/reference/compare_data.md)
+  instead of `arsenal`/`diffdf`, and `similar-work` compares against
+  them directly. Document-wide `error = TRUE` was removed, which had
+  been hiding a missing `dplyr` import in `similar-work` and a stale
+  file path in `change-frequency-from-proc-compare`.
+
+- `mod_compare.R`’s download handler no longer reimplements
+  [`create_comparison_report()`](https://mjfrigaard.github.io/dfdiffs/reference/create_comparison_report.md)’s
+  logic by hand; it now calls
+  [`create_comparison_report()`](https://mjfrigaard.github.io/dfdiffs/reference/create_comparison_report.md)
+  directly, which also fixes the downloaded report being missing the
+  “Base Data”/“Compare Data” sheets the package function already
+  produced.
+
 ## dfdiffs 2.1.0
 
 The comparison engine
