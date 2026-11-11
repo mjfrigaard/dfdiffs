@@ -95,7 +95,7 @@ base_dfs |> str()
 #>   .. ..   enroll_month = col_double(),
 #>   .. ..   enroll_day = col_double()
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x57b78c704570> 
+#>   ..- attr(*, "problems")=<pointer: 0x5f66912b6790> 
 #>  $ Name.csv  : spc_tbl_ [200 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
 #>   ..$ subject_id: chr [1:200] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...
 #>   ..$ full_name : chr [1:200] "Jamie Nguyen" "Riley Jensen" "Rowan Singh" "Reese Diaz" ...
@@ -104,7 +104,7 @@ base_dfs |> str()
 #>   .. ..   subject_id = col_character(),
 #>   .. ..   full_name = col_character()
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x57b78fcf1d30> 
+#>   ..- attr(*, "problems")=<pointer: 0x5f668f743860> 
 #>  $ Visit.csv : spc_tbl_ [200 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
 #>   ..$ subject_id      : chr [1:200] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...
 #>   ..$ first_visit_date: Date[1:200], format: "2021-05-15" "2021-10-05" ...
@@ -113,7 +113,7 @@ base_dfs |> str()
 #>   .. ..   subject_id = col_character(),
 #>   .. ..   first_visit_date = col_date(format = "")
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x57b78fd75630>
+#>   ..- attr(*, "problems")=<pointer: 0x5f668e03bb50>
 ```
 
 #### Import compare dfs
@@ -142,7 +142,7 @@ compare_dfs |> str()
 #>   .. ..   enroll_month = col_double(),
 #>   .. ..   enroll_day = col_double()
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x57b78e5a5ea0> 
+#>   ..- attr(*, "problems")=<pointer: 0x5f6694303f80> 
 #>  $ Name.csv  : spc_tbl_ [237 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
 #>   ..$ subject_id: chr [1:237] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...
 #>   ..$ full_name : chr [1:237] "Jamie Nguyen" "Riley Jensen" "Rowan Singh" "Reese Diaz" ...
@@ -151,7 +151,7 @@ compare_dfs |> str()
 #>   .. ..   subject_id = col_character(),
 #>   .. ..   full_name = col_character()
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x57b78f332e80> 
+#>   ..- attr(*, "problems")=<pointer: 0x5f6693edde50> 
 #>  $ Visit.csv : spc_tbl_ [237 × 2] (S3: spec_tbl_df/tbl_df/tbl/data.frame)
 #>   ..$ subject_id      : chr [1:237] "SUBJ-0001" "SUBJ-0002" "SUBJ-0003" "SUBJ-0004" ...
 #>   ..$ first_visit_date: Date[1:237], format: "2021-05-15" "2021-10-05" ...
@@ -160,7 +160,7 @@ compare_dfs |> str()
 #>   .. ..   subject_id = col_character(),
 #>   .. ..   first_visit_date = col_date(format = "")
 #>   .. .. )
-#>   ..- attr(*, "problems")=<pointer: 0x57b78c57fce0>
+#>   ..- attr(*, "problems")=<pointer: 0x5f6690916c80>
 ```
 
 ## Iteration
