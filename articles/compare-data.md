@@ -132,84 +132,28 @@ for its column-intersection reactive, and it uses the `%nin%` helper to
 drop `join_column`, `data_source`, and `join_source` from the list of
 compared columns. Its download handler calls
 [`create_comparison_report()`](https://mjfrigaard.github.io/dfdiffs/reference/create_comparison_report.md)
-directly, so the module has no report-building logic of its own:
+directly, so the module has no report-building logic of its own.
+`max_depth = 1` keeps only these direct calls, since the tree for each
+comparison function is shown above:
 
 ``` r
 
-stackcallr::call_tree_dir("R", root = "mod_compare_server")
+stackcallr::call_tree_dir("../R", root = "mod_compare_server", max_depth = 1)
 ```
 
     █─mod_compare_server
     ├─compare_columns
     ├─%nin%
     ├─info_react_theme
-    ├─█─create_new_data
-    │ ├─anti_join_base
-    │ ├─select_cols
-    │ ├─rename_join_col
-    │ └─create_new_column
+    ├─create_new_data
     ├─new_react_theme
-    ├─█─create_deleted_data
-    │ ├─anti_join_base
-    │ ├─select_cols
-    │ ├─rename_join_col
-    │ └─create_new_column
+    ├─create_deleted_data
     ├─deleted_react_theme
-    ├─█─create_modified_data
-    │ ├─select_cols
-    │ ├─█─diff_values_by_key
-    │ │ ├─compare_values
-    │ │ └─class_diffs
-    │ ├─rename_join_col
-    │ ├─create_new_column
-    │ └─class_diffs
+    ├─create_modified_data
     ├─select_cols
     ├─changed_react_theme
     ├─left_join_base
-    └─█─create_comparison_report
-      ├─█─create_new_data
-      │ ├─anti_join_base
-      │ ├─select_cols
-      │ ├─rename_join_col
-      │ └─create_new_column
-      ├─█─create_deleted_data
-      │ ├─anti_join_base
-      │ ├─select_cols
-      │ ├─rename_join_col
-      │ └─create_new_column
-      ├─█─create_modified_data
-      │ ├─select_cols
-      │ ├─█─diff_values_by_key
-      │ │ ├─compare_values
-      │ │ └─class_diffs
-      │ ├─rename_join_col
-      │ ├─create_new_column
-      │ └─class_diffs
-      ├─create_empty_tbl
-      ├─compare_columns
-      ├─class_diffs
-      └─█─compare_summary
-        └─█─compare_data
-          ├─█─create_new_data
-          │ ├─anti_join_base
-          │ ├─select_cols
-          │ ├─rename_join_col
-          │ └─create_new_column
-          ├─█─create_deleted_data
-          │ ├─anti_join_base
-          │ ├─select_cols
-          │ ├─rename_join_col
-          │ └─create_new_column
-          ├─█─create_changed_data
-          │ ├─select_cols
-          │ ├─█─diff_values_by_key
-          │ │ ├─compare_values
-          │ │ └─class_diffs
-          │ ├─rename_join_col
-          │ ├─create_new_column
-          │ └─class_diffs
-          ├─class_diffs
-          └─compare_columns
+    └─create_comparison_report
 
 ### `$new_data`
 

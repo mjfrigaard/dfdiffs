@@ -81,7 +81,6 @@ The trees were generated from the package source with
 library(stackcallr)
 call_tree_dir("R", root = "mod_upload_server")
 call_tree_dir("R", root = "mod_select_server")
-call_tree_dir("R", root = "mod_compare_server")
 ```
 
     █─mod_upload_server
@@ -97,6 +96,15 @@ call_tree_dir("R", root = "mod_compare_server")
     ├─info_react_theme
     └─█─create_join_column
       └─select_cols
+
+The full tree for
+[`mod_compare_server()`](https://mjfrigaard.github.io/dfdiffs/reference/mod_compare_server.md)
+is long, so `max_depth = 2` stops it two levels below the module:
+
+``` r
+
+stackcallr::call_tree_dir("../R", root = "mod_compare_server", max_depth = 2)
+```
 
     █─mod_compare_server
     ├─compare_columns
@@ -116,9 +124,7 @@ call_tree_dir("R", root = "mod_compare_server")
     ├─deleted_react_theme
     ├─█─create_modified_data
     │ ├─select_cols
-    │ ├─█─diff_values_by_key
-    │ │ ├─compare_values
-    │ │ └─class_diffs
+    │ ├─diff_values_by_key
     │ ├─rename_join_col
     │ ├─create_new_column
     │ └─class_diffs
@@ -126,49 +132,13 @@ call_tree_dir("R", root = "mod_compare_server")
     ├─changed_react_theme
     ├─left_join_base
     └─█─create_comparison_report
-      ├─█─create_new_data
-      │ ├─anti_join_base
-      │ ├─select_cols
-      │ ├─rename_join_col
-      │ └─create_new_column
-      ├─█─create_deleted_data
-      │ ├─anti_join_base
-      │ ├─select_cols
-      │ ├─rename_join_col
-      │ └─create_new_column
-      ├─█─create_modified_data
-      │ ├─select_cols
-      │ ├─█─diff_values_by_key
-      │ │ ├─compare_values
-      │ │ └─class_diffs
-      │ ├─rename_join_col
-      │ ├─create_new_column
-      │ └─class_diffs
+      ├─create_new_data
+      ├─create_deleted_data
+      ├─create_modified_data
       ├─create_empty_tbl
       ├─compare_columns
       ├─class_diffs
-      └─█─compare_summary
-        └─█─compare_data
-          ├─█─create_new_data
-          │ ├─anti_join_base
-          │ ├─select_cols
-          │ ├─rename_join_col
-          │ └─create_new_column
-          ├─█─create_deleted_data
-          │ ├─anti_join_base
-          │ ├─select_cols
-          │ ├─rename_join_col
-          │ └─create_new_column
-          ├─█─create_changed_data
-          │ ├─select_cols
-          │ ├─█─diff_values_by_key
-          │ │ ├─compare_values
-          │ │ └─class_diffs
-          │ ├─rename_join_col
-          │ ├─create_new_column
-          │ └─class_diffs
-          ├─class_diffs
-          └─compare_columns
+      └─compare_summary
 
 The download-handler tests for
 [`mod_compare_server()`](https://mjfrigaard.github.io/dfdiffs/reference/mod_compare_server.md)

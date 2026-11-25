@@ -208,57 +208,24 @@ supplies the Summary sheet.
 I generated the call tree below from the package source with
 [stackcallr](https://github.com/mjfrigaard/stackcallr)
 (`pak::pak("mjfrigaard/stackcallr")`), and it only shows functions
-defined in `dfdiffs`.
+defined in `dfdiffs`. `max_depth = 1` keeps only the functions
+[`create_comparison_report()`](https://mjfrigaard.github.io/dfdiffs/reference/create_comparison_report.md)
+calls directly. The trees for the comparison functions are in their own
+vignettes.
 
 ``` r
 
-stackcallr::call_tree_dir("R", root = "create_comparison_report")
+stackcallr::call_tree_dir("../R", root = "create_comparison_report", max_depth = 1)
 ```
 
     █─create_comparison_report
-    ├─█─create_new_data
-    │ ├─anti_join_base
-    │ ├─select_cols
-    │ ├─rename_join_col
-    │ └─create_new_column
-    ├─█─create_deleted_data
-    │ ├─anti_join_base
-    │ ├─select_cols
-    │ ├─rename_join_col
-    │ └─create_new_column
-    ├─█─create_modified_data
-    │ ├─select_cols
-    │ ├─█─diff_values_by_key
-    │ │ ├─compare_values
-    │ │ └─class_diffs
-    │ ├─rename_join_col
-    │ ├─create_new_column
-    │ └─class_diffs
+    ├─create_new_data
+    ├─create_deleted_data
+    ├─create_modified_data
     ├─create_empty_tbl
     ├─compare_columns
     ├─class_diffs
-    └─█─compare_summary
-      └─█─compare_data
-        ├─█─create_new_data
-        │ ├─anti_join_base
-        │ ├─select_cols
-        │ ├─rename_join_col
-        │ └─create_new_column
-        ├─█─create_deleted_data
-        │ ├─anti_join_base
-        │ ├─select_cols
-        │ ├─rename_join_col
-        │ └─create_new_column
-        ├─█─create_changed_data
-        │ ├─select_cols
-        │ ├─█─diff_values_by_key
-        │ │ ├─compare_values
-        │ │ └─class_diffs
-        │ ├─rename_join_col
-        │ ├─create_new_column
-        │ └─class_diffs
-        ├─class_diffs
-        └─compare_columns
+    └─compare_summary
 
 ### Running `create_comparison_report()`
 

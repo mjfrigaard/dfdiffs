@@ -118,14 +118,33 @@ compare), and each module has a UI function and a server function.
 [`app_ui()`](https://mjfrigaard.github.io/dfdiffs/reference/app_ui.md)
 and
 [`app_server()`](https://mjfrigaard.github.io/dfdiffs/reference/app_server.md)
-assemble the modules, and
-[`dfdiffs_fresh_theme()`](https://mjfrigaard.github.io/dfdiffs/reference/dfdiffs_fresh_theme.md)
-supplies the app’s theme. The code below generates the full call tree
-for the app:
+assemble the modules. Setting `modules_only = TRUE` shows only this
+structure:
 
 ``` r
 
-call_tree_dir("R", root = "launch_app")
+stackcallr::call_tree_dir("../R", root = "launch_app", modules_only = TRUE)
+```
+
+    █─launch_app
+    ├─█─app_ui
+    │ ├─mod_upload_ui
+    │ ├─mod_select_ui
+    │ └─mod_compare_ui
+    └─█─app_server
+      ├─mod_upload_server
+      ├─mod_select_server
+      └─mod_compare_server
+
+The fuller tree below adds the helpers each module calls.
+[`dfdiffs_fresh_theme()`](https://mjfrigaard.github.io/dfdiffs/reference/dfdiffs_fresh_theme.md)
+supplies the app’s theme. `max_depth = 3` stops the tree at the
+functions each module server calls directly, and the trees for those
+functions appear above and in their own vignettes:
+
+``` r
+
+stackcallr::call_tree_dir("../R", root = "launch_app", max_depth = 3)
 ```
 
     █─launch_app
@@ -136,8 +155,7 @@ call_tree_dir("R", root = "launch_app")
     │ └─mod_compare_ui
     └─█─app_server
       ├─█─mod_upload_server
-      │ ├─█─upload_data
-      │ │ └─load_flat_file
+      │ ├─upload_data
       │ ├─base_react_theme
       │ └─comp_react_theme
       ├─█─mod_select_server
@@ -145,79 +163,20 @@ call_tree_dir("R", root = "launch_app")
       │ ├─base_react_theme
       │ ├─comp_react_theme
       │ ├─info_react_theme
-      │ └─█─create_join_column
-      │   └─select_cols
+      │ └─create_join_column
       └─█─mod_compare_server
         ├─compare_columns
         ├─%nin%
         ├─info_react_theme
-        ├─█─create_new_data
-        │ ├─anti_join_base
-        │ ├─select_cols
-        │ ├─rename_join_col
-        │ └─create_new_column
+        ├─create_new_data
         ├─new_react_theme
-        ├─█─create_deleted_data
-        │ ├─anti_join_base
-        │ ├─select_cols
-        │ ├─rename_join_col
-        │ └─create_new_column
+        ├─create_deleted_data
         ├─deleted_react_theme
-        ├─█─create_modified_data
-        │ ├─select_cols
-        │ ├─█─diff_values_by_key
-        │ │ ├─compare_values
-        │ │ └─class_diffs
-        │ ├─rename_join_col
-        │ ├─create_new_column
-        │ └─class_diffs
+        ├─create_modified_data
         ├─select_cols
         ├─changed_react_theme
         ├─left_join_base
-        └─█─create_comparison_report
-          ├─█─create_new_data
-          │ ├─anti_join_base
-          │ ├─select_cols
-          │ ├─rename_join_col
-          │ └─create_new_column
-          ├─█─create_deleted_data
-          │ ├─anti_join_base
-          │ ├─select_cols
-          │ ├─rename_join_col
-          │ └─create_new_column
-          ├─█─create_modified_data
-          │ ├─select_cols
-          │ ├─█─diff_values_by_key
-          │ │ ├─compare_values
-          │ │ └─class_diffs
-          │ ├─rename_join_col
-          │ ├─create_new_column
-          │ └─class_diffs
-          ├─create_empty_tbl
-          ├─compare_columns
-          ├─class_diffs
-          └─█─compare_summary
-            └─█─compare_data
-              ├─█─create_new_data
-              │ ├─anti_join_base
-              │ ├─select_cols
-              │ ├─rename_join_col
-              │ └─create_new_column
-              ├─█─create_deleted_data
-              │ ├─anti_join_base
-              │ ├─select_cols
-              │ ├─rename_join_col
-              │ └─create_new_column
-              ├─█─create_changed_data
-              │ ├─select_cols
-              │ ├─█─diff_values_by_key
-              │ │ ├─compare_values
-              │ │ └─class_diffs
-              │ ├─rename_join_col
-              │ ├─create_new_column
-              │ └─class_diffs
-              ├─class_diffs
-              └─compare_columns
+        └─create_comparison_report
 
 ### *What rows are here now that weren’t here before?*
 
