@@ -72,7 +72,6 @@ The trees were generated from the package source with [stackcallr](https://githu
 library(stackcallr)
 call_tree_dir("R", root = "mod_upload_server")
 call_tree_dir("R", root = "mod_select_server")
-call_tree_dir("R", root = "mod_compare_server")
 ```
 
 ```
@@ -93,78 +92,14 @@ call_tree_dir("R", root = "mod_compare_server")
   └─select_cols
 ```
 
-```
-█─mod_compare_server
-├─compare_columns
-├─%nin%
-├─info_react_theme
-├─█─create_new_data
-│ ├─anti_join_base
-│ ├─select_cols
-│ ├─rename_join_col
-│ └─create_new_column
-├─new_react_theme
-├─█─create_deleted_data
-│ ├─anti_join_base
-│ ├─select_cols
-│ ├─rename_join_col
-│ └─create_new_column
-├─deleted_react_theme
-├─█─create_modified_data
-│ ├─select_cols
-│ ├─█─diff_values_by_key
-│ │ ├─compare_values
-│ │ └─class_diffs
-│ ├─rename_join_col
-│ ├─create_new_column
-│ └─class_diffs
-├─select_cols
-├─changed_react_theme
-├─left_join_base
-└─█─create_comparison_report
-  ├─█─create_new_data
-  │ ├─anti_join_base
-  │ ├─select_cols
-  │ ├─rename_join_col
-  │ └─create_new_column
-  ├─█─create_deleted_data
-  │ ├─anti_join_base
-  │ ├─select_cols
-  │ ├─rename_join_col
-  │ └─create_new_column
-  ├─█─create_modified_data
-  │ ├─select_cols
-  │ ├─█─diff_values_by_key
-  │ │ ├─compare_values
-  │ │ └─class_diffs
-  │ ├─rename_join_col
-  │ ├─create_new_column
-  │ └─class_diffs
-  ├─create_empty_tbl
-  ├─compare_columns
-  ├─class_diffs
-  └─█─compare_summary
-    └─█─compare_data
-      ├─█─create_new_data
-      │ ├─anti_join_base
-      │ ├─select_cols
-      │ ├─rename_join_col
-      │ └─create_new_column
-      ├─█─create_deleted_data
-      │ ├─anti_join_base
-      │ ├─select_cols
-      │ ├─rename_join_col
-      │ └─create_new_column
-      ├─█─create_changed_data
-      │ ├─select_cols
-      │ ├─█─diff_values_by_key
-      │ │ ├─compare_values
-      │ │ └─class_diffs
-      │ ├─rename_join_col
-      │ ├─create_new_column
-      │ └─class_diffs
-      ├─class_diffs
-      └─compare_columns
+The full tree for `mod_compare_server()` is long, so `max_depth = 2` stops it two levels below the module:
+
+```{r}
+#| label: call-tree-tests-mod_compare_server
+#| eval: !expr requireNamespace("stackcallr", quietly = TRUE)
+#| collapse: false
+#| comment: ""
+stackcallr::call_tree_dir("../R", root = "mod_compare_server", max_depth = 2)
 ```
 
 The download-handler tests for `mod_compare_server()` also exercise `create_comparison_report()` (shown as a subtree above), because the module calls it instead of building the report itself.
